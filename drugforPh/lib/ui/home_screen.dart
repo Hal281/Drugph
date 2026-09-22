@@ -25,6 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   DrugCategory? _selectedCategory;
   Drug? _selectedDrugForDesktop; // Track selected drug for desktop view
+  final ScrollController _categoryScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _categoryScrollController.dispose();
+    super.dispose();
+  }
 
   bool get isThai => widget.currentLocale.languageCode == 'th';
 
@@ -352,22 +359,36 @@ class _HomeScreenState extends State<HomeScreen> {
           // Category Filter Cards
           SizedBox(
             height: 95,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              itemCount: categories.length + 1,
-              itemBuilder: (context, index) {
-                final isAll = index == 0;
-                final cat = isAll ? null : categories[index - 1];
-                final isSelected = _selectedCategory == cat;
-                
-                // Need to cast to MaterialColor to use .shade400, if not possible we use withOpacity
-                final baseColor = isAll ? Colors.teal : _getCategoryColor(cat!);
-                final Color startColor = baseColor is MaterialColor ? baseColor.shade400 : baseColor;
-                final Color endColor = baseColor is MaterialColor ? baseColor.shade600 : baseColor;
-                
-                final icon = isAll ? Icons.apps : _getCategoryIcon(cat!);
-                final label = isAll ? (isThai ? 'ทั้งหมด' : 'All') : (isThai ? cat!.nameTh : cat!.nameEn);
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.chevron_left, color: Colors.teal.shade700, size: 32),
+                  onPressed: () {
+                    _categoryScrollController.animateTo(
+                      _categoryScrollController.offset - 250,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    controller: _categoryScrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    itemCount: categories.length + 1,
+                    itemBuilder: (context, index) {
+                      final isAll = index == 0;
+                      final cat = isAll ? null : categories[index - 1];
+                      final isSelected = _selectedCategory == cat;
+                      
+                      // Need to cast to MaterialColor to use .shade400, if not possible we use withOpacity
+                      final baseColor = isAll ? Colors.teal : _getCategoryColor(cat!);
+                      final Color startColor = baseColor is MaterialColor ? baseColor.shade400 : baseColor;
+                      final Color endColor = baseColor is MaterialColor ? baseColor.shade600 : baseColor;
+                      
+                      final icon = isAll ? Icons.apps : _getCategoryIcon(cat!);
+                      final label = isAll ? (isThai ? 'ทั้งหมด' : 'All') : (isThai ? cat!.nameTh : cat!.nameEn);
 
                 return GestureDetector(
                   onTap: () => setState(() => _selectedCategory = cat),
@@ -420,8 +441,21 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.chevron_right, color: Colors.teal.shade700, size: 32),
+            onPressed: () {
+              _categoryScrollController.animateTo(
+                _categoryScrollController.offset + 250,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            },
+          ),
+        ],
+      ),
+    ),
 
-          // Drug List
+    // Drug List
           Expanded(
             child: displayDrugs.isEmpty
                 ? Center(

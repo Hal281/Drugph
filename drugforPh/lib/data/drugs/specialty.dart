@@ -161,6 +161,76 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
+  Drug(
+    id: 'apixaban',
+    genericName: 'Apixaban',
+    brandNames: ['Eliquis'],
+    nameTh: 'อะพิกซาแบน (ยาละลายลิ่มเลือด)',
+    category: DrugCategory.cardiovascular,
+    requiresRenalAdjustment: true,
+    isHighAlert: true,
+    severeInteractions: [
+      'Strong CYP3A4 inhibitors (Ketoconazole, Itraconazole, Ritonavir)',
+      'Strong CYP3A4 inducers (Rifampin, Phenytoin)',
+      'NSAIDs (Bleeding risk)'
+    ],
+    contraindications: ['Active pathological bleeding', 'Severe hepatic impairment (Child-Pugh C)'],
+    specialNotes: 'Dose reduction to 2.5 mg BID required if 2 of 3 criteria met: Age >= 80, Weight <= 60 kg, or SCr >= 1.5 mg/dL.',
+    specialNotesTh: 'ยารักษาลิ่มเลือดอุดตัน (DOAC) ต้องลดโดสเหลือ 2.5 mg BID หากเข้าเกณฑ์ 2 ใน 3 ข้อนี้: (1) อายุ 80 ขึ้นไป (2) น้ำหนักตัว 60 กก. ลงมา (3) SCr >= 1.5',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'AFib (Stroke Prophylaxis)',
+        dosingType: DosingType.fixed,
+        fixedDose: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: 'q12h (BID)',
+        limits: DoseLimit(maxDailyDose: 10.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 999, adjustmentFactor: 0.5, notes: '2.5 mg BID if 2 criteria met (Age >=80, Wt <=60kg, SCr >=1.5)'),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'DVT/PE Treatment',
+        dosingType: DosingType.fixed,
+        fixedDose: 10.0,
+        doseUnit: DoseUnit.mg,
+        frequency: 'BID for 7 days, then 5 mg BID',
+        limits: DoseLimit(maxDailyDose: 20.0),
+      ),
+    ],
+  ),
+  Drug(
+    id: 'rivaroxaban',
+    genericName: 'Rivaroxaban',
+    brandNames: ['Xarelto'],
+    nameTh: 'ริวาร็อกซาแบน (ยาละลายลิ่มเลือด)',
+    category: DrugCategory.cardiovascular,
+    requiresRenalAdjustment: true,
+    isHighAlert: true,
+    severeInteractions: [
+      'Strong CYP3A4 inhibitors & P-gp inhibitors',
+      'NSAIDs (Bleeding risk)'
+    ],
+    specialNotes: 'For doses >= 15 mg, must be taken WITH FOOD to ensure adequate absorption. Avoid if CrCl < 15.',
+    specialNotesTh: 'ถ้ารับประทานขนาด 15 mg หรือ 20 mg ต้องกิน "พร้อมอาหาร" เท่านั้นเพื่อการดูดซึมยา หลีกเลี่ยงถ้าไตวาย (CrCl < 15)',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'AFib (Stroke Prophylaxis)',
+        dosingType: DosingType.fixed,
+        fixedDose: 20.0,
+        doseUnit: DoseUnit.mg,
+        frequency: 'q24h (OD)',
+        limits: DoseLimit(maxDailyDose: 20.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 15, crclMax: 50, adjustmentFactor: 0.75, notes: 'Reduce to 15 mg OD'),
+          RenalAdjustment(crclMin: 0, crclMax: 14, adjustmentFactor: 1.0, notes: 'Avoid use (Not recommended)'),
+        ],
+      ),
+    ],
+  ),
 ];
 
 /// Vitamins, Supplements, and Electrolyte Replacements.

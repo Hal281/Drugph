@@ -194,5 +194,46 @@ final List<Drug> neurology = [
       ),
     ],
   ),
+  Drug(
+    id: 'valproic_acid',
+    genericName: 'Valproic Acid / Sodium Valproate',
+    brandNames: ['Depakine'],
+    nameTh: 'วาลโปรอิก แอซิด (เดพาคีน)',
+    category: DrugCategory.neurological,
+    requiresHepaticCaution: true,
+    isHighAlert: true,
+    requiresTDM: true,
+    pregnancyCategory: 'D/X',
+    severeInteractions: [
+      'Carbapenem antibiotics (Meropenem reduces Valproic acid level by >50% - AVOID)',
+      'Phenytoin (Displaces protein binding)'
+    ],
+    contraindications: ['Hepatic disease or significant hepatic dysfunction', 'Urea cycle disorders'],
+    specialNotes: 'Target level: 50-100 mcg/mL. Extremely hepatotoxic. NEVER use with Meropenem.',
+    specialNotesTh: 'ห้ามจ่ายคู่กับ Meropenem เด็ดขาด (ระดับยากันชักจะตกฮวบ) ระวังตับวาย Target TDM: 50-100',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Seizures / Mania / Migraine Prophylaxis',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 15.0, // Initial 10-15 mg/kg/day
+        doseUnit: DoseUnit.mg,
+        frequency: 'divided BID to TID',
+        limits: DoseLimit(
+          maxDosePerKgPerDay: 60.0,
+        ),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Status Epilepticus',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 20.0, // 20-40 mg/kg
+        doseUnit: DoseUnit.mg,
+        frequency: 'Stat',
+        maxInfusionRateMgPerMin: 150.0, // usually up to 3-6 mg/kg/min
+        limits: DoseLimit(maxSingleDose: 3000.0),
+      ),
+    ],
+  ),
 ];
 
