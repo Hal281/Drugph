@@ -718,4 +718,108 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
+  Drug(
+    id: 'rifampin',
+    genericName: 'Rifampin (Rifampicin)',
+    brandNames: ['Rifadin', 'Rimactane'],
+    nameTh: 'ไรแฟมพิน (ยารักษาวัณโรค)',
+    category: DrugCategory.antibiotic,
+    requiresHepaticCaution: true,
+    isHighAlert: true,
+    severeInteractions: [
+      'Apixaban / Rivaroxaban (Decreases DOAC levels - Avoid)',
+      'Warfarin (Decreases INR significantly)',
+      'Oral Contraceptives (Decreases effectiveness)',
+      'Fluconazole / Itraconazole'
+    ],
+    specialNotes: 'Strong CYP450 inducer (causes many drug interactions). Causes red-orange discoloration of urine and tears. Take on an empty stomach.',
+    specialNotesTh: 'บอสใหญ่ยาตีกัน (รบกวนเอนไซม์ตับ) ห้ามใช้คู่กับ DOACs หรือต้องปรับยาอื่น ปัสสาวะและน้ำตาจะเปลี่ยนเป็นสีส้มแดง',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Tuberculosis Treatment',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 10.0,
+        doseUnit: DoseUnit.mg,
+        frequency: 'q24h (OD)',
+        limits: DoseLimit(maxSingleDose: 600.0, maxDailyDose: 600.0), // Max 600 mg/day
+      ),
+    ],
+  ),
+  Drug(
+    id: 'isoniazid',
+    genericName: 'Isoniazid (INH)',
+    brandNames: ['Isoniazid'],
+    nameTh: 'ไอโซไนอาซิด (ยารักษาวัณโรค)',
+    category: DrugCategory.antibiotic,
+    requiresHepaticCaution: true,
+    severeInteractions: ['Phenytoin / Carbamazepine (Increases toxicity)', 'Alcohol (Severe hepatotoxicity)'],
+    contraindications: ['Active liver disease', 'Severe adverse reaction to INH previously'],
+    specialNotes: 'High risk of hepatotoxicity and peripheral neuropathy. MUST supplement with Vitamin B6 (Pyridoxine).',
+    specialNotesTh: 'ระวังตับอักเสบรุนแรง และชาปลายมือปลายเท้า **ต้องจ่ายคู่กับ Vitamin B6 เสมอ**',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Tuberculosis Treatment',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: 'q24h (OD)',
+        limits: DoseLimit(maxDailyDose: 300.0), // Max 300 mg/day
+      ),
+    ],
+  ),
+  Drug(
+    id: 'pyrazinamide',
+    genericName: 'Pyrazinamide (PZA)',
+    brandNames: ['Pyrazinamide'],
+    nameTh: 'ไพราซินาไมด์ (ยารักษาวัณโรค)',
+    category: DrugCategory.antibiotic,
+    requiresHepaticCaution: true,
+    requiresRenalAdjustment: true,
+    severeInteractions: ['Rifampin (Increases hepatotoxicity risk)'],
+    contraindications: ['Severe hepatic damage', 'Acute gout'],
+    specialNotes: 'Causes hyperuricemia (high uric acid) and joint pain. Extremely hepatotoxic.',
+    specialNotesTh: 'ทำให้กรดยูริกสูง ปวดข้อรุนแรง และมีพิษต่อตับมากที่สุดในกลุ่มยาวัณโรค',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Tuberculosis Treatment',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 25.0, // 20-30 mg/kg
+        doseUnit: DoseUnit.mg,
+        frequency: 'q24h (OD)',
+        limits: DoseLimit(maxDailyDose: 2000.0), // Typically capped at ~2g
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '25-35 mg/kg 3 times/week'),
+        ],
+      ),
+    ],
+  ),
+  Drug(
+    id: 'ethambutol',
+    genericName: 'Ethambutol (EMB)',
+    brandNames: ['Myambutol'],
+    nameTh: 'อีแทมบูทอล (ยารักษาวัณโรค)',
+    category: DrugCategory.antibiotic,
+    requiresRenalAdjustment: true,
+    severeInteractions: ['Antacids (Decreases absorption)'],
+    contraindications: ['Optic neuritis', 'Patients unable to report visual changes (e.g., young children)'],
+    specialNotes: 'High risk of optic neuritis (decreased visual acuity, red-green color blindness). Requires renal dose adjustment.',
+    specialNotesTh: 'ผลข้างเคียงสำคัญคือ **ตาบอดสี (ตาบอดสีแดง-เขียว)** หรือมองไม่ชัด ต้องตรวจตาก่อนและระหว่างใช้ยา ต้องปรับโดสในคนไข้ไตวาย',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Tuberculosis Treatment',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 15.0, // 15-20 mg/kg
+        doseUnit: DoseUnit.mg,
+        frequency: 'q24h (OD)',
+        limits: DoseLimit(maxDailyDose: 1600.0), // Max usually around 1.6g
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '15-25 mg/kg 3 times/week'),
+        ],
+      ),
+    ],
+  ),
 ];
