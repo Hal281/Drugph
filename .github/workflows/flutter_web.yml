@@ -1,4 +1,4 @@
-name: Flutter Web Deploy
+﻿name: Flutter Web Deploy
 
 on:
   push:
@@ -8,6 +8,12 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    
+    # We must specify the working directory because your Flutter app
+    # is inside a subfolder called "drugforPh" on GitHub!
+    defaults:
+      run:
+        working-directory: ./drugforPh
 
     steps:
       - name: Checkout repository
@@ -28,4 +34,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+          publish_dir: ./drugforPh/build/web
