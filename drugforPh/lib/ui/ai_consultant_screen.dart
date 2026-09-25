@@ -10,7 +10,6 @@ class AiConsultantScreen extends StatefulWidget {
 }
 
 class _AiConsultantScreenState extends State<AiConsultantScreen> {
-  final TextEditingController _apiKeyCtrl = TextEditingController();
   final TextEditingController _msgCtrl = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   
@@ -19,12 +18,25 @@ class _AiConsultantScreenState extends State<AiConsultantScreen> {
   
   List<Map<String, dynamic>> _messages = [];
   bool _isLoading = false;
+  
+  static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
+
+  @override
+  void initState() {
+    super.initState();
+    _initModel();
+  }
 
   void _initModel() {
-    if (_apiKeyCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.isThai ? 'กรุณาใส่ API Key' : 'Please enter API Key')),
-      );
+    if (_apiKey.isEmpty) {
+      setState(() {
+        _messages.add({
+          'isBot': true,
+          'text': widget.isThai 
+            ? 'ข้อผิดพลาด: ไม่พบ API Key กรุณาตั้งค่า GEMINI_API_KEY ใน GitHub Secrets และ Build ใหม่' 
+            : 'Error: API Key not found. Please configure GEMINI_API_KEY in GitHub Secrets and rebuild.'
+        });
+      });
       return;
     }
 
@@ -41,9 +53,9 @@ Strict Rules:
 
     _model = GenerativeModel(
       model: 'gemini-2.5-flash',
-      apiKey: _apiKeyCtrl.text.trim(),
+      apiKey: _apiKey,
       systemInstruction: systemInstruction,
-      generationConfig: GenerationConfig(temperature: 0.2), // Low temp for clinical accuracy
+      generationConfig: GenerationConfig(temperature: 0.2),
     );
     
     _chat = _model!.startChat();
@@ -56,8 +68,6 @@ Strict Rules:
           : 'Hello! I am your Clinical Pharmacist AI Assistant. How can I help you with drug information today?'
       });
     });
-    
-    FocusScope.of(context).unfocus();
   }
 
   Future<void> _sendMessage() async {
@@ -109,65 +119,13 @@ Strict Rules:
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      body: _chat == null ? _buildSetupScreen() : _buildChatScreen(),
-    );
-  }
-
-  Widget _buildSetupScreen() {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.smart_toy, size: 80, color: Colors.indigo),
-          const SizedBox(height: 16),
-          Text(
-            widget.isThai 
-              ? 'ระบบ AI ใช้ Gemini API โปรดนำ API Key ฟรีมาใส่เพื่อเริ่มต้นใช้งาน'
-              : 'AI System uses Gemini API. Please enter a free API Key to start.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: _apiKeyCtrl,
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Gemini API Key',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.key),
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            ),
-            onPressed: _initModel,
-            child: Text(widget.isThai ? 'เริ่มใช้งาน AI' : 'Start AI Session'),
-          ),
-        ],
-      ),
+      body: _buildChatScreen(),
     );
   }
 
   Widget _buildChatScreen() {
     return Column(
       children: [
-        Container(
-          color: Colors.yellow.shade100,
-          padding: const EdgeInsets.all(8),
-          width: double.infinity,
-          child: Text(
-            widget.isThai
-                ? '⚠️ คำเตือน: ข้อมูลจาก AI ใช้สำหรับการอ้างอิงเบื้องต้นเท่านั้น ห้ามใช้ AI คำนวณขนาดยาเด็ดขาด'
-                : '⚠️ WARNING: AI information is for reference only. Do NOT use AI for dosage calculation.',
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12),
-            textAlign: TextAlign.center,
-          ),
-        ),
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
@@ -175,20 +133,31 @@ Strict Rules:
             itemCount: _messages.length,
             itemBuilder: (context, index) {
               final msg = _messages[index];
-              final isBot = msg['isBot'];
+              final isBot = msg['isBot'] as bool;
               return Align(
                 alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isBot ? Colors.grey.shade200 : Colors.indigo.shade100,
-                    borderRadius: BorderRadius.circular(16),
+                  padding: const EdgeInsets.all(12),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 0.75,
                   ),
-                  constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                  decoration: BoxDecoration(
+                    color: isBot ? Colors.white : Colors.indigo.shade100,
+                    borderRadius: BorderRadius.circular(16).copyWith(
+                      bottomLeft: isBot ? const Radius.circular(0) : const Radius.circular(16),
+                      bottomRight: isBot ? const Radius.circular(16) : const Radius.circular(0),
+                    ),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))
+                    ]
+                  ),
                   child: Text(
-                    msg['text'],
-                    style: const TextStyle(fontSize: 15),
+                    msg['text'] as String,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isBot ? Colors.black87 : Colors.indigo.shade900,
+                    ),
                   ),
                 ),
               );
@@ -201,17 +170,22 @@ Strict Rules:
             child: CircularProgressIndicator(),
           ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          color: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -2))
+            ]
+          ),
           child: Row(
             children: [
               Expanded(
                 child: TextField(
                   controller: _msgCtrl,
                   decoration: InputDecoration(
-                    hintText: widget.isThai ? 'ถามเรื่องยา...' : 'Ask about drugs...',
+                    hintText: widget.isThai ? 'ถามคำถามเรื่องยา...' : 'Ask about medications...',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                   onSubmitted: (_) => _sendMessage(),
                 ),
@@ -220,7 +194,7 @@ Strict Rules:
               CircleAvatar(
                 backgroundColor: Colors.indigo,
                 child: IconButton(
-                  icon: const Icon(Icons.send, color: Colors.white),
+                  icon: const Icon(Icons.send, color: Colors.white, size: 20),
                   onPressed: _sendMessage,
                 ),
               )
