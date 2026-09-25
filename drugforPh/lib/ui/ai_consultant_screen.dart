@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_generative_ai/flutter.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class AiConsultantScreen extends StatefulWidget {
@@ -83,7 +82,7 @@ Strict Rules:
       _scrollToBottom();
     } catch (e) {
       setState(() {
-        _messages.add({'isBot': true, 'text': 'Error: \${e.toString()}'});
+        _messages.add({'isBot': true, 'text': 'Error: ${e.toString()}'});
         _isLoading = false;
       });
       _scrollToBottom();
