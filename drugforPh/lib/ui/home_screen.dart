@@ -6,6 +6,7 @@ import 'history_screen.dart';
 import 'widgets/patient_banner.dart';
 import '../data/prescription_cart.dart';
 import 'prescription_cart_screen.dart';
+import 'ai_consultant_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Locale currentLocale;
@@ -277,6 +278,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                 ],
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.smart_toy),
+            tooltip: isThai ? 'AI ผู้ช่วย' : 'AI Assistant',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AiConsultantScreen(isThai: isThai),
+                ),
               );
             },
           ),
