@@ -99,6 +99,28 @@ class PatientBanner extends StatelessWidget {
                                 color: Colors.white70,
                               ),
                             ),
+                          if (hasPatient && patient.allergies.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.warning_amber, color: Colors.redAccent, size: 14),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      'แพ้ยา: ${patient.allergies.join(", ")}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.redAccent,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                     ),

@@ -25,6 +25,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
   late TextEditingController _heightCtrl;
   late TextEditingController _ageCtrl;
   late TextEditingController _scrCtrl;
+  late TextEditingController _allergiesCtrl;
   bool _isScrStable = true;
 
   @override
@@ -39,6 +40,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     _scrCtrl = TextEditingController(
       text: p?.serumCreatinineMgDl?.toString() ?? '',
     );
+    _allergiesCtrl = TextEditingController(text: p?.allergies.join(', ') ?? '');
     _isScrStable = p?.isScrStable ?? true;
   }
 
@@ -50,6 +52,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     _heightCtrl.dispose();
     _ageCtrl.dispose();
     _scrCtrl.dispose();
+    _allergiesCtrl.dispose();
     super.dispose();
   }
 
@@ -73,6 +76,12 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       // In a real app we'd add sex selector. Let's add a default for now.
     }
 
+    final allergies = _allergiesCtrl.text
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
     final newPatient = Patient(
       id:
           widget.initialPatient?.id ??
@@ -87,6 +96,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       creatinineClearanceMlMin: crcl,
       isScrStable: _isScrStable,
       activeDrugIds: widget.initialPatient?.activeDrugIds ?? const [],
+      allergies: allergies,
     );
 
     PatientSession.instance.savePatient(newPatient, setAsCurrent: true);
@@ -133,6 +143,15 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelText: 'Serum Creatinine (mg/dL)',
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _allergiesCtrl,
+              decoration: InputDecoration(
+                labelText: widget.isThai ? 'ประวัติแพ้ยา (คั่นด้วยลูกน้ำ ,)' : 'Allergies (comma separated)',
+                hintText: 'ex: Penicillin, Sulfa',
+                prefixIcon: const Icon(Icons.warning_amber, color: Colors.red),
               ),
             ),
             const SizedBox(height: 8),

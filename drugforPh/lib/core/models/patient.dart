@@ -50,6 +50,9 @@ class Patient {
   /// List of drug IDs the patient is currently taking (for the dashboard).
   final List<String> activeDrugIds;
 
+  /// List of drug names or classes the patient is allergic to.
+  final List<String> allergies;
+
   /// Optional patient name for display.
   final String? patientName;
 
@@ -73,6 +76,7 @@ class Patient {
     this.eGfrMlMinPer173m2,
     this.isScrStable = true,
     this.activeDrugIds = const [],
+    this.allergies = const [],
   });
 
   // ---- Derived properties ----
@@ -113,6 +117,7 @@ class Patient {
     double? eGfrMlMinPer173m2,
     bool? isScrStable,
     List<String>? activeDrugIds,
+    List<String>? allergies,
   }) {
     return Patient(
       id: id ?? this.id,
@@ -129,6 +134,7 @@ class Patient {
       eGfrMlMinPer173m2: eGfrMlMinPer173m2 ?? this.eGfrMlMinPer173m2,
       isScrStable: isScrStable ?? this.isScrStable,
       activeDrugIds: activeDrugIds ?? this.activeDrugIds,
+      allergies: allergies ?? this.allergies,
     );
   }
 
@@ -136,7 +142,8 @@ class Patient {
   String toString() {
     final nameStr = patientName != null ? 'Name: $patientName, ' : '';
     final hnStr = hospitalNumber != null ? 'HN: $hospitalNumber, ' : '';
-    return 'Patient($nameStr$hnStr'
+    final allergyStr = allergies.isNotEmpty ? 'Allergies: ${allergies.join(", ")}, ' : '';
+    return 'Patient($nameStr$hnStr$allergyStr'
         'wt: ${weightKg}kg, ht: ${heightCm}cm, '
         'age: $ageYears y${ageMonths != null ? " ${ageMonths}m" : ""}, '
         'sex: ${sex.nameEn}'

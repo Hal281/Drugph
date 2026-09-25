@@ -29,7 +29,29 @@ class PrescriptionCart {
   List<String> checkInteractions(bool isThai) {
     List<String> warnings = [];
     final currentDrugs = items.value;
+    final patient = PatientSession.instance.currentPatient.value;
 
+    // 1. Check patient allergies
+    if (patient != null && patient.allergies.isNotEmpty) {
+      for (final drug in currentDrugs) {
+        for (final allergy in patient.allergies) {
+          final allergyLower = allergy.toLowerCase();
+          // Check if drug name matches allergy or allergyClass matches
+          bool matchesName = drug.genericName.toLowerCase().contains(allergyLower) ||
+              drug.brandNames.any((b) => b.toLowerCase().contains(allergyLower));
+          bool matchesClass = drug.allergyClass != null &&
+              drug.allergyClass!.toLowerCase().contains(allergyLower);
+
+          if (matchesName || matchesClass) {
+            warnings.add(isThai
+                ? '🚫 ผู้ป่วยแพ้ยา: ${drug.genericName} (ตรงกับประวัติแพ้ "$allergy")'
+                : '🚫 ALLERGY ALERT: Patient is allergic to ${drug.genericName}');
+          }
+        }
+      }
+    }
+
+    // 2. Check drug-drug interactions
     for (int i = 0; i < currentDrugs.length; i++) {
       for (int j = i + 1; j < currentDrugs.length; j++) {
         final d1 = currentDrugs[i];
