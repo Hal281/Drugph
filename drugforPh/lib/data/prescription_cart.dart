@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../core/models/drug.dart';
+import 'patient_session.dart';
 
 /// Singleton service to manage the prescription cart.
 class PrescriptionCart {
