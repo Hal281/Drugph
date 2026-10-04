@@ -119,5 +119,46 @@ void main() {
       expect(normalDose, equals(600.0));
     });
   });
+
+  group('Clinical Safety & Boundary Tests', () {
+    test('CrCl decimal boundary tolerance: 25.5 mL/min matches 26-50 tier without gap', () {
+      const tier1 = RenalAdjustment(crclMin: 26, crclMax: 50, adjustmentFactor: 1.0);
+      const tier2 = RenalAdjustment(crclMin: 10, crclMax: 25, adjustmentFactor: 0.5);
+
+      // CrCl 25.5 should round to 26 and match tier1
+      expect(tier1.appliesTo(25.5), isTrue);
+
+      // CrCl 25.4 should round to 25 and match tier2
+      expect(tier2.appliesTo(25.4), isTrue);
+
+      // CrCl 9.6 should round to 10 and match tier2
+      expect(tier2.appliesTo(9.6), isTrue);
+    });
+
+    test('Vancomycin AUC24 steady-state calculation', () {
+      // Dose 1000 mg q12h (2000 mg/day), Vd = 45 L, Ke = 0.05 hr^-1 -> Cl = 2.25 L/hr
+      // AUC24 = 2000 / 2.25 = 888.88 mg*hr/L (supratherapeutic)
+      final auc = TdmCalculator.calculateAuc24(dose: 1000, tau: 12, vd: 45, ke: 0.05);
+      expect(auc, closeTo(888.89, 0.1));
+
+      // Dose 750 mg q12h (1500 mg/day), Cl = 3.0 L/hr -> AUC24 = 500 mg*hr/L (target 400-600)
+      final targetAuc = TdmCalculator.calculateAuc24(dose: 750, tau: 12, vd: 50, ke: 0.06);
+      expect(targetAuc, closeTo(500.0, 0.1));
+    });
+
+    test('Aminoglycoside dosing weight in obese patient uses AdjBW', () {
+      // Patient: Height 170cm Male (IBW = 65.94 kg), Weight 120 kg (Obese, 182% IBW)
+      final ibw = WeightBasedCalculator.idealBodyWeight(heightCm: 170, sex: Sex.male);
+      expect(WeightBasedCalculator.isObese(actualWeightKg: 120, ibwKg: ibw), isTrue);
+
+      // AdjBW = 65.94 + 0.4 * (120 - 65.94) = 87.56 kg
+      final adjBw = WeightBasedCalculator.adjustedBodyWeight(actualWeightKg: 120, ibwKg: ibw);
+      expect(adjBw, closeTo(87.56, 0.1));
+
+      // Dose at 5 mg/kg should use AdjBW (437.8 mg), NOT TBW (600 mg)!
+      final safeDose = WeightBasedCalculator.calculateDose(weightKg: adjBw, dosePerKg: 5.0);
+      expect(safeDose, closeTo(437.81, 0.1));
+    });
+  });
 }
 

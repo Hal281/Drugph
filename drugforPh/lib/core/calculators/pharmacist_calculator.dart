@@ -63,13 +63,43 @@ class PharmacistCalculator {
           );
         }
       }
+    } else if (drug.requiresRenalAdjustment) {
+      warnings.add(
+        const DoseWarning(
+          severity: LimitSeverity.hard,
+          messageEn:
+              'RENAL ALERT: This drug requires dose adjustment in renal impairment, but Serum Creatinine was NOT provided. Standard dose calculated assuming normal renal function (CrCl > 50 mL/min).',
+          messageTh:
+              'เตือนความปลอดภัย: ยานี้ต้องปรับขนาดยาตามการทำงานของไต แต่ไม่ได้ระบุค่า SCr ระบบจึงคำนวณตามขนาดปกติของผู้ป่วยที่ไตทำงานปกติ (CrCl > 50)',
+        ),
+      );
     }
 
     // --- 3. Base Dose Calculation ---
     if (regimen.dosingType == DosingType.weightBased) {
-      // NOTE: Base dosing often uses TBW (e.g. Vancomycin)
+      double weightForDosing = patient.weightKg;
+      if (regimen.dosingWeightStrategy == DosingWeightStrategy.ideal) {
+        weightForDosing = ibw;
+      } else if (regimen.dosingWeightStrategy == DosingWeightStrategy.adjustedIfObese) {
+        if (WeightBasedCalculator.isObese(actualWeightKg: patient.weightKg, ibwKg: ibw)) {
+          weightForDosing = WeightBasedCalculator.adjustedBodyWeight(
+            actualWeightKg: patient.weightKg,
+            ibwKg: ibw,
+          );
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.info,
+            messageEn:
+                'Using Adjusted Body Weight (${weightForDosing.toStringAsFixed(1)} kg) for dosing in obese patient.',
+            messageTh:
+                'ใช้น้ำหนักปรับปรุง (AdjBW ${weightForDosing.toStringAsFixed(1)} กก.) ในการคำนวณสำหรับผู้ป่วยอ้วน',
+          ));
+        } else if (patient.weightKg > ibw) {
+          weightForDosing = ibw;
+        }
+      }
+
       dose = WeightBasedCalculator.calculateDose(
-        weightKg: patient.weightKg,
+        weightKg: weightForDosing,
         dosePerKg: regimen.dosePerKg ?? 0,
       );
     } else if (regimen.dosingType == DosingType.fixed) {

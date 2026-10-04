@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/calculators/renal_calculator.dart';
 import '../../core/models/patient.dart';
 import '../../core/models/unit.dart';
 import '../../data/patient_session.dart';
@@ -24,8 +25,10 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
   late TextEditingController _weightCtrl;
   late TextEditingController _heightCtrl;
   late TextEditingController _ageCtrl;
+  late TextEditingController _ageMonthsCtrl;
   late TextEditingController _scrCtrl;
   late TextEditingController _allergiesCtrl;
+  late Sex _sex;
   bool _isScrStable = true;
 
   @override
@@ -37,10 +40,12 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     _weightCtrl = TextEditingController(text: p?.weightKg.toString() ?? '');
     _heightCtrl = TextEditingController(text: p?.heightCm.toString() ?? '');
     _ageCtrl = TextEditingController(text: p?.ageYears.toString() ?? '');
+    _ageMonthsCtrl = TextEditingController(text: p?.ageMonths?.toString() ?? '');
     _scrCtrl = TextEditingController(
       text: p?.serumCreatinineMgDl?.toString() ?? '',
     );
     _allergiesCtrl = TextEditingController(text: p?.allergies.join(', ') ?? '');
+    _sex = p?.sex ?? Sex.male;
     _isScrStable = p?.isScrStable ?? true;
   }
 
@@ -51,6 +56,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     _weightCtrl.dispose();
     _heightCtrl.dispose();
     _ageCtrl.dispose();
+    _ageMonthsCtrl.dispose();
     _scrCtrl.dispose();
     _allergiesCtrl.dispose();
     super.dispose();
@@ -60,6 +66,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     final wt = double.tryParse(_weightCtrl.text);
     final ht = double.tryParse(_heightCtrl.text);
     final age = int.tryParse(_ageCtrl.text);
+    final ageMonths = int.tryParse(_ageMonthsCtrl.text);
     final scr = double.tryParse(_scrCtrl.text);
 
     if (wt == null || ht == null || age == null) {
@@ -67,13 +74,15 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       return;
     }
 
-    // Crude CrCl calculation for the global session just to have it
-    // Using Cockcroft-Gault simplified.
+    // Precise CrCl calculation using Cockcroft-Gault
     double? crcl;
-    if (scr != null && scr > 0) {
-      crcl = ((140 - age) * wt) / (72 * scr);
-      // Assuming male default for quick setup if sex is not asked in this minimal dialog.
-      // In a real app we'd add sex selector. Let's add a default for now.
+    if (scr != null && scr > 0 && age >= 18) {
+      crcl = RenalCalculator.cockcroftGault(
+        ageYears: age,
+        weightKg: wt,
+        sex: _sex,
+        serumCreatinineMgDl: scr,
+      );
     }
 
     final allergies = _allergiesCtrl.text
@@ -91,7 +100,8 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       weightKg: wt,
       heightCm: ht,
       ageYears: age,
-      sex: widget.initialPatient?.sex ?? Sex.male,
+      ageMonths: ageMonths,
+      sex: _sex,
       serumCreatinineMgDl: scr,
       creatinineClearanceMlMin: crcl,
       isScrStable: _isScrStable,
@@ -123,6 +133,19 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
               controller: _hnCtrl,
               decoration: const InputDecoration(labelText: 'HN (Optional)'),
             ),
+            DropdownButtonFormField<Sex>(
+              initialValue: _sex,
+              decoration: InputDecoration(
+                labelText: widget.isThai ? 'เพศกำเนิด (Sex) *' : 'Biological Sex *',
+              ),
+              items: Sex.values.map((s) => DropdownMenuItem(
+                value: s,
+                child: Text(widget.isThai ? s.nameTh : s.nameEn),
+              )).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _sex = val);
+              },
+            ),
             TextField(
               controller: _weightCtrl,
               keyboardType: TextInputType.number,
@@ -133,10 +156,29 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Height (cm) *'),
             ),
-            TextField(
-              controller: _ageCtrl,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Age (years) *'),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _ageCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: widget.isThai ? 'อายุ (ปี) *' : 'Age (years) *',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _ageMonthsCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: widget.isThai ? 'เดือน (เด็กเล็ก)' : 'Months (pediatric)',
+                      hintText: '0-11',
+                    ),
+                  ),
+                ),
+              ],
             ),
             TextField(
               controller: _scrCtrl,

@@ -165,15 +165,38 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ));
         }
       }
+    } else if (widget.drug.requiresRenalAdjustment) {
+      warnings.add(const DoseWarning(
+        severity: LimitSeverity.hard,
+        messageEn: 'RENAL ALERT: This drug requires dose adjustment in renal impairment, but Serum Creatinine was NOT provided. Standard dose calculated assuming normal renal function (CrCl > 50 mL/min).',
+        messageTh: 'เตือนความปลอดภัย: ยานี้ต้องปรับขนาดยาตามการทำงานของไต แต่ไม่ได้ระบุค่า SCr ระบบจึงคำนวณตามขนาดปกติของผู้ป่วยที่ไตทำงานปกติ (CrCl > 50)',
+      ));
     }
 
     final regimen = _selectedRegimen!;
 
     if (regimen.dosingType == DosingType.weightBased) {
-      // NOTE: For drugs like Vancomycin, dosing dose is strictly TBW.
-      // So we use 'weight' (TBW) here, not 'crclDosingWeight'.
+      double weightForDosing = weight!;
+      if (regimen.dosingWeightStrategy == DosingWeightStrategy.ideal && ibw != null) {
+        weightForDosing = ibw;
+      } else if (regimen.dosingWeightStrategy == DosingWeightStrategy.adjustedIfObese && ibw != null) {
+        if (WeightBasedCalculator.isObese(actualWeightKg: weight, ibwKg: ibw)) {
+          weightForDosing = WeightBasedCalculator.adjustedBodyWeight(
+            actualWeightKg: weight,
+            ibwKg: ibw,
+          );
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.info,
+            messageEn: 'Using Adjusted Body Weight (${weightForDosing.toStringAsFixed(1)} kg) for aminoglycoside dosing in obese patient.',
+            messageTh: 'ใช้น้ำหนักปรับปรุง (AdjBW ${weightForDosing.toStringAsFixed(1)} กก.) สำหรับคำนวณยานี้ในผู้ป่วยอ้วน',
+          ));
+        } else if (weight > ibw) {
+          weightForDosing = ibw;
+        }
+      }
+
       dose = WeightBasedCalculator.calculateDose(
-        weightKg: weight!,
+        weightKg: weightForDosing,
         dosePerKg: regimen.dosePerKg ?? 0,
       );
     } else if (regimen.dosingType == DosingType.fixed) {
@@ -857,16 +880,36 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget _buildResultSection() {
     final t = widget.isThai;
     final res = _result!;
+    final hasHardWarnings = _warnings.any((w) => w.severity == LimitSeverity.hard);
+    final hasSoftWarnings = _warnings.any((w) => w.severity == LimitSeverity.soft);
+
+    final cardBgColor = hasHardWarnings
+        ? Colors.red.shade50
+        : (hasSoftWarnings ? Colors.amber.shade50 : Colors.green.shade50);
+    final cardBorderColor = hasHardWarnings
+        ? Colors.red.shade700
+        : (hasSoftWarnings ? Colors.amber.shade800 : Colors.green);
+    final headerIcon = hasHardWarnings
+        ? Icons.error
+        : (hasSoftWarnings ? Icons.warning_amber_rounded : Icons.check_circle);
+    final headerIconColor = hasHardWarnings
+        ? Colors.red.shade700
+        : (hasSoftWarnings ? Colors.amber.shade900 : Colors.green);
+    final headerTitle = hasHardWarnings
+        ? (t ? 'คำเตือน: พบความเสี่ยงระดับวิกฤต (Critical Alert)' : 'CRITICAL SAFETY ALERT')
+        : (hasSoftWarnings
+            ? (t ? 'ผลการคำนวณ (มีข้อควรระวัง)' : 'Calculated with Warnings')
+            : (t ? 'ผลการคำนวณผ่านเกณฑ์ความปลอดภัย' : 'Calculated Result (Verified)'));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Result Card
         Card(
-          color: Colors.green.shade50,
+          color: cardBgColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Colors.green, width: 2),
+            side: BorderSide(color: cardBorderColor, width: 2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
@@ -876,14 +919,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
+                    Icon(headerIcon, color: headerIconColor),
                     const SizedBox(width: 8),
                     Text(
-                      t ? 'ผลการคำนวณ' : 'Calculated Result',
-                      style: const TextStyle(
+                      headerTitle,
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        color: headerIconColor,
                       ),
                     ),
                   ],

@@ -23,6 +23,7 @@ class IVTitrationScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(isThai ? 'ตารางดริปยา' : 'IV Titration Table'),
           backgroundColor: Colors.red.shade800,
+          foregroundColor: Colors.white,
         ),
         body: Center(
           child: Text(isThai
@@ -32,8 +33,43 @@ class IVTitrationScreen extends StatelessWidget {
       );
     }
 
+    if (regimen.standardDilutionMgPerMl == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isThai ? 'ตารางดริปยา' : 'IV Titration Table'),
+          backgroundColor: Colors.red.shade800,
+          foregroundColor: Colors.white,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.warning_amber_rounded, size: 64, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  isThai ? 'ไม่พบข้อมูลความเข้มข้นสารน้ำมาตรฐาน' : 'No Standard Dilution Specified',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isThai
+                      ? 'เพื่อความปลอดภัยของผู้ป่วย ระบบไม่อนุญาตให้สมมติปริมาตรสารน้ำเอง กรุณาปรึกษาเภสัชกรหรือตรวจสอบคู่มือการผสมยาก่อนบริหารยา'
+                      : 'To ensure patient safety, arbitrary IV fluid dilution cannot be assumed. Please consult a pharmacist or clinical IV monograph.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     final wt = patient.weightKg;
-    final dilutionMgPerMl = regimen.standardDilutionMgPerMl ?? 1.0;
+    final dilutionMgPerMl = regimen.standardDilutionMgPerMl!;
 
     // Convert dilution to mcg/ml for easier math with mcg/kg/min
     final dilutionMcgPerMl = dilutionMgPerMl * 1000;

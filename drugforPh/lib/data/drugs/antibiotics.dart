@@ -67,6 +67,7 @@ final List<Drug> antibiotics = [
         route: DoseRoute.ivInfusion,
         indication: 'Extended Interval Dosing',
         dosingType: DosingType.weightBased,
+        dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 5.0, // 5-7 mg/kg
         doseUnit: DoseUnit.mg,
         frequency: 'q24h',
@@ -96,6 +97,7 @@ final List<Drug> antibiotics = [
         route: DoseRoute.ivInfusion,
         indication: 'Traditional Dosing',
         dosingType: DosingType.weightBased,
+        dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 1.5, // 1-2.5 mg/kg
         doseUnit: DoseUnit.mg,
         frequency: 'q8h',
@@ -116,6 +118,7 @@ final List<Drug> antibiotics = [
         route: DoseRoute.ivInfusion,
         indication: 'Extended Interval Dosing',
         dosingType: DosingType.weightBased,
+        dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 15.0, // 15 mg/kg
         doseUnit: DoseUnit.mg,
         frequency: 'q24h',
@@ -244,6 +247,22 @@ final List<Drug> antibiotics = [
         fixedDose: 1000.0, // Commonly 875/125 mg = 1000 mg total tablet, but base is amox
         doseUnit: DoseUnit.mg,
         frequency: 'q12h',
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 10,
+            crclMax: 30,
+            adjustmentFactor: 0.5,
+            adjustedFrequency: '500 mg q12h (do not use 875 mg tab)',
+            notes: 'Use 500/125 mg tablet q12h in CrCl 10-30',
+          ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 9,
+            adjustmentFactor: 0.5,
+            adjustedFrequency: '500 mg q24h (OD)',
+            notes: 'Use 500/125 mg tablet q24h in CrCl <10',
+          ),
+        ],
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -524,13 +543,15 @@ final List<Drug> antibiotics = [
           RenalAdjustment(
             crclMin: 20,
             crclMax: 40,
-            adjustmentFactor: 0.5,
-            notes: '2.25g q6h or 3.375g q8h',
+            adjustmentFactor: 0.75, // 4.5g * 0.75 = 3.375g
+            adjustedFrequency: '3.375g q8h (extended infusion) or 2.25g q6h',
+            notes: '3.375g q8h (extended infusion) or 2.25g q6h',
           ),
           RenalAdjustment(
             crclMin: 0,
             crclMax: 19,
-            adjustmentFactor: 0.5,
+            adjustmentFactor: 0.5, // 4.5g * 0.5 = 2.25g
+            adjustedFrequency: '2.25g q8h',
             notes: '2.25g q8h',
           ),
         ],

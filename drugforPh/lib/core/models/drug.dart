@@ -38,12 +38,35 @@ class RenalAdjustment {
   });
 
   /// Returns `true` if [crcl] falls within [crclMin]..[crclMax].
-  bool appliesTo(double crcl) => crcl >= crclMin && crcl <= crclMax;
+  /// Uses clinical integer-rounding tolerance so intermediate decimal values
+  /// (e.g. CrCl 25.5 mL/min between integer tiers 10–25 and 26–50) do not fall into an unadjusted void.
+  bool appliesTo(double crcl) {
+    if (crcl >= crclMin && crcl <= crclMax) return true;
+    final rounded = crcl.roundToDouble();
+    return rounded >= crclMin && rounded <= crclMax;
+  }
 
   @override
   String toString() =>
       'RenalAdj(CrCl $crclMin–$crclMax → ×$adjustmentFactor'
       '${adjustedFrequency != null ? ", freq=$adjustedFrequency" : ""})';
+}
+
+/// Strategy for selecting body weight for weight-based drug calculations.
+enum DosingWeightStrategy {
+  /// Actual/Total Body Weight (TBW). Used for Vancomycin, Heparin, etc.
+  actual('Actual Body Weight (TBW)', 'น้ำหนักจริง (TBW)'),
+
+  /// Ideal Body Weight (IBW). Used for Theophylline, etc.
+  ideal('Ideal Body Weight (IBW)', 'น้ำหนักในอุดมคติ (IBW)'),
+
+  /// IBW for non-obese, Adjusted Body Weight (AdjBW) for obese (>= 120% IBW).
+  /// Mandatory for Aminoglycosides (Gentamicin, Amikacin) to prevent nephro/ototoxicity.
+  adjustedIfObese('IBW or AdjBW if Obese', 'IBW หรือ AdjBW หากผู้ป่วยอ้วน');
+
+  const DosingWeightStrategy(this.nameEn, this.nameTh);
+  final String nameEn;
+  final String nameTh;
 }
 
 /// A single dosing regimen for a drug.
@@ -125,6 +148,9 @@ class DosingRegimen {
   /// Clinician notes (Thai).
   final String? notesTh;
 
+  /// Strategy for selecting body weight (TBW, IBW, AdjBW).
+  final DosingWeightStrategy dosingWeightStrategy;
+
   const DosingRegimen({
     required this.route,
     this.indication,
@@ -148,6 +174,7 @@ class DosingRegimen {
     this.renalAdjustments,
     this.notes,
     this.notesTh,
+    this.dosingWeightStrategy = DosingWeightStrategy.actual,
   });
 
   @override

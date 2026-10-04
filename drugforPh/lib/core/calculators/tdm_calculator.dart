@@ -73,4 +73,20 @@ class TdmCalculator {
     final troughSS = peakSS * exp(-ke * (tau - tInf));
     return troughSS;
   }
+
+  /// Calculates 24-hour Area Under the Curve (AUC24) for Vancomycin at steady state.
+  /// Formula: AUC24 = Daily Dose / Clearance = (Dose * (24 / tau)) / (Vd * Ke)
+  ///
+  /// Target: 400–600 mg·hr/L per ASHP/IDSA/PIDS/SIDP 2020 Guidelines.
+  static double calculateAuc24({
+    required double dose,
+    required double tau,
+    required double vd,
+    required double ke,
+  }) {
+    if (tau <= 0 || vd <= 0 || ke <= 0) return 0;
+    final dailyDose = dose * (24.0 / tau);
+    final clearanceLPerHr = vd * ke;
+    return dailyDose / clearanceLPerHr;
+  }
 }

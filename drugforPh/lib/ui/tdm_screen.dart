@@ -61,11 +61,16 @@ class _TdmScreenState extends State<TdmScreen> {
       2000,
     ]);
 
-    // --- Predicted Trough ---
     final predictedTrough = TdmCalculator.predictTrough(
       dose: _maintDose,
       tau: _intervalHrs,
       tInf: _infusionTimeHrs,
+      vd: vd,
+      ke: ke,
+    );
+    final predictedAuc24 = TdmCalculator.calculateAuc24(
+      dose: _maintDose,
+      tau: _intervalHrs,
       vd: vd,
       ke: ke,
     );
@@ -199,11 +204,73 @@ class _TdmScreenState extends State<TdmScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  // AUC24 Primary Guideline Target
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _getTroughColor(predictedTrough).withValues(alpha: 0.2),
+                      color: _getAucColor(predictedAuc24).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _getAucColor(predictedAuc24),
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              predictedAuc24 >= 400 && predictedAuc24 <= 600
+                                  ? Icons.check_circle
+                                  : Icons.warning_amber_rounded,
+                              color: _getAucColor(predictedAuc24).shade900,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              widget.isThai
+                                  ? 'เป้าหมายหลัก: AUC₂₄ (ASHP 2020: 400–600 mg·hr/L)'
+                                  : 'Primary Target: AUC₂₄ (ASHP 2020: 400–600 mg·hr/L)',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: _getAucColor(predictedAuc24).shade900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${predictedAuc24.toStringAsFixed(1)} mg·hr/L',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: _getAucColor(predictedAuc24).shade900,
+                          ),
+                        ),
+                        Text(
+                          predictedAuc24 < 400
+                              ? (widget.isThai ? 'ต่ำกว่าเป้าหมาย (เสี่ยงรักษาไม่ได้ผล)' : 'Subtherapeutic')
+                              : (predictedAuc24 <= 600
+                                  ? (widget.isThai ? 'อยู่ในช่วงเป้าหมายการรักษา' : 'Target Therapeutic Range')
+                                  : (widget.isThai ? 'สูงเกินเป้าหมาย (เสี่ยงต่อพิษไต AKI)' : 'Supratherapeutic / AKI Risk')),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _getAucColor(predictedAuc24).shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Trough Secondary Surrogate Target
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _getTroughColor(predictedTrough).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: _getTroughColor(predictedTrough),
@@ -213,8 +280,8 @@ class _TdmScreenState extends State<TdmScreen> {
                       children: [
                         Text(
                           widget.isThai
-                              ? 'ระดับยา Trough ที่คาดการณ์'
-                              : 'Predicted Trough SS',
+                              ? 'ระดับยา Trough คาดการณ์ (Surrogate: 10–20 mg/L)'
+                              : 'Predicted Trough SS (Surrogate: 10–20 mg/L)',
                           style: TextStyle(
                             color: _getTroughColor(predictedTrough).shade900,
                           ),
@@ -222,7 +289,7 @@ class _TdmScreenState extends State<TdmScreen> {
                         Text(
                           '${predictedTrough.toStringAsFixed(1)} mg/L',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: _getTroughColor(predictedTrough).shade900,
                           ),
@@ -237,6 +304,12 @@ class _TdmScreenState extends State<TdmScreen> {
         ],
       ),
     );
+  }
+
+  MaterialColor _getAucColor(double auc) {
+    if (auc < 400) return Colors.orange;
+    if (auc <= 600) return Colors.green;
+    return Colors.red;
   }
 
   MaterialColor _getTroughColor(double trough) {
