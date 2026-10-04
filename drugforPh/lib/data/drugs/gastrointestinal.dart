@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> gastrointestinal = [
-  Drug(
+  const Drug(
     id: 'omeprazole',
     genericName: 'Omeprazole',
     brandNames: ['Miracid', 'Losec', 'O-Sid'],
@@ -49,7 +49,7 @@ final List<Drug> gastrointestinal = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'metoclopramide',
     genericName: 'Metoclopramide',
     brandNames: ['Plasil'],
@@ -96,7 +96,7 @@ final List<Drug> gastrointestinal = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'domperidone',
     genericName: 'Domperidone',
     brandNames: ['Motilium'],
@@ -139,7 +139,7 @@ final List<Drug> gastrointestinal = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ondansetron',
     genericName: 'Ondansetron',
     brandNames: ['Zofran', 'Onsia'],
@@ -180,7 +180,7 @@ final List<Drug> gastrointestinal = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'hyoscine_butylbromide',
     genericName: 'Hyoscine Butylbromide',
     brandNames: ['Buscopan'],

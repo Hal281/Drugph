@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import '../core/models/drug.dart';
 import '../data/drug_database.dart';
 
 class AiConsultantScreen extends StatefulWidget {
@@ -18,7 +17,7 @@ class _AiConsultantScreenState extends State<AiConsultantScreen> {
   GenerativeModel? _model;
   ChatSession? _chat;
   
-  List<Map<String, dynamic>> _messages = [];
+  final List<Map<String, dynamic>> _messages = [];
   bool _isLoading = false;
   
   static const String _apiKey = String.fromEnvironment('GEMINI_API_KEY');
@@ -173,7 +172,7 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
                       bottomRight: isBot ? const Radius.circular(16) : const Radius.circular(0),
                     ),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
                     ]
                   ),
                   child: Text(
@@ -198,7 +197,7 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -2))
+              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2))
             ]
           ),
           child: Row(

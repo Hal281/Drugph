@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> chemotherapy = [
-  Drug(
+  const Drug(
     id: 'carboplatin',
     genericName: 'Carboplatin',
     brandNames: ['Paraplatin'],
@@ -25,7 +25,7 @@ final List<Drug> chemotherapy = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'methotrexate',
     genericName: 'Methotrexate',
     brandNames: ['Trexall', 'Rheumatrex'],

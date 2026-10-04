@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/patient_session.dart';
 import '../../core/models/patient.dart';
-import '../../core/models/unit.dart';
 import '../ward_list_screen.dart';
 import 'patient_edit_dialog.dart';
 
@@ -33,7 +32,7 @@ class PatientBanner extends StatelessWidget {
                   ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -50,7 +49,7 @@ class PatientBanner extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -126,7 +125,7 @@ class PatientBanner extends StatelessWidget {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: IconButton(

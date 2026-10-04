@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> psychiatry = [
-  Drug(
+  const Drug(
     id: 'haloperidol',
     genericName: 'Haloperidol',
     brandNames: ['Haldol', 'Haricon'],
@@ -37,7 +37,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'diazepam',
     genericName: 'Diazepam',
     brandNames: ['Valium', 'Di-a-pam'],
@@ -68,7 +68,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'lorazepam',
     genericName: 'Lorazepam',
     brandNames: ['Ativan', 'Lora'],
@@ -98,7 +98,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'olanzapine',
     genericName: 'Olanzapine',
     brandNames: ['Zyprexa'],
@@ -127,7 +127,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'risperidone',
     genericName: 'Risperidone',
     brandNames: ['Risperdal', 'Neurelan'],
@@ -146,7 +146,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'quetiapine',
     genericName: 'Quetiapine',
     brandNames: ['Seroquel'],
@@ -166,7 +166,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'fluoxetine',
     genericName: 'Fluoxetine',
     brandNames: ['Prozac'],
@@ -186,7 +186,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'sertraline',
     genericName: 'Sertraline',
     brandNames: ['Zoloft', 'Serlift'],
@@ -206,7 +206,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'escitalopram',
     genericName: 'Escitalopram',
     brandNames: ['Lexapro'],
@@ -227,7 +227,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'amitriptyline',
     genericName: 'Amitriptyline',
     brandNames: ['Tryptanol'],
@@ -248,7 +248,7 @@ final List<Drug> psychiatry = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'lithium',
     genericName: 'Lithium',
     brandNames: ['Lithobid', 'Eskalith'],

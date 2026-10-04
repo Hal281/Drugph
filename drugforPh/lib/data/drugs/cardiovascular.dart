@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> cardiovascular = [
-  Drug(
+  const Drug(
     id: 'norepinephrine',
     genericName: 'Norepinephrine',
     brandNames: ['Levophed'],
@@ -31,7 +31,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'dopamine',
     genericName: 'Dopamine',
     brandNames: ['Intropin'],
@@ -57,7 +57,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'amiodarone',
     genericName: 'Amiodarone',
     brandNames: ['Cordarone'],
@@ -76,7 +76,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'amlodipine',
     genericName: 'Amlodipine',
     brandNames: ['Norvasc', 'Amvaz'],
@@ -107,7 +107,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'enalapril',
     genericName: 'Enalapril',
     brandNames: ['Renitec', 'Enaril'],
@@ -148,7 +148,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'furosemide',
     genericName: 'Furosemide',
     brandNames: ['Lasix', 'Hyles'],
@@ -212,7 +212,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'adenosine',
     genericName: 'Adenosine',
     brandNames: ['Adenocor'],
@@ -257,7 +257,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'digoxin',
     genericName: 'Digoxin',
     brandNames: ['Lanoxin'],
@@ -301,7 +301,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'nicardipine',
     genericName: 'Nicardipine',
     brandNames: ['Cardene'],
@@ -337,7 +337,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'spironolactone',
     genericName: 'Spironolactone',
     brandNames: ['Aldactone', 'Hyles'],
@@ -372,7 +372,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'losartan',
     genericName: 'Losartan',
     brandNames: ['Cozaar'],
@@ -393,7 +393,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'metoprolol',
     genericName: 'Metoprolol',
     brandNames: ['Betaloc'],
@@ -419,7 +419,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'clopidogrel',
     genericName: 'Clopidogrel',
     brandNames: ['Plavix'],
@@ -447,7 +447,7 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'rosuvastatin',
     genericName: 'Rosuvastatin',
     brandNames: ['Crestor'],

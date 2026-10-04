@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/models/drug.dart';
-import '../core/models/patient.dart';
 import '../data/patient_session.dart';
 
 class IVTitrationScreen extends StatelessWidget {
@@ -90,7 +89,7 @@ class IVTitrationScreen extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(Colors.red.shade100),
+                headingRowColor: WidgetStateProperty.all(Colors.red.shade100),
                 columns: const [
                   DataColumn(
                       label: Text('Dose\n(mcg/kg/min)',

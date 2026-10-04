@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> obstetric = [
-  Drug(
+  const Drug(
     id: 'oxytocin',
     genericName: 'Oxytocin',
     brandNames: ['Pitocin', 'Syntocinon'],
@@ -37,7 +37,7 @@ final List<Drug> obstetric = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'magnesium_sulfate',
     genericName: 'Magnesium Sulfate',
     brandNames: ['MgSo4'],
@@ -75,7 +75,7 @@ final List<Drug> obstetric = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'misoprostol',
     genericName: 'Misoprostol',
     brandNames: ['Cytotec'],
@@ -105,7 +105,7 @@ final List<Drug> obstetric = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'methylergometrine',
     genericName: 'Methylergonovine',
     brandNames: ['Methergine'],
@@ -126,7 +126,7 @@ final List<Drug> obstetric = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'terbutaline',
     genericName: 'Terbutaline',
     brandNames: ['Bricanyl'],
@@ -151,7 +151,7 @@ final List<Drug> obstetric = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'dexamethasone_ob',
     genericName: 'Dexamethasone',
     brandNames: ['Dexa'],

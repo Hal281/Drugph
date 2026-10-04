@@ -26,7 +26,7 @@ class PharmacistCalculator {
 
     if (patient.weightKg < ibw) {
       crclDosingWeight = patient.weightKg; // TBW
-    } else if (patient.weightKg < 1.25 * ibw) {
+    } else if (patient.weightKg < 1.20 * ibw) {
       crclDosingWeight = ibw; // IBW
     } else {
       crclDosingWeight = ibw + 0.4 * (patient.weightKg - ibw); // AdjBW
@@ -85,6 +85,21 @@ class PharmacistCalculator {
       );
     } else if (regimen.dosingType == DosingType.titrated) {
       dose = regimen.continuousRateMin ?? 0;
+    } else if (regimen.dosingType == DosingType.gfrBased) {
+      final gfr = crcl ?? 0;
+      dose = WeightBasedCalculator.calvertFormula(
+        targetAuc: regimen.targetAuc ?? 5.0,
+        gfrMlMin: gfr,
+      );
+      if (crcl == null) {
+        warnings.add(
+          const DoseWarning(
+            severity: LimitSeverity.hard,
+            messageEn: 'Calvert formula requires CrCl / GFR. Please provide SCr.',
+            messageTh: 'สูตร Calvert ต้องใช้ค่า CrCl / GFR กรุณาระบุค่า SCr',
+          ),
+        );
+      }
     }
 
     // --- 4. Automated Renal Adjuster ---

@@ -2,7 +2,7 @@ import '../../core/models/models.dart';
 
 /// Emergency & Resuscitation drugs commonly used in ER and ICU.
 final List<Drug> emergency = [
-  Drug(
+  const Drug(
     id: 'epinephrine',
     genericName: 'Epinephrine (Adrenaline)',
     brandNames: ['Adrenaline'],
@@ -55,7 +55,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'atropine',
     genericName: 'Atropine',
     brandNames: ['Atropine Sulfate'],
@@ -88,7 +88,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'magnesium_sulfate',
     genericName: 'Magnesium Sulfate',
     brandNames: ['MgSO4'],
@@ -123,7 +123,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'dexamethasone',
     genericName: 'Dexamethasone',
     brandNames: ['Dexon', 'Oradexon'],
@@ -166,7 +166,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'hydrocortisone',
     genericName: 'Hydrocortisone',
     brandNames: ['Solu-Cortef'],
@@ -200,7 +200,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'naloxone',
     genericName: 'Naloxone',
     brandNames: ['Narcan'],
@@ -230,7 +230,7 @@ final List<Drug> emergency = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'dobutamine',
     genericName: 'Dobutamine',
     brandNames: ['Dobutrex'],

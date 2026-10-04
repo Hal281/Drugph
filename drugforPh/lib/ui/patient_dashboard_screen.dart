@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../data/patient_session.dart';
 import '../core/models/patient.dart';
-import '../core/models/drug.dart';
 import '../core/models/dosage_result.dart';
 import '../data/drug_database.dart';
 import '../core/calculators/pharmacist_calculator.dart';

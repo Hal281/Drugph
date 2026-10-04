@@ -57,7 +57,7 @@ void main() {
   });
 
   group('Dose Checker Tests', () {
-    final limits = DoseLimit(
+    const limits = DoseLimit(
       maxSingleDose: 1000.0,
       softMaxSingleDose: 800.0,
       minSingleDose: 100.0,
@@ -87,6 +87,36 @@ void main() {
       );
       expect(warnings.length, equals(1));
       expect(warnings.first.severity, equals(LimitSeverity.soft));
+    });
+  });
+
+  group('Weight-Based & Calvert Calculator Tests', () {
+    test('Devine IBW Male', () {
+      // 175 cm = 68.8976 inches -> 50 + 2.3 * 8.8976 = 70.46 kg
+      final ibw = WeightBasedCalculator.idealBodyWeight(heightCm: 175, sex: Sex.male);
+      expect(ibw, closeTo(70.46, 0.1));
+    });
+
+    test('Devine IBW Female', () {
+      // 165 cm = 64.96 inches -> 45.5 + 2.3 * 4.96 = 56.91 kg
+      final ibw = WeightBasedCalculator.idealBodyWeight(heightCm: 165, sex: Sex.female);
+      expect(ibw, closeTo(56.91, 0.1));
+    });
+
+    test('Adjusted Body Weight (AdjBW)', () {
+      // IBW = 50 kg, Actual = 80 kg -> 50 + 0.4 * (80 - 50) = 62.0 kg
+      final adjBw = WeightBasedCalculator.adjustedBodyWeight(actualWeightKg: 80, ibwKg: 50);
+      expect(adjBw, equals(62.0));
+    });
+
+    test('Calvert Formula for Carboplatin with GFR cap at 125', () {
+      // AUC = 5, GFR = 150 (capped at 125) -> 5 * (125 + 25) = 750 mg
+      final dose = WeightBasedCalculator.calvertFormula(targetAuc: 5, gfrMlMin: 150);
+      expect(dose, equals(750.0));
+
+      // AUC = 6, GFR = 75 -> 6 * (75 + 25) = 600 mg
+      final normalDose = WeightBasedCalculator.calvertFormula(targetAuc: 6, gfrMlMin: 75);
+      expect(normalDose, equals(600.0));
     });
   });
 }

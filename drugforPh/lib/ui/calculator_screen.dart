@@ -125,7 +125,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         dosingWeightLabel = 'TBW';
         dosingWeightReason =
             'ใช้ TBW เนื่องจากน้ำหนักตัวจริงน้อยกว่า IBW (${ibw.toStringAsFixed(1)} kg)';
-      } else if (weight < 1.25 * ibw) {
+      } else if (weight < 1.20 * ibw) {
         crclDosingWeight = ibw;
         dosingWeightLabel = 'IBW';
         dosingWeightReason = 'ใช้ IBW เนื่องจากน้ำหนักตัวอยู่ในเกณฑ์ปกติ';
@@ -134,7 +134,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         crclDosingWeight = adjBw;
         dosingWeightLabel = 'AdjBW';
         dosingWeightReason =
-            'ใช้ AdjBW เนื่องจากน้ำหนักตัวจริงมากกว่า 125% ของ IBW';
+            'ใช้ AdjBW เนื่องจากน้ำหนักตัวจริงมากกว่า 120% ของ IBW';
       }
     }
 
@@ -147,7 +147,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     if (scr != null && age != null && crclDosingWeight != null) {
       if (!_isScrStable) {
         // AKI check: Do not calculate CrCl if not stable
-        warnings.add(DoseWarning(
+        warnings.add(const DoseWarning(
           severity: LimitSeverity.hard,
           messageEn: 'AKI Alert: SCr is not stable. Cockcroft-Gault is inaccurate.',
           messageTh: 'AKI Alert: ค่า SCr ไม่คงที่ สูตร Cockcroft-Gault จะไม่แม่นยำ (ห้ามใช้ CrCl นี้)',
@@ -158,7 +158,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
         // Low SCr in elderly check
         if (scr < 0.6 && age >= 65) {
-          warnings.add(DoseWarning(
+          warnings.add(const DoseWarning(
             severity: LimitSeverity.soft,
             messageEn: 'Elderly with low SCr (<0.6). CrCl may be overestimated.',
             messageTh: 'ผู้สูงอายุที่มี SCr ต่ำ (<0.6) ค่า CrCl ที่ได้อาจสูงเกินจริง (พิจารณาปัด SCr เป็น 0.8 หรือ 1.0)',
@@ -186,6 +186,19 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       );
     } else if (regimen.dosingType == DosingType.titrated) {
       dose = regimen.continuousRateMin ?? 0;
+    } else if (regimen.dosingType == DosingType.gfrBased) {
+      final gfr = crcl ?? 0;
+      dose = WeightBasedCalculator.calvertFormula(
+        targetAuc: regimen.targetAuc ?? 5.0,
+        gfrMlMin: gfr,
+      );
+      if (crcl == null) {
+        warnings.add(const DoseWarning(
+          severity: LimitSeverity.hard,
+          messageEn: 'Calvert formula requires CrCl / GFR. Please provide SCr.',
+          messageTh: 'สูตร Calvert ต้องใช้ค่า CrCl / GFR กรุณาระบุค่า SCr',
+        ));
+      }
     }
 
     // 4. Automated Renal Adjuster & Formulary Rounder
@@ -279,14 +292,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   double? _calculateDailyDose(double singleDose, String frequency) {
-    if (frequency.contains('q24h') || frequency.contains('OD'))
+    if (frequency.contains('q24h') || frequency.contains('OD')) {
       return singleDose;
-    if (frequency.contains('q12h') || frequency.contains('BID'))
+    }
+    if (frequency.contains('q12h') || frequency.contains('BID')) {
       return singleDose * 2;
-    if (frequency.contains('q8h') || frequency.contains('TID'))
+    }
+    if (frequency.contains('q8h') || frequency.contains('TID')) {
       return singleDose * 3;
-    if (frequency.contains('q6h') || frequency.contains('QID'))
+    }
+    if (frequency.contains('q6h') || frequency.contains('QID')) {
       return singleDose * 4;
+    }
     return null;
   }
 
@@ -608,12 +625,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           },
                           style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.resolveWith<Color>((
-                                  Set<MaterialState> states,
+                                WidgetStateProperty.resolveWith<Color>((
+                                  Set<WidgetState> states,
                                 ) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    return widget.categoryColor.withOpacity(
-                                      0.2,
+                                  if (states.contains(WidgetState.selected)) {
+                                    return widget.categoryColor.withValues(
+                                      alpha: 0.2,
                                     );
                                   }
                                   return Colors.white;
@@ -642,7 +659,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -729,11 +746,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   Widget _buildAlertCard(IconData icon, Color color, String text) {
     return Card(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: color.withOpacity(0.5), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.5), width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
@@ -747,7 +764,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               child: Text(
                 text,
                 style: TextStyle(
-                  color: color.withOpacity(0.9),
+                  color: color.withValues(alpha: 0.9),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -765,11 +782,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     List<String> items,
   ) {
     return Card(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: color.withOpacity(0.5), width: 1),
+        side: BorderSide(color: color.withValues(alpha: 0.5), width: 1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
@@ -785,7 +802,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: color.withOpacity(0.9),
+                    color: color.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -797,11 +814,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     padding: const EdgeInsets.only(bottom: 4.0, left: 28.0),
                     child: Text(
                       '• $i',
-                      style: TextStyle(color: color.withOpacity(0.9)),
+                      style: TextStyle(color: color.withValues(alpha: 0.9)),
                     ),
                   ),
                 )
-                .toList(),
+                ,
           ],
         ),
       ),
@@ -886,7 +903,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     ),
                   ),
                   Text(
-                    '${res.frequency!}',
+                    res.frequency!,
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.grey.shade800,
@@ -1016,7 +1033,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                           ),
                         ),
                       )
-                      .toList(),
+                      ,
                 ],
               ],
             ),

@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> analgesics = [
-  Drug(
+  const Drug(
     id: 'paracetamol',
     genericName: 'Paracetamol (Acetaminophen)',
     brandNames: ['Tylenol', 'Sara', 'Calpol'],
@@ -52,7 +52,7 @@ final List<Drug> analgesics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ibuprofen',
     genericName: 'Ibuprofen',
     brandNames: ['Brufen', 'Nurofen'],
@@ -92,7 +92,7 @@ final List<Drug> analgesics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'tramadol',
     genericName: 'Tramadol',
     brandNames: ['Tramal', 'Anarex'],
@@ -133,7 +133,7 @@ final List<Drug> analgesics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'morphine',
     genericName: 'Morphine',
     brandNames: ['MST Continus', 'Morphine Sulfate'],
@@ -174,7 +174,7 @@ final List<Drug> analgesics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'fentanyl',
     genericName: 'Fentanyl',
     brandNames: ['Durogesic', 'Sublimaze'],

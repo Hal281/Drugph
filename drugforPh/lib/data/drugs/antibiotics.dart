@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> antibiotics = [
-  Drug(
+  const Drug(
     id: 'vancomycin',
     genericName: 'Vancomycin',
     brandNames: ['Vancocin'],
@@ -51,7 +51,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'gentamicin',
     genericName: 'Gentamicin',
     brandNames: ['Garamycin'],
@@ -103,7 +103,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'amikacin',
     genericName: 'Amikacin',
     brandNames: ['Amikin'],
@@ -123,7 +123,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'meropenem',
     genericName: 'Meropenem',
     brandNames: ['Meronem'],
@@ -172,7 +172,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ceftriaxone',
     genericName: 'Ceftriaxone',
     brandNames: ['Rocephin'],
@@ -217,7 +217,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'amoxicillin_clavulanate',
     genericName: 'Amoxicillin/Clavulanate',
     brandNames: ['Augmentin', 'Curam', 'Amoksiklav'],
@@ -256,7 +256,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'azithromycin',
     genericName: 'Azithromycin',
     brandNames: ['Zithromax'],
@@ -292,7 +292,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ciprofloxacin',
     genericName: 'Ciprofloxacin',
     brandNames: ['Ciproxyl', 'Ciprobay'],
@@ -337,7 +337,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'levofloxacin',
     genericName: 'Levofloxacin',
     brandNames: ['Cravit', 'Leflox'],
@@ -378,7 +378,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'clindamycin',
     genericName: 'Clindamycin',
     brandNames: ['Dalacin C', 'Clinmanda'],
@@ -410,7 +410,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'metronidazole',
     genericName: 'Metronidazole',
     brandNames: ['Flagyl', 'Robaz'],
@@ -448,7 +448,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'cefazolin',
     genericName: 'Cefazolin',
     brandNames: ['Cefamezin'],
@@ -502,7 +502,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'piperacillin_tazobactam',
     genericName: 'Piperacillin/Tazobactam',
     brandNames: ['Tazocin'],
@@ -537,7 +537,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'cefepime',
     genericName: 'Cefepime',
     brandNames: ['Maxipime'],
@@ -560,7 +560,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'linezolid',
     genericName: 'Linezolid',
     brandNames: ['Zyvox'],
@@ -582,7 +582,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'doxycycline',
     genericName: 'Doxycycline',
     brandNames: ['Vibramycin'],
@@ -603,7 +603,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'colistin',
     genericName: 'Colistin (Colistimethate Sodium)',
     brandNames: ['Colomycin'],
@@ -639,7 +639,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'acyclovir',
     genericName: 'Acyclovir',
     brandNames: ['Zovirax'],
@@ -665,7 +665,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'fluconazole',
     genericName: 'Fluconazole',
     brandNames: ['Diflucan'],
@@ -691,7 +691,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ceftazidime',
     genericName: 'Ceftazidime',
     brandNames: ['Fortum'],
@@ -718,7 +718,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'rifampin',
     genericName: 'Rifampin (Rifampicin)',
     brandNames: ['Rifadin', 'Rimactane'],
@@ -746,7 +746,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'isoniazid',
     genericName: 'Isoniazid (INH)',
     brandNames: ['Isoniazid'],
@@ -769,7 +769,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'pyrazinamide',
     genericName: 'Pyrazinamide (PZA)',
     brandNames: ['Pyrazinamide'],
@@ -796,7 +796,7 @@ final List<Drug> antibiotics = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ethambutol',
     genericName: 'Ethambutol (EMB)',
     brandNames: ['Myambutol'],

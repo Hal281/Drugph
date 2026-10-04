@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> metabolic = [
-  Drug(
+  const Drug(
     id: 'metformin',
     genericName: 'Metformin',
     brandNames: ['Glucophage'],
@@ -36,7 +36,7 @@ final List<Drug> metabolic = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'regular_insulin',
     genericName: 'Regular Insulin (RI)',
     brandNames: ['Actrapid', 'Humulin R'],
@@ -74,7 +74,7 @@ final List<Drug> metabolic = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'atorvastatin',
     genericName: 'Atorvastatin',
     brandNames: ['Lipitor', 'Xarator'],

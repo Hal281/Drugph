@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> neurology = [
-  Drug(
+  const Drug(
     id: 'diazepam',
     genericName: 'Diazepam',
     brandNames: ['Valium'],
@@ -57,7 +57,7 @@ final List<Drug> neurology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'phenytoin',
     genericName: 'Phenytoin',
     brandNames: ['Dilantin'],
@@ -100,7 +100,7 @@ final List<Drug> neurology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'levetiracetam',
     genericName: 'Levetiracetam',
     brandNames: ['Keppra'],
@@ -128,7 +128,7 @@ final List<Drug> neurology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'haloperidol',
     genericName: 'Haloperidol',
     brandNames: ['Haldol'],
@@ -166,7 +166,7 @@ final List<Drug> neurology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'gabapentin',
     genericName: 'Gabapentin',
     brandNames: ['Neurontin'],
@@ -194,7 +194,7 @@ final List<Drug> neurology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'valproic_acid',
     genericName: 'Valproic Acid / Sodium Valproate',
     brandNames: ['Depakine'],

@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> nephrology = [
-  Drug(
+  const Drug(
     id: 'sevelamer',
     genericName: 'Sevelamer',
     brandNames: ['Renvela', 'Renagel'],
@@ -26,7 +26,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'epoetin_alfa',
     genericName: 'Epoetin alfa',
     brandNames: ['Epogen', 'Hemax'],
@@ -54,7 +54,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'sodium_polystyrene_sulfonate',
     genericName: 'Sodium polystyrene sulfonate',
     brandNames: ['Kalimate', 'Kayexalate'],
@@ -85,7 +85,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'calcitriol',
     genericName: 'Calcitriol (Active Vitamin D3)',
     brandNames: ['Rocaltrol'],
@@ -107,7 +107,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'calcium_carbonate',
     genericName: 'Calcium Carbonate',
     brandNames: ['CaCO3'],
@@ -137,7 +137,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'cinacalcet',
     genericName: 'Cinacalcet',
     brandNames: ['Sensipar'],
@@ -162,7 +162,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'tacrolimus',
     genericName: 'Tacrolimus',
     brandNames: ['Prograf', 'Advagraf'],
@@ -192,7 +192,7 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'mycophenolate',
     genericName: 'Mycophenolate Mofetil (MMF)',
     brandNames: ['CellCept'],

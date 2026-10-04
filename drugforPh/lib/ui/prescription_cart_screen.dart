@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/prescription_cart.dart';
 import '../core/models/drug.dart';
-import '../data/patient_session.dart';
 
 class PrescriptionCartScreen extends StatelessWidget {
   final bool isThai;

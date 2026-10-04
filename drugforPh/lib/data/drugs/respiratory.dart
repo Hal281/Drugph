@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> respiratory = [
-  Drug(
+  const Drug(
     id: 'salbutamol',
     genericName: 'Salbutamol (Albuterol)',
     brandNames: ['Ventolin', 'Asmasal'],
@@ -38,7 +38,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'chlorpheniramine',
     genericName: 'Chlorpheniramine (CPM)',
     brandNames: ['Piriton'],
@@ -90,7 +90,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'cetirizine',
     genericName: 'Cetirizine',
     brandNames: ['Zyrtec'],
@@ -116,7 +116,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'ipratropium',
     genericName: 'Ipratropium Bromide',
     brandNames: ['Atrovent'],
@@ -146,7 +146,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'budesonide_neb',
     genericName: 'Budesonide (Nebulizer)',
     brandNames: ['Pulmicort'],
@@ -175,7 +175,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'prednisolone',
     genericName: 'Prednisolone',
     brandNames: ['Precortalon', 'Solone'],
@@ -210,7 +210,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'loratadine',
     genericName: 'Loratadine',
     brandNames: ['Clarityne'],
@@ -239,7 +239,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'fexofenadine',
     genericName: 'Fexofenadine',
     brandNames: ['Telfast', 'Allegra'],
@@ -259,7 +259,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'montelukast',
     genericName: 'Montelukast',
     brandNames: ['Singulair', 'Montair'],
@@ -288,7 +288,7 @@ final List<Drug> respiratory = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'n_acetylcysteine',
     genericName: 'N-Acetylcysteine (NAC)',
     brandNames: ['Fluimucil', 'Mucomyst'],

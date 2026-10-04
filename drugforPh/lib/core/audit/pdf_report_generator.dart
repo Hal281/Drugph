@@ -19,7 +19,7 @@ class PdfReportGenerator {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text('Clinical Dose Calculation Report', 
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800)),
+                  style: const pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey800)),
               pw.SizedBox(height: 5),
               pw.Text('Software as a Medical Device (SaMD) Prototype - Audit Log'),
               pw.SizedBox(height: 10),
@@ -49,7 +49,7 @@ class PdfReportGenerator {
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
-                      pw.Text(log.drugName, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey)),
+                      pw.Text(log.drugName, style: const pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey)),
                       pw.Text(dateFormat.format(log.timestamp), style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey600)),
                     ]
                   ),
@@ -57,19 +57,19 @@ class PdfReportGenerator {
                   if (log.result.success)
                     pw.Text(
                       'Calculated Dose: ${log.result.calculatedDose?.toStringAsFixed(2)} ${log.result.doseUnit?.symbol} ${log.result.frequency}',
-                      style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.green700),
+                      style: const pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.green700),
                     )
                   else
                     pw.Text('Calculation Failed/Error', style: const pw.TextStyle(color: PdfColors.red)),
                   
                   pw.SizedBox(height: 8),
-                  pw.Text('Patient Inputs', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
+                  pw.Text('Patient Inputs', style: const pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
                   pw.Text('Weight: ${log.inputs['weightKg'] ?? '-'} kg | Height: ${log.inputs['heightCm'] ?? '-'} cm | Age: ${log.inputs['ageYears'] ?? '-'} y'),
                   pw.Text('Sex: ${log.inputs['sex']} | Serum Creatinine: ${log.inputs['scr'] ?? '-'} mg/dL'),
                   
                   if (hasWarnings) ...[
                     pw.SizedBox(height: 8),
-                    pw.Text('Safety Warnings (${log.result.warnings.length}):', style: pw.TextStyle(color: PdfColors.orange700, fontWeight: pw.FontWeight.bold)),
+                    pw.Text('Safety Warnings (${log.result.warnings.length}):', style: const pw.TextStyle(color: PdfColors.orange700, fontWeight: pw.FontWeight.bold)),
                     pw.Text('Please review warnings in the application.', style: const pw.TextStyle(color: PdfColors.orange700, fontSize: 10)),
                   ],
 

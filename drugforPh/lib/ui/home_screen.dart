@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(2, 0),
                             )
@@ -427,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: baseColor.withOpacity(0.4),
+                                color: baseColor.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               )
@@ -497,7 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: isSelected
                                 ? catColor
                                 : (drug.isHighAlert
-                                    ? Colors.red.withOpacity(0.5)
+                                    ? Colors.red.withValues(alpha: 0.5)
                                     : Colors.transparent),
                             width: isSelected ? 2 : 1,
                           ),
@@ -514,7 +514,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: catColor.withOpacity(0.15),
+                                    color: catColor.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Icon(_getCategoryIcon(drug.category),

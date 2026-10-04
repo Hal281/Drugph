@@ -192,9 +192,11 @@ class WeightBasedCalculator {
   ///
   /// [gfrMlMin] is the patient's GFR in mL/min (measured or estimated).
   /// [targetAuc] is the target AUC (commonly 5–7 for Carboplatin).
+  /// [capGfrAt125] caps GFR at 125 mL/min per FDA/NCCN guidelines (default true).
   static double calvertFormula({
     required double targetAuc,
     required double gfrMlMin,
+    bool capGfrAt125 = true,
   }) {
     if (targetAuc <= 0) {
       throw ArgumentError.value(targetAuc, 'targetAuc', 'Must be > 0');
@@ -203,6 +205,7 @@ class WeightBasedCalculator {
       throw ArgumentError.value(gfrMlMin, 'gfrMlMin', 'Must be ≥ 0');
     }
 
-    return targetAuc * (gfrMlMin + 25.0);
+    final effectiveGfr = (capGfrAt125 && gfrMlMin > 125.0) ? 125.0 : gfrMlMin;
+    return targetAuc * (effectiveGfr + 25.0);
   }
 }

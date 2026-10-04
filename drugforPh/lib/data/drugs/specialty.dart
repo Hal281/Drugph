@@ -2,7 +2,7 @@ import '../../core/models/models.dart';
 
 /// Dermatology, Ophthalmology, ENT, and Topical drugs.
 final List<Drug> topical = [
-  Drug(
+  const Drug(
     id: 'silver_sulfadiazine',
     genericName: 'Silver Sulfadiazine 1% Cream',
     brandNames: ['Silvadene', 'Flamazine'],
@@ -23,7 +23,7 @@ final List<Drug> topical = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'mupirocin',
     genericName: 'Mupirocin 2% Ointment',
     brandNames: ['Bactroban'],
@@ -46,7 +46,7 @@ final List<Drug> topical = [
 
 /// Hematology & Anticoagulant drugs.
 final List<Drug> anticoagulants = [
-  Drug(
+  const Drug(
     id: 'warfarin',
     genericName: 'Warfarin',
     brandNames: ['Coumadin', 'Orfarin'],
@@ -82,7 +82,7 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'enoxaparin',
     genericName: 'Enoxaparin',
     brandNames: ['Clexane', 'Lovenox'],
@@ -128,7 +128,7 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'heparin',
     genericName: 'Unfractionated Heparin (UFH)',
     brandNames: ['Heparin'],
@@ -161,7 +161,7 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'apixaban',
     genericName: 'Apixaban',
     brandNames: ['Eliquis'],
@@ -201,7 +201,7 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'rivaroxaban',
     genericName: 'Rivaroxaban',
     brandNames: ['Xarelto'],
@@ -235,7 +235,7 @@ final List<Drug> anticoagulants = [
 
 /// Vitamins, Supplements, and Electrolyte Replacements.
 final List<Drug> supplements = [
-  Drug(
+  const Drug(
     id: 'potassium_chloride',
     genericName: 'Potassium Chloride (KCl)',
     brandNames: ['KCl', 'K-Lor'],
@@ -270,7 +270,7 @@ final List<Drug> supplements = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'calcium_gluconate',
     genericName: 'Calcium Gluconate',
     brandNames: ['Calcium Gluconate'],
@@ -303,7 +303,7 @@ final List<Drug> supplements = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'vitamin_k',
     genericName: 'Phytonadione (Vitamin K1)',
     brandNames: ['Konakion'],

@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> endocrine = [
-  Drug(
+  const Drug(
     id: 'metformin',
     genericName: 'Metformin',
     brandNames: ['Glucophage', 'Siamformet'],
@@ -38,7 +38,7 @@ final List<Drug> endocrine = [
           ]),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'glipizide',
     genericName: 'Glipizide',
     brandNames: ['Minidiab', 'Glucotrol'],
@@ -60,7 +60,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'empagliflozin',
     genericName: 'Empagliflozin',
     brandNames: ['Jardiance'],
@@ -81,7 +81,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'sitagliptin',
     genericName: 'Sitagliptin',
     brandNames: ['Januvia'],
@@ -112,7 +112,7 @@ final List<Drug> endocrine = [
           ]),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'pioglitazone',
     genericName: 'Pioglitazone',
     brandNames: ['Actos'],
@@ -133,7 +133,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'levothyroxine',
     genericName: 'Levothyroxine',
     brandNames: ['Eltroxin', 'Thyrosit'],
@@ -167,7 +167,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'methimazole',
     genericName: 'Methimazole',
     brandNames: ['Tapazole'],
@@ -187,7 +187,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'propylthiouracil',
     genericName: 'Propylthiouracil (PTU)',
     brandNames: ['PTU'],
@@ -209,7 +209,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'insulin_glargine',
     genericName: 'Insulin Glargine',
     brandNames: ['Lantus', 'Toujeo'],
@@ -231,7 +231,7 @@ final List<Drug> endocrine = [
       ),
     ],
   ),
-  Drug(
+  const Drug(
     id: 'insulin_regular',
     genericName: 'Insulin Regular (RI)',
     brandNames: ['Actrapid', 'Humulin R'],

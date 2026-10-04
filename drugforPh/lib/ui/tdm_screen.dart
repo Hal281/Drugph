@@ -24,7 +24,7 @@ class TdmScreen extends StatefulWidget {
 class _TdmScreenState extends State<TdmScreen> {
   double _maintDose = 1000.0;
   double _intervalHrs = 12.0;
-  double _infusionTimeHrs = 1.0;
+  final double _infusionTimeHrs = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +203,7 @@ class _TdmScreenState extends State<TdmScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _getTroughColor(predictedTrough).withOpacity(0.2),
+                      color: _getTroughColor(predictedTrough).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: _getTroughColor(predictedTrough),
