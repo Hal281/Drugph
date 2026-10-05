@@ -133,13 +133,15 @@ class CalculationLog {
     this.warningOverridden = false,
     this.overrideJustification,
   })  : timestamp = timestamp.isUtc ? timestamp : timestamp.toUtc(),
-        inputs = Map.unmodifiable(inputs),
-        assert(
-          !warningOverridden ||
-              (overrideJustification != null &&
-                  overrideJustification.trim().isNotEmpty),
-          'Override justification is required when warnings are overridden',
-        );
+        inputs = Map.unmodifiable(inputs) {
+    if (warningOverridden &&
+        (overrideJustification == null ||
+            overrideJustification!.trim().isEmpty)) {
+      throw ArgumentError(
+        'Override justification is required when warnings are overridden',
+      );
+    }
+  }
 
   /// Serializes this log entry to a JSON-compatible Map.
   Map<String, dynamic> toJson() {

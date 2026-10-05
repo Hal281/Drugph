@@ -60,6 +60,23 @@ final List<Drug> analgesics = [
     category: DrugCategory.nsaid,
     requiresRenalAdjustment: true,
     allergyClass: 'NSAID / Aspirin',
+    drugClass: DrugClass.nsaid,
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'warfarin',
+        targetClass: DrugClass.anticoagulantVka,
+        severity: InteractionSeverity.major,
+        mechanismEn:
+            'Ibuprofen inhibits platelet COX-1 and causes gastric mucosal injury, markedly increasing the risk of major upper GI bleeding with Warfarin.',
+        mechanismTh:
+            'ไอบูโพรเฟนยับยั้งการทำงานของเกล็ดเลือดและระคายเคืองเยื่อบุกระเพาะอาหาร เพิ่มความเสี่ยงเลือดออกในทางเดินอาหารอย่างรุนแรงเมื่อใช้ร่วมกับ Warfarin',
+        managementEn:
+            'Avoid combination. Consider Paracetamol for analgesia. If NSAID unavoidable, monitor closely and coprescribe PPI.',
+        managementTh:
+            'หลีกเลี่ยงการใช้ร่วมกัน พิจารณาใช้พาราเซตามอลแทน หากจำเป็นต้องใช้ให้เฝ้าระวังอย่างใกล้ชิดและจ่ายร่วมกับยาลดกรดกลุ่ม PPI',
+        source: 'Lexicomp / AHFS Drug Information 2024',
+      ),
+    ],
     severeInteractions: ['Warfarin (bleeding risk)', 'ACE inhibitors (renal failure)', 'Lithium'],
     contraindications: ['Active GI bleeding', 'Severe renal impairment', 'Dengue fever (suspected)'],
     specialNotes: 'Avoid in suspected Dengue fever. Take with food to reduce GI irritation.',

@@ -56,6 +56,23 @@ final List<Drug> anticoagulants = [
     requiresTDM: true, // INR monitoring
     requiresHepaticCaution: true,
     allergyClass: 'Coumarin',
+    drugClass: DrugClass.anticoagulantVka,
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'ibuprofen',
+        targetClass: DrugClass.nsaid,
+        severity: InteractionSeverity.major,
+        mechanismEn:
+            'NSAIDs inhibit platelet function and cause GI mucosal injury, synergistically increasing major bleeding risk with Warfarin.',
+        mechanismTh:
+            'ยากลุ่ม NSAIDs ยับยั้งการทำงานของเกล็ดเลือดและระคายเคืองกระเพาะอาหาร เพิ่มความเสี่ยงเลือดออกรุนแรงร่วมกับ Warfarin',
+        managementEn:
+            'Avoid concomitant NSAID use. Consider alternative analgesia (e.g. Paracetamol) and monitor INR closely.',
+        managementTh:
+            'หลีกเลี่ยงการใช้ร่วมกับ NSAIDs พิจารณาใช้ยาแก้ปวดตัวอื่น (เช่น พาราเซตามอล) และติดตามค่า INR อย่างใกล้ชิด',
+        source: 'AHFS Drug Information 2024',
+      ),
+    ],
     severeInteractions: [
       'NSAIDs (Increased bleeding risk)',
       'Metronidazole (Increases INR significantly)',
@@ -158,6 +175,7 @@ final List<Drug> anticoagulants = [
         continuousRateMax: 18.0,
         continuousRateUnit: 'units/kg/hr',
         rateUnit: RateUnit.uKgHr,
+        standardDilutionMgPerMl: 100.0, // 25,000 units in 250 mL = 100 units/mL
         phases: [
           DosingPhase(
             type: PhaseType.bolus,

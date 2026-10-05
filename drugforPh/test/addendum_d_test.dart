@@ -12,6 +12,7 @@ void main() {
       heightCm: 175.0,
       sex: Sex.male,
       serumCreatinineMgDl: 1.0,
+      isScrStable: true,
     );
 
     const pediatricPatient = Patient(
@@ -21,6 +22,7 @@ void main() {
       heightCm: 125.0,
       sex: Sex.male,
       serumCreatinineMgDl: 0.5,
+      isScrStable: true,
     );
 
     // =========================================================================
@@ -203,6 +205,7 @@ void main() {
         heightCm: 170.0,
         sex: Sex.male,
         serumCreatinineMgDl: 4.0, // Low CrCl < 30
+        isScrStable: true,
       );
 
       final res = PharmacistCalculator.calculateDose(
@@ -289,6 +292,7 @@ void main() {
         weightKg: 140.0,
         heightCm: 175.0,
         sex: Sex.male,
+        isScrStable: true,
       );
 
       final res = PharmacistCalculator.calculateDose(
@@ -380,6 +384,7 @@ void main() {
         heightCm: 155.0,
         sex: Sex.female,
         serumCreatinineMgDl: 1.6,
+        isScrStable: true,
       );
 
       final res = PharmacistCalculator.calculateDose(

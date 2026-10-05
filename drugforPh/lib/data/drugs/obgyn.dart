@@ -26,6 +26,7 @@ final List<Drug> obstetric = [
         continuousRateUnit: 'mU/min',
         rateUnit: RateUnit.mUMin,
         standardDilutionMgPerMl: 0.01, // e.g. 10 units in 1000ml = 10 mU/ml
+        population: PopulationCriteria(sex: Sex.female),
       ),
       DosingRegimen(
         route: DoseRoute.im,
@@ -35,6 +36,7 @@ final List<Drug> obstetric = [
         doseUnit: DoseUnit.units, // Actually IU
         frequency: Frequency.once,
         limits: DoseLimit(maxDailyDose: 10),
+        population: PopulationCriteria(sex: Sex.female),
       ),
     ],
   ),

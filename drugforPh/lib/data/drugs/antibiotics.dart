@@ -162,6 +162,22 @@ final List<Drug> antibiotics = [
     category: DrugCategory.antibiotic,
     availableStrengths: [500.0, 1000.0],
     requiresRenalAdjustment: true,
+    drugClass: DrugClass.betaLactamCarbapenem,
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'valproic_acid',
+        severity: InteractionSeverity.contraindicated,
+        mechanismEn:
+            'Meropenem decreases serum valproic acid concentrations below therapeutic levels, risking breakthrough seizures.',
+        mechanismTh:
+            'Meropenem ลดระดับยา Valproic acid ในเลือดอย่างรวดเร็วจนต่ำกว่าระดับการรักษา เสี่ยงต่ออาการชักกำเริบ',
+        managementEn:
+            'Avoid coadministration. Choose alternative antibiotic or switch antiepileptic agent.',
+        managementTh:
+            'หลีกเลี่ยงการใช้ร่วมกันเด็ดขาด ให้เลือกใช้ยาฆ่าเชื้อตัวอื่นหรือเปลี่ยนยากันชัก',
+        source: 'FDA Merrem Label / Sanford Guide 2024',
+      ),
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,

@@ -55,10 +55,8 @@ void main() {
       );
       // Math sanity check: 
       // peakSS = (1000 / (1 * 49 * 0.0874)) * (1 - e^-0.0874) / (1 - e^(-0.0874 * 12))
-      // troughSS = peakSS * e^(-0.0874 * 11)
-      // Ensure it runs and returns a valid clinical range value
-      expect(trough, greaterThan(5.0));
-      expect(trough, lessThan(25.0));
+      // troughSS = peakSS * e^(-0.0874 * 11) ≈ 11.50 mcg/mL
+      expect(trough, closeTo(11.50, 0.05));
     });
   });
 }

@@ -80,7 +80,7 @@ void main() {
       expect(log.timestamp.isUtc, isTrue);
       expect(() => (log.inputs as Map)['weightKg'] = 80.0, throwsUnsupportedError);
 
-      // Warning overridden without justification must throw AssertionError
+      // Warning overridden without justification must throw ArgumentError (E6 release build enforcement)
       expect(
         () => CalculationLog(
           logId: 'log-002',
@@ -96,7 +96,7 @@ void main() {
           warningOverridden: true,
           overrideJustification: '',
         ),
-        throwsA(isA<AssertionError>()),
+        throwsA(isA<ArgumentError>()),
       );
 
       // Serialization round-trip

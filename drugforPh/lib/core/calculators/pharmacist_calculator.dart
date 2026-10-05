@@ -8,6 +8,8 @@
 // ============================================================
 
 import '../models/models.dart';
+import '../validators/input_validator.dart';
+import '../../data/drug_database.dart';
 import 'calculators.dart';
 
 /// The central core engine for a Ward Pharmacist.
@@ -24,6 +26,40 @@ class PharmacistCalculator {
   }) {
     try {
       final warnings = <DoseWarning>[];
+
+      // --- 0. Input Validation (A12) ---
+      final valRes = InputValidator.validatePatientInputs(
+        weightKg: patient.weightKg,
+        heightCm: patient.heightCm,
+        ageYears: patient.ageYears,
+        ageMonths: patient.ageMonths,
+        serumCreatinineMgDl: patient.serumCreatinineMgDl,
+      );
+      if (!valRes.isValid) {
+        final errEn = valRes.errorsEn.values.join('; ');
+        final errTh = valRes.errorsTh.values.join('; ');
+        return DosageResult.failure(
+          reasonEn: errEn,
+          reasonTh: errTh,
+          formulaUsed: 'Input Validation',
+          warnings: [
+            DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.calculationError,
+              messageEn: errEn,
+              messageTh: errTh,
+            ),
+          ],
+        );
+      }
+      for (final key in valRes.warningsEn.keys) {
+        warnings.add(DoseWarning(
+          severity: LimitSeverity.soft,
+          code: DoseWarningCode.generalAlert,
+          messageEn: valRes.warningsEn[key]!,
+          messageTh: valRes.warningsTh[key] ?? valRes.warningsEn[key]!,
+        ));
+      }
 
       // --- 1. Audience & Population Applicability Check (D4, 4.1) ---
       final isChild = patient.ageYears < 18;
@@ -98,8 +134,14 @@ class PharmacistCalculator {
       // Symmetric & Active Drug Interaction Check (D9)
       for (final activeDrugId in patient.activeDrugIds) {
         final activeNorm = activeDrugId.trim().toLowerCase();
+        final activeDrug = DrugDatabase.findById(activeDrugId);
+
+        // Check current drug's interactions targeting active drug ID or active drug class
         for (final inter in drug.interactions) {
-          if (inter.targetDrugId?.toLowerCase() == activeNorm) {
+          final matchesId = inter.targetDrugId?.toLowerCase() == activeNorm;
+          final matchesClass = inter.targetClass != null &&
+              activeDrug?.drugClass == inter.targetClass;
+          if (matchesId || matchesClass) {
             final isHard = inter.severity == InteractionSeverity.contraindicated ||
                 inter.severity == InteractionSeverity.major;
             warnings.add(DoseWarning(
@@ -114,6 +156,32 @@ class PharmacistCalculator {
             ));
           }
         }
+
+        // Symmetric check: Check active drug's interactions targeting current drug ID or current drug class
+        if (activeDrug != null) {
+          for (final inter in activeDrug.interactions) {
+            final matchesId = inter.targetDrugId?.toLowerCase() == drug.id.toLowerCase();
+            final matchesClass = inter.targetClass != null &&
+                drug.drugClass == inter.targetClass;
+            if (matchesId || matchesClass) {
+              final isHard = inter.severity == InteractionSeverity.contraindicated ||
+                  inter.severity == InteractionSeverity.major;
+              if (!warnings.any((w) => w.messageEn.contains('Interaction with $activeDrugId') || w.messageEn.contains('between ${drug.genericName} and $activeDrugId'))) {
+                warnings.add(DoseWarning(
+                  severity: isHard ? LimitSeverity.hard : LimitSeverity.soft,
+                  code: inter.severity == InteractionSeverity.contraindicated
+                      ? DoseWarningCode.contraindicationAlert
+                      : DoseWarningCode.severeInteractionAlert,
+                  messageEn:
+                      '${inter.severity.labelEn} Interaction between ${drug.genericName} and $activeDrugId: ${inter.mechanismEn}. Action: ${inter.managementEn}',
+                  messageTh:
+                      '${inter.severity.labelTh} ปฏิกิริยาระหว่างยา ${drug.genericName} กับ $activeDrugId: ${inter.mechanismTh}. คำแนะนำ: ${inter.managementTh}',
+                ));
+              }
+            }
+          }
+        }
+
         for (final inter in drug.severeInteractions) {
           if (inter.toLowerCase().contains(activeNorm)) {
             warnings.add(DoseWarning(
@@ -268,8 +336,10 @@ class PharmacistCalculator {
           drug.renalReviewStatus != RenalReviewStatus.notApplicable &&
           (regimen.renalAdjustments == null || regimen.renalAdjustments!.isEmpty)) {
         warnings.add(
-          const DoseWarning(
-            severity: LimitSeverity.hard,
+          DoseWarning(
+            severity: (crcl != null && crcl < 50.0)
+                ? LimitSeverity.hard
+                : LimitSeverity.soft,
             code: DoseWarningCode.severeRenalImpairment,
             messageEn:
                 'DATABASE WARNING: Drug requires renal adjustment but has unreviewed/empty renal tiers.',
@@ -532,7 +602,20 @@ class PharmacistCalculator {
         int criteriaCount = 0;
         if (patient.ageYears >= 80) criteriaCount++;
         if (patient.weightKg <= 60.0) criteriaCount++;
-        if ((patient.serumCreatinineMgDl ?? 0.0) >= 1.5) criteriaCount++;
+        if (patient.serumCreatinineMgDl != null) {
+          if (patient.serumCreatinineMgDl! >= 1.5) criteriaCount++;
+        } else {
+          warnings.add(
+            const DoseWarning(
+              severity: LimitSeverity.soft,
+              code: DoseWarningCode.scrMissing,
+              messageEn:
+                  'Serum creatinine is missing: Apixaban 2-of-3 dose reduction criteria cannot be fully evaluated.',
+              messageTh:
+                  'ไม่มีค่า Serum Creatinine: ไม่สามารถประเมินเกณฑ์การปรับลดขนาดยา Apixaban 2 ใน 3 ข้อได้อย่างสมบูรณ์',
+            ),
+          );
+        }
 
         if (criteriaCount >= 2) {
           finalDose = 2.5;
@@ -587,7 +670,7 @@ class PharmacistCalculator {
         }
 
         double? mlPerHr(double r) {
-          final conc = regimen.standardDilutionMgPerMl;
+          final conc = regimen.effectiveStandardDilutionMgPerMl;
           if (conc == null || conc <= 0) return null;
           if (rateUnit == RateUnit.mlHr) return r;
           final amountPerHr = rateUnit.toAmountPerHour(r, weightForDosing);
@@ -656,6 +739,32 @@ class PharmacistCalculator {
             dailyDose: dailyDose,
           ),
         );
+
+        if (roundedDose != null && roundedDose != finalDose) {
+          final roundedDailyDose = (finalFrequency.dosesPerDay != null && finalFrequency.dosesPerDay! > 0)
+              ? roundedDose * finalFrequency.dosesPerDay!
+              : null;
+          final roundedLimitWarnings = DoseChecker.checkDose(
+            calculatedDose: roundedDose,
+            limits: regimen.limits!,
+            doseUnit: regimen.doseUnit.symbol,
+            weightKg: weightForDosing,
+            dailyDose: roundedDailyDose,
+          );
+          for (final rw in roundedLimitWarnings) {
+            if (!warnings.any((w) => w.code == rw.code)) {
+              warnings.add(DoseWarning(
+                severity: rw.severity,
+                code: rw.code,
+                messageEn: 'Rounded dose (${roundedDose.toStringAsFixed(1)} ${regimen.doseUnit.symbol}): ${rw.messageEn}',
+                messageTh: 'ขนาดยาหลังปัดเศษ (${roundedDose.toStringAsFixed(1)} ${regimen.doseUnit.symbol}): ${rw.messageTh}',
+                calculatedValue: rw.calculatedValue,
+                limitValue: rw.limitValue,
+                unit: rw.unit,
+              ));
+            }
+          }
+        }
       }
 
       if (drug.isHighAlert) {
@@ -739,6 +848,14 @@ class PharmacistCalculator {
       return DosageResult.failure(
         reasonEn: 'Calculation error: $e',
         reasonTh: 'เกิดข้อผิดพลาดในการคำนวณ: $e',
+        warnings: [
+          DoseWarning(
+            severity: LimitSeverity.hard,
+            code: DoseWarningCode.calculationError,
+            messageEn: 'Calculation error: $e',
+            messageTh: 'เกิดข้อผิดพลาดในการคำนวณ: $e',
+          ),
+        ],
       );
     }
   }
@@ -776,6 +893,54 @@ class PharmacistCalculator {
               'ORDER DEVIATION: Ordered dose ($orderedDose ${regimen.doseUnit.symbol}) deviates by ${deviation.toStringAsFixed(1)}% from recommended (${targetDose?.toStringAsFixed(1)} ${regimen.doseUnit.symbol}).',
           messageTh:
               'ขนาดยาคลาดเคลื่อน: ขนาดยาที่สั่ง ($orderedDose ${regimen.doseUnit.symbol}) ต่างจากที่แนะนำ (${targetDose?.toStringAsFixed(1)} ${regimen.doseUnit.symbol}) อยู่ ${deviation.toStringAsFixed(1)}%',
+        ),
+      );
+    }
+
+    // Check if ordered dose is below regimen minimum
+    if (regimen.limits?.minSingleDose != null &&
+        orderedDose < regimen.limits!.minSingleDose!) {
+      verificationWarnings.add(
+        DoseWarning(
+          severity: LimitSeverity.info,
+          code: DoseWarningCode.minDoseNotReached,
+          messageEn:
+              'Ordered dose below minimum: $orderedDose ${regimen.doseUnit.symbol} < ${regimen.limits!.minSingleDose} ${regimen.doseUnit.symbol}',
+          messageTh:
+              'ขนาดยาที่สั่งต่ำกว่าเกณฑ์ขั้นต่ำ: $orderedDose ${regimen.doseUnit.symbol} < ${regimen.limits!.minSingleDose} ${regimen.doseUnit.symbol}',
+        ),
+      );
+    }
+
+    // Check if ordered frequency interval differs from recommended interval
+    if (recommended.structuredFrequency != null &&
+        recommended.structuredFrequency!.intervalHours != null &&
+        orderedFrequency.intervalHours != null &&
+        recommended.structuredFrequency!.intervalHours != orderedFrequency.intervalHours) {
+      verificationWarnings.add(
+        DoseWarning(
+          severity: LimitSeverity.soft,
+          code: DoseWarningCode.unknownFrequency,
+          messageEn:
+              'FREQUENCY MISMATCH: Ordered frequency (${orderedFrequency.displayEn}) differs from recommended (${recommended.structuredFrequency!.displayEn}).',
+          messageTh:
+              'ความถี่การให้ยาคลาดเคลื่อน: ความถี่ที่สั่ง (${orderedFrequency.displayTh}) ต่างจากที่แนะนำ (${recommended.structuredFrequency!.displayTh})',
+        ),
+      );
+    }
+
+    // Check if ordered frequency has unknown/variable doses per day
+    if (orderedFrequency.dosesPerDay == null &&
+        !orderedFrequency.isContinuous &&
+        !orderedFrequency.isOnce) {
+      verificationWarnings.add(
+        const DoseWarning(
+          severity: LimitSeverity.soft,
+          code: DoseWarningCode.unknownFrequency,
+          messageEn:
+              'Ordered frequency has irregular or variable dosing interval; daily dose limits cannot be verified.',
+          messageTh:
+              'ความถี่การให้ยาที่สั่งไม่คงที่ ไม่สามารถตรวจสอบขนาดยาสะสมต่อวันได้',
         ),
       );
     }

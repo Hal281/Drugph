@@ -31,6 +31,51 @@ export 'interaction.dart';
 export 'formulation.dart';
 export 'provenance.dart';
 
+/// Unit of medication concentration (E6).
+enum ConcentrationUnit {
+  mgPerMl('mg/mL'),
+  mcgPerMl('mcg/mL'),
+  unitsPerMl('Units/mL'),
+  mUPerMl('mU/mL'),
+  gPerMl('g/mL');
+
+  final String symbol;
+  const ConcentrationUnit(this.symbol);
+}
+
+/// Structured medication concentration (E6).
+class Concentration {
+  final double value;
+  final ConcentrationUnit unit;
+
+  const Concentration(this.value, this.unit);
+
+  /// Converts concentration to numeric value (mg/mL equivalent where applicable).
+  double toMgPerMl() {
+    switch (unit) {
+      case ConcentrationUnit.mgPerMl:
+        return value;
+      case ConcentrationUnit.mcgPerMl:
+        return value / 1000.0;
+      case ConcentrationUnit.gPerMl:
+        return value * 1000.0;
+      case ConcentrationUnit.unitsPerMl:
+      case ConcentrationUnit.mUPerMl:
+        return value;
+    }
+  }
+
+  @override
+  String toString() => '$value ${unit.symbol}';
+}
+
+/// Clinical verification status for SaMD regimens (E5).
+enum VerificationStatus {
+  verified,
+  pendingReview,
+  unverified,
+}
+
 /// Strategy for selecting body weight for weight-based drug calculations.
 enum DosingWeightStrategy {
   /// Actual/Total Body Weight (TBW). Used for Vancomycin, Heparin, etc.
@@ -128,6 +173,12 @@ class DosingRegimen {
   /// Standard dilution concentration for infusion in mg/mL.
   final double? standardDilutionMgPerMl;
 
+  /// Structured standard dilution concentration (E6).
+  final Concentration? standardDilution;
+
+  /// Clinical verification status for this regimen (E5).
+  final VerificationStatus verificationStatus;
+
   /// Recommended infusion time in minutes.
   final double? infusionTimeMinutes;
 
@@ -178,6 +229,7 @@ class DosingRegimen {
     this.provenance,
     this.limits,
     this.reconcentrationMgPerMl,
+    this.standardDilution,
     this.standardDilutionMgPerMl,
     this.infusionTimeMinutes,
     this.maxInfusionRateMgPerMin,
@@ -187,7 +239,12 @@ class DosingRegimen {
     this.dosingWeightStrategy = DosingWeightStrategy.actual,
     this.audience,
     this.maxDosingWeightKg,
+    this.verificationStatus = VerificationStatus.verified,
   });
+
+  /// Effective standard dilution concentration in mg/mL equivalent.
+  double? get effectiveStandardDilutionMgPerMl =>
+      standardDilution?.toMgPerMl() ?? standardDilutionMgPerMl;
 
   /// Who this regimen is written for.
   ///

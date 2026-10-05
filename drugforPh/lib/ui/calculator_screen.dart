@@ -1053,6 +1053,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         heightCm: double.tryParse(_heightCtrl.text) ?? 170,
                         ageYears: int.tryParse(_ageCtrl.text) ?? 35,
                         sex: _sex,
+                        isScrStable: _isScrStable,
                         creatinineClearanceMlMin: res.crclMlMin,
                       );
                       Navigator.push(

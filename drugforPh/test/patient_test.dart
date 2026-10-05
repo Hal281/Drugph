@@ -15,6 +15,7 @@ void main() {
         ageMonths: 6,
         sex: Sex.male,
         serumCreatinineMgDl: 1.2,
+        isScrStable: true,
         creatinineClearanceMlMin: 80.0,
         eGfrMlMinPer173m2: 85.0,
         allergies: ['Penicillin'],
@@ -43,6 +44,7 @@ void main() {
         heightCm: 170,
         ageYears: 45,
         sex: Sex.male,
+        isScrStable: true,
         allergies: ['Amoxicillin', 'Aspirin'],
       );
 

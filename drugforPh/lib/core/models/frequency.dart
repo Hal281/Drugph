@@ -1,5 +1,16 @@
 import 'dose_basis.dart';
 
+/// Classification of dosing schedules (E5, E6).
+enum FrequencyKind {
+  interval,
+  range,
+  once,
+  continuous,
+  weekly,
+  prn,
+  custom,
+}
+
 /// Structured clinical frequency value type (D1).
 ///
 /// Replaces free-text frequency strings. Supports fixed intervals, ranges,
@@ -26,6 +37,12 @@ class Frequency {
   /// Whether this is a continuous infusion.
   final bool isContinuous;
 
+  /// Clinical classification kind of this frequency schedule (E5, E6).
+  final FrequencyKind kind;
+
+  /// Clinical reason if [kind] is custom (E5).
+  final String? customReason;
+
   /// English display text (e.g. 'q8h', 'q4-6h PRN', 'Once', 'Continuous IV').
   final String displayEn;
 
@@ -46,6 +63,8 @@ class Frequency {
     required this.displayEn,
     required this.displayTh,
     this.doseBasis = DoseBasis.perDose,
+    this.kind = FrequencyKind.interval,
+    this.customReason,
   });
 
   // ---- Predefined Standard Clinical Frequencies ----
@@ -54,6 +73,7 @@ class Frequency {
     intervalHours: 4,
     displayEn: 'q4h',
     displayTh: 'ทุก 4 ชม.',
+    kind: FrequencyKind.interval,
   );
 
   static const Frequency q6h = Frequency(
@@ -103,6 +123,7 @@ class Frequency {
     maxIntervalHours: 24,
     displayEn: 'q12-24h',
     displayTh: 'ทุก 12-24 ชม.',
+    kind: FrequencyKind.range,
   );
 
   static const Frequency q48hTo72h = Frequency(
@@ -110,6 +131,7 @@ class Frequency {
     maxIntervalHours: 72,
     displayEn: 'q48-72h',
     displayTh: 'ทุก 48-72 ชม.',
+    kind: FrequencyKind.range,
   );
 
   static const Frequency bid = q12h;
@@ -121,18 +143,21 @@ class Frequency {
     isOnce: true,
     displayEn: 'Once',
     displayTh: 'ครั้งเดียว',
+    kind: FrequencyKind.once,
   );
 
   static const Frequency stat = Frequency(
     isOnce: true,
     displayEn: 'Stat',
     displayTh: 'ทันที (Stat)',
+    kind: FrequencyKind.once,
   );
 
   static const Frequency continuous = Frequency(
     isContinuous: true,
     displayEn: 'Continuous',
     displayTh: 'หยดต่อเนื่อง',
+    kind: FrequencyKind.continuous,
   );
 
   static const Frequency weekly = Frequency(
@@ -140,12 +165,14 @@ class Frequency {
     displayEn: 'Weekly',
     displayTh: 'สัปดาห์ละ 1 ครั้ง',
     doseBasis: DoseBasis.perWeek,
+    kind: FrequencyKind.weekly,
   );
 
   static const Frequency prn = Frequency(
     isPrn: true,
     displayEn: 'PRN',
     displayTh: 'เมื่อจำเป็น',
+    kind: FrequencyKind.prn,
   );
 
   // Common PRN & Range Frequencies
@@ -155,6 +182,7 @@ class Frequency {
     isPrn: true,
     displayEn: 'q4-6h PRN',
     displayTh: 'ทุก 4-6 ชม. เมื่อมีอาการ',
+    kind: FrequencyKind.prn,
   );
 
   static const Frequency q6_8hPrn = Frequency(
@@ -163,6 +191,7 @@ class Frequency {
     isPrn: true,
     displayEn: 'q6-8h PRN',
     displayTh: 'ทุก 6-8 ชม. เมื่อมีอาการ',
+    kind: FrequencyKind.prn,
   );
 
   static const Frequency q8hPrn = Frequency(
@@ -170,6 +199,7 @@ class Frequency {
     isPrn: true,
     displayEn: 'q8h PRN',
     displayTh: 'ทุก 8 ชม. เมื่อมีอาการ',
+    kind: FrequencyKind.prn,
   );
 
   static const Frequency q6hPrn = Frequency(
@@ -177,6 +207,7 @@ class Frequency {
     isPrn: true,
     displayEn: 'q6h PRN',
     displayTh: 'ทุก 6 ชม. เมื่อมีอาการ',
+    kind: FrequencyKind.prn,
   );
 
   /// Derives doses per day from the structured fields.

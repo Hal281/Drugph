@@ -27,6 +27,7 @@ void main() {
     });
 
     // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // 4.1: Pediatric Block
     // -------------------------------------------------------------------------
     test('4.1: Pediatric patients (< 18 years) are blocked by the adult dosing engine', () {
@@ -36,6 +37,7 @@ void main() {
         heightCm: 120.0,
         ageYears: 10,
         sex: Sex.male,
+        isScrStable: true,
       );
       final drug = antibiotics.firstWhere((d) => d.id == 'amoxicillin_clavulanate');
       final regimen = drug.regimens.first;
@@ -90,6 +92,7 @@ void main() {
         sex: Sex.male,
         serumCreatinineMgDl: null,
         creatinineClearanceMlMin: 20.0, // Entered manually
+        isScrStable: true,
       );
       final drug = antibiotics.firstWhere((d) => d.id == 'meropenem');
       final regimen = drug.regimens.first;
@@ -102,32 +105,101 @@ void main() {
 
       expect(result.crclMlMin, equals(20.0));
       expect(result.isRenallyAdjusted, isTrue);
+      expect(result.warnings.any((w) => w.messageEn.contains('manually entered Creatinine Clearance')), isTrue);
     });
 
     // -------------------------------------------------------------------------
-    // 4.4: GFR-based Dosing (Calvert)
+    // 4.4 & E1: GFR-based Dosing (Calvert Independent Golden Values)
     // -------------------------------------------------------------------------
-    test('4.4: Calvert formula uses CrCl directly without secondary renal factor reduction', () {
-      const patient = Patient(
-        id: 'p-chemo',
+    test('E1: Calvert golden values (female 415.1 mg, male 586.8 mg, CrCl > 125 cap 750 mg)', () {
+      final carboplatin = chemotherapy.firstWhere((d) => d.id == 'carboplatin');
+      final regimen = carboplatin.regimens.first; // AUC 5
+
+      // Female 60y / 70kg / 170cm / SCr 1.0 -> ~415.1 mg
+      const femalePatient = Patient(
+        id: 'p-calvert-f',
         weightKg: 70.0,
         heightCm: 170.0,
         ageYears: 60,
         sex: Sex.female,
         serumCreatinineMgDl: 1.0,
+        isScrStable: true,
       );
-      final carboplatin = chemotherapy.firstWhere((d) => d.id == 'carboplatin');
-      final regimen = carboplatin.regimens.first;
+      final resFemale = PharmacistCalculator.calculateDose(
+        patient: femalePatient,
+        drug: carboplatin,
+        regimen: regimen,
+      );
+      expect(resFemale.success, isTrue);
+      expect(resFemale.isRenallyAdjusted, isFalse);
+      expect(resFemale.calculatedDose, closeTo(415.1, 0.5));
 
-      final result = PharmacistCalculator.calculateDose(
-        patient: patient,
-        drug: drugWithCalvert(carboplatin),
+      // Male 45y / 70kg / 175cm / SCr 1.0 -> ~586.8 mg
+      const malePatient = Patient(
+        id: 'p-calvert-m',
+        weightKg: 70.0,
+        heightCm: 175.0,
+        ageYears: 45,
+        sex: Sex.male,
+        serumCreatinineMgDl: 1.0,
+        isScrStable: true,
+      );
+      final resMale = PharmacistCalculator.calculateDose(
+        patient: malePatient,
+        drug: carboplatin,
+        regimen: regimen,
+      );
+      expect(resMale.success, isTrue);
+      expect(resMale.calculatedDose, closeTo(586.8, 0.5));
+
+      // CrCl > 125 cap: Male with high CrCl (>125 mL/min capped at 125 mL/min) -> 5 * (125 + 25) = 750 mg
+      const cappedPatient = Patient(
+        id: 'p-calvert-cap',
+        weightKg: 85.0,
+        heightCm: 185.0,
+        ageYears: 22,
+        sex: Sex.male,
+        serumCreatinineMgDl: 0.6, // CrCl well over 125 mL/min
+        isScrStable: true,
+      );
+      final resCapped = PharmacistCalculator.calculateDose(
+        patient: cappedPatient,
+        drug: carboplatin,
+        regimen: regimen,
+      );
+      expect(resCapped.success, isTrue);
+      expect(resCapped.calculatedDose, closeTo(750.0, 0.1));
+    });
+
+    // -------------------------------------------------------------------------
+    // E1: Gentamicin through PharmacistCalculator Independent Golden Test
+    // -------------------------------------------------------------------------
+    test('E1: Gentamicin through PharmacistCalculator (100kg/170cm male/50y/SCr1.0)', () {
+      const obeseGentPatient = Patient(
+        id: 'p-gent-obese',
+        weightKg: 100.0,
+        heightCm: 170.0,
+        ageYears: 50,
+        sex: Sex.male,
+        serumCreatinineMgDl: 1.0,
+        isScrStable: true,
+      );
+      final gentamicin = antibiotics.firstWhere((d) => d.id == 'gentamicin');
+      final regimen = gentamicin.regimens.first; // Extended-interval 5 mg/kg
+
+      final res = PharmacistCalculator.calculateDose(
+        patient: obeseGentPatient,
+        drug: gentamicin,
         regimen: regimen,
       );
 
-      expect(result.success, isTrue);
-      expect(result.isRenallyAdjusted, isFalse, reason: 'Calvert already accounts for renal function');
-      expect(result.calculatedDose, greaterThan(0));
+      expect(res.success, isTrue);
+      expect(res.ibwKg, closeTo(65.94, 0.1));
+      expect(res.adjBwKg, closeTo(79.56, 0.1));
+      expect(res.calculatedDose, closeTo(397.8, 0.5));
+      expect(res.crclMlMin, closeTo(99.4, 0.5));
+      expect(res.dailyDose, closeTo(397.8, 0.5));
+      expect(res.structuredFrequency, equals(Frequency.q24h));
     });
 
     // -------------------------------------------------------------------------
@@ -141,6 +213,7 @@ void main() {
         ageYears: 70,
         sex: Sex.male,
         serumCreatinineMgDl: 8.0, // CrCl well below 10 mL/min
+        isScrStable: true,
       );
       final drug = antibiotics.firstWhere((d) => d.id == 'meropenem');
       final regimen = drug.regimens.first;
@@ -167,6 +240,7 @@ void main() {
         ageYears: 40,
         sex: Sex.female,
         allergies: ['Penicillin'],
+        isScrStable: true,
       );
       final amox = antibiotics.firstWhere((d) => d.id == 'amoxicillin_clavulanate');
       final regimen = amox.regimens.first;
@@ -193,6 +267,7 @@ void main() {
         ageYears: 50,
         sex: Sex.male,
         serumCreatinineMgDl: 1.0,
+        isScrStable: true,
       );
       final gentamicin = antibiotics.firstWhere((d) => d.id == 'gentamicin');
       final regimen = gentamicin.regimens.first;
@@ -211,5 +286,3 @@ void main() {
     });
   });
 }
-
-Drug drugWithCalvert(Drug base) => base;

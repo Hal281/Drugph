@@ -7,12 +7,15 @@ enum ChildPughClass {
   none(labelEn: 'None (Normal)', labelTh: 'ปกติ'),
   classA(labelEn: 'Child-Pugh A (Mild)', labelTh: 'Child-Pugh A (ตับทำงานบกพร่องเล็กน้อย)'),
   classB(labelEn: 'Child-Pugh B (Moderate)', labelTh: 'Child-Pugh B (ตับทำงานบกพร่องปานกลาง)'),
-  classC(labelEn: 'Child-Pugh C (Severe)', labelTh: 'Child-Pugh C (ตับทำงานบกพร่องรุนแรง)');
+  classC(labelEn: 'Child-Pugh C (Severe)', labelTh: 'Child-Pugh C (ตับทำงานบกพร่องรุนแรง)'),
+  sentinel(labelEn: '', labelTh: '');
 
   final String labelEn;
   final String labelTh;
 
   const ChildPughClass({required this.labelEn, required this.labelTh});
+
+  static List<ChildPughClass> get clinicalValues => [none, classA, classB, classC];
 }
 
 /// Structured population applicability criteria for a dosing regimen (D4).
@@ -111,7 +114,7 @@ class PopulationCriteria {
     if (sex != null && patient.sex != sex) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
-        code: DoseWarningCode.generalAlert,
+        code: DoseWarningCode.populationMismatch,
         messageEn: 'Regimen is clinically indicated for ${sex!.nameEn} patients only.',
         messageTh: 'สูตรยานี้มีข้อบ่งใช้เฉพาะผู้ป่วยเพศ ${sex!.nameTh} เท่านั้น',
       ));

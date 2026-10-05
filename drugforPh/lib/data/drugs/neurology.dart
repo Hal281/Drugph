@@ -166,6 +166,22 @@ final List<Drug> neurology = [
     isHighAlert: true,
     requiresTDM: true,
     pregnancyCategory: 'D/X',
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'meropenem',
+        targetClass: DrugClass.betaLactamCarbapenem,
+        severity: InteractionSeverity.contraindicated,
+        mechanismEn:
+            'Carbapenems rapidly decrease serum valproic acid concentrations below therapeutic levels (>50% drop within 24 hours), causing breakthrough seizures.',
+        mechanismTh:
+            'ยากลุ่มคาร์บาพีเนม (Meropenem) ลดระดับยากันชัก Valproic acid ในเลือดลงอย่างรวดเร็วกว่า 50% ทำให้เกิดอาการชักซ้ำได้',
+        managementEn:
+            'Avoid coadministration. Select alternative antibacterial therapy or change antiepileptic.',
+        managementTh:
+            'ห้ามใช้ร่วมกันเด็ดขาด (Contraindicated) ให้เลือกใช้ยาปฏิชีวนะกลุ่มอื่น หรือปรับเปลี่ยนยากันชัก',
+        source: 'FDA Valproate Package Insert / AHFS 2024',
+      ),
+    ],
     severeInteractions: [
       'Carbapenem antibiotics (Meropenem reduces Valproic acid level by >50% - AVOID)',
       'Phenytoin (Displaces protein binding)'

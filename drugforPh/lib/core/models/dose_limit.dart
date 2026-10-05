@@ -88,6 +88,7 @@ enum DoseWarningCode {
 
   /// A pediatric-only regimen was selected for an adult patient.
   populationMismatch,
+  calculationError,
   generalAlert,
 }
 

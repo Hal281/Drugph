@@ -14,6 +14,7 @@ void main() {
     heightCm: 175,
     sex: Sex.male,
     serumCreatinineMgDl: 1.0,
+    isScrStable: true,
   );
   const adultNoScr = Patient(
     id: 'sweep-adult-noscr',
@@ -21,6 +22,7 @@ void main() {
     weightKg: 70,
     heightCm: 175,
     sex: Sex.male,
+    isScrStable: true,
   );
   const elderlyRenal = Patient(
     id: 'sweep-elderly',
@@ -29,6 +31,7 @@ void main() {
     heightCm: 158,
     sex: Sex.female,
     serumCreatinineMgDl: 2.8,
+    isScrStable: true,
   );
   const obese = Patient(
     id: 'sweep-obese',
@@ -37,6 +40,7 @@ void main() {
     heightCm: 170,
     sex: Sex.male,
     serumCreatinineMgDl: 1.1,
+    isScrStable: true,
   );
   const child = Patient(
     id: 'sweep-child',
@@ -45,6 +49,7 @@ void main() {
     heightCm: 125,
     sex: Sex.male,
     serumCreatinineMgDl: 0.5,
+    isScrStable: true,
   );
 
   bool isPediatricRegimen(DosingRegimen r) =>
@@ -61,7 +66,7 @@ void main() {
             final res = PharmacistCalculator.calculateDose(
                 patient: p, drug: drug, regimen: reg);
             final tag = '${drug.id} / ${reg.indication} / ${p.id}';
-            if ((res.errorMessage ?? '').startsWith('Calculation error')) {
+            if (res.warnings.any((w) => w.code == DoseWarningCode.calculationError)) {
               failures.add('$tag threw: ${res.errorMessage}');
               continue;
             }

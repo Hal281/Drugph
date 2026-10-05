@@ -89,7 +89,7 @@ class Patient {
     this.serumCreatinineMgDl,
     this.creatinineClearanceMlMin,
     this.eGfrMlMinPer173m2,
-    this.isScrStable = true,
+    required this.isScrStable,
     this.activeDrugIds = const [],
     this.allergies = const [],
   });
@@ -117,57 +117,57 @@ class Patient {
 
   // ---- Copy ----
 
-  // Sentinel constant for clearing nullable fields in copyWith
-  static const Object _sentinel = Object();
+  // Strictly typed sentinel constants for clearing nullable fields in copyWith without Object? or casts
+  static const String _sentinelString = '\u0000__PATIENT_SENTINEL__\u0000';
+  static const int _sentinelInt = -999999999;
+  static const double _sentinelDouble = -999999999.0;
 
   /// Creates a copy with selected fields replaced.
   /// Nullable fields can be explicitly cleared by passing `null`.
   Patient copyWith({
     String? id,
-    Object? patientName = _sentinel,
-    Object? hospitalNumber = _sentinel,
+    String? patientName = _sentinelString,
+    String? hospitalNumber = _sentinelString,
     double? weightKg,
     double? heightCm,
     int? ageYears,
-    Object? ageMonths = _sentinel,
+    int? ageMonths = _sentinelInt,
     Sex? sex,
     bool? isPregnant,
-    Object? hepaticImpairment = _sentinel,
-    Object? serumCreatinineMgDl = _sentinel,
-    Object? creatinineClearanceMlMin = _sentinel,
-    Object? eGfrMlMinPer173m2 = _sentinel,
+    ChildPughClass? hepaticImpairment = ChildPughClass.sentinel,
+    double? serumCreatinineMgDl = _sentinelDouble,
+    double? creatinineClearanceMlMin = _sentinelDouble,
+    double? eGfrMlMinPer173m2 = _sentinelDouble,
     bool? isScrStable,
     List<String>? activeDrugIds,
     List<String>? allergies,
   }) {
     return Patient(
       id: id ?? this.id,
-      patientName: identical(patientName, _sentinel)
+      patientName: identical(patientName, _sentinelString)
           ? this.patientName
-          : patientName as String?,
-      hospitalNumber: identical(hospitalNumber, _sentinel)
+          : patientName,
+      hospitalNumber: identical(hospitalNumber, _sentinelString)
           ? this.hospitalNumber
-          : hospitalNumber as String?,
+          : hospitalNumber,
       weightKg: weightKg ?? this.weightKg,
       heightCm: heightCm ?? this.heightCm,
       ageYears: ageYears ?? this.ageYears,
-      ageMonths: identical(ageMonths, _sentinel)
-          ? this.ageMonths
-          : ageMonths as int?,
+      ageMonths: ageMonths == _sentinelInt ? this.ageMonths : ageMonths,
       sex: sex ?? this.sex,
       isPregnant: isPregnant ?? this.isPregnant,
-      hepaticImpairment: identical(hepaticImpairment, _sentinel)
+      hepaticImpairment: identical(hepaticImpairment, ChildPughClass.sentinel)
           ? this.hepaticImpairment
-          : hepaticImpairment as ChildPughClass?,
-      serumCreatinineMgDl: identical(serumCreatinineMgDl, _sentinel)
+          : hepaticImpairment,
+      serumCreatinineMgDl: serumCreatinineMgDl == _sentinelDouble
           ? this.serumCreatinineMgDl
-          : serumCreatinineMgDl as double?,
-      creatinineClearanceMlMin: identical(creatinineClearanceMlMin, _sentinel)
+          : serumCreatinineMgDl,
+      creatinineClearanceMlMin: creatinineClearanceMlMin == _sentinelDouble
           ? this.creatinineClearanceMlMin
-          : creatinineClearanceMlMin as double?,
-      eGfrMlMinPer173m2: identical(eGfrMlMinPer173m2, _sentinel)
+          : creatinineClearanceMlMin,
+      eGfrMlMinPer173m2: eGfrMlMinPer173m2 == _sentinelDouble
           ? this.eGfrMlMinPer173m2
-          : eGfrMlMinPer173m2 as double?,
+          : eGfrMlMinPer173m2,
       isScrStable: isScrStable ?? this.isScrStable,
       activeDrugIds: activeDrugIds ?? this.activeDrugIds,
       allergies: allergies ?? this.allergies,

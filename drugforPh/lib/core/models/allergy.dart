@@ -141,8 +141,12 @@ class AllergyService {
       }
 
       if (!isDirectClassMatch && normalizedLegacyClass != null) {
+        final legacyTokens = normalizedLegacyClass
+            .split(RegExp(r'[/,\s]+'))
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty);
         if (normalizedAllergen == normalizedLegacyClass ||
-            normalizedLegacyClass.contains(normalizedAllergen)) {
+            legacyTokens.contains(normalizedAllergen)) {
           isDirectClassMatch = true;
         }
       }
