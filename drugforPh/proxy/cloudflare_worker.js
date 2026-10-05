@@ -20,6 +20,22 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // 2. Environment secret verification
+    const apiKey = env.GEMINI_API_KEY;
+
+    // Friendly health-check response for browser GET requests
+    if (request.method === 'GET') {
+      return new Response(JSON.stringify({
+        status: 'online',
+        service: 'Drugph AI Consultant Proxy',
+        geminiConfigured: !!apiKey,
+        message: 'Proxy is active and ready to receive POST requests from Drugph app.'
+      }, null, 2), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json; charset=utf-8' },
+      });
+    }
+
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
@@ -27,8 +43,6 @@ export default {
       });
     }
 
-    // 2. Environment secret verification
-    const apiKey = env.GEMINI_API_KEY;
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'GEMINI_API_KEY is not configured on proxy server.' }), {
         status: 500,
