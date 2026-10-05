@@ -268,9 +268,10 @@ final List<Drug> antibiotics = [
         route: DoseRoute.po,
         indication: 'Standard Infection (Pediatric)',
         dosingType: DosingType.weightBased,
-        dosePerKg: 45.0, // 45 mg/kg/day divided q12h (so 22.5 per dose) -> we'll use daily dose / divided by freq manually, but let's do dose per dose
+        dosePerKg: 22.5, // 45 mg/kg/day divided q12h = 22.5 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (Dose = 22.5 mg/kg/dose)',
+        frequency: 'q12h',
+        notes: '45 mg/kg/day divided q12h (22.5 mg/kg/dose)',
         limits: DoseLimit(maxDailyDose: 4000.0), // Amoxicillin component
       ),
     ],
@@ -297,7 +298,8 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'day 1, then 250mg q24h',
+        frequency: 'q24h',
+        notes: 'Day 1: 500 mg, then 250 mg q24h on Days 2-5',
         limits: DoseLimit(maxSingleDose: 500.0),
       ),
       DosingRegimen(
@@ -306,7 +308,8 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0, // 10 mg/kg day 1, then 5 mg/kg day 2-5
         doseUnit: DoseUnit.mg,
-        frequency: 'day 1',
+        frequency: 'q24h',
+        notes: 'Day 1: 10 mg/kg (max 500 mg), then 5 mg/kg q24h on Days 2-5 (max 250 mg)',
         limits: DoseLimit(maxSingleDose: 500.0),
       ),
     ],
@@ -536,8 +539,9 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 4.5,
         doseUnit: DoseUnit.g,
-        frequency: 'q6h or q8h (extended infusion)',
-        infusionTimeMinutes: 240, // 4-hour extended infusion common
+        frequency: 'q6h',
+        infusionTimeMinutes: 30,
+        notes: 'Standard infusion is 4.5g q6h over 30 min. Extended infusion is 3.375g or 4.5g q8h over 4 hours.',
         limits: DoseLimit(maxDailyDose: 18),
         renalAdjustments: [
           RenalAdjustment(

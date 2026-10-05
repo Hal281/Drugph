@@ -2,8 +2,8 @@ name: drug_dosage_calculator
 description: >
   Deterministic Drug Dosage Calculator Engine for Flutter Mobile.
   All dose calculations use fixed mathematical formulas — NO AI/LLM inference.
-  SaMD prototype — DO NOT use clinically without medical validation
-  and Thai FDA / IEC 62304 / ISO 13485 regulatory approval.
+  Educational SaMD prototype — designed for traceability.
+  DO NOT use clinically without medical validation.
 version: 0.1.0
 publish_to: none
 

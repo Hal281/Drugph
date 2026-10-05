@@ -38,37 +38,6 @@ final List<Drug> psychiatry = [
     ],
   ),
   const Drug(
-    id: 'diazepam',
-    genericName: 'Diazepam',
-    brandNames: ['Valium', 'Di-a-pam'],
-    nameTh: 'ไดอะซีแพม',
-    category: DrugCategory.sedative,
-    pregnancyCategory: 'D',
-    requiresHepaticCaution: true,
-    severeInteractions: ['Opioids', 'Alcohol', 'Phenobarbital'],
-    regimens: [
-      DosingRegimen(
-        route: DoseRoute.po,
-        indication: 'Anxiety',
-        dosingType: DosingType.fixed,
-        fixedDose: 2,
-        doseUnit: DoseUnit.mg,
-        frequency: 'BID to QID',
-        limits: DoseLimit(maxDailyDose: 40),
-      ),
-      DosingRegimen(
-        route: DoseRoute.iv,
-        indication: 'Status Epilepticus (Adult)',
-        dosingType: DosingType.fixed,
-        fixedDose: 10, // 5-10 mg
-        doseUnit: DoseUnit.mg,
-        frequency: 'q5-10min (Max 30mg)',
-        maxInfusionRateMgPerMin: 5, // Do not exceed 5mg/min IV push
-        limits: DoseLimit(maxDailyDose: 30),
-      ),
-    ],
-  ),
-  const Drug(
     id: 'lorazepam',
     genericName: 'Lorazepam',
     brandNames: ['Ativan', 'Lora'],

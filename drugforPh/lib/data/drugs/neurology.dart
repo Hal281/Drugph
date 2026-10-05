@@ -129,44 +129,6 @@ final List<Drug> neurology = [
     ],
   ),
   const Drug(
-    id: 'haloperidol',
-    genericName: 'Haloperidol',
-    brandNames: ['Haldol'],
-    nameTh: 'ฮาโลเพอริดอล',
-    category: DrugCategory.neurological, // Antipsychotic
-    requiresHepaticCaution: true,
-    allergyClass: 'Butyrophenone',
-    severeInteractions: [
-      'Other QT prolonging drugs (e.g. Amiodarone, Ondansetron)',
-      'Levodopa (Antagonistic effect)'
-    ],
-    contraindications: ['Parkinson\'s disease', 'Severe CNS depression', 'Coma'],
-    specialNotes: 'High risk of Extrapyramidal Symptoms (EPS) and QT prolongation. Monitor ECG.',
-    specialNotesTh: 'เสี่ยงต่อกล้ามเนื้อเกร็ง (EPS) และคลื่นไฟฟ้าหัวใจผิดปกติ (QT prolongation) แนะนำตรวจคลื่นหัวใจ (ECG)',
-    regimens: [
-      DosingRegimen(
-        route: DoseRoute.im,
-        indication: 'Acute Agitation / Delirium (Adult)',
-        dosingType: DosingType.fixed,
-        fixedDose: 2.5, // 2.5 - 5 mg
-        doseUnit: DoseUnit.mg,
-        frequency: 'Stat (May repeat in 60 mins)',
-        limits: DoseLimit(
-          maxDailyDose: 20.0, // Depends on condition, but 20-30mg is common max for safety
-        ),
-      ),
-      DosingRegimen(
-        route: DoseRoute.po,
-        indication: 'Psychosis (Adult)',
-        dosingType: DosingType.fixed,
-        fixedDose: 2.0, // 0.5 - 5 mg
-        doseUnit: DoseUnit.mg,
-        frequency: 'q8h-q12h',
-        limits: DoseLimit(maxDailyDose: 30.0),
-      ),
-    ],
-  ),
-  const Drug(
     id: 'gabapentin',
     genericName: 'Gabapentin',
     brandNames: ['Neurontin'],

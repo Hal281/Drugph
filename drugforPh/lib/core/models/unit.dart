@@ -90,7 +90,6 @@ enum DoseRoute {
   pr('PR', 'Rectal', 'ทางทวารหนัก'),
   topical('TOP', 'Topical', 'ทาภายนอก'),
   inhalation('INH', 'Inhalation', 'สูดพ่น'),
-  inhaled('INH', 'Inhalation', 'สูดพ่น'),
   intranasal('IN', 'Intranasal', 'พ่นจมูก'),
   intrathecal('IT', 'Intrathecal', 'ฉีดเข้าช่องไขสันหลัง');
 

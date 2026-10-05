@@ -38,44 +38,6 @@ final List<Drug> obstetric = [
     ],
   ),
   const Drug(
-    id: 'magnesium_sulfate',
-    genericName: 'Magnesium Sulfate',
-    brandNames: ['MgSo4'],
-    nameTh: 'แมกนีเซียมซัลเฟต',
-    category: DrugCategory.obstetric,
-    pregnancyCategory: 'D',
-    isHighAlert: true,
-    requiresRenalAdjustment: true,
-    severeInteractions: ['Calcium channel blockers', 'Neuromuscular blockers'],
-    specialNotes:
-        'Monitor for Mg toxicity: loss of DTRs, respiratory depression. Antidote is Calcium Gluconate.',
-    specialNotesTh:
-        'ระวัง Mg toxicity: ตรวจ DTR, การหายใจ มียาแก้พิษคือ Calcium Gluconate',
-    regimens: [
-      DosingRegimen(
-        route: DoseRoute.iv,
-        indication: 'Preeclampsia / Eclampsia (Loading)',
-        dosingType: DosingType.fixed,
-        fixedDose: 4, // 4-6 grams
-        doseUnit: DoseUnit.g,
-        infusionTimeMinutes: 20,
-        frequency: 'Once over 20 mins',
-        limits: DoseLimit(maxDailyDose: 6),
-      ),
-      DosingRegimen(
-        route: DoseRoute.iv,
-        indication: 'Preeclampsia (Maintenance)',
-        dosingType: DosingType.titrated,
-        doseUnit: DoseUnit.g,
-        frequency: 'continuous',
-        continuousRateMin: 1,
-        continuousRateMax: 2,
-        continuousRateUnit: 'g/hr',
-        standardDilutionMgPerMl: 40, // 40g in 1000ml = 40mg/ml
-      ),
-    ],
-  ),
-  const Drug(
     id: 'misoprostol',
     genericName: 'Misoprostol',
     brandNames: ['Cytotec'],

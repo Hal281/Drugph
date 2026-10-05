@@ -18,17 +18,30 @@ class ValidationResult {
   /// Human-readable error messages (Thai) keyed by field name.
   final Map<String, String> errorsTh;
 
+  /// Human-readable warning messages (English) keyed by field name.
+  final Map<String, String> warningsEn;
+
+  /// Human-readable warning messages (Thai) keyed by field name.
+  final Map<String, String> warningsTh;
+
   const ValidationResult({
     required this.isValid,
     this.errorsEn = const {},
     this.errorsTh = const {},
+    this.warningsEn = const {},
+    this.warningsTh = const {},
   });
 
   /// Convenience factory for a valid result.
   const ValidationResult.valid()
       : isValid = true,
         errorsEn = const {},
-        errorsTh = const {};
+        errorsTh = const {},
+        warningsEn = const {},
+        warningsTh = const {};
+
+  /// Whether any warning messages exist.
+  bool get hasWarnings => warningsEn.isNotEmpty;
 
   @override
   String toString() {
@@ -53,6 +66,8 @@ class InputValidator {
   }) {
     final errorsEn = <String, String>{};
     final errorsTh = <String, String>{};
+    final warningsEn = <String, String>{};
+    final warningsTh = <String, String>{};
 
     // Weight
     if (weightKg == null) {
@@ -61,6 +76,9 @@ class InputValidator {
     } else if (weightKg <= 0) {
       errorsEn['weightKg'] = 'Weight must be greater than 0';
       errorsTh['weightKg'] = 'น้ำหนักต้องมากกว่า 0';
+    } else if (weightKg < 1.0) {
+      errorsEn['weightKg'] = 'Weight below 1 kg is implausible';
+      errorsTh['weightKg'] = 'น้ำหนักต่ำกว่า 1 กก. เป็นไปไม่ได้ในทางคลินิก';
     } else if (weightKg > 500) {
       errorsEn['weightKg'] = 'Weight exceeds 500 kg — please verify';
       errorsTh['weightKg'] = 'น้ำหนักเกิน 500 กก. — กรุณาตรวจสอบ';
@@ -73,9 +91,24 @@ class InputValidator {
     } else if (heightCm <= 0) {
       errorsEn['heightCm'] = 'Height must be greater than 0';
       errorsTh['heightCm'] = 'ส่วนสูงต้องมากกว่า 0';
+    } else if (heightCm < 30.0) {
+      errorsEn['heightCm'] = 'Height below 30 cm is implausible';
+      errorsTh['heightCm'] = 'ส่วนสูงต่ำกว่า 30 ซม. เป็นไปไม่ได้ในทางคลินิก';
     } else if (heightCm > 300) {
       errorsEn['heightCm'] = 'Height exceeds 300 cm — please verify';
       errorsTh['heightCm'] = 'ส่วนสูงเกิน 300 ซม. — กรุณาตรวจสอบ';
+    }
+
+    // Swapped height/weight cross-field check (implausible BMI)
+    if (weightKg != null && heightCm != null && weightKg > 0 && heightCm > 0) {
+      final heightM = heightCm / 100.0;
+      final bmi = weightKg / (heightM * heightM);
+      if (bmi > 120.0 || bmi < 8.0) {
+        errorsEn['bmi'] =
+            'Implausible BMI (${bmi.toStringAsFixed(1)}) — check if height and weight are swapped';
+        errorsTh['bmi'] =
+            'ค่า BMI ผิดปกติ (${bmi.toStringAsFixed(1)}) — กรุณาตรวจสอบว่ากรอกน้ำหนักและส่วนสูงสลับกันหรือไม่';
+      }
     }
 
     // Age
@@ -114,6 +147,8 @@ class InputValidator {
       isValid: errorsEn.isEmpty,
       errorsEn: errorsEn,
       errorsTh: errorsTh,
+      warningsEn: warningsEn,
+      warningsTh: warningsTh,
     );
   }
 
@@ -140,23 +175,27 @@ class InputValidator {
   }
 
   /// Validates a positive numeric value.
+  ///
+  /// Uses a unified field key so [errorsEn] and [errorsTh] share the exact same key.
   static ValidationResult validatePositive({
     required double? value,
+    String? fieldKey,
     required String fieldNameEn,
     required String fieldNameTh,
   }) {
+    final key = fieldKey ?? fieldNameEn.toLowerCase().replaceAll(' ', '_');
     if (value == null) {
       return ValidationResult(
         isValid: false,
-        errorsEn: {fieldNameEn: '$fieldNameEn is required'},
-        errorsTh: {fieldNameTh: 'กรุณาระบุ$fieldNameTh'},
+        errorsEn: {key: '$fieldNameEn is required'},
+        errorsTh: {key: 'กรุณาระบุ$fieldNameTh'},
       );
     }
     if (value <= 0) {
       return ValidationResult(
         isValid: false,
-        errorsEn: {fieldNameEn: '$fieldNameEn must be greater than 0'},
-        errorsTh: {fieldNameTh: '$fieldNameThต้องมากกว่า 0'},
+        errorsEn: {key: '$fieldNameEn must be greater than 0'},
+        errorsTh: {key: '$fieldNameThต้องมากกว่า 0'},
       );
     }
     return const ValidationResult.valid();

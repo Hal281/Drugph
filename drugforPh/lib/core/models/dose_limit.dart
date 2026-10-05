@@ -66,6 +66,28 @@ class DoseLimit {
       'DoseLimit(max: $maxSingleDose, maxDaily: $maxDailyDose)';
 }
 
+/// Machine-readable identifier for clinical warnings and alerts.
+enum DoseWarningCode {
+  scrMissing,
+  unstableScr,
+  unknownFrequency,
+  maxSingleDoseExceeded,
+  softMaxSingleDoseExceeded,
+  maxDailyDoseExceeded,
+  maxDosePerKgPerDayExceeded,
+  minDoseNotReached,
+  maxInfusionRateExceeded,
+  severeRenalImpairment,
+  renalAdjustmentApplied,
+  renalAdjustmentNotApplied,
+  highAlertMedication,
+  allergyAlert,
+  contraindicationAlert,
+  severeInteractionAlert,
+  pediatricBlocked,
+  generalAlert,
+}
+
 /// A warning generated when a calculated dose approaches or exceeds limits.
 class DoseWarning {
   /// How severe this warning is.
@@ -76,6 +98,9 @@ class DoseWarning {
 
   /// Human-readable message in Thai.
   final String messageTh;
+
+  /// Machine-readable categorization of the warning.
+  final DoseWarningCode code;
 
   /// The value that triggered the warning (e.g. calculated dose).
   final double? calculatedValue;
@@ -90,6 +115,7 @@ class DoseWarning {
     required this.severity,
     required this.messageEn,
     required this.messageTh,
+    this.code = DoseWarningCode.generalAlert,
     this.calculatedValue,
     this.limitValue,
     this.unit,

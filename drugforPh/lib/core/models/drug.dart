@@ -267,22 +267,41 @@ class Drug {
     this.isSplittable = true,
   });
 
-  /// Finds the first regimen matching [route] and optional [indication].
+  /// Finds the regimen matching [route] and optional [indication].
   ///
-  /// If no exact indication match, falls back to first regimen for that route.
+  /// Matching policy (A1, A9):
+  /// - Route matching: exact match (`r.route == route`), or if [route] is `DoseRoute.iv`,
+  ///   matches `ivPush` or `ivInfusion`.
+  /// - Indication matching: if [indication] is provided, returns the matching regimen
+  ///   or `null` if not found (no silent fallback).
+  /// - If [indication] is omitted (`null`), returns the regimen only if exactly one exists
+  ///   for that route; if multiple indications exist, returns `null` to force clinical selection.
   DosingRegimen? findRegimen(DoseRoute route, [String? indication]) {
-    // Try exact match first
-    for (final r in regimens) {
-      if (r.route == route &&
-          (indication == null || r.indication == indication)) {
-        return r;
+    bool isRouteMatch(DosingRegimen r) {
+      if (r.route == route) return true;
+      if (route == DoseRoute.iv &&
+          (r.route == DoseRoute.ivInfusion || r.route == DoseRoute.ivPush)) {
+        return true;
       }
+      return false;
     }
-    // Fallback: match route only
-    if (indication != null) {
-      for (final r in regimens) {
-        if (r.route == route) return r;
+
+    final routeRegimens = regimens.where(isRouteMatch).toList();
+    if (routeRegimens.isEmpty) return null;
+
+    if (indication != null && indication.trim().isNotEmpty) {
+      for (final r in routeRegimens) {
+        if (r.indication?.toLowerCase().trim() ==
+            indication.toLowerCase().trim()) {
+          return r;
+        }
       }
+      return null;
+    }
+
+    // If multiple indications exist for this route and none was chosen, force selection
+    if (routeRegimens.length == 1) {
+      return routeRegimens.first;
     }
     return null;
   }

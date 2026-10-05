@@ -38,6 +38,7 @@ class DoseChecker {
         calculatedDose > limits.maxSingleDose!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
+        code: DoseWarningCode.maxSingleDoseExceeded,
         messageEn:
             'EXCEEDS MAX SINGLE DOSE: '
             '${_fmt(calculatedDose)} $doseUnit > '
@@ -59,6 +60,7 @@ class DoseChecker {
         calculatedDose <= limits.maxSingleDose!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.soft,
+        code: DoseWarningCode.softMaxSingleDoseExceeded,
         messageEn:
             'Dose approaching max limit: '
             '${_fmt(calculatedDose)} $doseUnit '
@@ -79,6 +81,7 @@ class DoseChecker {
         dailyDose > limits.maxDailyDose!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
+        code: DoseWarningCode.maxDailyDoseExceeded,
         messageEn:
             'EXCEEDS MAX DAILY DOSE: '
             '${_fmt(dailyDose)} $doseUnit/day > '
@@ -102,6 +105,7 @@ class DoseChecker {
       if (dosePerKgPerDay > limits.maxDosePerKgPerDay!) {
         warnings.add(DoseWarning(
           severity: LimitSeverity.hard,
+          code: DoseWarningCode.maxDosePerKgPerDayExceeded,
           messageEn:
               'EXCEEDS MAX DOSE/KG/DAY: '
               '${_fmt(dosePerKgPerDay)} $doseUnit/kg/day > '
@@ -122,6 +126,7 @@ class DoseChecker {
         calculatedDose < limits.minSingleDose!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.info,
+        code: DoseWarningCode.minDoseNotReached,
         messageEn:
             'Dose below minimum: '
             '${_fmt(calculatedDose)} $doseUnit < '
@@ -149,6 +154,7 @@ class DoseChecker {
     if (rateMgPerMin > maxRateMgPerMin) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
+        code: DoseWarningCode.maxInfusionRateExceeded,
         messageEn:
             'EXCEEDS MAX INFUSION RATE: '
             '${_fmt(rateMgPerMin)} mg/min > '
@@ -167,6 +173,10 @@ class DoseChecker {
   }
 
   /// Generates a renal adjustment warning if applicable.
+  ///
+  /// Clinical Policy (Winter 2010; Cockcroft & Gault 1976):
+  /// Integer threshold rounding (`crcl.roundToDouble()`) is applied consistently
+  /// so decimal CrCl boundary values (e.g. 9.5 mL/min, 25.5 mL/min) match appropriate tiers.
   static List<DoseWarning> checkRenalAdjustment({
     required double crclMlMin,
     required List<RenalAdjustment> adjustments,
@@ -177,6 +187,7 @@ class DoseChecker {
       if (adj.appliesTo(crclMlMin) && adj.adjustmentFactor < 1.0) {
         warnings.add(DoseWarning(
           severity: LimitSeverity.soft,
+          code: DoseWarningCode.renalAdjustmentApplied,
           messageEn:
               'Renal dose adjustment: CrCl ${_fmt(crclMlMin)} mL/min '
               '→ reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
@@ -193,10 +204,11 @@ class DoseChecker {
       }
     }
 
-    // Critical renal impairment warning
-    if (crclMlMin < 10) {
+    // Critical renal impairment warning (< 10 mL/min)
+    if (crclMlMin.roundToDouble() < 10) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
+        code: DoseWarningCode.severeRenalImpairment,
         messageEn:
             'SEVERE RENAL IMPAIRMENT: CrCl ${_fmt(crclMlMin)} mL/min. '
             'Consult nephrologist before dosing.',
@@ -215,6 +227,7 @@ class DoseChecker {
   static DoseWarning highAlertWarning(String drugName) {
     return DoseWarning(
       severity: LimitSeverity.soft,
+      code: DoseWarningCode.highAlertMedication,
       messageEn:
           '⚠️ HIGH-ALERT MEDICATION: $drugName requires independent '
           'double-check before administration.',

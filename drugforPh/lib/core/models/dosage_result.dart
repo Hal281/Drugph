@@ -88,8 +88,11 @@ class DosageResult {
   /// Indicates if this dose was actively adjusted based on renal function.
   final bool isRenallyAdjusted;
 
-  /// Error description if [success] is `false`.
+  /// Error description if [success] is `false` (English).
   final String? errorMessage;
+
+  /// Error description if [success] is `false` (Thai).
+  final String? errorMessageTh;
 
   const DosageResult({
     required this.success,
@@ -114,23 +117,47 @@ class DosageResult {
     this.isRenallyAdjusted = false,
     this.warnings = const [],
     this.errorMessage,
+    this.errorMessageTh,
   });
 
   /// Creates a failed result with a single hard-level warning.
-  factory DosageResult.error(String message) {
+  factory DosageResult.error(String messageEn, [String? messageTh]) {
+    final th = messageTh ?? messageEn;
     return DosageResult(
       success: false,
       formulaUsed: 'N/A',
-      errorMessage: message,
+      errorMessage: messageEn,
+      errorMessageTh: th,
       warnings: [
         DoseWarning(
           severity: LimitSeverity.hard,
-          messageEn: message,
-          messageTh: message,
+          messageEn: messageEn,
+          messageTh: th,
         ),
       ],
     );
   }
+
+  /// Creates a failed result with custom reasons and optional warnings.
+  factory DosageResult.failure({
+    required String reasonEn,
+    required String reasonTh,
+    List<DoseWarning> warnings = const [],
+    String formulaUsed = 'N/A',
+    Map<String, dynamic> calculationInputs = const {},
+  }) {
+    return DosageResult(
+      success: false,
+      formulaUsed: formulaUsed,
+      errorMessage: reasonEn,
+      errorMessageTh: reasonTh,
+      calculationInputs: calculationInputs,
+      warnings: warnings,
+    );
+  }
+
+  /// `true` if calculation failed or any hard-limit violation exists — UI should **block**.
+  bool get isBlocked => !success || hasHardLimitViolation;
 
   /// `true` if any hard-limit violation exists — UI should **block**.
   bool get hasHardLimitViolation =>

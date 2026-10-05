@@ -106,12 +106,24 @@ final List<Drug> emergency = [
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
-        indication: 'Eclampsia / Pre-eclampsia',
+        indication: 'Eclampsia / Pre-eclampsia (Loading)',
         dosingType: DosingType.fixed,
         fixedDose: 4000.0, // 4g loading dose
         doseUnit: DoseUnit.mg,
-        frequency: 'Loading dose over 15-20 min, then 1-2g/hr maintenance',
+        frequency: 'once',
+        notes: 'Loading dose over 15-20 min, then 1-2g/hr maintenance',
         infusionTimeMinutes: 20,
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Eclampsia / Pre-eclampsia (Maintenance)',
+        dosingType: DosingType.titrated,
+        doseUnit: DoseUnit.g,
+        frequency: 'continuous',
+        continuousRateMin: 1.0,
+        continuousRateMax: 2.0,
+        continuousRateUnit: 'g/hr',
+        standardDilutionMgPerMl: 40.0,
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -119,7 +131,8 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0, // 2g
         doseUnit: DoseUnit.mg,
-        frequency: 'over 2-5 min',
+        frequency: 'stat',
+        notes: 'Slow IV push over 2-5 min',
       ),
     ],
   ),

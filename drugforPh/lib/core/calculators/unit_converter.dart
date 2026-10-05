@@ -119,44 +119,104 @@ class UnitConverter {
   }
 
   // ------------------------------------------------------------------
+  // Clinical laboratory conversions (Serum Creatinine: umol/L ↔ mg/dL)
+  // ------------------------------------------------------------------
+
+  /// Converts serum creatinine from micromoles per liter (umol/L) to milligrams per deciliter (mg/dL).
+  ///
+  /// Formula: `mg/dL = umol/L / 88.4`
+  ///
+  /// Clinical Reference:
+  /// Winter ME. Basic Clinical Pharmacokinetics. 5th ed. Lippincott Williams & Wilkins; 2010.
+  /// (Creatinine MW = 113.12 g/mol: 1 mg/dL = 10 mg/L / 113.12 = 0.0884 mmol/L = 88.4 umol/L).
+  static double scrUmolPerLToMgPerDl(double umolPerL) => umolPerL / 88.4;
+
+  /// Converts serum creatinine from milligrams per deciliter (mg/dL) to micromoles per liter (umol/L).
+  ///
+  /// Formula: `umol/L = mg/dL * 88.4`
+  ///
+  /// Clinical Reference:
+  /// Winter ME. Basic Clinical Pharmacokinetics. 5th ed. Lippincott Williams & Wilkins; 2010.
+  static double scrMgPerDlToUmolPerL(double mgPerDl) => mgPerDl * 88.4;
+
+  // ------------------------------------------------------------------
+  // Imperial ↔ Metric conversions (lb ↔ kg, in ↔ cm)
+  // ------------------------------------------------------------------
+
+  /// Converts weight from pounds (lb) to kilograms (kg).
+  /// International avoirdupois pound = 0.45359237 kg.
+  static double lbToKg(double lb) => lb * 0.45359237;
+
+  /// Converts weight from kilograms (kg) to pounds (lb).
+  static double kgToLb(double kg) => kg / 0.45359237;
+
+  /// Converts height from inches to centimeters (cm).
+  /// 1 inch = 2.54 cm.
+  static double inToCm(double inches) => inches * 2.54;
+
+  /// Converts height from centimeters (cm) to inches.
+  static double cmToIn(double cm) => cm / 2.54;
+
+  // ------------------------------------------------------------------
   // Frequency parsing
   // ------------------------------------------------------------------
 
   /// Parses a frequency string and returns doses per day.
   ///
-  /// Supported formats: 'q4h', 'q6h', 'q8h', 'q12h', 'q24h',
-  /// 'q48h', 'once', 'stat', 'bid', 'tid', 'qid', 'daily'.
+  /// Supported standard formats: 'q4h', 'q6h', 'q8h', 'q12h', 'q24h',
+  /// 'q48h', 'once', 'stat', 'bid', 'tid', 'qid', 'daily', 'od', 'qd'.
+  ///
+  /// Returns 0.0 for variable/unsupported frequencies where doses per day
+  /// cannot be deterministically computed: e.g. ranges ('q6-8h'), 'prn',
+  /// 'qod', 'weekly', 'continuous'.
   static double dosesPerDay(String frequency) {
-    final f = frequency.trim().toLowerCase();
+    final raw = frequency.trim().toLowerCase();
+    if (raw.isEmpty) return 0.0;
 
-    // Named frequencies
-    switch (f) {
-      case 'once':
-      case 'stat':
-      case 'daily':
-      case 'od':
-      case 'qd':
-        return 1.0;
-      case 'bid':
-      case 'bd':
-        return 2.0;
-      case 'tid':
-      case 'tds':
-        return 3.0;
-      case 'qid':
-      case 'qds':
-        return 4.0;
+    // Strip parentheses content (e.g. 'q12h (bid)' -> 'q12h', 'q24h (od)' -> 'q24h')
+    final f = raw.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
+
+    // Variable or unsupported frequencies returning 0
+    if (f == 'prn' ||
+        f == 'as needed' ||
+        f == 'qod' ||
+        f == 'every other day' ||
+        f == 'weekly' ||
+        f == 'continuous' ||
+        f.contains('continuous') ||
+        f.contains('prn') ||
+        f.contains('as needed') ||
+        f.contains('titrate') ||
+        f.contains('per week') ||
+        f.contains('cycle') ||
+        RegExp(r'q\d+\s*-\s*q?\d+h').hasMatch(f) ||
+        RegExp(r'\b(to|or)\b').hasMatch(f)) {
+      return 0.0;
     }
 
-    // qNh pattern (e.g. q4h, q6h, q8h, q12h, q24h, q48h)
-    final qhMatch = RegExp(r'^q(\d+)h$').firstMatch(f);
+    // 1. qNh pattern (e.g. q4h, q6h, q8h, q12h, q24h, q48h)
+    final qhMatch = RegExp(r'\bq(\d+)h\b').firstMatch(f);
     if (qhMatch != null) {
       final hours = int.parse(qhMatch.group(1)!);
-      if (hours <= 0) return 0;
+      if (hours <= 0) return 0.0;
       return 24.0 / hours;
     }
 
+    // 2. Named standard frequencies
+    if (RegExp(r'\b(qid|qds)\b').hasMatch(f)) {
+      return 4.0;
+    }
+    if (RegExp(r'\b(tid|tds)\b').hasMatch(f)) {
+      return 3.0;
+    }
+    if (RegExp(r'\b(bid|bd)\b').hasMatch(f)) {
+      return 2.0;
+    }
+    if (RegExp(r'\b(once|stat|daily|od|qd|single dose)\b').hasMatch(f)) {
+      return 1.0;
+    }
+
     // Fallback — unknown frequency, return 0 to signal error
-    return 0;
+    return 0.0;
   }
 }

@@ -102,36 +102,51 @@ class Patient {
 
   // ---- Copy ----
 
+  // Sentinel constant for clearing nullable fields in copyWith
+  static const Object _sentinel = Object();
+
   /// Creates a copy with selected fields replaced.
+  /// Nullable fields can be explicitly cleared by passing `null`.
   Patient copyWith({
     String? id,
-    String? patientName,
-    String? hospitalNumber,
+    Object? patientName = _sentinel,
+    Object? hospitalNumber = _sentinel,
     double? weightKg,
     double? heightCm,
     int? ageYears,
-    int? ageMonths,
+    Object? ageMonths = _sentinel,
     Sex? sex,
-    double? serumCreatinineMgDl,
-    double? creatinineClearanceMlMin,
-    double? eGfrMlMinPer173m2,
+    Object? serumCreatinineMgDl = _sentinel,
+    Object? creatinineClearanceMlMin = _sentinel,
+    Object? eGfrMlMinPer173m2 = _sentinel,
     bool? isScrStable,
     List<String>? activeDrugIds,
     List<String>? allergies,
   }) {
     return Patient(
       id: id ?? this.id,
-      patientName: patientName ?? this.patientName,
-      hospitalNumber: hospitalNumber ?? this.hospitalNumber,
+      patientName: identical(patientName, _sentinel)
+          ? this.patientName
+          : patientName as String?,
+      hospitalNumber: identical(hospitalNumber, _sentinel)
+          ? this.hospitalNumber
+          : hospitalNumber as String?,
       weightKg: weightKg ?? this.weightKg,
       heightCm: heightCm ?? this.heightCm,
       ageYears: ageYears ?? this.ageYears,
-      ageMonths: ageMonths ?? this.ageMonths,
+      ageMonths: identical(ageMonths, _sentinel)
+          ? this.ageMonths
+          : ageMonths as int?,
       sex: sex ?? this.sex,
-      serumCreatinineMgDl: serumCreatinineMgDl ?? this.serumCreatinineMgDl,
-      creatinineClearanceMlMin:
-          creatinineClearanceMlMin ?? this.creatinineClearanceMlMin,
-      eGfrMlMinPer173m2: eGfrMlMinPer173m2 ?? this.eGfrMlMinPer173m2,
+      serumCreatinineMgDl: identical(serumCreatinineMgDl, _sentinel)
+          ? this.serumCreatinineMgDl
+          : serumCreatinineMgDl as double?,
+      creatinineClearanceMlMin: identical(creatinineClearanceMlMin, _sentinel)
+          ? this.creatinineClearanceMlMin
+          : creatinineClearanceMlMin as double?,
+      eGfrMlMinPer173m2: identical(eGfrMlMinPer173m2, _sentinel)
+          ? this.eGfrMlMinPer173m2
+          : eGfrMlMinPer173m2 as double?,
       isScrStable: isScrStable ?? this.isScrStable,
       activeDrugIds: activeDrugIds ?? this.activeDrugIds,
       allergies: allergies ?? this.allergies,
@@ -140,9 +155,10 @@ class Patient {
 
   @override
   String toString() {
-    final nameStr = patientName != null ? 'Name: $patientName, ' : '';
-    final hnStr = hospitalNumber != null ? 'HN: $hospitalNumber, ' : '';
-    final allergyStr = allergies.isNotEmpty ? 'Allergies: ${allergies.join(", ")}, ' : '';
+    final nameStr = patientName != null ? 'Name: [REDACTED], ' : '';
+    final hnStr = hospitalNumber != null ? 'HN: [REDACTED], ' : '';
+    final allergyStr =
+        allergies.isNotEmpty ? 'Allergies: [REDACTED (${allergies.length})], ' : '';
     return 'Patient($nameStr$hnStr$allergyStr'
         'wt: ${weightKg}kg, ht: ${heightCm}cm, '
         'age: $ageYears y${ageMonths != null ? " ${ageMonths}m" : ""}, '

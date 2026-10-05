@@ -2,43 +2,6 @@ import '../../core/models/models.dart';
 
 final List<Drug> endocrine = [
   const Drug(
-    id: 'metformin',
-    genericName: 'Metformin',
-    brandNames: ['Glucophage', 'Siamformet'],
-    nameTh: 'เมทฟอร์มิน',
-    category: DrugCategory
-        .endocrine, // Wait, we have endocrine or antidiabetic? Let's check unit.dart. Wait, I didn't check if endocrine exists. It's DrugCategory.antidiabetic or endocrine.
-    // Let me use DrugCategory.antidiabetic
-    pregnancyCategory: 'B',
-    requiresRenalAdjustment: true,
-    contraindications: ['eGFR < 30', 'Metabolic acidosis'],
-    severeInteractions: ['Iodinated contrast media (withhold 48h)'],
-    specialNotes: 'Withhold before imaging studies using iodinated contrast.',
-    specialNotesTh: 'งดยาก่อนและหลังฉีดสี (contrast media) 48 ชั่วโมง',
-    regimens: [
-      DosingRegimen(
-          route: DoseRoute.po,
-          indication: 'Type 2 Diabetes',
-          dosingType: DosingType.fixed,
-          fixedDose: 500, // 500-1000 mg
-          doseUnit: DoseUnit.mg,
-          frequency: 'BID with meals',
-          limits: DoseLimit(maxDailyDose: 2550),
-          renalAdjustments: [
-            RenalAdjustment(
-                crclMin: 30,
-                crclMax: 45,
-                adjustmentFactor: 0.5,
-                notes: 'Max 1000 mg/day. Do not initiate new therapy.'),
-            RenalAdjustment(
-                crclMin: 0,
-                crclMax: 29.9,
-                adjustmentFactor: 0.0,
-                notes: 'Contraindicated'),
-          ]),
-    ],
-  ),
-  const Drug(
     id: 'glipizide',
     genericName: 'Glipizide',
     brandNames: ['Minidiab', 'Glucotrol'],
