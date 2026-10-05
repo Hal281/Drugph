@@ -81,10 +81,14 @@ RULES:
       };
 
       // 4. Forward to Gemini API
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const cleanKey = apiKey.trim();
+      const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
       const geminiResponse = await fetch(geminiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': cleanKey,
+        },
         body: JSON.stringify({
           system_instruction: systemInstruction,
           contents: contents,
