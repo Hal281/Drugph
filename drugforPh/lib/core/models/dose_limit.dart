@@ -85,6 +85,9 @@ enum DoseWarningCode {
   contraindicationAlert,
   severeInteractionAlert,
   pediatricBlocked,
+
+  /// A pediatric-only regimen was selected for an adult patient.
+  populationMismatch,
   generalAlert,
 }
 

@@ -311,6 +311,7 @@ final List<Drug> respiratory = [
         route: DoseRoute.ivInfusion,
         indication: 'Paracetamol Overdose Antidote (Adult)',
         dosingType: DosingType.weightBased,
+        maxDosingWeightKg: 100.0, // FDA Acetadote §2.1: Cap dosing weight at 100 kg for patients > 100 kg
         dosePerKg: 150.0, // 150 mg/kg first bag
         doseUnit: DoseUnit.mg,
         frequency: Frequency.continuous,

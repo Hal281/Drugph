@@ -294,7 +294,7 @@ final List<Drug> cardiovascular = [
               notes: 'Or administer q48h'),
           RenalAdjustment(
               crclMin: 0,
-              crclMax: 9,
+              crclMax: 10,
               adjustmentFactor: 0.25,
               notes: 'Administer q48h-q72h'),
         ],

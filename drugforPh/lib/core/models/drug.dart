@@ -148,6 +148,13 @@ class DosingRegimen {
   /// Strategy for selecting body weight (TBW, IBW, AdjBW).
   final DosingWeightStrategy dosingWeightStrategy;
 
+  /// Explicit audience. When `null` it is inferred by [effectiveAudience].
+  final RegimenAudience? audience;
+
+  /// Upper cap (kg) on the weight used for mg/kg dosing, where the primary
+  /// source defines one (e.g. IV acetylcysteine uses at most 100 kg).
+  final double? maxDosingWeightKg;
+
   const DosingRegimen({
     required this.route,
     this.indication,
@@ -178,12 +185,40 @@ class DosingRegimen {
     this.notes,
     this.notesTh,
     this.dosingWeightStrategy = DosingWeightStrategy.actual,
+    this.audience,
+    this.maxDosingWeightKg,
   });
+
+  /// Who this regimen is written for.
+  ///
+  /// Resolution order: explicit [audience]; then [population] age bounds
+  /// (18 years = 216 months); then the word "pediatric" in [indication];
+  /// otherwise adult. A data-lint test pins this so a pediatric regimen can
+  /// never silently be treated as an adult one.
+  RegimenAudience get effectiveAudience {
+    if (audience != null) return audience!;
+    final pop = population;
+    if (pop != null) {
+      if (pop.minAgeMonths != null && pop.minAgeMonths! >= 216) {
+        return RegimenAudience.adult;
+      }
+      if (pop.maxAgeMonths != null && pop.maxAgeMonths! < 216) {
+        return RegimenAudience.pediatric;
+      }
+    }
+    if ((indication ?? '').toLowerCase().contains('pediatric')) {
+      return RegimenAudience.pediatric;
+    }
+    return RegimenAudience.adult;
+  }
 
   @override
   String toString() =>
       'DosingRegimen(${route.abbreviation}, ${dosingType.nameEn}, ${frequency.displayEn})';
 }
+
+/// Intended patient population of a [DosingRegimen].
+enum RegimenAudience { adult, pediatric }
 
 /// Complete drug definition with all dosing information.
 class Drug {

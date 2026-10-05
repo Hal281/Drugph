@@ -23,7 +23,8 @@ final List<Drug> obstetric = [
         frequency: Frequency.continuous,
         continuousRateMin: 1, // 1-2 mU/min
         continuousRateMax: 20, // Max usually 20-40 mU/min
-        continuousRateUnit: 'milliunits/min',
+        continuousRateUnit: 'mU/min',
+        rateUnit: RateUnit.mUMin,
         standardDilutionMgPerMl: 0.01, // e.g. 10 units in 1000ml = 10 mU/ml
       ),
       DosingRegimen(

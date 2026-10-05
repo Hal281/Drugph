@@ -64,12 +64,12 @@ final List<Drug> endocrine = [
           renalAdjustments: [
             RenalAdjustment(
                 crclMin: 30,
-                crclMax: 49.9,
+                crclMax: 50,
                 adjustmentFactor: 0.5,
                 notes: '50 mg OD'),
             RenalAdjustment(
                 crclMin: 0,
-                crclMax: 29.9,
+                crclMax: 30,
                 adjustmentFactor: 0.25,
                 notes: '25 mg OD'),
           ]),

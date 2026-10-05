@@ -59,19 +59,19 @@ final List<Drug> antibiotics = [
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 50,
-            crclMax: 89,
+            crclMax: 90,
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q12hTo24h,
           ),
           RenalAdjustment(
             crclMin: 20,
-            crclMax: 49,
+            crclMax: 50,
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q24h,
           ),
           RenalAdjustment(
             crclMin: 10,
-            crclMax: 19,
+            crclMax: 20,
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q48hTo72h,
           ),
@@ -103,19 +103,19 @@ final List<Drug> antibiotics = [
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 40,
-            crclMax: 59,
+            crclMax: 60,
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q36h,
           ),
           RenalAdjustment(
             crclMin: 20,
-            crclMax: 39,
+            crclMax: 40,
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q48h,
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 19,
+            crclMax: 20,
             adjustmentFactor: 1.0,
             notes: 'Monitor levels',
           ),
@@ -172,6 +172,8 @@ final List<Drug> antibiotics = [
         frequency: Frequency.q8h,
         limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
         renalAdjustments: [
+          // Reference: Merrem (meropenem) FDA Prescribing Information §2.2; Sanford Guide 2023.
+          // CrCl 26-50: 1g q12h; CrCl 10-25: 500mg q12h; CrCl <10: 500mg q24h.
           RenalAdjustment(
             crclMin: 26,
             crclMax: 50,
@@ -180,13 +182,13 @@ final List<Drug> antibiotics = [
           ),
           RenalAdjustment(
             crclMin: 10,
-            crclMax: 25,
+            crclMax: 26,
             adjustmentFactor: 0.5,
             adjustedFrequency: Frequency.q12h,
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 9,
+            crclMax: 10,
             adjustmentFactor: 0.5,
             adjustedFrequency: Frequency.q24h,
           ),
@@ -414,16 +416,19 @@ final List<Drug> antibiotics = [
         frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 750.0),
         renalAdjustments: [
+          // Reference: Levaquin (levofloxacin) FDA Prescribing Information §2.3; Sanford Guide 2023.
+          // CrCl 20-49: 500mg initial then 250mg q24h; CrCl <20: 500mg initial then 250mg q48h.
           RenalAdjustment(
             crclMin: 20,
-            crclMax: 49,
+            crclMax: 50,
             adjustmentFactor: 0.5,
             notes: 'Initial 500mg, then 250mg q24h',
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 19,
+            crclMax: 20,
             adjustmentFactor: 0.5,
+            adjustedFrequency: Frequency.q48h,
             notes: 'Initial 500mg, then 250mg q48h',
           ),
         ],
@@ -532,26 +537,21 @@ final List<Drug> antibiotics = [
         frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 6000.0),
         renalAdjustments: [
+          // Reference: Cefazolin FDA Prescribing Information §2.2 (Ancef); Sanford Guide 2023.
+          // CrCl 35-54: standard dose q8h; CrCl 11-34: 500 mg q12h; CrCl <11: 500 mg q24h.
           RenalAdjustment(
-            crclMin: 26,
-            crclMax: 50,
-            adjustmentFactor: 1.0,
-            adjustedFrequency: Frequency.q12h,
-            notes: '1 g IV q12h',
-          ),
-          RenalAdjustment(
-            crclMin: 10,
-            crclMax: 26,
+            crclMin: 11,
+            crclMax: 35,
             adjustmentFactor: 0.5,
             adjustedFrequency: Frequency.q12h,
-            notes: '500 mg IV q12h',
+            notes: '500 mg IV q12h (50% reduction for CrCl 11-34 mL/min)',
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 10,
+            crclMax: 11,
             adjustmentFactor: 0.5,
             adjustedFrequency: Frequency.q24h,
-            notes: '500 mg IV q24h',
+            notes: '500 mg IV q24h (50% reduction for CrCl < 11 mL/min)',
           ),
         ],
       ),
@@ -577,19 +577,21 @@ final List<Drug> antibiotics = [
         notes: 'Standard infusion is 4.5g q6h over 30 min. Extended infusion is 3.375g or 4.5g q8h over 4 hours.',
         limits: DoseLimit(maxDailyDose: 18),
         renalAdjustments: [
+          // Reference: Zosyn (piperacillin/tazobactam) FDA Prescribing Information §2.2.
+          // For base 4.5g q6h: CrCl 20-40 -> 3.375g q6h (75%); CrCl <20 -> 2.25g q6h (50%).
           RenalAdjustment(
             crclMin: 20,
-            crclMax: 50,
+            crclMax: 40,
             adjustmentFactor: 0.75, // 4.5g * 0.75 = 3.375g
-            adjustedFrequency: Frequency.q8h,
-            notes: '3.375g q8h (extended infusion) or 2.25g q6h',
+            adjustedFrequency: Frequency.q6h,
+            notes: '3.375g IV q6h over 30 min (or 3.375g q8h extended infusion)',
           ),
           RenalAdjustment(
             crclMin: 0,
             crclMax: 20,
             adjustmentFactor: 0.5, // 4.5g * 0.5 = 2.25g
-            adjustedFrequency: Frequency.q8h,
-            notes: '2.25g q8h',
+            adjustedFrequency: Frequency.q6h,
+            notes: '2.25g IV q6h over 30 min',
           ),
         ],
       ),

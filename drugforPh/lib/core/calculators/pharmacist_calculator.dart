@@ -25,27 +25,47 @@ class PharmacistCalculator {
     try {
       final warnings = <DoseWarning>[];
 
-      // --- 1. Population Applicability Check (D4, 4.1) ---
-      if (regimen.population != null) {
-        final popWarnings = regimen.population!.checkApplicability(patient);
-        warnings.addAll(popWarnings);
-      } else if (patient.ageYears < 18) {
-        // Fallback adult safety gate if no explicit pediatric criteria
+      // --- 1. Audience & Population Applicability Check (D4, 4.1) ---
+      final isChild = patient.ageYears < 18;
+
+      if (regimen.effectiveAudience == RegimenAudience.adult && isChild) {
         return DosageResult.failure(
           reasonEn:
-              'Pediatric patients (< 18 years) are not supported by this adult dosing engine.',
+              'Pediatric patients (< 18 years) are not supported by this adult dosing regimen.',
           reasonTh:
-              'ระบบคำนวณยานี้สำหรับผู้ใหญ่ ไม่รองรับผู้ป่วยเด็ก (อายุ < 18 ปี)',
+              'สูตรยานี้สำหรับผู้ใหญ่ ไม่รองรับผู้ป่วยเด็ก (อายุ < 18 ปี)',
           warnings: const [
             DoseWarning(
               severity: LimitSeverity.hard,
               code: DoseWarningCode.pediatricBlocked,
-              messageEn: 'Pediatric dosing (< 18 years) is blocked for safety.',
+              messageEn: 'Pediatric dosing (< 18 years) is blocked for safety on adult regimens.',
               messageTh:
-                  'ไม่อนุญาตให้คำนวณขนาดยาในผู้ป่วยเด็ก (< 18 ปี) เพื่อความปลอดภัย',
+                  'ไม่อนุญาตให้ใช้สูตรยาสำหรับผู้ใหญ่ในผู้ป่วยเด็ก (< 18 ปี) เพื่อความปลอดภัย',
             ),
           ],
         );
+      }
+
+      if (regimen.effectiveAudience == RegimenAudience.pediatric && !isChild) {
+        return DosageResult.failure(
+          reasonEn:
+              'Adult patients (≥ 18 years) cannot be dosed using a pediatric-only regimen.',
+          reasonTh:
+              'ผู้ป่วยผู้ใหญ่ (อายุ ≥ 18 ปี) ไม่สามารถใช้สูตรยาเฉพาะสำหรับเด็กได้',
+          warnings: const [
+            DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.populationMismatch,
+              messageEn: 'Pediatric regimen selected for an adult patient.',
+              messageTh: 'เลือกสูตรยาเด็กสำหรับผู้ป่วยผู้ใหญ่',
+            ),
+          ],
+        );
+      }
+
+      if (regimen.population != null) {
+        final popWarnings = regimen.population!.checkApplicability(patient);
+        warnings.addAll(popWarnings);
       }
 
       // --- 2. Advanced Allergy Check (D9, A8) ---
@@ -119,27 +139,39 @@ class PharmacistCalculator {
       }
 
       // --- 4. Determine Body Weight Metrics (4.5, A6) ---
-      final ibw = WeightBasedCalculator.idealBodyWeight(
-        heightCm: patient.heightCm,
-        sex: patient.sex,
-      );
-      final isObese = WeightBasedCalculator.isObese(
-        actualWeightKg: patient.weightKg,
-        ibwKg: ibw,
-      );
-      final adjBw = WeightBasedCalculator.adjustedBodyWeight(
-        actualWeightKg: patient.weightKg,
-        ibwKg: ibw,
-      );
-
-      // Weight for Cockcroft-Gault CrCl (Winter 2010 guideline)
+      // Devine IBW is adult-only (≥18 years). For pediatric patients, TBW is used.
+      final double ibw;
+      final bool isObese;
+      final double adjBw;
       double crclDosingWeight = patient.weightKg;
-      if (patient.weightKg < ibw) {
-        crclDosingWeight = patient.weightKg; // TBW
-      } else if (patient.weightKg < 1.20 * ibw) {
-        crclDosingWeight = ibw; // IBW
+
+      if (isChild) {
+        ibw = patient.weightKg;
+        isObese = false;
+        adjBw = patient.weightKg;
+        crclDosingWeight = patient.weightKg;
       } else {
-        crclDosingWeight = adjBw; // AdjBW
+        ibw = WeightBasedCalculator.idealBodyWeight(
+          heightCm: patient.heightCm,
+          sex: patient.sex,
+        );
+        isObese = WeightBasedCalculator.isObese(
+          actualWeightKg: patient.weightKg,
+          ibwKg: ibw,
+        );
+        adjBw = WeightBasedCalculator.adjustedBodyWeight(
+          actualWeightKg: patient.weightKg,
+          ibwKg: ibw,
+        );
+
+        // Weight for Cockcroft-Gault CrCl (Winter 2010 guideline)
+        if (patient.weightKg < ibw) {
+          crclDosingWeight = patient.weightKg; // TBW
+        } else if (patient.weightKg < 1.20 * ibw) {
+          crclDosingWeight = ibw; // IBW
+        } else {
+          crclDosingWeight = adjBw; // AdjBW
+        }
       }
 
       // --- 5. Renal Function Evaluation & Database Review Check (D5, D6, A5, A11) ---
@@ -156,6 +188,37 @@ class PharmacistCalculator {
                   'เตือน AKI: ค่า SCr ไม่คงที่ จึงไม่มีการปรับขนาดยาตามไตอัตโนมัติ',
             ),
           );
+        } else if (isChild) {
+          if (patient.ageYears >= 1) {
+            crcl = RenalCalculator.bedsideSchwartz(
+              heightCm: patient.heightCm,
+              serumCreatinineMgDl: patient.serumCreatinineMgDl!,
+            );
+            warnings.add(
+              DoseWarning(
+                severity: LimitSeverity.info,
+                code: DoseWarningCode.generalAlert,
+                messageEn:
+                    'Estimated GFR calculated via Bedside Schwartz equation (${crcl.toStringAsFixed(1)} mL/min/1.73 m²).',
+                messageTh:
+                    'ประเมิน eGFR ด้วยสูตร Bedside Schwartz (${crcl.toStringAsFixed(1)} มล./นาที/1.73 ตร.ม.) สำหรับผู้ป่วยเด็ก',
+              ),
+            );
+          } else {
+            // Infant < 1 year
+            warnings.add(
+              DoseWarning(
+                severity: drug.requiresRenalAdjustment
+                    ? LimitSeverity.hard
+                    : LimitSeverity.soft,
+                code: DoseWarningCode.generalAlert,
+                messageEn:
+                    'Infant (< 1 year): Standard eGFR equations are not validated. Consult pediatric nephrology/specialist dosing.',
+                messageTh:
+                    'ทารก (< 1 ปี): ไม่มีสูตรประเมินการทำงานของไตมาตรฐาน โปรดปรึกษาแพทย์เฉพาะทางเด็ก',
+              ),
+            );
+          }
         } else {
           crcl = RenalCalculator.cockcroftGault(
             ageYears: patient.ageYears,
@@ -248,6 +311,21 @@ class PharmacistCalculator {
             weightStrategyUsed = 'TBW';
           }
           break;
+      }
+
+      // Cap dosing weight if regimen defines maxDosingWeightKg (e.g. IV NAC max 100 kg)
+      if (regimen.maxDosingWeightKg != null &&
+          weightForDosing > regimen.maxDosingWeightKg!) {
+        final rawWeight = weightForDosing;
+        weightForDosing = regimen.maxDosingWeightKg!;
+        warnings.add(DoseWarning(
+          severity: LimitSeverity.info,
+          code: DoseWarningCode.generalAlert,
+          messageEn:
+              'Dosing weight capped at ${regimen.maxDosingWeightKg!.toStringAsFixed(0)} kg (actual: ${rawWeight.toStringAsFixed(1)} kg) per clinical guideline cap.',
+          messageTh:
+              'จำกัดน้ำหนักคำนวณยาสูงสุดไม่เกิน ${regimen.maxDosingWeightKg!.toStringAsFixed(0)} กก. (น้ำหนักจริง ${rawWeight.toStringAsFixed(1)} กก.) ตามแนวทางการรักษา',
+        ));
       }
 
       // --- 7. Exhaustive Dosing Calculation (A2, D1, D2) ---
@@ -447,7 +525,9 @@ class PharmacistCalculator {
       // Apixaban 2-of-3 Criteria Rule (D5)
       final isApixaban =
           drug.id == 'apixaban' || drug.genericName.toLowerCase().contains('apixaban');
-      final isAf = regimen.indication?.toLowerCase().contains('af') ?? false;
+      final indicationLower = regimen.indication?.toLowerCase() ?? '';
+      final isAf = RegExp(r'\bafib\b|atrial fibrillation|\bnvaf\b')
+          .hasMatch(indicationLower);
       if (isApixaban && isAf) {
         int criteriaCount = 0;
         if (patient.ageYears >= 80) criteriaCount++;
@@ -491,33 +571,46 @@ class PharmacistCalculator {
       InfusionResult? infusionResult;
       if (regimen.dosingType == DosingType.titrated) {
         final rate = regimen.continuousRateMin ?? 0.0;
-        final rateUnit = regimen.rateUnit ??
-            (regimen.continuousRateUnit != null
-                ? RateUnit.fromSymbol(regimen.continuousRateUnit!)
-                : RateUnit.mcgKgMin);
-        double? rateMlPerHour;
-
-        if (regimen.standardDilutionMgPerMl != null &&
-            regimen.standardDilutionMgPerMl! > 0) {
-          if (rateUnit == RateUnit.mcgKgMin) {
-            final mgPerHr = (rate * weightForDosing * 60.0) / 1000.0;
-            rateMlPerHour = mgPerHr / regimen.standardDilutionMgPerMl!;
-          } else if (rateUnit == RateUnit.mgHr) {
-            rateMlPerHour = rate / regimen.standardDilutionMgPerMl!;
-          } else if (rateUnit == RateUnit.uKgHr) {
-            rateMlPerHour =
-                (rate * weightForDosing) / regimen.standardDilutionMgPerMl!;
-          }
+        final rateMax = (regimen.continuousRateMax != null &&
+                regimen.continuousRateMax! > rate)
+            ? regimen.continuousRateMax
+            : null;
+        // No silent default: an unknown/missing unit throws and is reported
+        // as a calculation error (unit confusion is a dosing-error hazard).
+        final RateUnit rateUnit;
+        if (regimen.rateUnit != null) {
+          rateUnit = regimen.rateUnit!;
+        } else if (regimen.continuousRateUnit != null) {
+          rateUnit = RateUnit.fromSymbol(regimen.continuousRateUnit!);
+        } else {
+          rateUnit = RateUnit.mcgKgMin;
         }
+
+        double? mlPerHr(double r) {
+          final conc = regimen.standardDilutionMgPerMl;
+          if (conc == null || conc <= 0) return null;
+          if (rateUnit == RateUnit.mlHr) return r;
+          final amountPerHr = rateUnit.toAmountPerHour(r, weightForDosing);
+          return amountPerHr == null ? null : amountPerHr / conc;
+        }
+
+        final rangeEn = rateMax != null
+            ? '$rate–$rateMax ${rateUnit.symbol}'
+            : '$rate ${rateUnit.symbol}';
+        final rangeTh = rateMax != null
+            ? '$rate–$rateMax ${rateUnit.nameTh}'
+            : '$rate ${rateUnit.nameTh}';
 
         infusionResult = InfusionResult(
           rate: rate,
+          rateMax: rateMax,
           rateUnit: rateUnit,
-          rateMlPerHr: rateMlPerHour,
+          rateMlPerHr: mlPerHr(rate),
+          rateMlPerHrMax: rateMax != null ? mlPerHr(rateMax) : null,
           instructionsEn:
-              'Titrate continuously according to clinical protocol ($rate ${rateUnit.symbol}).',
+              'Titrate continuously according to clinical protocol ($rangeEn).',
           instructionsTh:
-              'ปรับอัตราการหยดยาอย่างต่อเนื่องตามโปรโตคอลคลินิก ($rate ${rateUnit.nameTh})',
+              'ปรับอัตราการหยดยาอย่างต่อเนื่องตามโปรโตคอลคลินิก ($rangeTh)',
         );
       }
 
@@ -631,8 +724,8 @@ class PharmacistCalculator {
         dripRateDropsPerMin: dripRateDropsPerMin,
         formulaUsed: formulaUsed,
         calculationInputs: auditInputs,
-        ibwKg: ibw,
-        adjBwKg: adjBw,
+        ibwKg: isChild ? null : ibw,
+        adjBwKg: isChild ? null : adjBw,
         crclMlMin: crcl,
         isRenallyAdjusted: isRenallyAdjusted,
         renalAdjustmentFactor: appliedRenalFactor,

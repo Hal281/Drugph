@@ -21,15 +21,65 @@ enum RateUnit {
     required this.nameTh,
   });
 
-  /// Resolves a raw symbol string to a structured [RateUnit].
-  static RateUnit fromSymbol(String raw) {
+  /// Resolves a raw symbol string to a structured [RateUnit], or `null` when
+  /// the symbol is not recognised. Prefer this over [fromSymbol] in any
+  /// safety-relevant path: a silent fallback to a different unit (e.g.
+  /// mU/min shown as mcg/kg/min) is a dosing-error hazard.
+  static RateUnit? tryFromSymbol(String raw) {
     final lower = raw.trim().toLowerCase();
+    if (lower == 'milliunits/min' || lower == 'milliunit/min') {
+      return RateUnit.mUMin;
+    }
     for (final unit in RateUnit.values) {
-      if (unit.symbol.toLowerCase() == lower || unit.name.toLowerCase() == lower) {
+      if (unit.symbol.toLowerCase() == lower ||
+          unit.name.toLowerCase() == lower) {
         return unit;
       }
     }
-    return RateUnit.mcgKgMin;
+    return null;
+  }
+
+  /// Resolves a raw symbol string to a structured [RateUnit].
+  ///
+  /// Throws [ArgumentError] for unknown symbols (no silent fallback).
+  static RateUnit fromSymbol(String raw) {
+    final unit = tryFromSymbol(raw);
+    if (unit == null) {
+      throw ArgumentError.value(raw, 'raw', 'Unknown infusion rate unit');
+    }
+    return unit;
+  }
+
+  /// Converts [rate] (expressed in this unit) to an absolute amount per hour:
+  /// mg/hr for mass-based units, units/hr for unit-based units (U, mU).
+  ///
+  /// Returns `null` for [mlHr] (already a volume rate; there is no mass
+  /// amount to derive) and when the unit is weight-based but [weightKg] is
+  /// not positive.
+  double? toAmountPerHour(double rate, double weightKg) {
+    switch (this) {
+      case RateUnit.mcgKgMin:
+        return weightKg > 0 ? rate * weightKg * 60.0 / 1000.0 : null;
+      case RateUnit.mcgKgHr:
+        return weightKg > 0 ? rate * weightKg / 1000.0 : null;
+      case RateUnit.mgKgHr:
+        return weightKg > 0 ? rate * weightKg : null;
+      case RateUnit.mgKgMin:
+        return weightKg > 0 ? rate * weightKg * 60.0 : null;
+      case RateUnit.uKgHr:
+        return weightKg > 0 ? rate * weightKg : null;
+      case RateUnit.uHr:
+        return rate;
+      case RateUnit.mgHr:
+        return rate;
+      case RateUnit.gHr:
+        return rate * 1000.0;
+      case RateUnit.mUMin:
+        // 1 mU/min = 60 mU/hr = 0.06 units/hr
+        return rate * 60.0 / 1000.0;
+      case RateUnit.mlHr:
+        return null;
+    }
   }
 }
 
@@ -38,11 +88,18 @@ class InfusionResult {
   /// The numeric rate in [rateUnit].
   final double rate;
 
+  /// Upper bound of the titration range in [rateUnit], when the regimen
+  /// defines one (null for a single fixed rate).
+  final double? rateMax;
+
   /// The unit of the infusion rate.
   final RateUnit rateUnit;
 
   /// Calculated pump rate in mL/hr if standard dilution concentration is known.
   final double? rateMlPerHr;
+
+  /// Pump rate in mL/hr at [rateMax], when both are known.
+  final double? rateMlPerHrMax;
 
   /// Infusion duration in minutes, if fixed-duration.
   final double? durationMinutes;
@@ -58,8 +115,10 @@ class InfusionResult {
 
   const InfusionResult({
     required this.rate,
+    this.rateMax,
     required this.rateUnit,
     this.rateMlPerHr,
+    this.rateMlPerHrMax,
     this.durationMinutes,
     this.dripRateDropsPerMin,
     this.instructionsEn,

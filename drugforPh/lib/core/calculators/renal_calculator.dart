@@ -64,6 +64,35 @@ class RenalCalculator {
   }
 
   // ------------------------------------------------------------------
+  // Bedside Schwartz equation (paediatric eGFR)
+  //
+  // eGFR (mL/min/1.73 m²) = 0.413 × height_cm / serum_creatinine_mg_dL
+  //
+  // Reference: Schwartz GJ et al. J Am Soc Nephrol 2009;20:629-37
+  // (validated in children 1 to <18 years with CKD; CKiD cohort).
+  // ------------------------------------------------------------------
+
+  /// Estimates paediatric GFR using the **bedside Schwartz** equation.
+  ///
+  /// Returns eGFR in **mL/min/1.73 m²**. Valid for ages 1 to <18 years.
+  static double bedsideSchwartz({
+    required double heightCm,
+    required double serumCreatinineMgDl,
+  }) {
+    if (serumCreatinineMgDl <= 0) {
+      throw ArgumentError.value(
+        serumCreatinineMgDl,
+        'serumCreatinineMgDl',
+        'Serum creatinine must be > 0',
+      );
+    }
+    if (heightCm <= 0) {
+      throw ArgumentError.value(heightCm, 'heightCm', 'Height must be > 0');
+    }
+    return 0.413 * heightCm / serumCreatinineMgDl;
+  }
+
+  // ------------------------------------------------------------------
   // CKD-EPI 2021 equation (race-free)
   //
   // eGFR = 142
