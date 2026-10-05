@@ -59,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return Colors.pink.shade300;
       case DrugCategory.chemotherapy:
         return Colors.brown;
+      case DrugCategory.antifungal:
+        return Colors.indigo.shade600;
+      case DrugCategory.antiviral:
+        return Colors.deepOrange;
       case DrugCategory.antiInflammatory:
         return Colors.amber.shade700;
       case DrugCategory.antihistamine:
@@ -74,6 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (category) {
       case DrugCategory.antibiotic:
         return Icons.medication;
+      case DrugCategory.antifungal:
+        return Icons.biotech;
+      case DrugCategory.antiviral:
+        return Icons.coronavirus_outlined;
       case DrugCategory.cardiovascular:
       case DrugCategory.vasopressor:
         return Icons.favorite;
@@ -333,8 +341,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: Text(
                     isThai
-                        ? 'ซอฟต์แวร์ต้นแบบ ห้ามใช้กับผู้ป่วยจริง'
-                        : 'Prototype. Do NOT use clinically.',
+                        ? '⚠️ ซอฟต์แวร์ต้นแบบเพื่อการศึกษา (Educational Prototype) — ไม่ใช่เครื่องมือแพทย์ ห้ามใช้กับผู้ป่วยจริง'
+                        : '⚠️ Educational SaMD Prototype — Not a certified medical device. Never for real patient use.',
                     style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -488,102 +496,106 @@ class _HomeScreenState extends State<HomeScreen> {
                       final isSelected =
                           isDesktop && _selectedDrugForDesktop?.id == drug.id;
 
-                      return Card(
-                        elevation: isSelected ? 4 : 1,
-                        margin: const EdgeInsets.only(bottom: 8.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: isSelected
-                                ? catColor
-                                : (drug.isHighAlert
-                                    ? Colors.red.withValues(alpha: 0.5)
-                                    : Colors.transparent),
-                            width: isSelected ? 2 : 1,
+                      return Semantics(
+                        label: '${drug.genericName}, ${isThai ? drug.category.nameTh : drug.category.nameEn}${drug.isHighAlert ? (isThai ? ", ยาความเสี่ยงสูง" : ", High Alert") : ""}',
+                        button: true,
+                        child: Card(
+                          elevation: isSelected ? 4 : 1,
+                          margin: const EdgeInsets.only(bottom: 8.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: isSelected
+                                  ? catColor
+                                  : (drug.isHighAlert
+                                      ? Colors.red.withValues(alpha: 0.5)
+                                      : Colors.transparent),
+                              width: isSelected ? 2 : 1,
+                            ),
                           ),
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () => _onDrugTapped(context, drug, isDesktop),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: [
-                                // Icon
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: catColor.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(10),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => _onDrugTapped(context, drug, isDesktop),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  // Icon
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: catColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(_getCategoryIcon(drug.category),
+                                        color: catColor, size: 24),
                                   ),
-                                  child: Icon(_getCategoryIcon(drug.category),
-                                      color: catColor, size: 24),
-                                ),
-                                const SizedBox(width: 12),
+                                  const SizedBox(width: 12),
 
-                                // Details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              drug.genericName,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: isSelected
-                                                    ? FontWeight.w900
-                                                    : FontWeight.bold,
-                                                color: isSelected
-                                                    ? catColor
-                                                    : Colors.black87,
+                                  // Details
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                drug.genericName,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: isSelected
+                                                      ? FontWeight.w900
+                                                      : FontWeight.bold,
+                                                  color: isSelected
+                                                      ? catColor
+                                                      : Colors.black87,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          if (drug.isHighAlert)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 4,
-                                                      vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.red,
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
+                                            if (drug.isHighAlert)
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.shade700,
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                    isThai ? 'ยาความเสี่ยงสูง' : 'High Alert',
+                                                    style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 9,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
                                               ),
-                                              child: const Text('High Alert',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 9,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                            ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        isThai && drug.nameTh != null
-                                            ? '${drug.nameTh} • ${drug.brandNames.take(1).join(", ")}'
-                                            : drug.brandNames
-                                                .take(2)
-                                                .join(", "),
-                                        style: TextStyle(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 12),
-                                      ),
-                                    ],
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          [
+                                            if (drug.nameTh != null && drug.nameTh!.isNotEmpty) drug.nameTh!,
+                                            if (drug.brandNames.isNotEmpty) drug.brandNames.take(2).join(', '),
+                                          ].join(' • '),
+                                          style: TextStyle(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                if (!isDesktop) ...[
-                                  const SizedBox(width: 4),
-                                  Icon(Icons.chevron_right,
-                                      color: Colors.grey.shade400, size: 20),
-                                ]
-                              ],
+                                  if (!isDesktop) ...[
+                                    const SizedBox(width: 4),
+                                    Icon(Icons.chevron_right,
+                                        color: Colors.grey.shade400, size: 20),
+                                  ]
+                                ],
+                              ),
                             ),
                           ),
                         ),

@@ -57,15 +57,49 @@ class DrugDatabase {
     }
   }
 
-  /// Searches drugs by generic name or brand name.
+  /// Searches drugs by generic name, brand name, or Thai name with case-insensitive
+  /// and light fuzzy matching.
   static List<Drug> search(String query) {
-    if (query.isEmpty) return allDrugs;
+    final trimmed = query.trim().toLowerCase();
+    if (trimmed.isEmpty) return allDrugs;
 
-    final q = query.toLowerCase();
+    final cleanQuery = trimmed.replaceAll(RegExp(r'[\s\-_/]'), '');
+
     return allDrugs.where((d) {
-      if (d.genericName.toLowerCase().contains(q)) return true;
-      if (d.nameTh != null && d.nameTh!.contains(q)) return true;
-      if (d.brandNames.any((b) => b.toLowerCase().contains(q))) return true;
+      final generic = d.genericName.toLowerCase();
+      final cleanGeneric = generic.replaceAll(RegExp(r'[\s\-_/]'), '');
+
+      // 1. Direct and normalized substring matches
+      if (generic.contains(trimmed) || cleanGeneric.contains(cleanQuery)) {
+        return true;
+      }
+
+      // 2. Thai name match
+      if (d.nameTh != null) {
+        final thai = d.nameTh!.toLowerCase();
+        if (thai.contains(trimmed)) return true;
+      }
+
+      // 3. Brand names match
+      for (final b in d.brandNames) {
+        final brand = b.toLowerCase();
+        final cleanBrand = brand.replaceAll(RegExp(r'[\s\-_/]'), '');
+        if (brand.contains(trimmed) || cleanBrand.contains(cleanQuery)) {
+          return true;
+        }
+      }
+
+      // 4. Light fuzzy match: query chars appear in order in generic name
+      if (cleanQuery.length >= 3) {
+        int queryIdx = 0;
+        for (int i = 0; i < cleanGeneric.length && queryIdx < cleanQuery.length; i++) {
+          if (cleanGeneric[i] == cleanQuery[queryIdx]) {
+            queryIdx++;
+          }
+        }
+        if (queryIdx == cleanQuery.length) return true;
+      }
+
       return false;
     }).toList();
   }

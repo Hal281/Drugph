@@ -150,7 +150,7 @@ enum DrugCategory {
   nephrology('Nephrology', 'ยาโรคไต'),
   obstetric('Obstetric', 'ยาสูติศาสตร์'),
   antidote('Antidotes', 'ยาแก้พิษ'),
-  muscle_relaxant('Muscle Relaxants', 'ยาคลายกล้ามเนื้อ'),
+  muscleRelaxant('Muscle Relaxants', 'ยาคลายกล้ามเนื้อ'),
   antiInflammatory('Anti-inflammatory', 'ยาลดการอักเสบ'),
   antihistamine('Antihistamines', 'ยาแก้แพ้'),
   supplement('Supplements', 'วิตามิน/เกลือแร่'),

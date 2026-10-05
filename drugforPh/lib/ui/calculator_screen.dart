@@ -467,6 +467,35 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         : widget.drug.specialNotes!,
                   ),
 
+                // Clinical Metadata Badge (Source & Last Reviewed)
+                Container(
+                  margin: const EdgeInsets.only(top: 8, bottom: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blueGrey.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.verified_user_outlined, size: 16, color: Colors.blueGrey.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          t
+                              ? 'แหล่งอ้างอิง: ${widget.drug.sourceCitation} • ตรวจสอบล่าสุด: ${widget.drug.lastReviewedDate}'
+                              : 'Source: ${widget.drug.sourceCitation} • Reviewed: ${widget.drug.lastReviewedDate}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.blueGrey.shade800,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 16),
 
                 // Regimen Selection

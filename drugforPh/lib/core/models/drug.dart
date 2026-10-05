@@ -235,6 +235,15 @@ class Drug {
   /// Clinical notes (Thai).
   final String? specialNotesTh;
 
+  /// Primary source citation for drug dosing rules (e.g. Lexicomp 2024, Sanford Guide).
+  final String sourceCitation;
+
+  /// ISO 8601 date when this drug's rules were last reviewed.
+  final String lastReviewedDate;
+
+  /// Whether oral tablets of this drug may be split (e.g., scored tablets).
+  final bool isSplittable;
+
   const Drug({
     required this.id,
     required this.genericName,
@@ -253,6 +262,9 @@ class Drug {
     this.severeInteractions = const [],
     this.specialNotes,
     this.specialNotesTh,
+    this.sourceCitation = 'Lexicomp / Sanford Guide / UpToDate',
+    this.lastReviewedDate = '2026-10-04',
+    this.isSplittable = true,
   });
 
   /// Finds the first regimen matching [route] and optional [indication].
