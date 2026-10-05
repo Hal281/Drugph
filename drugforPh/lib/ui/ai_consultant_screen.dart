@@ -29,8 +29,15 @@ class _AiConsultantScreenState extends State<AiConsultantScreen> {
   final List<Map<String, dynamic>> _messages = [];
   bool _isLoading = false;
 
-  // Configured via --dart-define=AI_PROXY_URL=https://...
-  static const String _proxyUrl = String.fromEnvironment('AI_PROXY_URL');
+  // Production default proxy deployed on Cloudflare Workers
+  static const String _defaultProxyUrl =
+      'https://drugph-ai-proxy.turbodrugph.workers.dev';
+
+  // Configured via --dart-define=AI_PROXY_URL=https://... with default fallback
+  static const String _proxyUrl = String.fromEnvironment(
+    'AI_PROXY_URL',
+    defaultValue: _defaultProxyUrl,
+  );
   // Fallback for local testing only via --dart-define=GEMINI_API_KEY=...
   static const String _directApiKey = String.fromEnvironment('GEMINI_API_KEY');
 

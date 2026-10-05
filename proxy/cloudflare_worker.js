@@ -94,29 +94,44 @@ RULES:
         }]
       };
 
-      // 4. Forward to Gemini API
+      // 4. Forward to Gemini API (modern gemini-3.5-flash with resilient fallback)
       const cleanKey = apiKey.trim();
-      const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
-      const geminiResponse = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-goog-api-key': cleanKey,
-        },
-        body: JSON.stringify({
-          system_instruction: systemInstruction,
-          contents: contents,
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 800,
-          }
-        }),
-      });
+      const models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest'];
+      let geminiResponse;
+      let lastErrorText = '';
 
-      if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text();
-        return new Response(JSON.stringify({ error: 'Upstream AI provider error', details: errorText }), {
-          status: geminiResponse.status,
+      for (const model of models) {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+        try {
+          geminiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-goog-api-key': cleanKey,
+            },
+            body: JSON.stringify({
+              system_instruction: systemInstruction,
+              contents: contents,
+              generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 800,
+              }
+            }),
+          });
+
+          if (geminiResponse && geminiResponse.ok) {
+            break;
+          } else if (geminiResponse) {
+            lastErrorText = await geminiResponse.text();
+          }
+        } catch (fetchErr) {
+          lastErrorText = fetchErr.message;
+        }
+      }
+
+      if (!geminiResponse || !geminiResponse.ok) {
+        return new Response(JSON.stringify({ error: 'Upstream AI provider error', details: lastErrorText }), {
+          status: geminiResponse ? geminiResponse.status : 502,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
