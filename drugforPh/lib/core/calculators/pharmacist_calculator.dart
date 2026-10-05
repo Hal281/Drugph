@@ -1,3 +1,12 @@
+// ============================================================
+// Drug Dosage Calculator — Ward Pharmacist Dosing Engine
+// ============================================================
+// Deterministic, pure clinical calculation engine.
+// Single source of truth for all dose calculations across Drugph.
+//
+// DISCLAIMER: SaMD prototype — not for clinical use.
+// ============================================================
+
 import '../models/models.dart';
 import 'calculators.dart';
 
@@ -14,8 +23,14 @@ class PharmacistCalculator {
     required DosingRegimen regimen,
   }) {
     try {
-      // --- 1. Pediatric Boundary Check (4.1) ---
-      if (patient.ageYears < 18) {
+      final warnings = <DoseWarning>[];
+
+      // --- 1. Population Applicability Check (D4, 4.1) ---
+      if (regimen.population != null) {
+        final popWarnings = regimen.population!.checkApplicability(patient);
+        warnings.addAll(popWarnings);
+      } else if (patient.ageYears < 18) {
+        // Fallback adult safety gate if no explicit pediatric criteria
         return DosageResult.failure(
           reasonEn:
               'Pediatric patients (< 18 years) are not supported by this adult dosing engine.',
@@ -33,28 +48,24 @@ class PharmacistCalculator {
         );
       }
 
-      final warnings = <DoseWarning>[];
-
-      // --- 2. Allergy Check (A8) ---
-      for (final allergy in patient.allergies) {
-        final a = allergy.trim().toLowerCase();
-        if (a.isEmpty) continue;
-        final gen = drug.genericName.toLowerCase();
-        final aClass = drug.allergyClass?.toLowerCase() ?? '';
-        if (gen.contains(a) || (aClass.isNotEmpty && aClass.contains(a))) {
-          warnings.add(DoseWarning(
-            severity: LimitSeverity.hard,
-            code: DoseWarningCode.allergyAlert,
-            messageEn:
-                'PATIENT ALLERGY ALERT: Patient is allergic to "$allergy". Drug belongs to $aClass ($gen).',
-            messageTh:
-                'แจ้งเตือนการแพ้ยา: ผู้ป่วยมีประวัติแพ้ "$allergy" ยานี้อยู่ในกลุ่ม $aClass ($gen)',
-          ));
-          break;
-        }
+      // --- 2. Advanced Allergy Check (D9, A8) ---
+      final allergyAlerts = AllergyService.evaluateAllergies(
+        patientAllergies: patient.allergies,
+        drugGenericName: drug.genericName,
+        drugId: drug.id,
+        drugClass: drug.drugClass,
+        legacyAllergyClass: drug.allergyClass,
+      );
+      for (final alert in allergyAlerts) {
+        warnings.add(DoseWarning(
+          severity: alert.severity,
+          code: DoseWarningCode.allergyAlert,
+          messageEn: alert.messageEn,
+          messageTh: alert.messageTh,
+        ));
       }
 
-      // --- 3. Contraindications & Severe Interactions (A8) ---
+      // --- 3. Contraindications & Drug-Drug Interactions (D9, A8) ---
       for (final c in drug.contraindications) {
         warnings.add(DoseWarning(
           severity: LimitSeverity.soft,
@@ -64,13 +75,47 @@ class PharmacistCalculator {
         ));
       }
 
-      for (final inter in drug.severeInteractions) {
-        warnings.add(DoseWarning(
-          severity: LimitSeverity.info,
-          code: DoseWarningCode.severeInteractionAlert,
-          messageEn: 'Severe drug interaction potential: $inter',
-          messageTh: 'ปฏิกิริยาระหว่างยาที่สำคัญ: $inter',
-        ));
+      // Symmetric & Active Drug Interaction Check (D9)
+      for (final activeDrugId in patient.activeDrugIds) {
+        final activeNorm = activeDrugId.trim().toLowerCase();
+        for (final inter in drug.interactions) {
+          if (inter.targetDrugId?.toLowerCase() == activeNorm) {
+            final isHard = inter.severity == InteractionSeverity.contraindicated ||
+                inter.severity == InteractionSeverity.major;
+            warnings.add(DoseWarning(
+              severity: isHard ? LimitSeverity.hard : LimitSeverity.soft,
+              code: inter.severity == InteractionSeverity.contraindicated
+                  ? DoseWarningCode.contraindicationAlert
+                  : DoseWarningCode.severeInteractionAlert,
+              messageEn:
+                  '${inter.severity.labelEn} Interaction with $activeDrugId: ${inter.mechanismEn}. Action: ${inter.managementEn}',
+              messageTh:
+                  '${inter.severity.labelTh} ปฏิกิริยาระหว่างยากับ $activeDrugId: ${inter.mechanismTh}. คำแนะนำ: ${inter.managementTh}',
+            ));
+          }
+        }
+        for (final inter in drug.severeInteractions) {
+          if (inter.toLowerCase().contains(activeNorm)) {
+            warnings.add(DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.severeInteractionAlert,
+              messageEn: 'Severe interaction with active drug $activeDrugId: $inter',
+              messageTh: 'ปฏิกิริยารุนแรงกับยาที่กำลังใช้อยู่ $activeDrugId: $inter',
+            ));
+          }
+        }
+      }
+
+      // Informational notes for general severe interactions when no active drugs are specified
+      if (patient.activeDrugIds.isEmpty) {
+        for (final inter in drug.severeInteractions) {
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.info,
+            code: DoseWarningCode.severeInteractionAlert,
+            messageEn: 'Severe drug interaction potential: $inter',
+            messageTh: 'ปฏิกิริยาระหว่างยาที่สำคัญ: $inter',
+          ));
+        }
       }
 
       // --- 4. Determine Body Weight Metrics (4.5, A6) ---
@@ -97,7 +142,7 @@ class PharmacistCalculator {
         crclDosingWeight = adjBw; // AdjBW
       }
 
-      // --- 5. Renal Function Evaluation (4.1, A5, A11) ---
+      // --- 5. Renal Function Evaluation & Database Review Check (D5, D6, A5, A11) ---
       double? crcl;
       if (patient.serumCreatinineMgDl != null) {
         if (!patient.isScrStable) {
@@ -155,6 +200,22 @@ class PharmacistCalculator {
         );
       }
 
+      // D6 Database Lint Alert: Flag drugs requiring renal adjustment without reviewed tiers
+      if (drug.requiresRenalAdjustment &&
+          drug.renalReviewStatus != RenalReviewStatus.notApplicable &&
+          (regimen.renalAdjustments == null || regimen.renalAdjustments!.isEmpty)) {
+        warnings.add(
+          const DoseWarning(
+            severity: LimitSeverity.hard,
+            code: DoseWarningCode.severeRenalImpairment,
+            messageEn:
+                'DATABASE WARNING: Drug requires renal adjustment but has unreviewed/empty renal tiers.',
+            messageTh:
+                'เตือนฐานข้อมูล: ยานี้ต้องปรับตามไตแต่ยังไม่มีตารางปรับขนาดยาในระบบ',
+          ),
+        );
+      }
+
       // --- 6. Weight Strategy for Regimen (4.5) ---
       double weightForDosing = patient.weightKg;
       String weightStrategyUsed = 'TBW';
@@ -189,16 +250,14 @@ class PharmacistCalculator {
           break;
       }
 
-      // --- 7. Exhaustive Dosing Calculation (A2, 4.4) ---
-      double dose = 0.0;
-      double? continuousRate;
-      String? continuousRateUnit;
+      // --- 7. Exhaustive Dosing Calculation (A2, D1, D2) ---
+      double baseDose = 0.0;
       String formulaUsed = regimen.dosingType.nameEn;
 
       switch (regimen.dosingType) {
         case DosingType.weightBased:
           final dosePerKg = regimen.dosePerKg ?? regimen.minDosePerKg ?? 0.0;
-          dose = WeightBasedCalculator.calculateDose(
+          baseDose = WeightBasedCalculator.calculateDose(
             weightKg: weightForDosing,
             dosePerKg: dosePerKg,
           );
@@ -207,9 +266,9 @@ class PharmacistCalculator {
           break;
 
         case DosingType.fixed:
-          dose = regimen.fixedDose ?? 0.0;
+          baseDose = regimen.fixedDose ?? 0.0;
           formulaUsed =
-              'Fixed Dose (${dose.toStringAsFixed(0)} ${regimen.doseUnit.symbol})';
+              'Fixed Dose (${baseDose.toStringAsFixed(0)} ${regimen.doseUnit.symbol})';
           break;
 
         case DosingType.bsaBased:
@@ -218,7 +277,7 @@ class PharmacistCalculator {
             weightKg: patient.weightKg,
           );
           final dosePerM2 = regimen.dosePerM2 ?? 0.0;
-          dose = WeightBasedCalculator.calculateBsaDose(
+          baseDose = WeightBasedCalculator.calculateBsaDose(
             bsaM2: bsa,
             dosePerM2: dosePerM2,
           );
@@ -246,7 +305,7 @@ class PharmacistCalculator {
             );
           }
           final targetAuc = regimen.targetAuc ?? 5.0;
-          dose = WeightBasedCalculator.calvertFormula(
+          baseDose = WeightBasedCalculator.calvertFormula(
             targetAuc: targetAuc,
             gfrMlMin: crcl,
           );
@@ -254,19 +313,21 @@ class PharmacistCalculator {
           break;
 
         case DosingType.titrated:
-          continuousRate = regimen.continuousRateMin ?? 0.0;
-          continuousRateUnit = regimen.continuousRateUnit ?? 'mcg/kg/min';
-          dose = 0.0;
-          formulaUsed = 'Titrated Infusion ($continuousRate $continuousRateUnit)';
+          baseDose = 0.0;
+          final continuousUnitStr = regimen.rateUnit?.symbol ??
+              regimen.continuousRateUnit ??
+              'mcg/kg/min';
+          formulaUsed =
+              'Titrated Infusion (${regimen.continuousRateMin ?? 0.0} $continuousUnitStr)';
           break;
 
         case DosingType.renalAdjusted:
           if (regimen.fixedDose != null) {
-            dose = regimen.fixedDose!;
+            baseDose = regimen.fixedDose!;
             formulaUsed =
-                'Renal-adjusted (${dose.toStringAsFixed(0)} ${regimen.doseUnit.symbol})';
+                'Renal-adjusted (${baseDose.toStringAsFixed(0)} ${regimen.doseUnit.symbol})';
           } else if (regimen.dosePerKg != null) {
-            dose = WeightBasedCalculator.calculateDose(
+            baseDose = WeightBasedCalculator.calculateDose(
               weightKg: weightForDosing,
               dosePerKg: regimen.dosePerKg!,
             );
@@ -282,11 +343,36 @@ class PharmacistCalculator {
           break;
       }
 
-      // --- 8. Automated Renal Adjustment (4.4, 4.6) ---
+      // --- 8. DoseBasis (Per-Dose vs Per-Day vs Per-Week) (D1) ---
+      double dose = baseDose;
+      if (regimen.dosingType != DosingType.titrated &&
+          regimen.doseBasis == DoseBasis.perDay) {
+        final dPerDay = regimen.frequency.dosesPerDay;
+        if (dPerDay != null && dPerDay > 0) {
+          dose = baseDose / dPerDay;
+          formulaUsed +=
+              ' [Total daily ${baseDose.toStringAsFixed(1)} ${regimen.doseUnit.symbol}/day divided by $dPerDay doses]';
+        } else {
+          warnings.add(
+            const DoseWarning(
+              severity: LimitSeverity.soft,
+              code: DoseWarningCode.unknownFrequency,
+              messageEn:
+                  'Daily dose basis configured, but frequency interval is irregular/PRN. Dose not divided.',
+              messageTh:
+                  'กำหนดขนาดยาต่อวัน แต่ความถี่ไม่คงที่ ไม่สามารถหารขนาดยาต่อครั้งได้',
+            ),
+          );
+        }
+      }
+
+      // --- 9. Automated Renal Adjustment & Half-Open Range Tiers (D5) ---
       double finalDose = dose;
-      String finalFrequency = regimen.frequency;
+      Frequency finalFrequency = regimen.frequency;
       bool isRenallyAdjusted = false;
       double? appliedRenalFactor;
+      String? renalNotesEn;
+      String? renalNotesTh;
 
       // Do NOT apply secondary renal factor to Calvert (GFR-based) or titrated
       if (regimen.dosingType != DosingType.gfrBased &&
@@ -295,44 +381,147 @@ class PharmacistCalculator {
           regimen.renalAdjustments != null) {
         for (final adj in regimen.renalAdjustments!) {
           if (adj.appliesTo(crcl)) {
-            if (adj.adjustmentFactor < 1.0 || adj.adjustedFrequency != null) {
-              finalDose = finalDose * adj.adjustmentFactor;
-              finalFrequency = adj.adjustedFrequency ?? finalFrequency;
-              isRenallyAdjusted = true;
-              appliedRenalFactor = adj.adjustmentFactor;
+            // Check for Hard Contraindication / Avoid Action (D5)
+            if (adj.action == RenalAction.avoid ||
+                adj.action == RenalAction.contraindicated) {
+              final noteEn = adj.notes ??
+                  'CONTRAINDICATED in renal impairment (CrCl < ${adj.crclMax} mL/min).';
+              final noteTh = adj.notesTh ??
+                  'ข้อห้ามใช้เด็ดขาดในผู้ป่วยไตบกพร่อง (CrCl < ${adj.crclMax} มล./นาที)';
+              warnings.add(DoseWarning(
+                severity: LimitSeverity.hard,
+                code: DoseWarningCode.contraindicationAlert,
+                messageEn: noteEn,
+                messageTh: noteTh,
+              ));
+              return DosageResult.failure(
+                reasonEn: noteEn,
+                reasonTh: noteTh,
+                formulaUsed: formulaUsed,
+                crclMlMin: crcl,
+                warnings: warnings,
+              );
+            }
+
+            if (adj.action == RenalAction.monitorOnly) {
+              warnings.add(DoseWarning(
+                severity: LimitSeverity.info,
+                code: DoseWarningCode.renalAdjustmentApplied,
+                messageEn: adj.notes ?? 'Monitor renal function closely.',
+                messageTh: adj.notesTh ?? 'ติดตามการทำงานของไตอย่างใกล้ชิด',
+              ));
+            } else if (adj.action == RenalAction.adjust) {
+              if (adj.absoluteDose != null) {
+                finalDose = adj.absoluteDose!;
+                isRenallyAdjusted = true;
+              } else if (adj.adjustmentFactor < 1.0) {
+                finalDose = finalDose * adj.adjustmentFactor;
+                isRenallyAdjusted = true;
+                appliedRenalFactor = adj.adjustmentFactor;
+              }
+
+              if (adj.adjustedFrequency != null) {
+                finalFrequency = adj.adjustedFrequency!;
+                isRenallyAdjusted = true;
+              }
+
+              renalNotesEn = adj.notes;
+              renalNotesTh = adj.notesTh;
 
               warnings.add(
                 DoseWarning(
                   severity: LimitSeverity.info,
                   code: DoseWarningCode.renalAdjustmentApplied,
                   messageEn:
-                      'Auto Renal Adjustment applied (CrCl ${crcl.toStringAsFixed(1)} mL/min).',
+                      'Auto Renal Adjustment applied for CrCl ${crcl.toStringAsFixed(1)} mL/min${adj.notes != null ? ": ${adj.notes}" : ""}.',
                   messageTh:
-                      'ปรับขนาดยาอัตโนมัติตามค่า CrCl ${crcl.toStringAsFixed(1)} mL/min แล้ว',
+                      'ปรับขนาดยาอัตโนมัติตามค่า CrCl ${crcl.toStringAsFixed(1)} mL/min${adj.notesTh != null ? ": ${adj.notesTh}" : ""}',
                 ),
               );
             }
-            break;
+            break; // Stop at first matching tier
           }
         }
       }
 
-      // 4.6: Severe renal impairment check (< 10 mL/min)
-      if (crcl != null) {
-        final renalWarnings = DoseChecker.checkRenalAdjustment(
-          crclMlMin: crcl,
-          adjustments: regimen.renalAdjustments ?? [],
+      // Apixaban 2-of-3 Criteria Rule (D5)
+      final isApixaban =
+          drug.id == 'apixaban' || drug.genericName.toLowerCase().contains('apixaban');
+      final isAf = regimen.indication?.toLowerCase().contains('af') ?? false;
+      if (isApixaban && isAf) {
+        int criteriaCount = 0;
+        if (patient.ageYears >= 80) criteriaCount++;
+        if (patient.weightKg <= 60.0) criteriaCount++;
+        if ((patient.serumCreatinineMgDl ?? 0.0) >= 1.5) criteriaCount++;
+
+        if (criteriaCount >= 2) {
+          finalDose = 2.5;
+          finalFrequency = Frequency.q12h;
+          isRenallyAdjusted = true;
+          warnings.add(
+            const DoseWarning(
+              severity: LimitSeverity.info,
+              code: DoseWarningCode.renalAdjustmentApplied,
+              messageEn:
+                  'Apixaban dose reduced to 2.5 mg BID (meets ≥2 criteria: Age ≥80, Weight ≤60 kg, SCr ≥1.5 mg/dL).',
+              messageTh:
+                  'ปรับลดขนาดยา Apixaban เป็น 2.5 mg วันละ 2 ครั้ง (เข้าเกณฑ์ ≥2 ข้อ: อายุ ≥80, นน. ≤60 กก., SCr ≥1.5 mg/dL)',
+            ),
+          );
+        }
+      }
+
+      // Critical renal impairment check (< 10 mL/min)
+      if (crcl != null && crcl < 10.0) {
+        if (!warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
+          warnings.add(
+            DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.severeRenalImpairment,
+              messageEn:
+                  'CRITICAL RENAL IMPAIRMENT: CrCl ${crcl.toStringAsFixed(1)} mL/min < 10 mL/min.',
+              messageTh:
+                  'การทำงานของไตวิกฤต: CrCl ${crcl.toStringAsFixed(1)} มล./นาที ต่ำกว่า 10 มล./นาที',
+            ),
+          );
+        }
+      }
+
+      // --- 10. Continuous Infusion & Titrated Regimens (D2) ---
+      InfusionResult? infusionResult;
+      if (regimen.dosingType == DosingType.titrated) {
+        final rate = regimen.continuousRateMin ?? 0.0;
+        final rateUnit = regimen.rateUnit ??
+            (regimen.continuousRateUnit != null
+                ? RateUnit.fromSymbol(regimen.continuousRateUnit!)
+                : RateUnit.mcgKgMin);
+        double? rateMlPerHour;
+
+        if (regimen.standardDilutionMgPerMl != null &&
+            regimen.standardDilutionMgPerMl! > 0) {
+          if (rateUnit == RateUnit.mcgKgMin) {
+            final mgPerHr = (rate * weightForDosing * 60.0) / 1000.0;
+            rateMlPerHour = mgPerHr / regimen.standardDilutionMgPerMl!;
+          } else if (rateUnit == RateUnit.mgHr) {
+            rateMlPerHour = rate / regimen.standardDilutionMgPerMl!;
+          } else if (rateUnit == RateUnit.uKgHr) {
+            rateMlPerHour =
+                (rate * weightForDosing) / regimen.standardDilutionMgPerMl!;
+          }
+        }
+
+        infusionResult = InfusionResult(
+          rate: rate,
+          rateUnit: rateUnit,
+          rateMlPerHr: rateMlPerHour,
+          instructionsEn:
+              'Titrate continuously according to clinical protocol ($rate ${rateUnit.symbol}).',
+          instructionsTh:
+              'ปรับอัตราการหยดยาอย่างต่อเนื่องตามโปรโตคอลคลินิก ($rate ${rateUnit.nameTh})',
         );
-        for (final rw in renalWarnings) {
-          if (rw.code == DoseWarningCode.severeRenalImpairment &&
-              !warnings
-                  .any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
-            warnings.add(rw);
-          }
-        }
       }
 
-      // --- 9. Formulary Rounding (4.3) ---
+      // --- 11. Formulary Rounding (4.3) ---
       double? roundedDose;
       if (regimen.dosingType != DosingType.titrated &&
           drug.availableStrengths != null &&
@@ -344,12 +533,23 @@ class PharmacistCalculator {
         );
       }
 
-      // --- 10. Safety Limits & Daily Dose Check (A6, 4.2) ---
+      // --- 12. Safety Limits & Daily Dose Check (A6, D1, 4.2) ---
       double? dailyDose;
       if (regimen.dosingType != DosingType.titrated) {
-        final dPerDay = UnitConverter.dosesPerDay(finalFrequency);
-        if (dPerDay > 0) {
+        final dPerDay = finalFrequency.dosesPerDay;
+        if (dPerDay != null && dPerDay > 0) {
           dailyDose = finalDose * dPerDay;
+        } else {
+          warnings.add(
+            const DoseWarning(
+              severity: LimitSeverity.soft,
+              code: DoseWarningCode.unknownFrequency,
+              messageEn:
+                  'Daily dose limits not checked because frequency is variable, PRN, or continuous.',
+              messageTh:
+                  'ไม่สามารถตรวจสอบขีดจำกัดขนาดยาต่อวันได้ เนื่องจากความถี่เป็นแบบเมื่อจำเป็น หรือไม่คงที่',
+            ),
+          );
         }
       }
 
@@ -369,13 +569,14 @@ class PharmacistCalculator {
         warnings.insert(0, DoseChecker.highAlertWarning(drug.genericName));
       }
 
-      // --- 11. Infusion Preparation (A8) ---
+      // --- 13. Infusion Preparation (A8) ---
       double? volumeMl;
       double? infusionRateMlPerHr;
       double? infusionDurationMinutes = regimen.infusionTimeMinutes;
       double? dripRateDropsPerMin;
 
-      if (regimen.standardDilutionMgPerMl != null &&
+      if (regimen.dosingType != DosingType.titrated &&
+          regimen.standardDilutionMgPerMl != null &&
           regimen.standardDilutionMgPerMl! > 0 &&
           finalDose > 0) {
         volumeMl = finalDose / regimen.standardDilutionMgPerMl!;
@@ -387,7 +588,8 @@ class PharmacistCalculator {
 
       if (regimen.maxInfusionRateMgPerMin != null &&
           infusionDurationMinutes != null &&
-          infusionDurationMinutes > 0) {
+          infusionDurationMinutes > 0 &&
+          finalDose > 0) {
         final actualRateMgPerMin = finalDose / infusionDurationMinutes;
         warnings.addAll(
           DoseChecker.checkInfusionRate(
@@ -397,7 +599,7 @@ class PharmacistCalculator {
         );
       }
 
-      // --- 12. Audit Inputs Snapshot (B2) ---
+      // --- 14. Audit Inputs Snapshot (B2) ---
       final auditInputs = <String, dynamic>{
         'patientId': patient.id,
         'weightKg': patient.weightKg,
@@ -416,11 +618,13 @@ class PharmacistCalculator {
       return DosageResult(
         success: true,
         calculatedDose: regimen.dosingType == DosingType.titrated
-            ? continuousRate
+            ? null
             : finalDose,
         doseUnit: regimen.doseUnit,
-        frequency: finalFrequency,
+        frequency: finalFrequency.displayEn,
+        structuredFrequency: finalFrequency,
         dailyDose: dailyDose,
+        infusionResult: infusionResult,
         volumeMl: volumeMl,
         infusionRateMlPerHr: infusionRateMlPerHr,
         infusionDurationMinutes: infusionDurationMinutes,
@@ -432,7 +636,10 @@ class PharmacistCalculator {
         crclMlMin: crcl,
         isRenallyAdjusted: isRenallyAdjusted,
         renalAdjustmentFactor: appliedRenalFactor,
+        renalNotes: renalNotesEn,
+        renalNotesTh: renalNotesTh,
         roundedDose: roundedDose,
+        activePhases: regimen.phases,
         warnings: warnings,
       );
     } catch (e) {
@@ -441,5 +648,61 @@ class PharmacistCalculator {
         reasonTh: 'เกิดข้อผิดพลาดในการคำนวณ: $e',
       );
     }
+  }
+
+  /// Verifies an ordered prescription against recommended dosing rules (D7).
+  static OrderVerificationResult verifyOrder({
+    required Patient patient,
+    required Drug drug,
+    required DosingRegimen regimen,
+    required double orderedDose,
+    required Frequency orderedFrequency,
+    double? orderedRate,
+  }) {
+    final recommended = calculateDose(
+      patient: patient,
+      drug: drug,
+      regimen: regimen,
+    );
+
+    final verificationWarnings = <DoseWarning>[];
+    verificationWarnings.addAll(recommended.warnings);
+
+    double? deviation;
+    final targetDose = recommended.roundedDose ?? recommended.calculatedDose;
+    if (targetDose != null && targetDose > 0) {
+      deviation = ((orderedDose - targetDose).abs() / targetDose) * 100.0;
+    }
+
+    if (deviation != null && deviation > 15.0) {
+      verificationWarnings.add(
+        DoseWarning(
+          severity: deviation > 30.0 ? LimitSeverity.hard : LimitSeverity.soft,
+          code: DoseWarningCode.maxSingleDoseExceeded,
+          messageEn:
+              'ORDER DEVIATION: Ordered dose ($orderedDose ${regimen.doseUnit.symbol}) deviates by ${deviation.toStringAsFixed(1)}% from recommended (${targetDose?.toStringAsFixed(1)} ${regimen.doseUnit.symbol}).',
+          messageTh:
+              'ขนาดยาคลาดเคลื่อน: ขนาดยาที่สั่ง ($orderedDose ${regimen.doseUnit.symbol}) ต่างจากที่แนะนำ (${targetDose?.toStringAsFixed(1)} ${regimen.doseUnit.symbol}) อยู่ ${deviation.toStringAsFixed(1)}%',
+        ),
+      );
+    }
+
+    final isAcceptable = !recommended.isBlocked &&
+        !verificationWarnings.any((w) => w.severity == LimitSeverity.hard);
+
+    return OrderVerificationResult(
+      isAcceptable: isAcceptable,
+      recommendedResult: recommended,
+      orderedDose: orderedDose,
+      orderedFrequency: orderedFrequency,
+      deviationPercent: deviation,
+      warnings: verificationWarnings,
+      summaryEn: isAcceptable
+          ? 'Order is clinically acceptable.'
+          : 'Order requires pharmacist review or intervention.',
+      summaryTh: isAcceptable
+          ? 'คำสั่งใช้ยาผ่านเกณฑ์ความปลอดภัย'
+          : 'คำสั่งใช้ยาต้องได้รับการตรวจสอบหรือปรึกษาแพทย์ผู้สั่ง',
+    );
   }
 }

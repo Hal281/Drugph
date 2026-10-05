@@ -18,7 +18,7 @@ final List<Drug> chemotherapy = [
         dosingType: DosingType.gfrBased, // Calvert formula
         targetAuc: 5.0, // Often 4-6
         doseUnit: DoseUnit.mg,
-        frequency: 'once per cycle',
+        frequency: Frequency(isOnce: true, displayEn: 'Once per cycle', displayTh: 'ครั้งเดียวต่อรอบการรักษา'),
         limits: DoseLimit(
           maxSingleDose: 900.0,
         ),
@@ -42,7 +42,7 @@ final List<Drug> chemotherapy = [
         dosingType: DosingType.bsaBased,
         dosePerM2: 12000.0, // Up to 12 g/m2
         doseUnit: DoseUnit.mg,
-        frequency: 'once per cycle',
+        frequency: Frequency(isOnce: true, displayEn: 'Once per cycle', displayTh: 'ครั้งเดียวต่อรอบการรักษา'),
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -50,7 +50,7 @@ final List<Drug> chemotherapy = [
         dosingType: DosingType.fixed,
         fixedDose: 7.5, // 7.5 to 25 mg weekly
         doseUnit: DoseUnit.mg,
-        frequency: 'weekly',
+        frequency: Frequency.weekly,
         limits: DoseLimit(
           maxSingleDose: 30.0,
         ),

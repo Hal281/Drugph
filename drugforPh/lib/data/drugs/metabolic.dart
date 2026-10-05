@@ -25,52 +25,14 @@ final List<Drug> metabolic = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0, // Initial 500 mg BID or OD
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID) with meals',
+        frequency: Frequency.q12h,
         limits: DoseLimit(
           maxDailyDose: 2550.0,
         ),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 30, crclMax: 45, adjustmentFactor: 0.5, notes: 'Max 1,000 mg/day. Do not initiate new therapy.'),
-          RenalAdjustment(crclMin: 0, crclMax: 29, adjustmentFactor: 0.0, notes: 'CONTRAINDICATED'), // 0.0 conceptually blocks it if logic implemented, or use notes
+          RenalAdjustment(crclMin: 30, crclMax: 45, action: RenalAction.adjust, adjustmentFactor: 0.5, notes: 'Max 1,000 mg/day. Do not initiate new therapy.'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.contraindicated, notes: 'CONTRAINDICATED: Risk of lactic acidosis at CrCl < 30 mL/min', notesTh: 'ข้อห้ามใช้เด็ดขาด: เสี่ยงต่อภาวะ Lactic acidosis เมื่อ CrCl < 30 มล./นาที'), // 0.0 conceptually blocks it if logic implemented, or use notes
         ],
-      ),
-    ],
-  ),
-  const Drug(
-    id: 'regular_insulin',
-    genericName: 'Regular Insulin (RI)',
-    brandNames: ['Actrapid', 'Humulin R'],
-    nameTh: 'อินซูลินออกฤทธิ์สั้น (RI)',
-    category: DrugCategory.endocrine,
-    isHighAlert: true,
-    allergyClass: 'Insulin',
-    severeInteractions: [
-      'Thiazolidinediones (e.g. Pioglitazone) - Increased risk of heart failure',
-      'Beta-blockers - May mask symptoms of hypoglycemia'
-    ],
-    contraindications: ['Episodes of hypoglycemia'],
-    specialNotes: 'HIGH ALERT MEDICATION. Dosed in UNITS. Risk of severe hypoglycemia and hypokalemia.',
-    specialNotesTh: 'ยาความเสี่ยงสูง (High Alert) หน่วยเป็น ยูนิต (Units) ระวังภาวะน้ำตาลตกและโพแทสเซียมในเลือดต่ำรุนแรง',
-    regimens: [
-      DosingRegimen(
-        route: DoseRoute.sc,
-        indication: 'Hyperglycemia / Sliding Scale (Adult)',
-        dosingType: DosingType.fixed,
-        fixedDose: 4.0, // Just a baseline, usually sliding scale
-        doseUnit: DoseUnit.units, // Use units
-        frequency: 'q6h prn or before meals',
-      ),
-      DosingRegimen(
-        route: DoseRoute.ivInfusion,
-        indication: 'Diabetic Ketoacidosis (DKA)',
-        dosingType: DosingType.weightBased, // Rate: 0.1 units/kg/hr
-        dosePerKg: 0.1, // 0.1 units/kg/hr
-        doseUnit: DoseUnit.units,
-        frequency: 'continuous',
-        continuousRateMin: 0.1,
-        continuousRateMax: 0.1,
-        continuousRateUnit: 'units/kg/hr',
-        standardDilutionMgPerMl: 1.0, // 100 units in 100 mL NS = 1 unit/mL
       ),
     ],
   ),
@@ -101,7 +63,7 @@ final List<Drug> metabolic = [
         dosingType: DosingType.fixed,
         fixedDose: 40.0, // 40-80 mg High intensity, 10-20 mg Moderate
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 80.0,
         ),

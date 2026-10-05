@@ -10,6 +10,9 @@
 
 import 'dose_limit.dart';
 import 'unit.dart';
+import 'rate_unit.dart';
+import 'frequency.dart';
+import 'dosing_phase.dart';
 
 /// The complete result of a dose calculation.
 ///
@@ -28,13 +31,19 @@ class DosageResult {
   /// Unit of [calculatedDose].
   final DoseUnit? doseUnit;
 
-  /// Dosing frequency (e.g. 'q8h', 'q12h').
+  /// Dosing frequency string (e.g. 'q8h', 'q12h').
   final String? frequency;
+
+  /// Structured frequency value type (D1).
+  final Frequency? structuredFrequency;
 
   /// Total daily dose (calculatedDose × doses per day).
   final double? dailyDose;
 
   // ---- IV / infusion output ----
+
+  /// Infusion result with rate, rateUnit, and pump rate (D2).
+  final InfusionResult? infusionResult;
 
   /// Volume to administer in milliliters (for IV/IM).
   final double? volumeMl;
@@ -47,6 +56,11 @@ class DosageResult {
 
   /// Drip rate in drops/min (for gravity infusion sets).
   final double? dripRateDropsPerMin;
+
+  // ---- Multi-phase regimens (D3) ----
+
+  /// Active phases for this regimen (e.g. loading, maintenance, taper).
+  final List<DosingPhase>? activePhases;
 
   // ---- Calculation audit data ----
 
@@ -77,6 +91,12 @@ class DosageResult {
   /// Frequency after renal adjustment (may differ from [frequency]).
   final String? adjustedFrequency;
 
+  /// Clinical notes / instructions for renal adjustment in English (D5).
+  final String? renalNotes;
+
+  /// Clinical notes / instructions for renal adjustment in Thai (D5).
+  final String? renalNotesTh;
+
   // ---- Safety ----
 
   /// All warnings and alerts generated during calculation.
@@ -99,11 +119,14 @@ class DosageResult {
     this.calculatedDose,
     this.doseUnit,
     this.frequency,
+    this.structuredFrequency,
     this.dailyDose,
+    this.infusionResult,
     this.volumeMl,
     this.infusionRateMlPerHr,
     this.infusionDurationMinutes,
     this.dripRateDropsPerMin,
+    this.activePhases,
     required this.formulaUsed,
     this.calculationInputs = const {},
     this.bsaM2,
@@ -113,6 +136,8 @@ class DosageResult {
     this.adjBwKg,
     this.renalAdjustmentFactor,
     this.adjustedFrequency,
+    this.renalNotes,
+    this.renalNotesTh,
     this.roundedDose,
     this.isRenallyAdjusted = false,
     this.warnings = const [],
@@ -144,6 +169,7 @@ class DosageResult {
     required String reasonTh,
     List<DoseWarning> warnings = const [],
     String formulaUsed = 'N/A',
+    double? crclMlMin,
     Map<String, dynamic> calculationInputs = const {},
   }) {
     return DosageResult(
@@ -151,6 +177,7 @@ class DosageResult {
       formulaUsed: formulaUsed,
       errorMessage: reasonEn,
       errorMessageTh: reasonTh,
+      crclMlMin: crclMlMin,
       calculationInputs: calculationInputs,
       warnings: warnings,
     );
@@ -189,4 +216,42 @@ class DosageResult {
     buf.write(')');
     return buf.toString();
   }
+}
+
+/// Result of verifying an existing clinician order against the dosing engine (D7).
+class OrderVerificationResult {
+  /// Whether the order is within safe boundaries.
+  final bool isAcceptable;
+
+  /// The engine's recommended calculation for this patient and regimen.
+  final DosageResult recommendedResult;
+
+  /// Ordered single dose.
+  final double orderedDose;
+
+  /// Ordered frequency.
+  final Frequency orderedFrequency;
+
+  /// Percentage deviation from recommended dose (|ordered - recommended| / recommended * 100).
+  final double? deviationPercent;
+
+  /// Clinical safety warnings identified during order verification.
+  final List<DoseWarning> warnings;
+
+  /// Verification summary in English.
+  final String summaryEn;
+
+  /// Verification summary in Thai.
+  final String summaryTh;
+
+  const OrderVerificationResult({
+    required this.isAcceptable,
+    required this.recommendedResult,
+    required this.orderedDose,
+    required this.orderedFrequency,
+    this.deviationPercent,
+    required this.warnings,
+    required this.summaryEn,
+    required this.summaryTh,
+  });
 }

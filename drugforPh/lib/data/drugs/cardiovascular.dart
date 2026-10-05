@@ -21,7 +21,7 @@ final List<Drug> cardiovascular = [
         continuousRateMax: 3.0,
         continuousRateUnit: 'mcg/kg/min',
         doseUnit: DoseUnit.mcg,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         standardDilutionMgPerMl:
             0.016, // 4mg in 250mL = 0.016 mg/mL (or 16 mcg/mL)
         limits: DoseLimit(
@@ -47,7 +47,7 @@ final List<Drug> cardiovascular = [
         continuousRateMax: 20.0,
         continuousRateUnit: 'mcg/kg/min',
         doseUnit: DoseUnit.mcg,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         standardDilutionMgPerMl:
             1.6, // 400mg in 250mL = 1.6 mg/mL (1600 mcg/mL)
         limits: DoseLimit(
@@ -71,7 +71,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 150.0, // 150 mg over 10 mins
         doseUnit: DoseUnit.mg,
-        frequency: 'once',
+        frequency: Frequency.once,
         infusionTimeMinutes: 10.0,
       ),
     ],
@@ -99,7 +99,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0, // 5-10 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxSingleDose: 10.0,
           maxDailyDose: 10.0,
@@ -134,7 +134,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0, // 5-20 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h or q12h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 40.0,
         ),
@@ -170,7 +170,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 40.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h or q12h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxSingleDose: 160.0,
           maxDailyDose: 600.0, // Severe edema/renal failure
@@ -182,7 +182,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 40.0, // 40-80 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat or q12h',
+        frequency: Frequency.stat,
         limits: DoseLimit(
           maxSingleDose: 200.0,
         ),
@@ -193,7 +193,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.weightBased,
         dosePerKg: 1.0, // 1-2 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h to q24h',
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'q12-24h', displayTh: 'ทุก 12-24 ชม.'),
         limits: DoseLimit(
           maxDosePerKgPerDay: 6.0,
           maxSingleDose: 40.0,
@@ -205,7 +205,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.weightBased,
         dosePerKg: 1.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h to q24h',
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'q12-24h', displayTh: 'ทุก 12-24 ชม.'),
         limits: DoseLimit(
           maxDosePerKgPerDay: 6.0,
         ),
@@ -239,7 +239,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 6.0, // First dose 6mg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (can repeat 12mg if no response)',
+        frequency: Frequency.stat,
         limits: DoseLimit(
           maxSingleDose: 12.0,
         ),
@@ -250,7 +250,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.1, // 0.1 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         limits: DoseLimit(
           maxSingleDose: 6.0, // Max first dose 6mg
         ),
@@ -282,7 +282,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 0.25, // 0.125 - 0.25 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 0.5,
         ),
@@ -328,7 +328,7 @@ final List<Drug> cardiovascular = [
         continuousRateMax: 15.0, // Max 15 mg/hr
         continuousRateUnit: 'mg/hr',
         doseUnit: DoseUnit.mg,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         standardDilutionMgPerMl: 0.1, // 25mg in 250mL = 0.1 mg/mL
         limits: DoseLimit(
           maxInfusionRate: 15.0,
@@ -358,7 +358,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 25, // 12.5-25mg
         doseUnit: DoseUnit.mg,
-        frequency: 'OD',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 50),
       ),
       DosingRegimen(
@@ -367,7 +367,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 100,
         doseUnit: DoseUnit.mg,
-        frequency: 'OD to BID',
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'OD to BID', displayTh: 'วันละ 1-2 ครั้ง'),
         limits: DoseLimit(maxDailyDose: 400),
       ),
     ],
@@ -388,7 +388,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 50,
         doseUnit: DoseUnit.mg,
-        frequency: 'OD to BID',
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'OD to BID', displayTh: 'วันละ 1-2 ครั้ง'),
         limits: DoseLimit(maxDailyDose: 100),
       ),
     ],
@@ -414,7 +414,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 50,
         doseUnit: DoseUnit.mg,
-        frequency: 'BID',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 200),
       ),
     ],
@@ -435,7 +435,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 75,
         doseUnit: DoseUnit.mg,
-        frequency: 'OD',
+        frequency: Frequency.q24h,
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -443,7 +443,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 300, // 300-600mg
         doseUnit: DoseUnit.mg,
-        frequency: 'Once',
+        frequency: Frequency.once,
       ),
     ],
   ),
@@ -464,7 +464,7 @@ final List<Drug> cardiovascular = [
         dosingType: DosingType.fixed,
         fixedDose: 20, // 5-40mg
         doseUnit: DoseUnit.mg,
-        frequency: 'OD',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 40),
       ),
     ],

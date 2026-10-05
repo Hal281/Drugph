@@ -21,7 +21,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 800, // 800-1600 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'TID with meals',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 14000), // Max is ~14g/day
       ),
     ],
@@ -50,7 +50,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 50, // 50-100 units/kg
         doseUnit: DoseUnit.units,
-        frequency: '1-3 times per week',
+        frequency: Frequency(isWeekly: true, displayEn: '1-3 times/week', displayTh: 'สัปดาห์ละ 1-3 ครั้ง'),
       ),
     ],
   ),
@@ -72,7 +72,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 15, // 15-30g
         doseUnit: DoseUnit.g,
-        frequency: 'OD to QID',
+        frequency: Frequency(minIntervalHours: 6, maxIntervalHours: 24, displayEn: 'OD to QID', displayTh: 'วันละ 1-4 ครั้ง'),
         limits: DoseLimit(maxDailyDose: 120), // 15g QID x 2 is max typically
       ),
       DosingRegimen(
@@ -81,7 +81,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 30, // 30-50g
         doseUnit: DoseUnit.g,
-        frequency: 'q6h',
+        frequency: Frequency.q6h,
       ),
     ],
   ),
@@ -103,7 +103,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 0.25, // 0.25 mcg
         doseUnit: DoseUnit.mcg,
-        frequency: 'OD',
+        frequency: Frequency.q24h,
       ),
     ],
   ),
@@ -130,7 +130,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 1000,
         doseUnit: DoseUnit.mg,
-        frequency: 'TID with meals',
+        frequency: Frequency.q8h,
         limits: DoseLimit(
             maxDailyDose:
                 3000), // Varies, but usually max 3000 mg elemental Ca/day from all sources
@@ -157,7 +157,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 30,
         doseUnit: DoseUnit.mg,
-        frequency: 'OD',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 300),
       ),
     ],
@@ -188,7 +188,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.05, // typically 0.05 - 0.1 mg/kg/dose BID
         doseUnit: DoseUnit.mg,
-        frequency: 'BID',
+        frequency: Frequency.q12h,
       ),
     ],
   ),
@@ -209,7 +209,7 @@ final List<Drug> nephrology = [
         dosingType: DosingType.fixed,
         fixedDose: 1000,
         doseUnit: DoseUnit.mg,
-        frequency: 'BID',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 3000),
       ),
     ],

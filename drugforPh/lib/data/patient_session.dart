@@ -11,6 +11,14 @@ class PatientSession {
   /// The active patient globally across the app.
   final ValueNotifier<Patient?> currentPatient = ValueNotifier<Patient?>(null);
 
+  /// Current clinician user ID (D0).
+  String currentUserId = 'RPH-042';
+
+  /// Sets the active clinician ID.
+  void setUserId(String id) {
+    currentUserId = id;
+  }
+
   /// The list of saved patients (Ward List).
   final ValueNotifier<List<Patient>> wardPatients =
       ValueNotifier<List<Patient>>([]);

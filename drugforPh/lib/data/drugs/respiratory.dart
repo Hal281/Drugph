@@ -21,7 +21,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 2.5, // 2.5 - 5 mg via nebulizer
         doseUnit: DoseUnit.mg,
-        frequency: 'q20min x 3 doses, then q1-4h prn',
+        frequency: Frequency(isPrn: true, displayEn: 'q20min x3 then q1-4h PRN', displayTh: 'ทุก 20 นาที 3 ครั้ง แล้วทุก 1-4 ชม.'),
         limits: DoseLimit(maxSingleDose: 5.0),
       ),
       DosingRegimen(
@@ -30,7 +30,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.weightBased, // Commonly weight or age based, often just 2.5mg fixed, but let's provide a standard
         dosePerKg: 0.15, // 0.15 mg/kg (min 1.25mg, max 2.5mg)
         doseUnit: DoseUnit.mg,
-        frequency: 'q20min x 3 doses, then q1-4h prn',
+        frequency: Frequency(isPrn: true, displayEn: 'q20min x3 then q1-4h PRN', displayTh: 'ทุก 20 นาที 3 ครั้ง แล้วทุก 1-4 ชม.'),
         limits: DoseLimit(
           minSingleDose: 1.25,
           maxSingleDose: 2.5,
@@ -63,7 +63,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 4.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q4h-q6h prn',
+        frequency: Frequency.q4_6hPrn,
         limits: DoseLimit(
           maxDailyDose: 24.0,
         ),
@@ -74,7 +74,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 2.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q4h-q6h prn',
+        frequency: Frequency.q4_6hPrn,
         limits: DoseLimit(
           maxDailyDose: 12.0,
         ),
@@ -85,7 +85,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         limits: DoseLimit(maxSingleDose: 20.0, maxDailyDose: 40.0),
       ),
     ],
@@ -107,11 +107,11 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 10.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 11, crclMax: 31, adjustmentFactor: 0.5, notes: 'Max 5 mg/day'),
-          RenalAdjustment(crclMin: 0, crclMax: 10, adjustmentFactor: 0.5, notes: 'Max 5 mg/day (Avoid in ESRD if possible)'),
+          RenalAdjustment(crclMin: 10, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 0.5, notes: 'Max 5 mg/day'),
+          RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, adjustmentFactor: 0.5, notes: 'Max 5 mg/day (Avoid in ESRD if possible)'),
         ],
       ),
     ],
@@ -134,7 +134,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 0.5, // 500 mcg = 0.5 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q20min x 3 doses, then q4-6h prn',
+        frequency: Frequency(isPrn: true, displayEn: 'q20min x3 then q4-6h PRN', displayTh: 'ทุก 20 นาที 3 ครั้ง แล้วทุก 4-6 ชม.'),
       ),
       DosingRegimen(
         route: DoseRoute.inhalation,
@@ -142,7 +142,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 0.25,
         doseUnit: DoseUnit.mg,
-        frequency: 'q20min x 3 doses, then q4-6h prn',
+        frequency: Frequency(isPrn: true, displayEn: 'q20min x3 then q4-6h PRN', displayTh: 'ทุก 20 นาที 3 ครั้ง แล้วทุก 4-6 ชม.'),
       ),
     ],
   ),
@@ -162,7 +162,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 0.5, // 0.5-1 mg BID
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 2.0),
       ),
       DosingRegimen(
@@ -171,7 +171,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 2.0, // 2 mg nebulized single dose
         doseUnit: DoseUnit.mg,
-        frequency: 'Single dose (May repeat once)',
+        frequency: Frequency.once,
       ),
     ],
   ),
@@ -196,7 +196,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 40.0, // 40-60 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h for 5-7 days',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 60.0),
       ),
       DosingRegimen(
@@ -205,7 +205,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.weightBased,
         dosePerKg: 1.0, // 1-2 mg/kg/day
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h for 3-5 days',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 60.0),
       ),
     ],
@@ -226,7 +226,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 10.0),
       ),
       DosingRegimen(
@@ -235,7 +235,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
       ),
     ],
   ),
@@ -255,7 +255,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 180.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
       ),
     ],
   ),
@@ -276,7 +276,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD) at bedtime',
+        frequency: Frequency(intervalHours: 24, displayEn: 'q24h (OD at bedtime)', displayTh: 'ทุก 24 ชม. (ก่อนนอน)'),
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -284,7 +284,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD) at bedtime',
+        frequency: Frequency(intervalHours: 24, displayEn: 'q24h (OD at bedtime)', displayTh: 'ทุก 24 ชม. (ก่อนนอน)'),
       ),
     ],
   ),
@@ -304,7 +304,7 @@ final List<Drug> respiratory = [
         dosingType: DosingType.fixed,
         fixedDose: 200.0, // 200 mg TID or 600 mg OD
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h (TID)',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 600.0),
       ),
       DosingRegimen(
@@ -313,7 +313,42 @@ final List<Drug> respiratory = [
         dosingType: DosingType.weightBased,
         dosePerKg: 150.0, // 150 mg/kg first bag
         doseUnit: DoseUnit.mg,
-        frequency: '150mg/kg over 1hr → 50mg/kg over 4hr → 100mg/kg over 16hr',
+        frequency: Frequency.continuous,
+        phases: [
+          DosingPhase(
+            type: PhaseType.loading,
+            role: DoseRole.start,
+            nameEn: 'Bag 1 (Loading)',
+            nameTh: 'ถุงที่ 1 (Loading)',
+            dosePerKg: 150.0,
+            doseUnit: DoseUnit.mg,
+            durationHours: 1.0,
+            instructionsEn: '150 mg/kg in 200 mL D5W infused over 60 minutes',
+            instructionsTh: '150 มก./กก. ใน D5W 200 มล. หยดใน 60 นาที',
+          ),
+          DosingPhase(
+            type: PhaseType.maintenance,
+            role: DoseRole.usual,
+            nameEn: 'Bag 2 (Second dose)',
+            nameTh: 'ถุงที่ 2',
+            dosePerKg: 50.0,
+            doseUnit: DoseUnit.mg,
+            durationHours: 4.0,
+            instructionsEn: '50 mg/kg in 500 mL D5W infused over 4 hours',
+            instructionsTh: '50 มก./กก. ใน D5W 500 มล. หยดใน 4 ชั่วโมง',
+          ),
+          DosingPhase(
+            type: PhaseType.maintenance,
+            role: DoseRole.usual,
+            nameEn: 'Bag 3 (Third dose)',
+            nameTh: 'ถุงที่ 3',
+            dosePerKg: 100.0,
+            doseUnit: DoseUnit.mg,
+            durationHours: 16.0,
+            instructionsEn: '100 mg/kg in 1000 mL D5W infused over 16 hours',
+            instructionsTh: '100 มก./กก. ใน D5W 1000 มล. หยดใน 16 ชั่วโมง',
+          ),
+        ],
       ),
     ],
   ),

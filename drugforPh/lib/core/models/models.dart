@@ -2,5 +2,16 @@
 export 'unit.dart';
 export 'patient.dart';
 export 'dose_limit.dart';
+export 'dose_basis.dart';
+export 'frequency.dart';
+export 'rate_unit.dart';
+export 'dosing_phase.dart';
+export 'population_criteria.dart';
+export 'renal_adjustment.dart';
+export 'drug_class.dart';
+export 'interaction.dart';
+export 'allergy.dart';
+export 'formulation.dart';
+export 'provenance.dart';
 export 'drug.dart';
 export 'dosage_result.dart';

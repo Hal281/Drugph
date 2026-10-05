@@ -191,11 +191,11 @@ class DoseChecker {
           messageEn:
               'Renal dose adjustment: CrCl ${_fmt(crclMlMin)} mL/min '
               '→ reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
-              '${adj.adjustedFrequency != null ? ", change frequency to ${adj.adjustedFrequency}" : ""}',
+              '${adj.adjustedFrequency != null ? ", change frequency to ${adj.adjustedFrequency!.displayEn}" : ""}',
           messageTh:
               'ปรับโดสตามไต: CrCl ${_fmt(crclMlMin)} mL/min '
               '→ ลดโดสเหลือ ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
-              '${adj.adjustedFrequency != null ? ", เปลี่ยนความถี่เป็น ${adj.adjustedFrequency}" : ""}',
+              '${adj.adjustedFrequency != null ? ", เปลี่ยนความถี่เป็น ${adj.adjustedFrequency!.displayTh}" : ""}',
           calculatedValue: crclMlMin,
           limitValue: adj.adjustmentFactor,
           unit: 'mL/min',
@@ -205,7 +205,7 @@ class DoseChecker {
     }
 
     // Critical renal impairment warning (< 10 mL/min)
-    if (crclMlMin.roundToDouble() < 10) {
+    if (crclMlMin < 10) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
         code: DoseWarningCode.severeRenalImpairment,

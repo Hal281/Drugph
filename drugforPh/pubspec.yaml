@@ -22,6 +22,7 @@ dependencies:
   intl: ^0.20.3
   pdf: ^3.11.0
   printing: ^5.11.1
+  uuid: ^4.6.0
 
 dev_dependencies:
   flutter_test:

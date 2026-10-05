@@ -186,12 +186,15 @@ void main() {
 
       for (final drug in allDrugs) {
         for (final reg in drug.regimens) {
-          final freq = reg.frequency.trim().toLowerCase();
-          final dPerDay = UnitConverter.dosesPerDay(freq);
-          final isSpecial = isRecognizedSpecialInterval(freq);
+          final freq = reg.frequency.displayEn.trim().toLowerCase();
+          final dPerDay = reg.frequency.dosesPerDay ?? UnitConverter.dosesPerDay(freq);
+          final isSpecial = isRecognizedSpecialInterval(freq) ||
+              reg.frequency.isPrn ||
+              reg.frequency.isContinuous ||
+              reg.frequency.isOnce;
 
           if (dPerDay <= 0 && !isSpecial) {
-            failures.add('${drug.id}: "${reg.frequency}"');
+            failures.add('${drug.id}: "${reg.frequency.displayEn}"');
           }
         }
       }
@@ -221,8 +224,11 @@ void main() {
             // Titrated continuous infusion must NOT round to vial strengths
             expect(result.roundedDose, isNull,
                 reason: 'Titrated regimen on ${drug.id} must have roundedDose == null');
-            expect(result.calculatedDose, isNotNull,
-                reason: 'Titrated regimen on ${drug.id} must define continuous rate in calculatedDose');
+            // Titrated continuous infusion must return InfusionResult, never bare dose (D2)
+            expect(result.calculatedDose, isNull,
+                reason: 'Titrated regimen on ${drug.id} must have calculatedDose == null (D2)');
+            expect(result.infusionResult, isNotNull,
+                reason: 'Titrated regimen on ${drug.id} must return InfusionResult (D2)');
           }
         }
       }

@@ -24,7 +24,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 0.3, // 0.3-0.5 mg IM (1:1,000)
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (Repeat q5-15min prn)',
+        frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
         limits: DoseLimit(maxSingleDose: 0.5),
       ),
       DosingRegimen(
@@ -33,7 +33,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.01, // 0.01 mg/kg IM
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (Repeat q5-15min prn)',
+        frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
         limits: DoseLimit(maxSingleDose: 0.3),
       ),
       DosingRegimen(
@@ -42,7 +42,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 1.0, // 1 mg IV (1:10,000)
         doseUnit: DoseUnit.mg,
-        frequency: 'q3-5min during resuscitation',
+        frequency: Frequency(displayEn: 'q3-5min', displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ'),
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -50,7 +50,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.01,
         doseUnit: DoseUnit.mg,
-        frequency: 'q3-5min during resuscitation',
+        frequency: Frequency(displayEn: 'q3-5min', displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ'),
         limits: DoseLimit(maxSingleDose: 1.0),
       ),
     ],
@@ -74,7 +74,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 0.5,
         doseUnit: DoseUnit.mg,
-        frequency: 'q3-5min (Max total 3 mg)',
+        frequency: Frequency(isPrn: true, displayEn: 'q3-5min PRN', displayTh: 'ทุก 3-5 นาที เมื่อจำเป็น'),
         limits: DoseLimit(maxSingleDose: 1.0),
       ),
       DosingRegimen(
@@ -83,7 +83,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.02,
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (May repeat once)',
+        frequency: Frequency.stat,
         limits: DoseLimit(minSingleDose: 0.1, maxSingleDose: 0.5),
       ),
     ],
@@ -110,7 +110,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 4000.0, // 4g loading dose
         doseUnit: DoseUnit.mg,
-        frequency: 'once',
+        frequency: Frequency.once,
         notes: 'Loading dose over 15-20 min, then 1-2g/hr maintenance',
         infusionTimeMinutes: 20,
       ),
@@ -119,7 +119,7 @@ final List<Drug> emergency = [
         indication: 'Eclampsia / Pre-eclampsia (Maintenance)',
         dosingType: DosingType.titrated,
         doseUnit: DoseUnit.g,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         continuousRateMin: 1.0,
         continuousRateMax: 2.0,
         continuousRateUnit: 'g/hr',
@@ -131,7 +131,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0, // 2g
         doseUnit: DoseUnit.mg,
-        frequency: 'stat',
+        frequency: Frequency.stat,
         notes: 'Slow IV push over 2-5 min',
       ),
     ],
@@ -142,6 +142,7 @@ final List<Drug> emergency = [
     brandNames: ['Dexon', 'Oradexon'],
     nameTh: 'เดกซาเมทาโซน',
     category: DrugCategory.antiInflammatory,
+    tags: ['obstetric'],
     allergyClass: 'Corticosteroid',
     severeInteractions: [
       'Warfarin (Increases bleeding risk)',
@@ -157,7 +158,20 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0, // 10 mg IV loading
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat, then 4mg q6h',
+        frequency: Frequency.stat,
+      ),
+      DosingRegimen(
+        route: DoseRoute.im,
+        indication: 'Fetal lung maturity',
+        dosingType: DosingType.fixed,
+        fixedDose: 6.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency(
+          intervalHours: 12,
+          displayEn: 'q12h (4 doses)',
+          displayTh: 'ทุก 12 ชม. (4 ครั้ง)',
+        ),
+        limits: DoseLimit(maxDailyDose: 12.0),
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -165,7 +179,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.6,
         doseUnit: DoseUnit.mg,
-        frequency: 'Single dose',
+        frequency: Frequency.once,
         limits: DoseLimit(maxSingleDose: 10.0),
       ),
       DosingRegimen(
@@ -174,7 +188,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 4.0, // 4-8 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 20.0),
       ),
     ],
@@ -199,7 +213,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 50.0, // 50 mg q8h = 150mg or 50 q6h = 200mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h or q6h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 200.0),
       ),
       DosingRegimen(
@@ -208,7 +222,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 2.0, // 2 mg/kg bolus
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat, then 25-50 mg/m2/day divided q6-8h',
+        frequency: Frequency.stat,
         limits: DoseLimit(maxSingleDose: 100.0),
       ),
     ],
@@ -229,7 +243,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 0.4, // 0.04-0.4 mg titrate
         doseUnit: DoseUnit.mg,
-        frequency: 'q2-3min until respiratory recovery (Max 10 mg)',
+        frequency: Frequency(isPrn: true, displayEn: 'q2-3min PRN', displayTh: 'ทุก 2-3 นาที เมื่อจำเป็น'),
         limits: DoseLimit(maxSingleDose: 2.0),
       ),
       DosingRegimen(
@@ -238,7 +252,7 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.01,
         doseUnit: DoseUnit.mg,
-        frequency: 'q2-3min prn',
+        frequency: Frequency(isPrn: true, displayEn: 'q2-3min PRN', displayTh: 'ทุก 2-3 นาที เมื่อจำเป็น'),
         limits: DoseLimit(maxSingleDose: 2.0),
       ),
     ],
@@ -262,7 +276,7 @@ final List<Drug> emergency = [
         continuousRateMax: 20.0,
         continuousRateUnit: 'mcg/kg/min',
         doseUnit: DoseUnit.mcg,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         standardDilutionMgPerMl: 1.0, // 250mg in 250mL
         limits: DoseLimit(maxInfusionRate: 20.0, infusionRateUnit: 'mcg/kg/min'),
       ),

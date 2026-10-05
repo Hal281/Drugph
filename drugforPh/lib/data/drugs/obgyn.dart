@@ -20,7 +20,7 @@ final List<Drug> obstetric = [
         indication: 'Labor induction',
         dosingType: DosingType.titrated,
         doseUnit: DoseUnit.units,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
         continuousRateMin: 1, // 1-2 mU/min
         continuousRateMax: 20, // Max usually 20-40 mU/min
         continuousRateUnit: 'milliunits/min',
@@ -32,7 +32,7 @@ final List<Drug> obstetric = [
         dosingType: DosingType.fixed,
         fixedDose: 10,
         doseUnit: DoseUnit.units, // Actually IU
-        frequency: 'Once after delivery',
+        frequency: Frequency.once,
         limits: DoseLimit(maxDailyDose: 10),
       ),
     ],
@@ -53,7 +53,7 @@ final List<Drug> obstetric = [
         dosingType: DosingType.fixed,
         fixedDose: 600, // 600-800 mcg
         doseUnit: DoseUnit.mcg,
-        frequency: 'Once',
+        frequency: Frequency.once,
         limits: DoseLimit(maxDailyDose: 800),
       ),
       DosingRegimen(
@@ -62,7 +62,7 @@ final List<Drug> obstetric = [
         dosingType: DosingType.fixed,
         fixedDose: 25,
         doseUnit: DoseUnit.mcg,
-        frequency: 'q3-6h',
+        frequency: Frequency(minIntervalHours: 3, maxIntervalHours: 6, displayEn: 'q3-6h', displayTh: 'ทุก 3-6 ชม.'),
         limits: DoseLimit(maxDailyDose: 100), // Max total dose usually limited
       ),
     ],
@@ -83,7 +83,13 @@ final List<Drug> obstetric = [
         dosingType: DosingType.fixed,
         fixedDose: 0.2,
         doseUnit: DoseUnit.mg,
-        frequency: 'q2-4h PRN',
+        frequency: Frequency(
+          minIntervalHours: 2,
+          maxIntervalHours: 4,
+          isPrn: true,
+          displayEn: 'q2-4h PRN',
+          displayTh: 'ทุก 2-4 ชม. เมื่อจำเป็น',
+        ),
         limits: DoseLimit(maxDailyDose: 1), // Max 5 doses
       ),
     ],
@@ -107,28 +113,9 @@ final List<Drug> obstetric = [
         dosingType: DosingType.fixed,
         fixedDose: 0.25,
         doseUnit: DoseUnit.mg,
-        frequency: 'q20-30min PRN',
+        frequency: Frequency(minIntervalHours: 0, isPrn: true, displayEn: 'q20-30min PRN', displayTh: 'ทุก 20-30 นาที เมื่อจำเป็น'),
         limits: DoseLimit(
             maxDailyDose: 1), // Limited doses due to maternal cardiac risks
-      ),
-    ],
-  ),
-  const Drug(
-    id: 'dexamethasone_ob',
-    genericName: 'Dexamethasone',
-    brandNames: ['Dexa'],
-    nameTh: 'เดกซาเมทาโซน',
-    category: DrugCategory.obstetric,
-    pregnancyCategory: 'C',
-    regimens: [
-      DosingRegimen(
-        route: DoseRoute.im,
-        indication: 'Fetal lung maturity',
-        dosingType: DosingType.fixed,
-        fixedDose: 6,
-        doseUnit: DoseUnit.mg,
-        frequency: 'q12h (for 4 doses)',
-        limits: DoseLimit(maxDailyDose: 12),
       ),
     ],
   ),

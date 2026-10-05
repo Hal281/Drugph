@@ -96,21 +96,24 @@ void main() {
     // RenalAdjustment & DoseChecker (A7)
     // -------------------------------------------------------------------------
     test('A7: RenalAdjustment appliesTo and DoseChecker at decimal boundaries (9.5, 9.6, 25.5, 49.5)', () {
-      const tier1 = RenalAdjustment(crclMin: 0, crclMax: 9, adjustmentFactor: 0.25);
+      const tier1 = RenalAdjustment(crclMin: 0, crclMax: 10, adjustmentFactor: 0.25);
       const tier2 = RenalAdjustment(crclMin: 10, crclMax: 25, adjustmentFactor: 0.5);
-      const tier3 = RenalAdjustment(crclMin: 26, crclMax: 50, adjustmentFactor: 0.75);
-      const tier4 = RenalAdjustment(crclMin: 51, crclMax: 100, adjustmentFactor: 1.0);
+      const tier3 = RenalAdjustment(crclMin: 25, crclMax: 50, adjustmentFactor: 0.75);
+      const tier4 = RenalAdjustment(crclMin: 50, crclMax: 100, adjustmentFactor: 1.0);
 
-      // CrCl 9.5 rounds to 10 -> matches tier2 (10-25)
-      expect(tier2.appliesTo(9.5), isTrue);
+      // CrCl 9.5 falls in [0, 10)
+      expect(tier1.appliesTo(9.5), isTrue);
 
-      // CrCl 9.6 rounds to 10 -> matches tier2 (10-25)
-      expect(tier2.appliesTo(9.6), isTrue);
+      // CrCl 9.6 falls in [0, 10)
+      expect(tier1.appliesTo(9.6), isTrue);
 
-      // CrCl 25.5 rounds to 26 -> matches tier3 (26-50)
+      // CrCl 10.0 falls in [10, 25)
+      expect(tier2.appliesTo(10.0), isTrue);
+
+      // CrCl 25.5 falls in [25, 50)
       expect(tier3.appliesTo(25.5), isTrue);
 
-      // CrCl 49.5 rounds to 50 -> matches tier3 (26-50)
+      // CrCl 49.5 falls in [25, 50)
       expect(tier3.appliesTo(49.5), isTrue);
       expect(tier4.appliesTo(60), isTrue);
 
@@ -118,8 +121,8 @@ void main() {
       final warn94 = DoseChecker.checkRenalAdjustment(crclMlMin: 9.4, adjustments: [tier1, tier2]);
       expect(warn94.any((w) => w.code == DoseWarningCode.severeRenalImpairment), isTrue);
 
-      final warn96 = DoseChecker.checkRenalAdjustment(crclMlMin: 9.6, adjustments: [tier1, tier2]);
-      expect(warn96.any((w) => w.code == DoseWarningCode.severeRenalImpairment), isFalse);
+      final warn10 = DoseChecker.checkRenalAdjustment(crclMlMin: 10.0, adjustments: [tier1, tier2]);
+      expect(warn10.any((w) => w.code == DoseWarningCode.severeRenalImpairment), isFalse);
     });
 
     // -------------------------------------------------------------------------

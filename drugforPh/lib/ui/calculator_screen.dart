@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
 
 import '../core/models/models.dart';
 import '../core/calculators/calculators.dart';
@@ -40,6 +41,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   DosageResult? _result;
   List<DoseWarning> _warnings = [];
+  bool _isOverrideAccepted = false;
+  String? _overrideJustification;
 
   // UI Display for weight selection
   String? _dosingWeightLabel;
@@ -107,227 +110,65 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
     if (_selectedRegimen == null) return;
 
-    // 3. Perform Calculations based on Regimen
-    double dose = 0;
-    double? crcl;
-    List<DoseWarning> warnings = [];
+    // Reset override state on new calculation
+    _isOverrideAccepted = false;
+    _overrideJustification = null;
 
-    // --- Pharmacist Logic: Determine Dosing Weight for CrCl ---
-    double? crclDosingWeight = weight;
-    String dosingWeightLabel = 'TBW';
-    String dosingWeightReason = 'ใช้ TBW เนื่องจากไม่มีข้อมูลส่วนสูง';
-    double? ibw;
-
-    if (weight != null && height != null) {
-      ibw = WeightBasedCalculator.idealBodyWeight(heightCm: height, sex: _sex);
-      if (weight < ibw) {
-        crclDosingWeight = weight;
-        dosingWeightLabel = 'TBW';
-        dosingWeightReason =
-            'ใช้ TBW เนื่องจากน้ำหนักตัวจริงน้อยกว่า IBW (${ibw.toStringAsFixed(1)} kg)';
-      } else if (weight < 1.20 * ibw) {
-        crclDosingWeight = ibw;
-        dosingWeightLabel = 'IBW';
-        dosingWeightReason = 'ใช้ IBW เนื่องจากน้ำหนักตัวอยู่ในเกณฑ์ปกติ';
-      } else {
-        final adjBw = ibw + 0.4 * (weight - ibw);
-        crclDosingWeight = adjBw;
-        dosingWeightLabel = 'AdjBW';
-        dosingWeightReason =
-            'ใช้ AdjBW เนื่องจากน้ำหนักตัวจริงมากกว่า 120% ของ IBW';
-      }
-    }
-
-    // Update UI state for weight selection
-    _dosingWeightLabel = dosingWeightLabel;
-    _dosingWeightValue = crclDosingWeight;
-    _dosingWeightReason = dosingWeightReason;
-
-    // Calculate CrCl if needed and SCr is provided
-    if (scr != null && age != null && crclDosingWeight != null) {
-      if (!_isScrStable) {
-        // AKI check: Do not calculate CrCl if not stable
-        warnings.add(const DoseWarning(
-          severity: LimitSeverity.hard,
-          messageEn: 'AKI Alert: SCr is not stable. Cockcroft-Gault is inaccurate.',
-          messageTh: 'AKI Alert: ค่า SCr ไม่คงที่ สูตร Cockcroft-Gault จะไม่แม่นยำ (ห้ามใช้ CrCl นี้)',
-        ));
-      } else {
-        crcl = RenalCalculator.cockcroftGault(
-            ageYears: age, weightKg: crclDosingWeight, sex: _sex, serumCreatinineMgDl: scr);
-
-        // Low SCr in elderly check
-        if (scr < 0.6 && age >= 65) {
-          warnings.add(const DoseWarning(
-            severity: LimitSeverity.soft,
-            messageEn: 'Elderly with low SCr (<0.6). CrCl may be overestimated.',
-            messageTh: 'ผู้สูงอายุที่มี SCr ต่ำ (<0.6) ค่า CrCl ที่ได้อาจสูงเกินจริง (พิจารณาปัด SCr เป็น 0.8 หรือ 1.0)',
-          ));
-        }
-      }
-    } else if (widget.drug.requiresRenalAdjustment) {
-      warnings.add(const DoseWarning(
-        severity: LimitSeverity.hard,
-        messageEn: 'RENAL ALERT: This drug requires dose adjustment in renal impairment, but Serum Creatinine was NOT provided. Standard dose calculated assuming normal renal function (CrCl > 50 mL/min).',
-        messageTh: 'เตือนความปลอดภัย: ยานี้ต้องปรับขนาดยาตามการทำงานของไต แต่ไม่ได้ระบุค่า SCr ระบบจึงคำนวณตามขนาดปกติของผู้ป่วยที่ไตทำงานปกติ (CrCl > 50)',
-      ));
-    }
-
-    final regimen = _selectedRegimen!;
-
-    if (regimen.dosingType == DosingType.weightBased) {
-      double weightForDosing = weight!;
-      if (regimen.dosingWeightStrategy == DosingWeightStrategy.ideal && ibw != null) {
-        weightForDosing = ibw;
-      } else if (regimen.dosingWeightStrategy == DosingWeightStrategy.adjustedIfObese && ibw != null) {
-        if (WeightBasedCalculator.isObese(actualWeightKg: weight, ibwKg: ibw)) {
-          weightForDosing = WeightBasedCalculator.adjustedBodyWeight(
-            actualWeightKg: weight,
-            ibwKg: ibw,
-          );
-          warnings.add(DoseWarning(
-            severity: LimitSeverity.info,
-            messageEn: 'Using Adjusted Body Weight (${weightForDosing.toStringAsFixed(1)} kg) for aminoglycoside dosing in obese patient.',
-            messageTh: 'ใช้น้ำหนักปรับปรุง (AdjBW ${weightForDosing.toStringAsFixed(1)} กก.) สำหรับคำนวณยานี้ในผู้ป่วยอ้วน',
-          ));
-        } else if (weight > ibw) {
-          weightForDosing = ibw;
-        }
-      }
-
-      dose = WeightBasedCalculator.calculateDose(
-        weightKg: weightForDosing,
-        dosePerKg: regimen.dosePerKg ?? 0,
-      );
-    } else if (regimen.dosingType == DosingType.fixed) {
-      dose = regimen.fixedDose ?? 0;
-    } else if (regimen.dosingType == DosingType.bsaBased) {
-      final bsa = BsaCalculator.mosteller(heightCm: height!, weightKg: weight!);
-      dose = WeightBasedCalculator.calculateBsaDose(
-        bsaM2: bsa,
-        dosePerM2: regimen.dosePerM2 ?? 0,
-      );
-    } else if (regimen.dosingType == DosingType.titrated) {
-      dose = regimen.continuousRateMin ?? 0;
-    } else if (regimen.dosingType == DosingType.gfrBased) {
-      final gfr = crcl ?? 0;
-      dose = WeightBasedCalculator.calvertFormula(
-        targetAuc: regimen.targetAuc ?? 5.0,
-        gfrMlMin: gfr,
-      );
-      if (crcl == null) {
-        warnings.add(const DoseWarning(
-          severity: LimitSeverity.hard,
-          messageEn: 'Calvert formula requires CrCl / GFR. Please provide SCr.',
-          messageTh: 'สูตร Calvert ต้องใช้ค่า CrCl / GFR กรุณาระบุค่า SCr',
-        ));
-      }
-    }
-
-    // 4. Automated Renal Adjuster & Formulary Rounder
-    double finalDose = dose;
-    String finalFrequency = regimen.frequency;
-    bool isRenallyAdjusted = false;
-    double? appliedRenalFactor;
-
-    if (crcl != null && regimen.renalAdjustments != null) {
-      for (final adj in regimen.renalAdjustments!) {
-        if (adj.appliesTo(crcl)) {
-          if (adj.adjustmentFactor < 1.0 || adj.adjustedFrequency != null) {
-            finalDose = finalDose * adj.adjustmentFactor;
-            finalFrequency = adj.adjustedFrequency ?? finalFrequency;
-            isRenallyAdjusted = true;
-            appliedRenalFactor = adj.adjustmentFactor;
-            
-            warnings.add(DoseWarning(
-              severity: LimitSeverity.info,
-              messageEn: 'Auto Renal Adjustment applied (CrCl ${crcl.toStringAsFixed(1)} mL/min).',
-              messageTh: 'ปรับขนาดยาอัตโนมัติตามค่า CrCl ${crcl.toStringAsFixed(1)} mL/min แล้ว',
-            ));
-          }
-          break; // Match only the first applicable tier
-        }
-      }
-    }
-
-    double? roundedDose;
-    if (widget.drug.availableStrengths != null && widget.drug.availableStrengths!.isNotEmpty) {
-      roundedDose = DoseRounder.roundToNearestStrength(finalDose, widget.drug.availableStrengths!);
-    }
-
-    // Safety Checks against original un-adjusted dose limits (or adjusted depending on policy, but checking against base is safer)
-    if (regimen.limits != null) {
-      warnings.addAll(
-        DoseChecker.checkDose(
-          calculatedDose: finalDose,
-          limits: regimen.limits!,
-          doseUnit: regimen.doseUnit.symbol,
-          weightKg: weight,
-          dailyDose: _calculateDailyDose(finalDose, finalFrequency),
-        ),
-      );
-    }
-
-    if (widget.drug.isHighAlert) {
-      warnings.insert(0, DoseChecker.highAlertWarning(widget.drug.genericName));
-    }
-
-    final dosageResult = DosageResult(
-      success: true,
-      calculatedDose: finalDose,
-      doseUnit: regimen.doseUnit,
-      frequency: finalFrequency,
-      formulaUsed: regimen.dosingType.nameEn,
-      crclMlMin: crcl,
-      isRenallyAdjusted: isRenallyAdjusted,
-      renalAdjustmentFactor: appliedRenalFactor,
-      roundedDose: roundedDose,
-      warnings: warnings,
+    // Build Patient from inputs and session (D0)
+    final sessionPatient = PatientSession.instance.currentPatient.value;
+    final patient = Patient(
+      id: sessionPatient?.id ??
+          'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
+      patientName: sessionPatient?.patientName,
+      hospitalNumber: sessionPatient?.hospitalNumber,
+      weightKg: weight!,
+      heightCm: height!,
+      ageYears: age!,
+      sex: _sex,
+      serumCreatinineMgDl: scr,
+      isScrStable: _isScrStable,
+      allergies: sessionPatient?.allergies ?? const [],
+      activeDrugIds: sessionPatient?.activeDrugIds ?? const [],
+      isPregnant: sessionPatient?.isPregnant ?? false,
+      hepaticImpairment: sessionPatient?.hepaticImpairment,
     );
 
+    // Call central calculation engine (D0)
+    final dosageResult = PharmacistCalculator.calculateDose(
+      patient: patient,
+      drug: widget.drug,
+      regimen: _selectedRegimen!,
+    );
+
+    final weightStrategy =
+        dosageResult.calculationInputs['weightStrategy'] as String? ?? 'TBW';
+    final dosingWeightUsed =
+        dosageResult.calculationInputs['dosingWeightUsedKg'] as double?;
+
     setState(() {
-      _warnings = warnings;
+      _warnings = dosageResult.warnings;
       _result = dosageResult;
+      _dosingWeightLabel = weightStrategy;
+      _dosingWeightValue = dosingWeightUsed ?? weight;
+      _dosingWeightReason = 'ใช้ $weightStrategy ในการคำนวณตามเกณฑ์คลินิก';
     });
 
-    // 5. Save to Audit Log
+    // Save to Audit Log with real UUID and logged-in clinician ID (D0)
     final log = CalculationLog(
-      logId: DateTime.now().millisecondsSinceEpoch.toString(), // Mock UUID
+      logId: const Uuid().v4(),
       timestamp: DateTime.now(),
-      userId: 'MD-001', // Mock logged in user
-      patientId: 'HN-Unknown',
+      userId: PatientSession.instance.currentUserId,
+      patientId: patient.id,
       drugName: widget.drug.genericName,
       drugId: widget.drug.id,
-      route: regimen.route.abbreviation,
-      indication: regimen.indication,
-      inputs: {
-        'weightKg': weight,
-        'heightCm': height,
-        'ageYears': age,
-        'sex': _sex.nameEn,
-        'scr': scr,
-      },
+      route: _selectedRegimen!.route.abbreviation,
+      indication: _selectedRegimen!.indication,
+      inputs: dosageResult.calculationInputs,
       result: dosageResult,
-      formulaUsed: regimen.dosingType.nameEn,
+      formulaUsed: dosageResult.formulaUsed,
       softwareVersion: '0.1.0-prototype',
     );
     HistoryService().addLog(log);
-  }
-
-  double? _calculateDailyDose(double singleDose, String frequency) {
-    if (frequency.contains('q24h') || frequency.contains('OD')) {
-      return singleDose;
-    }
-    if (frequency.contains('q12h') || frequency.contains('BID')) {
-      return singleDose * 2;
-    }
-    if (frequency.contains('q8h') || frequency.contains('TID')) {
-      return singleDose * 3;
-    }
-    if (frequency.contains('q6h') || frequency.contains('QID')) {
-      return singleDose * 4;
-    }
-    return null;
   }
 
   void _showErrorDialog(String title, String message) {
@@ -346,6 +187,66 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           TextButton(
             onPressed: () => Navigator.pop(c),
             child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _promptClinicianOverride(BuildContext context) {
+    final reasonCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          widget.isThai
+              ? 'บันทึกเหตุผลการอนุมัติข้ามขั้นตอน'
+              : 'Clinician Override Authorization',
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.isThai
+                  ? 'กรุณากรอกเหตุผลทางคลินิกและข้อมูลผู้สั่งยา เพื่อปลดบล็อกการแสดงขนาดยา'
+                  : 'Please enter clinical rationale and provider details to unlock dose display.',
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonCtrl,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: widget.isThai
+                    ? 'เช่น ผู้ป่วยฟอกไตฉุกเฉินแล้ว, มีข้อบ่งชี้พิเศษที่ประเมินแล้ว'
+                    : 'e.g. Patient on emergent hemodialysis, risk-benefit evaluated',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(widget.isThai ? 'ยกเลิก' : 'Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              final text = reasonCtrl.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  _isOverrideAccepted = true;
+                  _overrideJustification = text;
+                });
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(widget.isThai ? 'ยืนยันอนุมัติ' : 'Confirm Override'),
           ),
         ],
       ),
@@ -961,54 +862,155 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (res.roundedDose != null) ...[
-                  Text(
-                    t ? 'ขนาดยาที่แนะนำ (ปัดเศษแล้ว)' : 'Recommended Dose (Rounded)',
-                    style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    '${res.roundedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                if (res.isBlocked && !_isOverrideAccepted) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.shade400),
                     ),
-                  ),
-                  Text(
-                    res.frequency!,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey.shade800,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '(คำนวณได้: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol})',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      decoration: TextDecoration.lineThrough,
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.block, color: Colors.red, size: 28),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                t
+                                    ? 'การแสดงขนาดยาถูกระงับเพื่อความปลอดภัย'
+                                    : 'Dose Display Blocked for Safety',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          t
+                              ? 'พบข้อห้ามใช้เด็ดขาดหรือคำเตือนระดับวิกฤต (Critical Alert) ระบบจึงไม่อนุญาตให้แสดงตัวเลขขนาดยาจนกว่าจะมีการบันทึกเหตุผลอนุมัติข้ามขั้นตอนโดยบุคลากรทางการแพทย์'
+                              : 'This calculation triggered a critical safety alert or strict contraindication. Numerical dose is hidden until clinician override justification is recorded.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red.shade900, fontSize: 13),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.security, size: 18),
+                          label: Text(
+                            t
+                                ? 'บันทึกการอนุมัติข้ามขั้นตอน (Clinician Override)'
+                                : 'Authorize Clinician Override',
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade700,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => _promptClinicianOverride(context),
+                        ),
+                      ],
                     ),
                   ),
                 ] else ...[
-                  Text(
-                    '${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  if (res.frequency != null)
-                    Text(
-                      res.frequency!,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w500,
+                  if (_isOverrideAccepted)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: Colors.orange.shade400),
+                      ),
+                      child: Text(
+                        t
+                            ? '⚠️ อนุมัติการใช้ยาโดยแพทย์/เภสัชกร: $_overrideJustification'
+                            : '⚠️ CLINICIAN OVERRIDE RECORDED: $_overrideJustification',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange.shade900,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
+                  if (res.infusionResult != null) ...[
+                    Text(
+                      t ? 'อัตราการหยดยา (Titrated Infusion)' : 'Titrated Infusion Rate',
+                      style: TextStyle(
+                          color: Colors.teal.shade800, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      '${res.infusionResult!.rate} ${res.infusionResult!.rateUnit.symbol}',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (res.infusionResult!.rateMlPerHr != null)
+                      Text(
+                        'Pump Rate: ${res.infusionResult!.rateMlPerHr!.toStringAsFixed(1)} mL/hr',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade800,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ] else if (res.roundedDose != null) ...[
+                    Text(
+                      t ? 'ขนาดยาที่แนะนำ (ปัดเศษแล้ว)' : 'Recommended Dose (Rounded)',
+                      style: TextStyle(
+                          color: Colors.green.shade800, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      '${res.roundedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      res.frequency ?? '',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '(คำนวณได้: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol})',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      '${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (res.frequency != null)
+                      Text(
+                        res.frequency!,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                  ],
                 ],
                 if (res.crclMlMin != null) ...[
                   const SizedBox(height: 12),

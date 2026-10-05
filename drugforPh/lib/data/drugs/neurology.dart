@@ -27,7 +27,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0, // 2-10 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h-q8h (BID-QID)',
+        frequency: Frequency(minIntervalHours: 6, maxIntervalHours: 8, displayEn: 'q6-8h', displayTh: 'ทุก 6-8 ชม.'),
         limits: DoseLimit(
           maxDailyDose: 40.0,
         ),
@@ -38,7 +38,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0, // 5-10 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (Repeat in 10-15 mins prn)',
+        frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 10-15min PRN)', displayTh: 'ทันที (ซ้ำได้ใน 10-15 นาที)'),
         limits: DoseLimit(
           maxSingleDose: 10.0,
           maxDailyDose: 30.0,
@@ -50,7 +50,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.2, // 0.1-0.3 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         limits: DoseLimit(
           maxSingleDose: 10.0,
         ),
@@ -81,7 +81,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // 15-20 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         maxInfusionRateMgPerMin: 50.0,
         limits: DoseLimit(
           maxSingleDose: 1500.0,
@@ -93,7 +93,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.fixed,
         fixedDose: 300.0, // or 100mg TID
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 600.0,
         ),
@@ -118,12 +118,12 @@ final List<Drug> neurology = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 3000.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 50, crclMax: 79, adjustmentFactor: 1.0, adjustedFrequency: '500-1000 mg q12h'),
-          RenalAdjustment(crclMin: 30, crclMax: 49, adjustmentFactor: 0.5, adjustedFrequency: '250-750 mg q12h'),
-          RenalAdjustment(crclMin: 0, crclMax: 29, adjustmentFactor: 0.5, adjustedFrequency: '250-500 mg q12h'),
+          RenalAdjustment(crclMin: 50, crclMax: 80, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h),
+          RenalAdjustment(crclMin: 30, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 0.5, adjustedFrequency: Frequency.q12h),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 0.5, adjustedFrequency: Frequency.q12h, notes: '250-500 mg q12h'),
         ],
       ),
     ],
@@ -146,12 +146,12 @@ final List<Drug> neurology = [
         dosingType: DosingType.fixed,
         fixedDose: 300.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h (TID)',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 3600.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 30, crclMax: 59, adjustmentFactor: 1.0, adjustedFrequency: '400-1400 mg/day divided BID'),
-          RenalAdjustment(crclMin: 15, crclMax: 29, adjustmentFactor: 1.0, adjustedFrequency: '200-700 mg/day (OD)'),
-          RenalAdjustment(crclMin: 0, crclMax: 14, adjustmentFactor: 1.0, adjustedFrequency: '100-300 mg/day (OD)'),
+          RenalAdjustment(crclMin: 30, crclMax: 60, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h, notes: '400-1400 mg/day divided BID'),
+          RenalAdjustment(crclMin: 15, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '200-700 mg/day (OD)'),
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '100-300 mg/day (OD)'),
         ],
       ),
     ],
@@ -180,7 +180,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // Initial 10-15 mg/kg/day
         doseUnit: DoseUnit.mg,
-        frequency: 'divided BID to TID',
+        frequency: Frequency(minIntervalHours: 8, maxIntervalHours: 12, displayEn: 'Divided BID-TID', displayTh: 'แบ่งวันละ 2-3 ครั้ง'),
         limits: DoseLimit(
           maxDosePerKgPerDay: 60.0,
         ),
@@ -191,7 +191,7 @@ final List<Drug> neurology = [
         dosingType: DosingType.weightBased,
         dosePerKg: 20.0, // 20-40 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         maxInfusionRateMgPerMin: 150.0, // usually up to 3-6 mg/kg/min
         limits: DoseLimit(maxSingleDose: 3000.0),
       ),

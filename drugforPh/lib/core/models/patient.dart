@@ -8,6 +8,7 @@
 // ============================================================
 
 import 'unit.dart';
+import 'population_criteria.dart';
 
 /// Immutable patient data for dose calculations.
 ///
@@ -32,6 +33,12 @@ class Patient {
 
   /// Biological sex — required for CrCl, IBW, and some drug formulas.
   final Sex sex;
+
+  /// Whether the patient is currently pregnant (D4).
+  final bool isPregnant;
+
+  /// Hepatic impairment classification, if assessed (D4).
+  final ChildPughClass? hepaticImpairment;
 
   /// Serum creatinine in mg/dL.
   /// Required for Cockcroft-Gault and CKD-EPI calculations.
@@ -62,6 +69,12 @@ class Patient {
   /// Unique internal ID for managing lists.
   final String id;
 
+  /// Convenience alias for [patientName].
+  String? get name => patientName;
+
+  /// Convenience alias for [hospitalNumber].
+  String? get hn => hospitalNumber;
+
   const Patient({
     required this.id,
     this.patientName,
@@ -71,6 +84,8 @@ class Patient {
     required this.ageYears,
     this.ageMonths,
     required this.sex,
+    this.isPregnant = false,
+    this.hepaticImpairment,
     this.serumCreatinineMgDl,
     this.creatinineClearanceMlMin,
     this.eGfrMlMinPer173m2,
@@ -116,6 +131,8 @@ class Patient {
     int? ageYears,
     Object? ageMonths = _sentinel,
     Sex? sex,
+    bool? isPregnant,
+    Object? hepaticImpairment = _sentinel,
     Object? serumCreatinineMgDl = _sentinel,
     Object? creatinineClearanceMlMin = _sentinel,
     Object? eGfrMlMinPer173m2 = _sentinel,
@@ -138,6 +155,10 @@ class Patient {
           ? this.ageMonths
           : ageMonths as int?,
       sex: sex ?? this.sex,
+      isPregnant: isPregnant ?? this.isPregnant,
+      hepaticImpairment: identical(hepaticImpairment, _sentinel)
+          ? this.hepaticImpairment
+          : hepaticImpairment as ChildPughClass?,
       serumCreatinineMgDl: identical(serumCreatinineMgDl, _sentinel)
           ? this.serumCreatinineMgDl
           : serumCreatinineMgDl as double?,
@@ -159,7 +180,8 @@ class Patient {
     final hnStr = hospitalNumber != null ? 'HN: [REDACTED], ' : '';
     final allergyStr =
         allergies.isNotEmpty ? 'Allergies: [REDACTED (${allergies.length})], ' : '';
-    return 'Patient($nameStr$hnStr$allergyStr'
+    final pregStr = isPregnant ? 'pregnant, ' : '';
+    return 'Patient($nameStr$hnStr$allergyStr$pregStr'
         'wt: ${weightKg}kg, ht: ${heightCm}cm, '
         'age: $ageYears y${ageMonths != null ? " ${ageMonths}m" : ""}, '
         'sex: ${sex.nameEn}'

@@ -121,18 +121,21 @@ void main() {
   });
 
   group('Clinical Safety & Boundary Tests', () {
-    test('CrCl decimal boundary tolerance: 25.5 mL/min matches 26-50 tier without gap', () {
-      const tier1 = RenalAdjustment(crclMin: 26, crclMax: 50, adjustmentFactor: 1.0);
+    test('CrCl decimal boundary: contiguous half-open ranges [25, 50) and [10, 25) leave zero gaps', () {
+      const tier1 = RenalAdjustment(crclMin: 25, crclMax: 50, adjustmentFactor: 1.0);
       const tier2 = RenalAdjustment(crclMin: 10, crclMax: 25, adjustmentFactor: 0.5);
 
-      // CrCl 25.5 should round to 26 and match tier1
+      // CrCl 25.5 falls in tier1 [25, 50)
       expect(tier1.appliesTo(25.5), isTrue);
 
-      // CrCl 25.4 should round to 25 and match tier2
-      expect(tier2.appliesTo(25.4), isTrue);
+      // CrCl 25.0 falls in tier1 [25, 50)
+      expect(tier1.appliesTo(25.0), isTrue);
 
-      // CrCl 9.6 should round to 10 and match tier2
-      expect(tier2.appliesTo(9.6), isTrue);
+      // CrCl 24.9 falls in tier2 [10, 25)
+      expect(tier2.appliesTo(24.9), isTrue);
+
+      // CrCl 10.0 falls in tier2 [10, 25)
+      expect(tier2.appliesTo(10.0), isTrue);
     });
 
     test('Vancomycin AUC24 steady-state calculation', () {

@@ -9,48 +9,27 @@
 
 import 'unit.dart';
 import 'dose_limit.dart';
+import 'frequency.dart';
+import 'dose_basis.dart';
+import 'rate_unit.dart';
+import 'dosing_phase.dart';
+import 'population_criteria.dart';
+import 'renal_adjustment.dart';
+import 'drug_class.dart';
+import 'interaction.dart';
+import 'formulation.dart';
+import 'provenance.dart';
 
-/// Renal dose adjustment rule for a specific CrCl range.
-///
-/// Example: Vancomycin CrCl 30–49 → same dose but change to q24h.
-class RenalAdjustment {
-  /// Minimum CrCl for this tier (inclusive), in mL/min.
-  final double crclMin;
-
-  /// Maximum CrCl for this tier (inclusive), in mL/min.
-  final double crclMax;
-
-  /// Dose multiplication factor (1.0 = unchanged, 0.5 = halve dose).
-  final double adjustmentFactor;
-
-  /// Replacement frequency if changed (e.g. 'q24h' instead of 'q12h').
-  final String? adjustedFrequency;
-
-  /// Clinician-facing note for this tier.
-  final String? notes;
-
-  const RenalAdjustment({
-    required this.crclMin,
-    required this.crclMax,
-    required this.adjustmentFactor,
-    this.adjustedFrequency,
-    this.notes,
-  });
-
-  /// Returns `true` if [crcl] falls within [crclMin]..[crclMax].
-  /// Uses clinical integer-rounding tolerance so intermediate decimal values
-  /// (e.g. CrCl 25.5 mL/min between integer tiers 10–25 and 26–50) do not fall into an unadjusted void.
-  bool appliesTo(double crcl) {
-    if (crcl >= crclMin && crcl <= crclMax) return true;
-    final rounded = crcl.roundToDouble();
-    return rounded >= crclMin && rounded <= crclMax;
-  }
-
-  @override
-  String toString() =>
-      'RenalAdj(CrCl $crclMin–$crclMax → ×$adjustmentFactor'
-      '${adjustedFrequency != null ? ", freq=$adjustedFrequency" : ""})';
-}
+export 'renal_adjustment.dart';
+export 'frequency.dart';
+export 'dose_basis.dart';
+export 'rate_unit.dart';
+export 'dosing_phase.dart';
+export 'population_criteria.dart';
+export 'drug_class.dart';
+export 'interaction.dart';
+export 'formulation.dart';
+export 'provenance.dart';
 
 /// Strategy for selecting body weight for weight-based drug calculations.
 enum DosingWeightStrategy {
@@ -115,8 +94,26 @@ class DosingRegimen {
   /// Unit in which the dose is expressed.
   final DoseUnit doseUnit;
 
-  /// Dosing frequency (e.g. 'q6h', 'q8h', 'q12h', 'q24h', 'once').
-  final String frequency;
+  /// Dosing frequency value type (D1).
+  final Frequency frequency;
+
+  /// Explicit dose basis (perDose, perDay, perWeek) (D1).
+  final DoseBasis doseBasis;
+
+  /// Structured unit for continuous infusion rates (D2).
+  final RateUnit? rateUnit;
+
+  /// Multi-phase dosing sequence (loading, maintenance, taper) (D3).
+  final List<DosingPhase>? phases;
+
+  /// Population applicability constraints (age, weight, sex, pregnancy) (D4).
+  final PopulationCriteria? population;
+
+  /// Pharmaceutical formulation for this regimen (D10).
+  final DrugFormulation? formulation;
+
+  /// Clinical provenance / citation (D11).
+  final Provenance? provenance;
 
   // ---- Dose safety limits ----
 
@@ -166,6 +163,12 @@ class DosingRegimen {
     this.continuousRateUnit,
     required this.doseUnit,
     required this.frequency,
+    this.doseBasis = DoseBasis.perDose,
+    this.rateUnit,
+    this.phases,
+    this.population,
+    this.formulation,
+    this.provenance,
     this.limits,
     this.reconcentrationMgPerMl,
     this.standardDilutionMgPerMl,
@@ -179,7 +182,7 @@ class DosingRegimen {
 
   @override
   String toString() =>
-      'DosingRegimen(${route.abbreviation}, ${dosingType.nameEn}, $frequency)';
+      'DosingRegimen(${route.abbreviation}, ${dosingType.nameEn}, ${frequency.displayEn})';
 }
 
 /// Complete drug definition with all dosing information.
@@ -199,8 +202,26 @@ class Drug {
   /// Therapeutic category.
   final DrugCategory category;
 
+  /// Secondary category tags (D11).
+  final List<String> tags;
+
   /// All available dosing regimens.
   final List<DosingRegimen> regimens;
+
+  /// Pharmacological drug class for interaction and allergy matching (D9).
+  final DrugClass? drugClass;
+
+  /// Structured drug-drug interactions (D9).
+  final List<DrugInteraction> interactions;
+
+  /// Status of renal dose review (D6, D12).
+  final RenalReviewStatus renalReviewStatus;
+
+  /// Clinical rationale if drug does not require renal adjustment (D6).
+  final String? renalExemptionReason;
+
+  /// Primary pharmaceutical formulation (D10).
+  final DrugFormulation? formulation;
 
   /// Known contraindications (English).
   final List<String> contraindications;
@@ -250,7 +271,13 @@ class Drug {
     this.brandNames = const [],
     this.nameTh,
     required this.category,
+    this.tags = const [],
     required this.regimens,
+    this.drugClass,
+    this.interactions = const [],
+    this.renalReviewStatus = RenalReviewStatus.reviewedWithTiers,
+    this.renalExemptionReason,
+    this.formulation,
     this.contraindications = const [],
     this.availableStrengths,
     this.requiresRenalAdjustment = false,

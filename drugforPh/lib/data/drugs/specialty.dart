@@ -19,7 +19,7 @@ final List<Drug> topical = [
         dosingType: DosingType.fixed,
         fixedDose: 1.0, // apply thin layer
         doseUnit: DoseUnit.application,
-        frequency: 'q12h-q24h',
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'q12-24h', displayTh: 'ทุก 12-24 ชม.'),
       ),
     ],
   ),
@@ -38,7 +38,7 @@ final List<Drug> topical = [
         dosingType: DosingType.fixed,
         fixedDose: 1.0,
         doseUnit: DoseUnit.application,
-        frequency: 'q8h (TID) for 5-14 days',
+        frequency: Frequency.q8h,
       ),
     ],
   ),
@@ -77,7 +77,7 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0, // Initial 5 mg, then adjust by INR
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 15.0), // Rarely >10mg/day
       ),
     ],
@@ -109,10 +109,10 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.weightBased,
         dosePerKg: 1.0, // 1 mg/kg q12h
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxSingleDose: 100.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '1 mg/kg q24h (OD)', notes: 'Use q24h dosing in CrCl <30'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: 'Use 1 mg/kg q24h in CrCl < 30 mL/min'),
         ],
       ),
       DosingRegimen(
@@ -121,9 +121,9 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.fixed,
         fixedDose: 40.0, // 40 mg SC q24h
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 0.75, notes: 'Use 30 mg q24h'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, absoluteDose: 30.0, adjustedFrequency: Frequency.q24h, notes: 'Use 30 mg q24h'),
         ],
       ),
     ],
@@ -151,13 +151,35 @@ final List<Drug> anticoagulants = [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
         indication: 'Anticoagulation (Adult)',
-        dosingType: DosingType.weightBased,
-        dosePerKg: 80.0, // 80 units/kg bolus
+        dosingType: DosingType.titrated,
         doseUnit: DoseUnit.units,
-        frequency: 'Bolus, then 18 units/kg/hr continuous',
+        frequency: Frequency.continuous,
         continuousRateMin: 18.0,
         continuousRateMax: 18.0,
         continuousRateUnit: 'units/kg/hr',
+        rateUnit: RateUnit.uKgHr,
+        phases: [
+          DosingPhase(
+            type: PhaseType.bolus,
+            role: DoseRole.start,
+            nameEn: 'Initial IV Bolus',
+            nameTh: 'ฉีดเข้าหลอดเลือดดำทันที (Bolus)',
+            dosePerKg: 80.0,
+            doseUnit: DoseUnit.units,
+            instructionsEn: '80 units/kg IV bolus (max 4,000-5,000 units)',
+            instructionsTh: '80 ยูนิต/กก. ฉีดเข้าหลอดเลือดดำทันที (สูงสุด 4,000-5,000 ยูนิต)',
+          ),
+          DosingPhase(
+            type: PhaseType.infusion,
+            role: DoseRole.usual,
+            nameEn: 'Continuous Infusion',
+            nameTh: 'หยดเข้าหลอดเลือดดำต่อเนื่อง (Infusion)',
+            rate: 18.0,
+            rateUnit: RateUnit.uKgHr,
+            instructionsEn: '18 units/kg/hr continuous infusion, titrated to target aPTT',
+            instructionsTh: '18 ยูนิต/กก./ชม. หยดเข้าหลอดเลือดดำต่อเนื่อง ปรับตามระดับ aPTT',
+          ),
+        ],
       ),
     ],
   ),
@@ -184,10 +206,10 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.fixed,
         fixedDose: 5.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 10.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 999, adjustmentFactor: 0.5, notes: '2.5 mg BID if 2 criteria met (Age >=80, Wt <=60kg, SCr >=1.5)'),
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.avoid, notes: 'Avoid in severe renal impairment (CrCl < 15 mL/min)'),
         ],
       ),
       DosingRegimen(
@@ -196,8 +218,33 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'BID for 7 days, then 5 mg BID',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 20.0),
+        phases: [
+          DosingPhase(
+            type: PhaseType.loading,
+            role: DoseRole.start,
+            nameEn: 'Initial Treatment (Days 1-7)',
+            nameTh: 'ระยะเริ่มต้น (วันที่ 1-7)',
+            dose: 10.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            durationDays: 7,
+            instructionsEn: '10 mg PO BID for 7 days',
+            instructionsTh: '10 มก. รับประทานวันละ 2 ครั้ง เป็นเวลา 7 วัน',
+          ),
+          DosingPhase(
+            type: PhaseType.maintenance,
+            role: DoseRole.usual,
+            nameEn: 'Maintenance (After Day 7)',
+            nameTh: 'ขนาดยาต่อเนื่อง (หลังวันที่ 7)',
+            dose: 5.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            instructionsEn: '5 mg PO BID thereafter',
+            instructionsTh: '5 มก. รับประทานวันละ 2 ครั้ง ต่อเนื่อง',
+          ),
+        ],
       ),
     ],
   ),
@@ -222,11 +269,11 @@ final List<Drug> anticoagulants = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 20.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 15, crclMax: 50, adjustmentFactor: 0.75, notes: 'Reduce to 15 mg OD'),
-          RenalAdjustment(crclMin: 0, crclMax: 14, adjustmentFactor: 1.0, notes: 'Avoid use (Not recommended)'),
+          RenalAdjustment(crclMin: 15, crclMax: 50, action: RenalAction.adjust, absoluteDose: 15.0, adjustedFrequency: Frequency.q24h, notes: 'Reduce to 15 mg OD'),
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.avoid, notes: 'Avoid use in severe renal impairment (CrCl < 15 mL/min)'),
         ],
       ),
     ],
@@ -256,7 +303,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0, // 20-40 mEq
         doseUnit: DoseUnit.mEq,
-        frequency: 'q8h-q12h',
+        frequency: Frequency(minIntervalHours: 8, maxIntervalHours: 12, displayEn: 'q8-12h', displayTh: 'ทุก 8-12 ชม.'),
         limits: DoseLimit(maxDailyDose: 200.0),
       ),
       DosingRegimen(
@@ -265,7 +312,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0, // 20 mEq in 100mL over 1-2hr
         doseUnit: DoseUnit.mEq,
-        frequency: 'over 1-2 hours, then recheck K+',
+        frequency: Frequency(displayEn: 'Over 1-2 hours', displayTh: 'ให้ใน 1-2 ชม.'),
         limits: DoseLimit(maxInfusionRate: 10.0, infusionRateUnit: 'mEq/hr'),
       ),
     ],
@@ -290,7 +337,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0, // 1g (10mL of 10%)
         doseUnit: DoseUnit.mg,
-        frequency: 'over 5-10 min, may repeat',
+        frequency: Frequency(displayEn: 'Over 5-10 min', displayTh: 'ให้ใน 5-10 นาที (ซ้ำได้)'),
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -298,7 +345,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.weightBased,
         dosePerKg: 60.0, // 60-100 mg/kg slow IV
         doseUnit: DoseUnit.mg,
-        frequency: 'over 5-10 min',
+        frequency: Frequency(displayEn: 'Over 5-10 min', displayTh: 'ให้ใน 5-10 นาที'),
         limits: DoseLimit(maxSingleDose: 3000.0),
       ),
     ],
@@ -319,7 +366,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0, // 10 mg slow IV
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (slow infusion over 30 min)',
+        frequency: Frequency.stat,
         infusionTimeMinutes: 30,
       ),
       DosingRegimen(
@@ -328,7 +375,7 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 2.5, // 2.5-5 mg PO
         doseUnit: DoseUnit.mg,
-        frequency: 'Once, recheck INR in 24h',
+        frequency: Frequency.once,
       ),
     ],
   ),

@@ -23,7 +23,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0, // 20-40 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD) or q12h (BID)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 80.0, // Zollinger-Ellison can go higher, but standard max is 80-120
         ),
@@ -34,7 +34,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 80.0, // 80 mg bolus then 8 mg/hr
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat, then continuous infusion',
+        frequency: Frequency.stat,
       ),
       DosingRegimen(
         route: DoseRoute.po,
@@ -42,7 +42,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.weightBased,
         dosePerKg: 1.0, // 1-2 mg/kg/day
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(
           maxDailyDose: 40.0,
         ),
@@ -76,13 +76,13 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn (TID)',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(
           maxSingleDose: 15.0,
           maxDailyDose: 40.0,
         ),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 40, adjustmentFactor: 0.5),
+          RenalAdjustment(crclMin: 0, crclMax: 40, action: RenalAction.adjust, adjustmentFactor: 0.5),
         ],
       ),
       DosingRegimen(
@@ -91,7 +91,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn (TID)',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(maxDailyDose: 40.0),
       ),
     ],
@@ -121,7 +121,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(
           maxDailyDose: 30.0,
         ),
@@ -132,7 +132,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.25, // 0.25 mg/kg per dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(
           maxDosePerKgPerDay: 0.75, // Max 0.75 mg/kg/day
         ),
@@ -161,7 +161,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 8.0, // 4-8 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(
           maxSingleDose: 16.0, // Single doses >16mg no longer recommended due to QT
           maxDailyDose: 24.0,
@@ -173,7 +173,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.15, // 0.15 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h prn',
+        frequency: Frequency.q8hPrn,
         limits: DoseLimit(
           maxSingleDose: 8.0,
         ),
@@ -205,7 +205,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 10.0, // 10-20 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h-q8h (TID to QID)',
+        frequency: Frequency(minIntervalHours: 6, maxIntervalHours: 8, displayEn: 'q6-8h', displayTh: 'ทุก 6-8 ชม.'),
         limits: DoseLimit(
           maxSingleDose: 20.0,
           maxDailyDose: 100.0,
@@ -217,7 +217,7 @@ final List<Drug> gastrointestinal = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q30min prn (max 100mg/day)',
+        frequency: Frequency(isPrn: true, displayEn: 'q30min PRN', displayTh: 'ทุก 30 นาที เมื่อจำเป็น'),
         limits: DoseLimit(
           maxSingleDose: 20.0,
           maxDailyDose: 100.0,

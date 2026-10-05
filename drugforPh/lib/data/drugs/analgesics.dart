@@ -17,7 +17,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0, // 500 - 1000 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q4h-q6h prn',
+        frequency: Frequency.q4_6hPrn,
         limits: DoseLimit(
           maxSingleDose: 1000.0,
           maxDailyDose: 4000.0, // Hard limit 4g
@@ -29,7 +29,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0, // 10-15 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q4h-q6h prn',
+        frequency: Frequency.q4_6hPrn,
         limits: DoseLimit(
           maxSingleDose: 750.0,
           softMaxSingleDose: 500.0,
@@ -43,7 +43,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h prn',
+        frequency: Frequency.q6hPrn,
         infusionTimeMinutes: 15.0,
         limits: DoseLimit(
           maxSingleDose: 1000.0,
@@ -71,7 +71,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h-q8h prn',
+        frequency: Frequency.q6_8hPrn,
         limits: DoseLimit(
           maxSingleDose: 800.0,
           maxDailyDose: 3200.0,
@@ -83,7 +83,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0, // 5-10 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h-q8h prn',
+        frequency: Frequency.q6_8hPrn,
         limits: DoseLimit(
           maxSingleDose: 400.0,
           maxDailyDose: 2400.0,
@@ -110,13 +110,13 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 50.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h prn',
+        frequency: Frequency.q6hPrn,
         limits: DoseLimit(
           maxSingleDose: 100.0,
           maxDailyDose: 400.0,
         ),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: 'q12h', notes: 'Max 200mg/day'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h, notes: 'Max 200 mg/day'),
         ],
       ),
       DosingRegimen(
@@ -125,7 +125,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 50.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h prn',
+        frequency: Frequency.q6hPrn,
         limits: DoseLimit(
           maxSingleDose: 100.0,
           maxDailyDose: 400.0,
@@ -152,13 +152,13 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 2.0, // 2-4 mg initial
         doseUnit: DoseUnit.mg,
-        frequency: 'q5-15min prn (titrate)',
+        frequency: Frequency(isPrn: true, displayEn: 'q5-15min PRN', displayTh: 'ทุก 5-15 นาที เมื่อจำเป็น'),
         limits: DoseLimit(
           softMaxSingleDose: 5.0,
         ),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 10, crclMax: 50, adjustmentFactor: 0.75),
-          RenalAdjustment(crclMin: 0, crclMax: 9, adjustmentFactor: 0.5),
+          RenalAdjustment(crclMin: 10, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 0.75),
+          RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, adjustmentFactor: 0.5, notes: 'Reduce dose by 50%'),
         ],
       ),
       DosingRegimen(
@@ -167,7 +167,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.05, // 0.05 - 0.1 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q2-4h prn',
+        frequency: Frequency(minIntervalHours: 2, maxIntervalHours: 4, isPrn: true, displayEn: 'q2-4h PRN', displayTh: 'ทุก 2-4 ชม. เมื่อจำเป็น'),
         limits: DoseLimit(
           maxSingleDose: 5.0, // Max initial single dose
         ),
@@ -191,7 +191,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.fixed,
         fixedDose: 50.0, // 25-50 mcg
         doseUnit: DoseUnit.mcg, // IMPORTANT: mcg
-        frequency: 'q15-30min prn',
+        frequency: Frequency(minIntervalHours: 0, isPrn: true, displayEn: 'q15-30min PRN', displayTh: 'ทุก 15-30 นาที เมื่อจำเป็น'),
         limits: DoseLimit(
           softMaxSingleDose: 100.0,
         ),
@@ -202,7 +202,7 @@ final List<Drug> analgesics = [
         dosingType: DosingType.weightBased, // or titrated
         dosePerKg: 1.0, // 1-2 mcg/kg/hr
         doseUnit: DoseUnit.mcg,
-        frequency: 'continuous',
+        frequency: Frequency.continuous,
       ),
     ],
   ),

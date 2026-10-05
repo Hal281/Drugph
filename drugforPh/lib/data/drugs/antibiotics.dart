@@ -20,12 +20,40 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // 15 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h',
+        frequency: Frequency.q12h,
         limits: DoseLimit(
           maxSingleDose: 2000.0,
           softMaxSingleDose: 1500.0,
           maxDosePerKgPerDay: 60.0,
         ),
+        phases: [
+          DosingPhase(
+            type: PhaseType.loading,
+            role: DoseRole.start,
+            nameEn: 'Loading Dose (Critically Ill)',
+            nameTh: 'ขนาดยาเริ่มต้น (สำหรับผู้ป่วยวิกฤต)',
+            dosePerKg: 25.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.once,
+            instructionsEn:
+                '25-30 mg/kg (actual body weight, max 2000-3000 mg) as a one-time loading dose',
+            instructionsTh:
+                '25-30 มก./กก. (คำนวณตามน้ำหนักจริง สูงสุด 2000-3000 มก.) ให้ครั้งเดียว',
+          ),
+          DosingPhase(
+            type: PhaseType.maintenance,
+            role: DoseRole.usual,
+            nameEn: 'Maintenance Dose',
+            nameTh: 'ขนาดยาต่อเนื่อง',
+            dosePerKg: 15.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            instructionsEn:
+                '15-20 mg/kg q8-12h, adjusted for renal function and TDM trough levels',
+            instructionsTh:
+                '15-20 มก./กก. ทุก 8-12 ชม. ปรับตามการทำงานของไตและระดับยา TDM',
+          ),
+        ],
         maxInfusionRateMgPerMin:
             10.0, // max 10 mg/min or 60 min, whichever is longer
         renalAdjustments: [
@@ -33,19 +61,19 @@ final List<Drug> antibiotics = [
             crclMin: 50,
             crclMax: 89,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q12h-q24h',
+            adjustedFrequency: Frequency.q12hTo24h,
           ),
           RenalAdjustment(
             crclMin: 20,
             crclMax: 49,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q24h',
+            adjustedFrequency: Frequency.q24h,
           ),
           RenalAdjustment(
             crclMin: 10,
             crclMax: 19,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q48h-q72h',
+            adjustedFrequency: Frequency.q48hTo72h,
           ),
         ],
       ),
@@ -70,20 +98,20 @@ final List<Drug> antibiotics = [
         dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 5.0, // 5-7 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxSingleDose: 700.0),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 40,
             crclMax: 59,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q36h',
+            adjustedFrequency: Frequency.q36h,
           ),
           RenalAdjustment(
             crclMin: 20,
             crclMax: 39,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q48h',
+            adjustedFrequency: Frequency.q48h,
           ),
           RenalAdjustment(
             crclMin: 0,
@@ -100,7 +128,7 @@ final List<Drug> antibiotics = [
         dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 1.5, // 1-2.5 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxSingleDose: 300.0),
       ),
     ],
@@ -121,7 +149,7 @@ final List<Drug> antibiotics = [
         dosingWeightStrategy: DosingWeightStrategy.adjustedIfObese,
         dosePerKg: 15.0, // 15 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxSingleDose: 1500.0),
       ),
     ],
@@ -141,26 +169,26 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 26,
             crclMax: 50,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q12h',
+            adjustedFrequency: Frequency.q12h,
           ),
           RenalAdjustment(
             crclMin: 10,
             crclMax: 25,
             adjustmentFactor: 0.5,
-            adjustedFrequency: 'q12h',
+            adjustedFrequency: Frequency.q12h,
           ),
           RenalAdjustment(
             crclMin: 0,
             crclMax: 9,
             adjustmentFactor: 0.5,
-            adjustedFrequency: 'q24h',
+            adjustedFrequency: Frequency.q24h,
           ),
         ],
       ),
@@ -170,7 +198,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
       ),
     ],
@@ -197,7 +225,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 4000.0),
       ),
       DosingRegimen(
@@ -206,7 +234,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 100.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h', // Can also be divided q12h
+        frequency: Frequency.q24h, // Can also be divided q12h
         limits: DoseLimit(maxDailyDose: 4000.0, maxDosePerKgPerDay: 100.0),
       ),
       DosingRegimen(
@@ -215,7 +243,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 50.0, // 50-75 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 2000.0),
       ),
     ],
@@ -246,20 +274,22 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0, // Commonly 875/125 mg = 1000 mg total tablet, but base is amox
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h',
+        frequency: Frequency.q12h,
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 10,
             crclMax: 30,
             adjustmentFactor: 0.5,
-            adjustedFrequency: '500 mg q12h (do not use 875 mg tab)',
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q12h,
             notes: 'Use 500/125 mg tablet q12h in CrCl 10-30',
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 9,
+            crclMax: 10,
             adjustmentFactor: 0.5,
-            adjustedFrequency: '500 mg q24h (OD)',
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q24h,
             notes: 'Use 500/125 mg tablet q24h in CrCl <10',
           ),
         ],
@@ -270,7 +300,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 22.5, // 45 mg/kg/day divided q12h = 22.5 mg/kg/dose
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h',
+        frequency: Frequency.q12h,
         notes: '45 mg/kg/day divided q12h (22.5 mg/kg/dose)',
         limits: DoseLimit(maxDailyDose: 4000.0), // Amoxicillin component
       ),
@@ -298,7 +328,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         notes: 'Day 1: 500 mg, then 250 mg q24h on Days 2-5',
         limits: DoseLimit(maxSingleDose: 500.0),
       ),
@@ -308,7 +338,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0, // 10 mg/kg day 1, then 5 mg/kg day 2-5
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h',
+        frequency: Frequency.q24h,
         notes: 'Day 1: 10 mg/kg (max 500 mg), then 5 mg/kg q24h on Days 2-5 (max 250 mg)',
         limits: DoseLimit(maxSingleDose: 500.0),
       ),
@@ -337,7 +367,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0, // 250 - 750 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 1500.0),
         renalAdjustments: [
           RenalAdjustment(
@@ -354,7 +384,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (BID)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 1200.0),
       ),
     ],
@@ -381,7 +411,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0, // 500-750 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 750.0),
         renalAdjustments: [
           RenalAdjustment(
@@ -418,7 +448,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 300.0, // 150-450 mg
         doseUnit: DoseUnit.mg,
-        frequency: 'q6h-q8h',
+        frequency: Frequency(minIntervalHours: 6, maxIntervalHours: 8, displayEn: 'q6-8h', displayTh: 'ทุก 6-8 ชม.'),
         limits: DoseLimit(maxDailyDose: 1800.0),
       ),
       DosingRegimen(
@@ -427,7 +457,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // 8-25 mg/kg/day divided TID or QID
         doseUnit: DoseUnit.mg,
-        frequency: 'divided q6h-q8h (Dose is per day, needs division)', // Assuming tool provides total per day
+        frequency: Frequency(minIntervalHours: 6, maxIntervalHours: 8, displayEn: 'Divided q6-8h', displayTh: 'แบ่งทุก 6-8 ชม.', doseBasis: DoseBasis.perDay), // Assuming tool provides total per day
         limits: DoseLimit(maxDailyDose: 1800.0),
       ),
     ],
@@ -456,7 +486,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 400.0, // or 500mg depending on country/formulation
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h (TID)',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 4000.0),
       ),
       DosingRegimen(
@@ -465,7 +495,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 4000.0),
       ),
     ],
@@ -488,7 +518,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0, // 2g for adults > 60kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat (60 mins before incision)',
+        frequency: Frequency.stat,
         limits: DoseLimit(
           maxSingleDose: 3000.0, // 3g for patients >120kg
         ),
@@ -499,26 +529,29 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0, // 1g q8h
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 6000.0),
         renalAdjustments: [
           RenalAdjustment(
-            crclMin: 35,
-            crclMax: 54,
+            crclMin: 26,
+            crclMax: 50,
             adjustmentFactor: 1.0,
-            adjustedFrequency: 'q8h (no change)',
+            adjustedFrequency: Frequency.q12h,
+            notes: '1 g IV q12h',
           ),
           RenalAdjustment(
-            crclMin: 11,
-            crclMax: 34,
+            crclMin: 10,
+            crclMax: 26,
             adjustmentFactor: 0.5,
-            adjustedFrequency: 'q12h',
+            adjustedFrequency: Frequency.q12h,
+            notes: '500 mg IV q12h',
           ),
           RenalAdjustment(
             crclMin: 0,
             crclMax: 10,
             adjustmentFactor: 0.5,
-            adjustedFrequency: 'q24h',
+            adjustedFrequency: Frequency.q24h,
+            notes: '500 mg IV q24h',
           ),
         ],
       ),
@@ -539,23 +572,23 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 4.5,
         doseUnit: DoseUnit.g,
-        frequency: 'q6h',
+        frequency: Frequency.q6h,
         infusionTimeMinutes: 30,
         notes: 'Standard infusion is 4.5g q6h over 30 min. Extended infusion is 3.375g or 4.5g q8h over 4 hours.',
         limits: DoseLimit(maxDailyDose: 18),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 20,
-            crclMax: 40,
+            crclMax: 50,
             adjustmentFactor: 0.75, // 4.5g * 0.75 = 3.375g
-            adjustedFrequency: '3.375g q8h (extended infusion) or 2.25g q6h',
+            adjustedFrequency: Frequency.q8h,
             notes: '3.375g q8h (extended infusion) or 2.25g q6h',
           ),
           RenalAdjustment(
             crclMin: 0,
-            crclMax: 19,
+            crclMax: 20,
             adjustmentFactor: 0.5, // 4.5g * 0.5 = 2.25g
-            adjustedFrequency: '2.25g q8h',
+            adjustedFrequency: Frequency.q8h,
             notes: '2.25g q8h',
           ),
         ],
@@ -580,7 +613,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 2,
         doseUnit: DoseUnit.g,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 6),
       ),
     ],
@@ -602,7 +635,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 600,
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 1200),
       ),
     ],
@@ -623,7 +656,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 100,
         doseUnit: DoseUnit.mg,
-        frequency: 'BID',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 200),
       ),
     ],
@@ -645,7 +678,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 5.0, // 5 mg CBA/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'Stat',
+        frequency: Frequency.stat,
         limits: DoseLimit(maxSingleDose: 300.0), // Max 300 mg CBA (or 9 million IU)
       ),
       DosingRegimen(
@@ -654,12 +687,12 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 150.0, // Typical maintenance for normal renal function
         doseUnit: DoseUnit.mg,
-        frequency: 'q12h (Start 12h after Loading)',
+        frequency: Frequency.q12h,
         limits: DoseLimit(maxDailyDose: 300.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 30, crclMax: 50, adjustmentFactor: 1.0, notes: '75-150 mg CBA q12h'),
-          RenalAdjustment(crclMin: 10, crclMax: 29, adjustmentFactor: 1.0, notes: '75-150 mg CBA q24h (OD)'),
-          RenalAdjustment(crclMin: 0, crclMax: 9, adjustmentFactor: 1.0, notes: '50-100 mg CBA q24h (OD)'),
+          RenalAdjustment(crclMin: 30, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h, notes: '75-150 mg CBA q12h'),
+          RenalAdjustment(crclMin: 10, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '75-150 mg CBA q24h'),
+          RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '50-100 mg CBA q24h'),
         ],
       ),
     ],
@@ -680,12 +713,12 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxSingleDose: 800.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 25, crclMax: 50, adjustmentFactor: 1.0, adjustedFrequency: 'q12h'),
-          RenalAdjustment(crclMin: 10, crclMax: 24, adjustmentFactor: 1.0, adjustedFrequency: 'q24h'),
-          RenalAdjustment(crclMin: 0, crclMax: 9, adjustmentFactor: 0.5, adjustedFrequency: 'q24h (Decrease dose by half)'),
+          RenalAdjustment(crclMin: 25, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h),
+          RenalAdjustment(crclMin: 10, crclMax: 25, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h),
+          RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, absoluteDose: 500.0, adjustedFrequency: Frequency.q24h, notes: '500 mg q24h'),
         ],
       ),
     ],
@@ -708,10 +741,10 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 800.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 50, adjustmentFactor: 0.5, notes: 'Reduce dose by 50% (e.g., 200 mg q24h)'),
+          RenalAdjustment(crclMin: 0, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 0.5, notes: 'Reduce daily dose by 50%'),
         ],
       ),
     ],
@@ -732,13 +765,13 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.fixed,
         fixedDose: 2000.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q8h',
+        frequency: Frequency.q8h,
         limits: DoseLimit(maxDailyDose: 6000.0),
         renalAdjustments: [
-          RenalAdjustment(crclMin: 31, crclMax: 50, adjustmentFactor: 1.0, adjustedFrequency: '1g q12h'),
-          RenalAdjustment(crclMin: 16, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '1g q24h'),
-          RenalAdjustment(crclMin: 6, crclMax: 15, adjustmentFactor: 1.0, adjustedFrequency: '500mg q24h'),
-          RenalAdjustment(crclMin: 0, crclMax: 5, adjustmentFactor: 1.0, adjustedFrequency: '500mg q48h'),
+          RenalAdjustment(crclMin: 30, crclMax: 50, action: RenalAction.adjust, absoluteDose: 1000.0, adjustedFrequency: Frequency.q12h, notes: '1 g q12h'),
+          RenalAdjustment(crclMin: 16, crclMax: 30, action: RenalAction.adjust, absoluteDose: 1000.0, adjustedFrequency: Frequency.q24h, notes: '1 g q24h'),
+          RenalAdjustment(crclMin: 6, crclMax: 16, action: RenalAction.adjust, absoluteDose: 500.0, adjustedFrequency: Frequency.q24h, notes: '500 mg q24h'),
+          RenalAdjustment(crclMin: 0, crclMax: 6, action: RenalAction.adjust, absoluteDose: 500.0, adjustedFrequency: Frequency.q48h, notes: '500 mg q48h'),
         ],
       ),
     ],
@@ -766,7 +799,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxSingleDose: 600.0, maxDailyDose: 600.0), // Max 600 mg/day
       ),
     ],
@@ -789,7 +822,7 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 5.0,
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 300.0), // Max 300 mg/day
       ),
     ],
@@ -813,10 +846,10 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 25.0, // 20-30 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 2000.0), // Typically capped at ~2g
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '25-35 mg/kg 3 times/week'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency(isWeekly: true, displayEn: '3 times/week', displayTh: 'สัปดาห์ละ 3 ครั้ง'), notes: '25-35 mg/kg 3 times/week'),
         ],
       ),
     ],
@@ -839,10 +872,10 @@ final List<Drug> antibiotics = [
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // 15-20 mg/kg
         doseUnit: DoseUnit.mg,
-        frequency: 'q24h (OD)',
+        frequency: Frequency.q24h,
         limits: DoseLimit(maxDailyDose: 1600.0), // Max usually around 1.6g
         renalAdjustments: [
-          RenalAdjustment(crclMin: 0, crclMax: 30, adjustmentFactor: 1.0, adjustedFrequency: '15-25 mg/kg 3 times/week'),
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency(isWeekly: true, displayEn: '3 times/week', displayTh: 'สัปดาห์ละ 3 ครั้ง'), notes: '15-25 mg/kg 3 times/week'),
         ],
       ),
     ],
