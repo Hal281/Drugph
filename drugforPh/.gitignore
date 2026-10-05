@@ -54,3 +54,4 @@ app.*.map.json
 *.env.json
 secrets.json
 secrets.yaml
+.wrangler/

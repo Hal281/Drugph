@@ -333,6 +333,7 @@ class PharmacistCalculator {
 
       // D6 Database Lint Alert: Flag drugs requiring renal adjustment without reviewed tiers
       if (drug.requiresRenalAdjustment &&
+          regimen.dosingType != DosingType.gfrBased &&
           drug.renalReviewStatus != RenalReviewStatus.notApplicable &&
           (regimen.renalAdjustments == null || regimen.renalAdjustments!.isEmpty)) {
         warnings.add(
@@ -514,6 +515,71 @@ class PharmacistCalculator {
         }
       }
 
+      // --- 8.1 Smart Dose Capping with Rich Clinical Advisory (Weight-based) ---
+      if (regimen.dosingType == DosingType.weightBased && regimen.limits != null) {
+        final capSingle = regimen.limits!.maxSingleDose;
+        final capDaily = regimen.limits!.maxDailyDose;
+        final dPerDay = regimen.frequency.dosesPerDay ?? 1;
+
+        double? effectiveCap;
+        if (capSingle != null && dose > capSingle) {
+          effectiveCap = capSingle;
+        } else if (capDaily != null && (dose * dPerDay) > capDaily) {
+          effectiveCap = capDaily / dPerDay;
+        }
+
+        if (effectiveCap != null && dose > effectiveCap) {
+          final rawDose = dose;
+          dose = effectiveCap;
+
+          String fmtVal(double v) => v == v.roundToDouble()
+              ? v.toStringAsFixed(0)
+              : ((v * 10) == (v * 10).roundToDouble()
+                  ? v.toStringAsFixed(1)
+                  : v.toStringAsFixed(2));
+
+          final alt1En =
+              'Standard Ceiling: Administer guideline maximum capped dose of '
+              '${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol} '
+              '${regimen.route.abbreviation.toUpperCase()} ${regimen.frequency.displayEn} (Recommended).';
+          final alt1Th =
+              'ขนาดยามาตรฐานสูงสุด: ให้ยาตามเกณฑ์เพดานสูงสุดที่จำกัดไว้ '
+              '${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol} '
+              '${regimen.route.abbreviation.toUpperCase()} ${regimen.frequency.displayTh} (แนะนำเป็นอันดับแรก)';
+
+          final alt2En =
+              'Clinician Override: If treating high-MIC, resistant, or severe disseminated/CNS infection, '
+              'clinician may consider dosing up to raw weight-based dose (${fmtVal(rawDose)} ${regimen.doseUnit.symbol}) '
+              'under infectious disease specialist consultation with therapeutic drug monitoring (TDM) and toxicity surveillance.';
+          final alt2Th =
+              'ขอยกเว้นเฉพาะราย: หากรักษาการติดเชื้อสายพันธุ์ดื้อยา รุนแรง หรือลุกลามเข้าระบบประสาทส่วนกลาง '
+              'แพทย์เฉพาะทางอาจพิจารณาขนาดยาเต็มตามน้ำหนักตัว (${fmtVal(rawDose)} ${regimen.doseUnit.symbol}) '
+              'โดยต้องติดตามระดับยาในเลือดและเฝ้าระวังพิษจากยาอย่างใกล้ชิด';
+
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.soft,
+            code: DoseWarningCode.doseCappedAtMax,
+            messageEn:
+                'DOSE CAPPED AT GUIDELINE MAXIMUM: Raw weight-based calculation is '
+                '${fmtVal(rawDose)} ${regimen.doseUnit.symbol}, which exceeds the guideline ceiling of '
+                '${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol}. Dose automatically capped to '
+                '${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol}. '
+                'Alternatives: 1) $alt1En 2) $alt2En',
+            messageTh:
+                'จำกัดขนาดยาสูงสุดตามแนวทาง: ขนาดยาตามน้ำหนักตัวคำนวณได้ '
+                '${fmtVal(rawDose)} ${regimen.doseUnit.symbol} ซึ่งเกินเพดานที่แนะนำ '
+                '(${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol}). ปรับลดลงมาที่ '
+                '${fmtVal(effectiveCap)} ${regimen.doseUnit.symbol} อัตโนมัติ '
+                'ทางเลือก: 1) $alt1Th 2) $alt2Th',
+            calculatedValue: rawDose,
+            limitValue: effectiveCap,
+            unit: regimen.doseUnit.symbol,
+            clinicalAlternativesEn: [alt1En, alt2En],
+            clinicalAlternativesTh: [alt1Th, alt2Th],
+          ));
+        }
+      }
+
       // --- 9. Automated Renal Adjustment & Half-Open Range Tiers (D5) ---
       double finalDose = dose;
       Frequency finalFrequency = regimen.frequency;
@@ -634,19 +700,82 @@ class PharmacistCalculator {
         }
       }
 
+      // --- Carboplatin & GFR-based Severe Renal Impairment Advisory (< 15 mL/min) ---
+      if ((drug.id == 'carboplatin' || regimen.dosingType == DosingType.gfrBased) &&
+          crcl != null &&
+          crcl < 15.0) {
+        const alt1En =
+            'Target AUC Reduction: Reduce target AUC by 20–30% (e.g. target AUC 3–4 instead of 5–6) to mitigate severe thrombocytopenia and myelosuppression (Recommended).';
+        const alt1Th =
+            'ปรับลดเป้าหมาย AUC: ลดเป้าหมาย AUC ลง 20–30% (เช่น ปรับเป็น AUC 3–4 แทน 5–6) เพื่อลดความเสี่ยงเกล็ดเลือดต่ำและกดไขกระดูกรุนแรง (แนะนำ)';
+        const alt2En =
+            'Intensive Hematologic Monitoring: If maintaining AUC, monitor weekly CBC with platelet nadir counts and prepare for transfusion support.';
+        const alt2Th =
+            'ติดตามโลหิตวิทยาอย่างเข้มงวด: หากคงขนาดยาเดิม ต้องตรวจ CBC และเกล็ดเลือดทุกสัปดาห์และเตรียมพร้อมรับมือเกล็ดเลือดต่ำวิกฤต';
+        const alt3En =
+            'Oncology Consultation: Consult medical oncology to consider alternative non-nephrotoxic chemotherapy.';
+        const alt3Th =
+            'ปรึกษาแพทย์มะเร็งวิทยา: พิจารณาเปลี่ยนไปใช้ยาเคมีบำบัดสูตรอื่นที่ไม่มีผลต่อไต';
+
+        warnings.add(
+          DoseWarning(
+            severity: LimitSeverity.soft,
+            code: DoseWarningCode.severeRenalImpairment,
+            messageEn:
+                'SEVERE RENAL IMPAIRMENT (CrCl ${crcl.toStringAsFixed(1)} mL/min < 15 mL/min): '
+                'Calvert formula accuracy is limited in severe renal dysfunction. Recommend oncology consult. '
+                'Alternatives: 1) $alt1En 2) $alt2En 3) $alt3En',
+            messageTh:
+                'ไตบกพร่องรุนแรง (CrCl ${crcl.toStringAsFixed(1)} มล./นาที < 15 มล./นาที): '
+                'การคำนวณโดส Carboplatin ในผู้ป่วยไตบกพร่องรุนแรงเสี่ยงต่อภาวะกดไขกระดูกและเกล็ดเลือดต่ำวิกฤต '
+                'ทางเลือก: 1) $alt1Th 2) $alt2Th 3) $alt3Th',
+            calculatedValue: crcl,
+            limitValue: 15.0,
+            unit: 'mL/min',
+            clinicalAlternativesEn: [alt1En, alt2En, alt3En],
+            clinicalAlternativesTh: [alt1Th, alt2Th, alt3Th],
+          ),
+        );
+      }
+
       // Critical renal impairment check (< 10 mL/min)
       if (crcl != null && crcl < 10.0) {
-        if (!warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
-          warnings.add(
-            DoseWarning(
-              severity: LimitSeverity.hard,
-              code: DoseWarningCode.severeRenalImpairment,
-              messageEn:
-                  'CRITICAL RENAL IMPAIRMENT: CrCl ${crcl.toStringAsFixed(1)} mL/min < 10 mL/min.',
-              messageTh:
-                  'การทำงานของไตวิกฤต: CrCl ${crcl.toStringAsFixed(1)} มล./นาที ต่ำกว่า 10 มล./นาที',
-            ),
-          );
+        final isVancomycin = drug.id == 'vancomycin';
+        final isCarboplatin =
+            drug.id == 'carboplatin' || regimen.dosingType == DosingType.gfrBased;
+
+        if (isVancomycin) {
+          if (!warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
+            warnings.add(
+              DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.severeRenalImpairment,
+                messageEn:
+                    'ESRD / HEMODIALYSIS (CrCl ${crcl.toStringAsFixed(1)} mL/min): Vancomycin clearance is severely reduced. Do NOT dose on a fixed schedule. Follow TDM pulse dosing: Loading dose 20–25 mg/kg, check pre-dialysis trough, and redose 500–1000 mg only when trough < 15–20 mcg/mL.',
+                messageTh:
+                    'ไตวายระยะสุดท้าย / ฟอกเลือด (CrCl ${crcl.toStringAsFixed(1)} มล./นาที): การขจัดยา Vancomycin ลดลงอย่างมาก ห้ามให้ยาตามเวลาปกติ ให้ใช้การบริหารยาแบบ TDM Pulse Dosing: Loading dose 20–25 มก./กก., เจาะ trough ก่อนฟอกไต และให้ซ้ำ 500–1000 มก. เมื่อ trough < 15–20 mcg/mL เท่านั้น',
+                calculatedValue: crcl,
+                unit: 'mL/min',
+              ),
+            );
+          }
+        } else if (isCarboplatin) {
+          // Handled above by GFR-based severe renal advisory, do not emit generic hard block
+        } else {
+          if (!warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
+            warnings.add(
+              DoseWarning(
+                severity: LimitSeverity.hard,
+                code: DoseWarningCode.severeRenalImpairment,
+                messageEn:
+                    'CRITICAL RENAL IMPAIRMENT: CrCl ${crcl.toStringAsFixed(1)} mL/min < 10 mL/min.',
+                messageTh:
+                    'การทำงานของไตวิกฤต: CrCl ${crcl.toStringAsFixed(1)} มล./นาที ต่ำกว่า 10 มล./นาที',
+                calculatedValue: crcl,
+                unit: 'mL/min',
+              ),
+            );
+          }
         }
       }
 

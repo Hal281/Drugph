@@ -75,6 +75,22 @@ final List<Drug> antibiotics = [
             adjustmentFactor: 1.0,
             adjustedFrequency: Frequency.q48hTo72h,
           ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 10,
+            action: RenalAction.adjust,
+            adjustmentFactor: 1.0,
+            adjustedFrequency: Frequency(
+              isPrn: true,
+              displayEn: 'TDM-guided pulse redosing',
+              displayTh: 'บริหารซ้ำตามระดับยา TDM',
+              kind: FrequencyKind.prn,
+            ),
+            notes:
+                'ESRD / Hemodialysis: Loading dose 20-25 mg/kg (actual weight, max 2000-3000 mg). Re-dose 500-1000 mg only when pre-dialysis or random trough level < 15-20 mcg/mL. Monitor trough before each subsequent dose.',
+            notesTh:
+                'ไตวายระยะสุดท้าย / ฟอกไต: ขนาดยาเริ่มต้น (Loading) 20-25 mg/kg (น้ำหนักจริง สูงสุด 2000-3000 mg). บริหารยาซ้ำ 500-1000 mg เฉพาะเมื่อระดับยา TDM ในเลือดก่อนฟอกไต < 15-20 mcg/mL. ตรวจติดตามระดับยาทุกครั้งก่อนให้ยาซ้ำ',
+          ),
         ],
       ),
     ],
@@ -841,7 +857,7 @@ final List<Drug> antibiotics = [
         dosePerKg: 5.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
-        limits: DoseLimit(maxDailyDose: 300.0), // Max 300 mg/day
+        limits: DoseLimit(maxSingleDose: 300.0, maxDailyDose: 300.0), // Max 300 mg/day
       ),
     ],
   ),

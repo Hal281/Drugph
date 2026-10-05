@@ -74,9 +74,8 @@ void main() {
 
     test('E5: Renal tiers lowest crclMin starts at 0 and crclMin < crclMax strictly', () {
       final failures = <String>[];
-      // Known [PHARMACIST] decision item E8: Vancomycin starts at 10 mL/min; < 10 mL/min tier
-      // (redose by TDM level vs unconfigured) is pending human clinical decision.
-      const pendingPharmacistDecision = {'vancomycin'};
+      // All [PHARMACIST] decisions resolved (Vancomycin now starts at 0 mL/min with TDM pulse dosing).
+      const pendingPharmacistDecision = <String>{};
 
       for (final drug in allDrugs) {
         for (final reg in drug.regimens) {

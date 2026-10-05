@@ -73,6 +73,9 @@ enum DoseWarningCode {
   unknownFrequency,
   maxSingleDoseExceeded,
   softMaxSingleDoseExceeded,
+
+  /// Dose automatically capped at guideline maximum (smart dose capping with advisory).
+  doseCappedAtMax,
   maxDailyDoseExceeded,
   maxDosePerKgPerDayExceeded,
   minDoseNotReached,
@@ -115,6 +118,12 @@ class DoseWarning {
   /// Unit of [calculatedValue] and [limitValue].
   final String? unit;
 
+  /// Actionable clinical alternatives (English) for decision support.
+  final List<String>? clinicalAlternativesEn;
+
+  /// Actionable clinical alternatives (Thai) for decision support.
+  final List<String>? clinicalAlternativesTh;
+
   const DoseWarning({
     required this.severity,
     required this.messageEn,
@@ -123,8 +132,11 @@ class DoseWarning {
     this.calculatedValue,
     this.limitValue,
     this.unit,
+    this.clinicalAlternativesEn,
+    this.clinicalAlternativesTh,
   });
 
   @override
   String toString() => '${severity.icon} [${severity.labelEn}] $messageEn';
 }
+
