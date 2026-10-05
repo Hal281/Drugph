@@ -207,14 +207,14 @@ class DoseChecker {
     // Critical renal impairment warning (< 10 mL/min)
     if (crclMlMin < 10) {
       warnings.add(DoseWarning(
-        severity: LimitSeverity.hard,
+        severity: LimitSeverity.soft,
         code: DoseWarningCode.severeRenalImpairment,
         messageEn:
             'SEVERE RENAL IMPAIRMENT: CrCl ${_fmt(crclMlMin)} mL/min. '
-            'Consult nephrologist before dosing.',
+            'Consult nephrologist and follow ESRD dosing protocol.',
         messageTh:
             'ไตวายรุนแรง: CrCl ${_fmt(crclMlMin)} mL/min. '
-            'ปรึกษาอายุรแพทย์โรคไตก่อนสั่งยา',
+            'ปรึกษาอายุรแพทย์โรคไตและปรับขนาดยาตามเกณฑ์ฟอกไต',
         calculatedValue: crclMlMin,
         unit: 'mL/min',
       ));

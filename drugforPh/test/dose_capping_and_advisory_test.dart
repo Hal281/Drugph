@@ -212,10 +212,10 @@ void main() {
     });
 
     // =========================================================================
-    // 4. Non-Exempt Drug Baseline Invariant Check
+    // 4. Clinical Model: Non-Blocking Renal Adjustments & Strict Hard Stops
     // =========================================================================
-    group('General drug invariant', () {
-      test('Meropenem still raises hard severeRenalImpairment warning and blocks at CrCl < 10', () {
+    group('Clinical Decision Support Hierarchy (Safe Defaults & Strict Hard Stops)', () {
+      test('Meropenem at CrCl < 10 auto-adjusts to 500 mg q24h with non-blocking ESRD advisory', () {
         const esrdPatient = Patient(
           id: 'p-esrd-mero',
           ageYears: 70,
@@ -235,9 +235,107 @@ void main() {
         );
 
         expect(res.warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment), isTrue);
+        expect(res.calculatedDose, equals(500.0), reason: 'Adjusted to 500 mg for CrCl < 10');
+        expect(res.structuredFrequency, equals(Frequency.q24h));
+        expect(res.hasHardLimitViolation, isFalse);
+        expect(res.isBlocked, isFalse, reason: 'Patient in ESRD can safely receive adjusted 500 mg q24h');
+      });
+
+      test('Missing SCr on renal drug emits non-blocking soft advisory for STAT first-dose emergent use', () {
+        const patientNoScr = Patient(
+          id: 'p-stat-noscr',
+          ageYears: 50,
+          weightKg: 70.0,
+          heightCm: 170.0,
+          sex: Sex.male,
+          isScrStable: true,
+        );
+        final ceftazidime = DrugDatabase.findById('ceftazidime')!;
+        final regimen = ceftazidime.regimens.first;
+
+        final res = PharmacistCalculator.calculateDose(
+          patient: patientNoScr,
+          drug: ceftazidime,
+          regimen: regimen,
+        );
+
+        expect(res.warnings.any((w) => w.code == DoseWarningCode.scrMissing), isTrue);
+        final scrWarn = res.warnings.firstWhere((w) => w.code == DoseWarningCode.scrMissing);
+        expect(scrWarn.severity, equals(LimitSeverity.soft));
+        expect(scrWarn.clinicalAlternativesEn, isNotNull);
+        expect(scrWarn.clinicalAlternativesEn!.any((a) => a.contains('STAT / Initial Empiric Dose')), isTrue);
+        expect(res.hasHardLimitViolation, isFalse);
+        expect(res.isBlocked, isFalse, reason: 'Does not block emergent initial dosing');
+      });
+
+      test('Strict Hard Stop: Severe Anaphylactic Allergy match remains strictly blocked', () {
+        const allergicPatient = Patient(
+          id: 'p-allergy',
+          ageYears: 30,
+          weightKg: 65.0,
+          heightCm: 165.0,
+          sex: Sex.female,
+          serumCreatinineMgDl: 0.8,
+          isScrStable: true,
+          allergies: ['Penicillin'],
+        );
+        final amoxClav = DrugDatabase.findById('amoxicillin_clavulanate')!;
+        final res = PharmacistCalculator.calculateDose(
+          patient: allergicPatient,
+          drug: amoxClav,
+          regimen: amoxClav.regimens.first,
+        );
+
+        expect(res.warnings.any((w) => w.code == DoseWarningCode.allergyAlert), isTrue);
         expect(res.hasHardLimitViolation, isTrue);
-        expect(res.isBlocked, isTrue, reason: 'Standard non-exempt drugs must remain blocked');
+        expect(res.isBlocked, isTrue, reason: 'Severe allergy must strictly block');
+      });
+
+      test('Strict Hard Stop: Contraindicated DDI (Meropenem + Valproate) remains strictly blocked', () {
+        const ddiPatient = Patient(
+          id: 'p-ddi',
+          ageYears: 40,
+          weightKg: 70.0,
+          heightCm: 170.0,
+          sex: Sex.male,
+          serumCreatinineMgDl: 0.9,
+          isScrStable: true,
+          activeDrugIds: ['valproic_acid'],
+        );
+        final mero = DrugDatabase.findById('meropenem')!;
+        final res = PharmacistCalculator.calculateDose(
+          patient: ddiPatient,
+          drug: mero,
+          regimen: mero.regimens.first,
+        );
+
+        expect(res.warnings.any((w) => w.code == DoseWarningCode.contraindicationAlert), isTrue);
+        expect(res.hasHardLimitViolation, isTrue);
+        expect(res.isBlocked, isTrue, reason: 'Fatal DDI must strictly block');
+      });
+
+      test('Strict Hard Stop: Absolute Contraindication (Metformin CrCl < 30) remains strictly blocked', () {
+        const severeRenalMetforminPatient = Patient(
+          id: 'p-metformin-crcl20',
+          ageYears: 65,
+          weightKg: 70.0,
+          heightCm: 170.0,
+          sex: Sex.male,
+          serumCreatinineMgDl: 3.5, // CrCl ~ 20 (< 30)
+          isScrStable: true,
+        );
+        final metformin = DrugDatabase.findById('metformin')!;
+        final res = PharmacistCalculator.calculateDose(
+          patient: severeRenalMetforminPatient,
+          drug: metformin,
+          regimen: metformin.regimens.first,
+        );
+
+        expect(res.warnings.any((w) => w.code == DoseWarningCode.contraindicationAlert), isTrue);
+        expect(res.hasHardLimitViolation, isTrue);
+        expect(res.isBlocked, isTrue, reason: 'Metformin lactic acidosis contraindication must strictly block');
       });
     });
   });
 }
+

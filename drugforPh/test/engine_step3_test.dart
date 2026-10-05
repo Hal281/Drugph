@@ -205,7 +205,7 @@ void main() {
     // -------------------------------------------------------------------------
     // 4.6: Critical Renal Impairment (CrCl < 10)
     // -------------------------------------------------------------------------
-    test('4.6: CrCl < 10 raises severe renal impairment hard warning', () {
+    test('4.6: CrCl < 10 raises severe renal impairment warning with auto-adjustment and non-blocking guidance', () {
       const patient = Patient(
         id: 'p-esrd',
         weightKg: 70.0,
@@ -225,8 +225,11 @@ void main() {
       );
 
       expect(result.warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment), isTrue);
-      expect(result.hasHardLimitViolation, isTrue);
-      expect(result.isBlocked, isTrue);
+      // Auto-adjusted to 500 mg q24h per CrCl < 10 tier
+      expect(result.calculatedDose, equals(500.0));
+      expect(result.structuredFrequency, equals(Frequency.q24h));
+      expect(result.hasHardLimitViolation, isFalse);
+      expect(result.isBlocked, isFalse);
     });
 
     // -------------------------------------------------------------------------

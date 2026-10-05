@@ -319,14 +319,33 @@ class PharmacistCalculator {
           ),
         );
       } else if (drug.requiresRenalAdjustment) {
+        const alt1En =
+            'STAT / Initial Empiric Dose: For acute/emergency care, clinician may administer the initial standard dose safely while awaiting STAT laboratory serum creatinine results (Recommended for emergent therapy).';
+        const alt1Th =
+            'ขนาดยาฉุกเฉิน / เข็มแรก (STAT): สำหรับภาวะฉุกเฉิน สามารถบริหารยาขนาดยาเริ่มต้นมาตรฐานได้ทันทีในเข็มแรกระหว่างรอผลตรวจ Serum Creatinine ด่วน (แนะนำสำหรับกรณีวิกฤต/ฉุกเฉิน)';
+
+        const alt2En =
+            'Enter Serum Creatinine: Obtain STAT point-of-care or laboratory SCr/CrCl to calculate renal function and enable automated renal adjustment for subsequent doses.';
+        const alt2Th =
+            'ระบุค่าไต: เจาะตรวจ SCr หรือ CrCl ด่วน เพื่อให้ระบบคำนวณการทำงานของไตและปรับขนาดยาอัตโนมัติในมื้อถัดไป';
+
+        const alt3En =
+            'Clinician Override: Proceed with unadjusted dose if patient has recently documented normal renal function and stable urine output.';
+        const alt3Th =
+            'ขอยกเว้นเฉพาะราย: ให้ขนาดยาปกติได้หากผู้ป่วยมีประวัติการทำงานของไตปกติและปัสสาวะออกดีสม่ำเสมอ';
+
         warnings.add(
           const DoseWarning(
-            severity: LimitSeverity.hard,
+            severity: LimitSeverity.soft,
             code: DoseWarningCode.scrMissing,
             messageEn:
-                'RENAL ALERT: This drug requires dose adjustment in renal impairment, but Serum Creatinine was NOT provided.',
+                'RENAL ALERT: This drug is eliminated renally and requires dose adjustment in kidney impairment, but Serum Creatinine is missing. '
+                'Alternatives: 1) $alt1En 2) $alt2En 3) $alt3En',
             messageTh:
-                'เตือนความปลอดภัย: ยานี้ต้องปรับขนาดยาตามการทำงานของไต แต่ไม่ได้ระบุค่า SCr',
+                'เตือนความปลอดภัย: ยานี้ขับออกทางไตและต้องปรับขนาดยาตามการทำงานของไต แต่ยังไม่ได้ระบุค่า SCr ในระบบ '
+                'ทางเลือก: 1) $alt1Th 2) $alt2Th 3) $alt3Th',
+            clinicalAlternativesEn: [alt1En, alt2En, alt3En],
+            clinicalAlternativesTh: [alt1Th, alt2Th, alt3Th],
           ),
         );
       }
@@ -338,14 +357,14 @@ class PharmacistCalculator {
           (regimen.renalAdjustments == null || regimen.renalAdjustments!.isEmpty)) {
         warnings.add(
           DoseWarning(
-            severity: (crcl != null && crcl < 50.0)
-                ? LimitSeverity.hard
-                : LimitSeverity.soft,
+            severity: LimitSeverity.soft,
             code: DoseWarningCode.severeRenalImpairment,
             messageEn:
-                'DATABASE WARNING: Drug requires renal adjustment but has unreviewed/empty renal tiers.',
+                'DATABASE WARNING: Automated renal adjustment tiers are unreviewed for this drug regimen. '
+                'Please verify dose manually via clinical reference (Lexicomp/Sanford) for CrCl ${crcl?.toStringAsFixed(1)} mL/min.',
             messageTh:
-                'เตือนฐานข้อมูล: ยานี้ต้องปรับตามไตแต่ยังไม่มีตารางปรับขนาดยาในระบบ',
+                'เตือนฐานข้อมูล: ยานี้ต้องปรับตามไตแต่ยังไม่มีตารางปรับขนาดยาในระบบ '
+                'โปรดตรวจสอบขนาดยาจากคู่มืออ้างอิง (Lexicomp/Sanford) ด้วยตนเองสำหรับ CrCl ${crcl?.toStringAsFixed(1)} มล./นาที',
           ),
         );
       }
@@ -763,16 +782,39 @@ class PharmacistCalculator {
           // Handled above by GFR-based severe renal advisory, do not emit generic hard block
         } else {
           if (!warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment)) {
+            final hasAdjustedTier = isRenallyAdjusted;
+            final alt1En = hasAdjustedTier
+                ? 'Renal Tier Adjustment Applied: Dose has been adjusted to ${finalDose.toStringAsFixed(1)} ${regimen.doseUnit.symbol} ${finalFrequency.displayEn} per clinical guideline tier for severe renal dysfunction (Recommended).'
+                : 'ESRD / Hemodialysis Protocol: Adjust dose per institutional ESRD/hemodialysis guidelines and administer dose post-hemodialysis on dialysis days (Recommended).';
+            final alt1Th = hasAdjustedTier
+                ? 'ปรับลดขนาดยาตามเกณฑ์ไตวายแล้ว: ระบบได้ปรับขนาดยาเป็น ${finalDose.toStringAsFixed(1)} ${regimen.doseUnit.symbol} ${finalFrequency.displayTh} ตามตารางแนะนำสำหรับผู้ป่วยไตวาย (แนะนำ)'
+                : 'แนวทางไตวายระยะสุดท้าย / ฟอกเลือด: ปรับขนาดยาตามโปรโตคอลฟอกเลือด และบริหารยาหลังฟอกเลือดในวันที่ฟอกไต (แนะนำ)';
+
+            const alt2En =
+                'Nephrology & TDM Consultation: Consult nephrologist for therapeutic drug monitoring, dialysis clearance evaluation, and renal replacement schedule.';
+            const alt2Th =
+                'ปรึกษาอายุรแพทย์โรคไต: ติดตามระดับยาในเลือด ประเมินการขจัดยาผ่านเครื่องฟอกไต และวางแผนการให้ยาร่วมกับการฟอกไต';
+
+            const alt3En =
+                'Clinician Override: Proceed with clinical override if acute therapeutic necessity outweighs drug accumulation risk under close clinical surveillance.';
+            const alt3Th =
+                'ขอยกเว้นเฉพาะราย: สั่งใช้ยาได้ตามดุลยพินิจของแพทย์หากประโยชน์ในการรักษาสูงกว่าความเสี่ยง โดยต้องเฝ้าระวังผลข้างเคียงอย่างใกล้ชิด';
+
             warnings.add(
               DoseWarning(
-                severity: LimitSeverity.hard,
+                severity: LimitSeverity.soft,
                 code: DoseWarningCode.severeRenalImpairment,
                 messageEn:
-                    'CRITICAL RENAL IMPAIRMENT: CrCl ${crcl.toStringAsFixed(1)} mL/min < 10 mL/min.',
+                    'CRITICAL RENAL IMPAIRMENT: CrCl ${crcl.toStringAsFixed(1)} mL/min < 10 mL/min. '
+                    'Alternatives: 1) $alt1En 2) $alt2En 3) $alt3En',
                 messageTh:
-                    'การทำงานของไตวิกฤต: CrCl ${crcl.toStringAsFixed(1)} มล./นาที ต่ำกว่า 10 มล./นาที',
+                    'การทำงานของไตวิกฤต: CrCl ${crcl.toStringAsFixed(1)} มล./นาที ต่ำกว่า 10 มล./นาที '
+                    'ทางเลือก: 1) $alt1Th 2) $alt2Th 3) $alt3Th',
                 calculatedValue: crcl,
+                limitValue: 10.0,
                 unit: 'mL/min',
+                clinicalAlternativesEn: [alt1En, alt2En, alt3En],
+                clinicalAlternativesTh: [alt1Th, alt2Th, alt3Th],
               ),
             );
           }
