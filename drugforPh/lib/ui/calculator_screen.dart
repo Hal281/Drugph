@@ -41,8 +41,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   DosageResult? _result;
   List<DoseWarning> _warnings = [];
-  bool _isOverrideAccepted = false;
-  String? _overrideJustification;
 
   // UI Display for weight selection
   String? _dosingWeightLabel;
@@ -109,10 +107,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     }
 
     if (_selectedRegimen == null) return;
-
-    // Reset override state on new calculation
-    _isOverrideAccepted = false;
-    _overrideJustification = null;
 
     // Build Patient from inputs and session (D0)
     final sessionPatient = PatientSession.instance.currentPatient.value;
@@ -193,65 +187,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  void _promptClinicianOverride(BuildContext context) {
-    final reasonCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          widget.isThai
-              ? 'บันทึกเหตุผลการอนุมัติข้ามขั้นตอน'
-              : 'Clinician Override Authorization',
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.isThai
-                  ? 'กรุณากรอกเหตุผลทางคลินิกและข้อมูลผู้สั่งยา เพื่อปลดบล็อกการแสดงขนาดยา'
-                  : 'Please enter clinical rationale and provider details to unlock dose display.',
-              style: const TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: reasonCtrl,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: widget.isThai
-                    ? 'เช่น ผู้ป่วยฟอกไตฉุกเฉินแล้ว, มีข้อบ่งชี้พิเศษที่ประเมินแล้ว'
-                    : 'e.g. Patient on emergent hemodialysis, risk-benefit evaluated',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(widget.isThai ? 'ยกเลิก' : 'Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade700,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              final text = reasonCtrl.text.trim();
-              if (text.isNotEmpty) {
-                setState(() {
-                  _isOverrideAccepted = true;
-                  _overrideJustification = text;
-                });
-                Navigator.pop(ctx);
-              }
-            },
-            child: Text(widget.isThai ? 'ยืนยันอนุมัติ' : 'Confirm Override'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -862,155 +797,107 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (res.isBlocked && !_isOverrideAccepted) ...[
+                if (res.hasHardLimitViolation || res.hasHardWarning) ...[
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade100,
+                      color: Colors.red.shade50,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.shade400),
+                      border: Border.all(color: Colors.red.shade400, width: 1.5),
                     ),
-                    child: Column(
+                    child: Row(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.block, color: Colors.red, size: 28),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                t
-                                    ? 'การแสดงขนาดยาถูกระงับเพื่อความปลอดภัย'
-                                    : 'Dose Display Blocked for Safety',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          t
-                              ? 'พบข้อห้ามใช้เด็ดขาดหรือคำเตือนระดับวิกฤต (Critical Alert) ระบบจึงไม่อนุญาตให้แสดงตัวเลขขนาดยาจนกว่าจะมีการบันทึกเหตุผลอนุมัติข้ามขั้นตอนโดยบุคลากรทางการแพทย์'
-                              : 'This calculation triggered a critical safety alert or strict contraindication. Numerical dose is hidden until clinician override justification is recorded.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.red.shade900, fontSize: 13),
-                        ),
-                        const SizedBox(height: 12),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.security, size: 18),
-                          label: Text(
+                        const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
                             t
-                                ? 'บันทึกการอนุมัติข้ามขั้นตอน (Clinician Override)'
-                                : 'Authorize Clinician Override',
+                                ? '⚠️ คำเตือน: ขนาดยานี้เกินเกณฑ์สูงสุดที่แนะนำ (Overdose Warning) — โปรดใช้ดุลยพินิจของแพทย์/เภสัชกรในการให้ยา'
+                                : '⚠️ CLINICAL WARNING: Dose exceeds recommended maximum limits — Please use clinical discretion',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.red.shade900,
+                            ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade700,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () => _promptClinicianOverride(context),
                         ),
                       ],
                     ),
                   ),
-                ] else ...[
-                  if (_isOverrideAccepted)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade100,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.orange.shade400),
-                      ),
-                      child: Text(
-                        t
-                            ? '⚠️ อนุมัติการใช้ยาโดยแพทย์/เภสัชกร: $_overrideJustification'
-                            : '⚠️ CLINICIAN OVERRIDE RECORDED: $_overrideJustification',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange.shade900,
-                          fontSize: 12,
-                        ),
-                      ),
+                ],
+                if (res.infusionResult != null) ...[
+                  Text(
+                    t ? 'อัตราการหยดยา (Titrated Infusion)' : 'Titrated Infusion Rate',
+                    style: TextStyle(
+                        color: Colors.teal.shade800, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    '${res.infusionResult!.rate} ${res.infusionResult!.rateUnit.symbol}',
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                  if (res.infusionResult != null) ...[
+                  ),
+                  if (res.infusionResult!.rateMlPerHr != null)
                     Text(
-                      t ? 'อัตราการหยดยา (Titrated Infusion)' : 'Titrated Infusion Rate',
+                      'Pump Rate: ${res.infusionResult!.rateMlPerHr!.toStringAsFixed(1)} mL/hr',
                       style: TextStyle(
-                          color: Colors.teal.shade800, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '${res.infusionResult!.rate} ${res.infusionResult!.rateUnit.symbol}',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    if (res.infusionResult!.rateMlPerHr != null)
-                      Text(
-                        'Pump Rate: ${res.infusionResult!.rateMlPerHr!.toStringAsFixed(1)} mL/hr',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey.shade800,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                  ] else if (res.roundedDose != null) ...[
-                    Text(
-                      t ? 'ขนาดยาที่แนะนำ (ปัดเศษแล้ว)' : 'Recommended Dose (Rounded)',
-                      style: TextStyle(
-                          color: Colors.green.shade800, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '${res.roundedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      res.frequency ?? '',
-                      style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         color: Colors.grey.shade800,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                ] else if (res.roundedDose != null) ...[
+                  Text(
+                    t ? 'ขนาดยาที่แนะนำ (ปัดเศษแล้ว)' : 'Recommended Dose (Rounded)',
+                    style: TextStyle(
+                        color: Colors.green.shade800, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    '${res.roundedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    res.frequency ?? '',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey.shade800,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '(คำนวณได้: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol})',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                ] else ...[
+                  Text(
+                    '${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  if (res.frequency != null)
                     Text(
-                      '(คำนวณได้: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol})',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
+                      res.frequency!,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ] else ...[
-                    Text(
-                      '${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    if (res.frequency != null)
-                      Text(
-                        res.frequency!,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                  ],
                 ],
                 if (res.crclMlMin != null) ...[
                   const SizedBox(height: 12),

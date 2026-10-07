@@ -42,7 +42,11 @@ final List<Drug> emergency = [
         dosingType: DosingType.fixed,
         fixedDose: 1.0, // 1 mg IV (1:10,000)
         doseUnit: DoseUnit.mg,
-        frequency: Frequency(displayEn: 'q3-5min', displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ'),
+        frequency: Frequency(
+          displayEn: 'q3-5min',
+          displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ',
+          customReason: 'ACLS cardiac arrest protocol every 3-5 minutes',
+        ),
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -50,7 +54,11 @@ final List<Drug> emergency = [
         dosingType: DosingType.weightBased,
         dosePerKg: 0.01,
         doseUnit: DoseUnit.mg,
-        frequency: Frequency(displayEn: 'q3-5min', displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ'),
+        frequency: Frequency(
+          displayEn: 'q3-5min',
+          displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ',
+          customReason: 'PALS cardiac arrest protocol every 3-5 minutes',
+        ),
         limits: DoseLimit(maxSingleDose: 1.0),
       ),
     ],

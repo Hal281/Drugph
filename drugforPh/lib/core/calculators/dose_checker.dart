@@ -55,9 +55,9 @@ class DoseChecker {
 
     // --- Soft limit: approaching max single dose ---
     if (limits.softMaxSingleDose != null &&
-        limits.maxSingleDose != null &&
         calculatedDose > limits.softMaxSingleDose! &&
-        calculatedDose <= limits.maxSingleDose!) {
+        (limits.maxSingleDose == null ||
+            calculatedDose <= limits.maxSingleDose!)) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.soft,
         code: DoseWarningCode.softMaxSingleDoseExceeded,
@@ -184,17 +184,24 @@ class DoseChecker {
     final warnings = <DoseWarning>[];
 
     for (final adj in adjustments) {
-      if (adj.appliesTo(crclMlMin) && adj.adjustmentFactor < 1.0) {
+      if (adj.appliesTo(crclMlMin) &&
+          (adj.adjustmentFactor < 1.0 || adj.adjustedFrequency != null)) {
+        final actionTextEn = adj.adjustmentFactor < 1.0
+            ? 'reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+            : 'maintain dose';
+        final actionTextTh = adj.adjustmentFactor < 1.0
+            ? 'ลดโดสเหลือ ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+            : 'คงขนาดยาเดิม';
         warnings.add(DoseWarning(
           severity: LimitSeverity.soft,
           code: DoseWarningCode.renalAdjustmentApplied,
           messageEn:
               'Renal dose adjustment: CrCl ${_fmt(crclMlMin)} mL/min '
-              '→ reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+              '→ $actionTextEn'
               '${adj.adjustedFrequency != null ? ", change frequency to ${adj.adjustedFrequency!.displayEn}" : ""}',
           messageTh:
               'ปรับโดสตามไต: CrCl ${_fmt(crclMlMin)} mL/min '
-              '→ ลดโดสเหลือ ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+              '→ $actionTextTh'
               '${adj.adjustedFrequency != null ? ", เปลี่ยนความถี่เป็น ${adj.adjustedFrequency!.displayTh}" : ""}',
           calculatedValue: crclMlMin,
           limitValue: adj.adjustmentFactor,

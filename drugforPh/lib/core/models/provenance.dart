@@ -27,4 +27,15 @@ enum RenalReviewStatus {
 
   /// Drug is flagged for clinical pharmacist review.
   pendingReview,
+
+  /// Drug has not been reviewed for renal dosing rules (F1 safe default).
+  unreviewed,
 }
+
+/// Clinical verification status for SaMD regimens (E5, F1).
+enum VerificationStatus {
+  verified,
+  pendingReview,
+  unverified,
+}
+

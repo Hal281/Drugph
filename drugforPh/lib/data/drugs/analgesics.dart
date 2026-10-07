@@ -110,6 +110,32 @@ final List<Drug> analgesics = [
     ],
   ),
   const Drug(
+    id: 'naproxen',
+    genericName: 'Naproxen',
+    brandNames: ['Synflex', 'Aleve'],
+    nameTh: 'นาพรอกเซน',
+    category: DrugCategory.nsaid,
+    requiresRenalAdjustment: true,
+    allergyClass: 'NSAID / Aspirin',
+    drugClass: DrugClass.nsaid,
+    severeInteractions: ['Warfarin', 'ACE inhibitors', 'Lithium', 'Methotrexate'],
+    contraindications: ['Active GI bleeding', 'Severe renal impairment'],
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Pain / Inflammation',
+        dosingType: DosingType.fixed,
+        fixedDose: 250.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        limits: DoseLimit(
+          maxSingleDose: 500.0,
+          maxDailyDose: 1250.0,
+        ),
+      ),
+    ],
+  ),
+  const Drug(
     id: 'tramadol',
     genericName: 'Tramadol',
     brandNames: ['Tramal', 'Anarex'],

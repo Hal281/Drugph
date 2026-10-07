@@ -75,6 +75,9 @@ class Patient {
   /// Convenience alias for [hospitalNumber].
   String? get hn => hospitalNumber;
 
+  /// Convenience alias for [hepaticImpairment] (F8).
+  ChildPughClass? get hepaticClass => hepaticImpairment;
+
   const Patient({
     required this.id,
     this.patientName,
@@ -121,6 +124,7 @@ class Patient {
   static const String _sentinelString = '\u0000__PATIENT_SENTINEL__\u0000';
   static const int _sentinelInt = -999999999;
   static const double _sentinelDouble = -999999999.0;
+  static const Object _sentinelObject = Object();
 
   /// Creates a copy with selected fields replaced.
   /// Nullable fields can be explicitly cleared by passing `null`.
@@ -134,7 +138,7 @@ class Patient {
     int? ageMonths = _sentinelInt,
     Sex? sex,
     bool? isPregnant,
-    ChildPughClass? hepaticImpairment = ChildPughClass.sentinel,
+    Object? hepaticImpairment = _sentinelObject,
     double? serumCreatinineMgDl = _sentinelDouble,
     double? creatinineClearanceMlMin = _sentinelDouble,
     double? eGfrMlMinPer173m2 = _sentinelDouble,
@@ -156,9 +160,9 @@ class Patient {
       ageMonths: ageMonths == _sentinelInt ? this.ageMonths : ageMonths,
       sex: sex ?? this.sex,
       isPregnant: isPregnant ?? this.isPregnant,
-      hepaticImpairment: identical(hepaticImpairment, ChildPughClass.sentinel)
+      hepaticImpairment: identical(hepaticImpairment, _sentinelObject)
           ? this.hepaticImpairment
-          : hepaticImpairment,
+          : (hepaticImpairment as ChildPughClass?),
       serumCreatinineMgDl: serumCreatinineMgDl == _sentinelDouble
           ? this.serumCreatinineMgDl
           : serumCreatinineMgDl,

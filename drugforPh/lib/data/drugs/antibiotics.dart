@@ -1,7 +1,7 @@
 import '../../core/models/models.dart';
 
 final List<Drug> antibiotics = [
-  const Drug(
+  Drug(
     id: 'vancomycin',
     genericName: 'Vancomycin',
     brandNames: ['Vancocin'],
@@ -13,8 +13,34 @@ final List<Drug> antibiotics = [
     requiresTDM: true,
     specialNotes: 'Red man syndrome with rapid infusion. Target trough 15-20 mcg/mL for severe infections.',
     specialNotesTh: 'ระวัง Red man syndrome หากดริปเร็วไป. เป้าหมายระดับยา 15-20 mcg/mL ในการติดเชื้อรุนแรง',
+    doseRules: [
+      DoseRule(
+        id: 'vancomycin_esrd_hemodialysis',
+        name: 'Vancomycin ESRD / Hemodialysis Pulse Dosing Protocol (CrCl < 10 mL/min)',
+        sourceCitation: 'Rybak MJ et al. Therapeutic monitoring of vancomycin: 2020 update. Am J Health-Syst Pharm 2020;77(11):835–864',
+        verificationStatus: VerificationStatus.verified,
+        applies: (ctx) => ctx.crclMlMin != null && ctx.crclMlMin! < 10.0,
+        evaluate: (ctx) {
+          final crcl = ctx.crclMlMin!;
+          return DoseRuleResult(
+            warnings: [
+              DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.severeRenalImpairment,
+                messageEn:
+                    'ESRD / HEMODIALYSIS (CrCl ${crcl.toStringAsFixed(1)} mL/min): Vancomycin clearance is severely reduced. Do NOT dose on a fixed schedule. Follow TDM pulse dosing: Loading dose 20–25 mg/kg, check pre-dialysis trough, and redose 500–1000 mg only when trough < 15–20 mcg/mL.',
+                messageTh:
+                    'ไตวายระยะสุดท้าย / ฟอกเลือด (CrCl ${crcl.toStringAsFixed(1)} มล./นาที): การขจัดยา Vancomycin ลดลงอย่างมาก ห้ามให้ยาตามเวลาปกติ ให้ใช้การบริหารยาแบบ TDM Pulse Dosing: Loading dose 20–25 มก./กก., เจาะ trough ก่อนฟอกไต และให้ซ้ำ 500–1000 มก. เมื่อ trough < 15–20 mcg/mL เท่านั้น',
+                calculatedValue: crcl,
+                unit: 'mL/min',
+              ),
+            ],
+          );
+        },
+      ),
+    ],
     regimens: [
-      DosingRegimen(
+      const DosingRegimen(
         route: DoseRoute.ivInfusion,
         indication: 'Systemic Infection (Adult)',
         dosingType: DosingType.weightBased,
@@ -309,6 +335,7 @@ final List<Drug> antibiotics = [
         fixedDose: 1000.0, // Commonly 875/125 mg = 1000 mg total tablet, but base is amox
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q12h,
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 10,
@@ -713,6 +740,8 @@ final List<Drug> antibiotics = [
         dosePerKg: 5.0, // 5 mg CBA/kg
         doseUnit: DoseUnit.mg,
         frequency: Frequency.stat,
+        doseCap: 300.0,
+        doseCapCitation: 'International Consensus Guidelines for the Optimal Use of the Polymyxins (Tsuji et al. Pharmacotherapy 2019)',
         limits: DoseLimit(maxSingleDose: 300.0), // Max 300 mg CBA (or 9 million IU)
       ),
       DosingRegimen(
@@ -834,6 +863,8 @@ final List<Drug> antibiotics = [
         dosePerKg: 10.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
+        doseCap: 600.0,
+        doseCapCitation: 'WHO Treatment of Tuberculosis Guidelines / Sanford Guide 2023',
         limits: DoseLimit(maxSingleDose: 600.0, maxDailyDose: 600.0), // Max 600 mg/day
       ),
     ],
@@ -857,6 +888,8 @@ final List<Drug> antibiotics = [
         dosePerKg: 5.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
+        doseCap: 300.0,
+        doseCapCitation: 'WHO Treatment of Tuberculosis Guidelines / Sanford Guide 2023',
         limits: DoseLimit(maxSingleDose: 300.0, maxDailyDose: 300.0), // Max 300 mg/day
       ),
     ],

@@ -269,8 +269,18 @@ void main() {
       final oxy = DrugDatabase.findById('oxytocin')!;
       final reg = oxy.regimens.firstWhere((r) => r.indication == 'Labor induction');
 
+      const femalePatient = Patient(
+        id: 'patient-female-1',
+        ageYears: 28,
+        weightKg: 65.0,
+        heightCm: 165.0,
+        sex: Sex.female,
+        serumCreatinineMgDl: 0.8,
+        isScrStable: true,
+      );
+
       final res = PharmacistCalculator.calculateDose(
-        patient: adultPatient,
+        patient: femalePatient,
         drug: oxy,
         regimen: reg,
       );

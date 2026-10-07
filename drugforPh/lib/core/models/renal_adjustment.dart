@@ -56,7 +56,7 @@ class RenalAdjustment {
     this.adjustedFrequency,
     this.notes,
     this.notesTh,
-  }) : assert(crclMin <= crclMax, 'crclMin ($crclMin) must be <= crclMax ($crclMax)');
+  }) : assert(crclMin < crclMax, 'crclMin ($crclMin) must be strictly less than crclMax ($crclMax)');
 
   /// Checks whether a patient's [crcl] falls in the half-open interval `[crclMin, crclMax)`.
   ///

@@ -37,8 +37,40 @@ class Frequency {
   /// Whether this is a continuous infusion.
   final bool isContinuous;
 
-  /// Clinical classification kind of this frequency schedule (E5, E6).
-  final FrequencyKind kind;
+  /// Clinical classification kind override (migration / custom only).
+  final FrequencyKind? _explicitKind;
+
+  /// Clinical classification kind of this frequency schedule (derived, not stored, F9).
+  FrequencyKind get kind {
+    if (_explicitKind != null) return _explicitKind!;
+    if (isContinuous) return FrequencyKind.continuous;
+    if (isOnce) return FrequencyKind.once;
+    if (isWeekly) return FrequencyKind.weekly;
+    if (isPrn) return FrequencyKind.prn;
+    if (minIntervalHours != null && maxIntervalHours != null) {
+      return FrequencyKind.range;
+    }
+    if (intervalHours != null) return FrequencyKind.interval;
+    return FrequencyKind.custom;
+  }
+
+  /// Worst-case maximum doses per day (F2, F9).
+  ///
+  /// For fixed intervals (e.g. q8h): 24 / 8 = 3 doses/day.
+  /// For range intervals (e.g. q4-6h): 24 / 4 = 6 doses/day (worst-case).
+  /// For single dose (once/stat): 1.0 dose/day.
+  /// For weekly dose: 1/7 dose/day.
+  double? get worstCaseDosesPerDay {
+    if (minIntervalHours != null && minIntervalHours! > 0) {
+      return 24.0 / minIntervalHours!;
+    }
+    if (intervalHours != null && intervalHours! > 0) {
+      return 24.0 / intervalHours!;
+    }
+    if (isOnce) return 1.0;
+    if (isWeekly) return 1.0 / 7.0;
+    return dosesPerDay?.toDouble();
+  }
 
   /// Clinical reason if [kind] is custom (E5).
   final String? customReason;
@@ -63,9 +95,9 @@ class Frequency {
     required this.displayEn,
     required this.displayTh,
     this.doseBasis = DoseBasis.perDose,
-    this.kind = FrequencyKind.interval,
+    FrequencyKind? kind,
     this.customReason,
-  });
+  }) : _explicitKind = kind;
 
   // ---- Predefined Standard Clinical Frequencies ----
 
@@ -257,7 +289,7 @@ class Frequency {
     // Interval patterns
     final qhMatch = RegExp(r'\bq(\d+)h\b').firstMatch(withoutParens);
     final isPrnMatch = withoutParens.contains('prn') || withoutParens.contains('as needed');
-    final rangeMatch = RegExp(r'q?(\d+)\s*-\s*q?(\d+)h').firstMatch(withoutParens);
+    final rangeMatch = RegExp(r'q?(\d+)h?\s*-\s*q?(\d+)h').firstMatch(withoutParens);
 
     if (rangeMatch != null) {
       final minH = int.parse(rangeMatch.group(1)!);
@@ -328,8 +360,7 @@ class Frequency {
           isWeekly == other.isWeekly &&
           isOnce == other.isOnce &&
           isContinuous == other.isContinuous &&
-          doseBasis == other.doseBasis &&
-          displayEn == other.displayEn;
+          doseBasis == other.doseBasis;
 
   @override
   int get hashCode =>
@@ -340,6 +371,5 @@ class Frequency {
       isWeekly.hashCode ^
       isOnce.hashCode ^
       isContinuous.hashCode ^
-      doseBasis.hashCode ^
-      displayEn.hashCode;
+      doseBasis.hashCode;
 }

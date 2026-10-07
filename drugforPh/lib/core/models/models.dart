@@ -15,3 +15,6 @@ export 'formulation.dart';
 export 'provenance.dart';
 export 'drug.dart';
 export 'dosage_result.dart';
+export 'dose_rule.dart';
+export 'drug_ontology.dart';
+export 'therapeutic_duplication.dart';

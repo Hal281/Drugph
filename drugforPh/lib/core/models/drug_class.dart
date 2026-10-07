@@ -10,6 +10,7 @@ enum DrugClass {
   fluoroquinolone(nameEn: 'Fluoroquinolone', nameTh: 'ยาปฏิชีวนะกลุ่มฟลูออโรควิโนโลน'),
   glycopeptide(nameEn: 'Glycopeptide', nameTh: 'ยาปฏิชีวนะกลุ่มไกลโคเปปไทด์'),
   macrolide(nameEn: 'Macrolide', nameTh: 'ยาปฏิชีวนะกลุ่มแมคโครไลด์'),
+  sulfonamide(nameEn: 'Sulfonamide', nameTh: 'ยาปฏิชีวนะกลุ่มซัลโฟนาไมด์'),
   anticoagulantVka(nameEn: 'Vitamin K Antagonist (Warfarin)', nameTh: 'ยาต้านการแข็งตัวของเลือดกลุ่ม VKA'),
   anticoagulantDoac(nameEn: 'Direct Oral Anticoagulant (DOAC)', nameTh: 'ยาต้านการแข็งตัวของเลือดกลุ่ม DOAC'),
   anticoagulantHeparin(nameEn: 'Heparin / LMWH', nameTh: 'ยาเฮพาริน / LMWH'),

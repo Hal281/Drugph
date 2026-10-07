@@ -7,8 +7,7 @@ enum ChildPughClass {
   none(labelEn: 'None (Normal)', labelTh: 'ปกติ'),
   classA(labelEn: 'Child-Pugh A (Mild)', labelTh: 'Child-Pugh A (ตับทำงานบกพร่องเล็กน้อย)'),
   classB(labelEn: 'Child-Pugh B (Moderate)', labelTh: 'Child-Pugh B (ตับทำงานบกพร่องปานกลาง)'),
-  classC(labelEn: 'Child-Pugh C (Severe)', labelTh: 'Child-Pugh C (ตับทำงานบกพร่องรุนแรง)'),
-  sentinel(labelEn: '', labelTh: '');
+  classC(labelEn: 'Child-Pugh C (Severe)', labelTh: 'Child-Pugh C (ตับทำงานบกพร่องรุนแรง)');
 
   final String labelEn;
   final String labelTh;
@@ -80,7 +79,7 @@ class PopulationCriteria {
     if (maxAgeMonths != null && patientAgeMonths > maxAgeMonths!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
-        code: DoseWarningCode.generalAlert,
+        code: DoseWarningCode.populationMismatch,
         messageEn:
             'Patient age ($patientAgeMonths months) exceeds maximum age ($maxAgeMonths months) for this regimen.',
         messageTh:
@@ -92,7 +91,7 @@ class PopulationCriteria {
     if (minWeightKg != null && patient.weightKg < minWeightKg!) {
       warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
-        code: DoseWarningCode.generalAlert,
+        code: DoseWarningCode.populationMismatch,
         messageEn:
             'Patient weight (${patient.weightKg.toStringAsFixed(1)} kg) is below minimum weight ($minWeightKg kg) for this regimen.',
         messageTh:
@@ -121,12 +120,12 @@ class PopulationCriteria {
     }
 
     // Pregnancy check
-    if (patient.isPregnant && contraindicatedPregnancy) {
+    if (patient.isPregnant && (contraindicatedPregnancy || pregnancySafe == false)) {
       warnings.add(const DoseWarning(
         severity: LimitSeverity.hard,
         code: DoseWarningCode.contraindicationAlert,
-        messageEn: 'PREGNANCY CONTRAINDICATION: This drug/regimen is strictly contraindicated in pregnancy.',
-        messageTh: 'ข้อห้ามใช้ในหญิงตั้งครรภ์: ยา/สูตรยานี้ห้ามใช้เด็ดขาดในสตรีมีครรภ์',
+        messageEn: 'PREGNANCY CONTRAINDICATION: This drug/regimen is strictly contraindicated or unsafe in pregnancy.',
+        messageTh: 'ข้อห้ามใช้ในหญิงตั้งครรภ์: ยา/สูตรยานี้ห้ามใช้เด็ดขาดหรือไม่ปลอดภัยในสตรีมีครรภ์',
       ));
     }
 

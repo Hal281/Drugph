@@ -122,6 +122,10 @@ final List<Drug> gastrointestinal = [
         fixedDose: 10.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8hPrn,
+        population: PopulationCriteria(
+          minAgeMonths: 144, // 12 years
+          minWeightKg: 35.0,
+        ),
         limits: DoseLimit(
           maxDailyDose: 30.0,
         ),

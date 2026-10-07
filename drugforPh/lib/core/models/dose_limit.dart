@@ -89,8 +89,27 @@ enum DoseWarningCode {
   severeInteractionAlert,
   pediatricBlocked,
 
+  /// Therapeutic duplication alert: duplicate active drug or contraindicated same-class combination.
+  therapeuticDuplication,
+
   /// A pediatric-only regimen was selected for an adult patient.
   populationMismatch,
+
+  /// Ordered dose deviates from default recommended dose (F2, informational).
+  orderDeviation,
+
+  /// Ordered dose is below the regimen dose range (F2).
+  orderBelowRange,
+
+  /// Ordered frequency mismatch with recommended frequency (F2).
+  frequencyMismatch,
+
+  /// Known low CrCl but drug tiers are unreviewed in the database (F4).
+  renalTiersUnreviewed,
+
+  /// Mandatory critical alert for weekly methotrexate and weekly regimens (F12).
+  weeklyRegimenBanner,
+
   calculationError,
   generalAlert,
 }

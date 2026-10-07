@@ -61,7 +61,12 @@ final List<Drug> psychiatry = [
         dosingType: DosingType.fixed,
         fixedDose: 4,
         doseUnit: DoseUnit.mg,
-        frequency: Frequency(minIntervalHours: 0, displayEn: 'q10-15min', displayTh: 'ทุก 10-15 นาที'),
+        frequency: Frequency(
+          minIntervalHours: 0,
+          displayEn: 'q10-15min',
+          displayTh: 'ทุก 10-15 นาที',
+          customReason: 'Status epilepticus emergent protocol repeat in 10-15 min PRN',
+        ),
         maxInfusionRateMgPerMin: 2,
         limits: DoseLimit(maxDailyDose: 8),
       ),

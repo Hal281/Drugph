@@ -5,6 +5,8 @@ import 'package:drug_dosage_calculator/core/audit/pdf_report_generator.dart';
 import 'package:drug_dosage_calculator/core/models/models.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('Addendum B4 & E7: PDF Report Generator Tests', () {
     final warnings = [
       const DoseWarning(

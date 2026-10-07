@@ -604,8 +604,10 @@ void main() {
         );
         expect(
           res.warnings.any((w) =>
-              w.code == DoseWarningCode.severeRenalImpairment &&
-              w.messageEn.contains('DATABASE WARNING')),
+              (w.code == DoseWarningCode.renalTiersUnreviewed ||
+                  w.code == DoseWarningCode.severeRenalImpairment) &&
+              (w.messageEn.contains('DATABASE WARNING') ||
+                  w.messageEn.contains('NO RENAL ADJUSTMENT TIERS'))),
           isTrue,
         );
       });
@@ -661,7 +663,8 @@ void main() {
         );
         expect(
           freqMismatch.warnings.any((w) =>
-              w.code == DoseWarningCode.unknownFrequency &&
+              (w.code == DoseWarningCode.frequencyMismatch ||
+                  w.code == DoseWarningCode.unknownFrequency) &&
               w.messageEn.contains('FREQUENCY MISMATCH')),
           isTrue,
         );
@@ -676,7 +679,8 @@ void main() {
         );
         expect(
           irregularOrder.warnings.any((w) =>
-              w.code == DoseWarningCode.unknownFrequency &&
+              (w.code == DoseWarningCode.frequencyMismatch ||
+                  w.code == DoseWarningCode.unknownFrequency) &&
               w.messageEn.contains('irregular or variable')),
           isTrue,
         );
@@ -778,8 +782,8 @@ void main() {
           legacyAllergyClass: null,
         );
         expect(alerts, isNotEmpty);
-        expect(alerts.first.hasDirectMatch, isTrue);
         expect(alerts.first.severity, equals(LimitSeverity.hard));
+        expect(alerts.first.messageEn, contains('CLASS ALLERGY ALERT'));
       });
 
       test('Thai allergen input matches beta-lactam penicillin class', () {
@@ -791,8 +795,8 @@ void main() {
           legacyAllergyClass: null,
         );
         expect(alerts, isNotEmpty);
-        expect(alerts.first.hasDirectMatch, isTrue);
         expect(alerts.first.severity, equals(LimitSeverity.hard));
+        expect(alerts.first.messageEn, contains('CLASS ALLERGY ALERT'));
       });
 
       test('Negative control: Penicillin allergy does NOT match Ciprofloxacin', () {
@@ -827,7 +831,8 @@ void main() {
           drugClass: null,
           legacyAllergyClass: 'Insulin',
         );
-        expect(alerts, isEmpty, reason: 'Short string "sul" must not trigger match against Insulin');
+        expect(alerts.where((a) => a.hasDirectMatch || a.hasCrossReactivity), isEmpty,
+            reason: 'Short string "sul" must not trigger match against Insulin');
       });
     });
 

@@ -64,6 +64,9 @@ class CalculationInputs {
     if (targetAuc != null) 'targetAuc': targetAuc,
     ...rawInputs,
   };
+
+  /// Allows map-like indexing for backward-compatible access.
+  dynamic operator [](String key) => toMap()[key];
 }
 
 /// An immutable audit log entry for a single dose calculation.

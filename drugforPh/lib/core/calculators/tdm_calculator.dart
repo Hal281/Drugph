@@ -111,6 +111,33 @@ class TdmCalculator {
     return troughSS;
   }
 
+  /// Predicts the Trough concentration given an infusion duration in minutes ([infusionDurationMinutes]).
+  ///
+  /// Cohesion Helper: Explicitly converts minutes to hours (`tInf = infusionDurationMinutes / 60.0`)
+  /// preventing unit mismatch bugs when callers pass duration in minutes.
+  static double predictTroughFromMinutes({
+    required double dose,
+    required double tau,
+    required double infusionDurationMinutes,
+    required double vd,
+    required double ke,
+  }) {
+    if (infusionDurationMinutes <= 0) {
+      throw ArgumentError.value(
+        infusionDurationMinutes,
+        'infusionDurationMinutes',
+        'Infusion duration in minutes must be > 0',
+      );
+    }
+    return predictTrough(
+      dose: dose,
+      tau: tau,
+      tInf: infusionDurationMinutes / 60.0,
+      vd: vd,
+      ke: ke,
+    );
+  }
+
   /// Calculates 24-hour Area Under the Curve (AUC24) for Vancomycin at steady state.
   /// Formula: AUC24 = Daily Dose / Clearance = (Dose * (24 / tau)) / (Vd * Ke)
   ///

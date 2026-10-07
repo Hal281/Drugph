@@ -469,4 +469,27 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
+  const Drug(
+    id: 'simvastatin',
+    genericName: 'Simvastatin',
+    brandNames: ['Zocor'],
+    nameTh: 'ซิมวาสแตติน',
+    category: DrugCategory.cardiovascular,
+    drugClass: DrugClass.statin,
+    pregnancyCategory: 'X',
+    contraindications: ['Active liver disease', 'Concomitant strong CYP3A4 inhibitors'],
+    requiresRenalAdjustment: true,
+    severeInteractions: ['Clarithromycin', 'Erythromycin', 'Ketoconazole', 'Gemfibrozil'],
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Hyperlipidemia',
+        dosingType: DosingType.fixed,
+        fixedDose: 20.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        limits: DoseLimit(maxDailyDose: 40.0),
+      ),
+    ],
+  ),
 ];

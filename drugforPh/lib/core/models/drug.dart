@@ -19,6 +19,8 @@ import 'drug_class.dart';
 import 'interaction.dart';
 import 'formulation.dart';
 import 'provenance.dart';
+import 'dose_rule.dart';
+import 'drug_ontology.dart';
 
 export 'renal_adjustment.dart';
 export 'frequency.dart';
@@ -28,6 +30,7 @@ export 'dosing_phase.dart';
 export 'population_criteria.dart';
 export 'drug_class.dart';
 export 'interaction.dart';
+export 'dose_rule.dart';
 export 'formulation.dart';
 export 'provenance.dart';
 
@@ -50,8 +53,9 @@ class Concentration {
 
   const Concentration(this.value, this.unit);
 
-  /// Converts concentration to numeric value (mg/mL equivalent where applicable).
-  double toMgPerMl() {
+  /// Converts concentration to numeric base value per mL
+  /// (mg/mL for mass units, Units/mL for biological units).
+  double toBaseUnitPerMl() {
     switch (unit) {
       case ConcentrationUnit.mgPerMl:
         return value;
@@ -60,20 +64,18 @@ class Concentration {
       case ConcentrationUnit.gPerMl:
         return value * 1000.0;
       case ConcentrationUnit.unitsPerMl:
-      case ConcentrationUnit.mUPerMl:
         return value;
+      case ConcentrationUnit.mUPerMl:
+        return value / 1000.0; // 1000 mU = 1 Unit
     }
   }
 
+  /// Converts concentration to numeric value (mg/mL equivalent where applicable).
+  /// Deprecated in favor of [toBaseUnitPerMl].
+  double toMgPerMl() => toBaseUnitPerMl();
+
   @override
   String toString() => '$value ${unit.symbol}';
-}
-
-/// Clinical verification status for SaMD regimens (E5).
-enum VerificationStatus {
-  verified,
-  pendingReview,
-  unverified,
 }
 
 /// Strategy for selecting body weight for weight-based drug calculations.
@@ -206,6 +208,18 @@ class DosingRegimen {
   /// source defines one (e.g. IV acetylcysteine uses at most 100 kg).
   final double? maxDosingWeightKg;
 
+  /// Minimum acceptable ordered single dose (F2 range verification).
+  final double? doseRangeMin;
+
+  /// Maximum acceptable ordered single dose (F2 range verification).
+  final double? doseRangeMax;
+
+  /// Clinical dose cap explicitly defined by guidelines (F3, separate from limits).
+  final double? doseCap;
+
+  /// Source citation for the explicit dose cap (F3).
+  final String? doseCapCitation;
+
   const DosingRegimen({
     required this.route,
     this.indication,
@@ -239,12 +253,16 @@ class DosingRegimen {
     this.dosingWeightStrategy = DosingWeightStrategy.actual,
     this.audience,
     this.maxDosingWeightKg,
-    this.verificationStatus = VerificationStatus.verified,
+    this.doseRangeMin,
+    this.doseRangeMax,
+    this.doseCap,
+    this.doseCapCitation,
+    this.verificationStatus = VerificationStatus.unverified,
   });
 
-  /// Effective standard dilution concentration in mg/mL equivalent.
+  /// Effective standard dilution concentration in base unit per mL equivalent.
   double? get effectiveStandardDilutionMgPerMl =>
-      standardDilution?.toMgPerMl() ?? standardDilutionMgPerMl;
+      standardDilution?.toBaseUnitPerMl() ?? standardDilutionMgPerMl;
 
   /// Who this regimen is written for.
   ///
@@ -277,6 +295,18 @@ class DosingRegimen {
 /// Intended patient population of a [DosingRegimen].
 enum RegimenAudience { adult, pediatric }
 
+/// Policy for handling renal data evaluation and missing SCr (F4).
+enum RenalDataPolicy {
+  /// Strictly blocks calculation when renal function is unknown.
+  block,
+
+  /// Warns with non-blocking advisory for emergent/STAT first dose.
+  warn,
+
+  /// Renal adjustment is not clinically required.
+  notNeeded,
+}
+
 /// Complete drug definition with all dosing information.
 class Drug {
   /// Unique identifier (lowercase, underscore-separated).
@@ -306,7 +336,7 @@ class Drug {
   /// Structured drug-drug interactions (D9).
   final List<DrugInteraction> interactions;
 
-  /// Status of renal dose review (D6, D12).
+  /// Status of renal dose review (D6, D12, F1).
   final RenalReviewStatus renalReviewStatus;
 
   /// Clinical rationale if drug does not require renal adjustment (D6).
@@ -324,8 +354,20 @@ class Drug {
   /// Whether renal dose adjustment is required.
   final bool requiresRenalAdjustment;
 
+  /// Policy for handling missing SCr on this drug (F4).
+  final RenalDataPolicy renalDataPolicy;
+
+  /// Whether initial/STAT first dose may be administered unadjusted (F4).
+  final bool firstDoseUnadjustedOk;
+
+  /// Clinical citation for first dose unadjusted policy (F4).
+  final String? firstDoseCitation;
+
   /// Whether hepatic dose adjustment/caution is required.
-  final bool requiresHepaticCaution;
+  final bool requiresHepationCaution;
+
+  /// Alias for hepatic caution requirement.
+  bool get requiresHepaticCaution => requiresHepationCaution;
 
   /// Whether TDM (Therapeutic Drug Monitoring) is required.
   final bool requiresTDM;
@@ -348,14 +390,23 @@ class Drug {
   /// Clinical notes (Thai).
   final String? specialNotesTh;
 
-  /// Primary source citation for drug dosing rules (e.g. Lexicomp 2024, Sanford Guide).
+  /// Primary source citation for drug dosing rules (F1 safe default is empty).
   final String sourceCitation;
 
-  /// ISO 8601 date when this drug's rules were last reviewed.
+  /// ISO 8601 date when this drug's rules were last reviewed (F1 safe default is empty).
   final String lastReviewedDate;
 
-  /// Whether oral tablets of this drug may be split (e.g., scored tablets).
-  final bool isSplittable;
+  /// Whether oral tablets of this drug may be split (F1).
+  final bool tabletSplittable;
+
+  /// Whether partial doses from vials are allowed (F1).
+  final bool vialPartialAllowed;
+
+  /// Declarative clinical dosing rules attached to this drug (F6).
+  final List<DoseRule> doseRules;
+
+  /// Combined helper for splittable/partial dosage forms.
+  bool get isSplittable => tabletSplittable || vialPartialAllowed;
 
   const Drug({
     required this.id,
@@ -367,13 +418,17 @@ class Drug {
     required this.regimens,
     this.drugClass,
     this.interactions = const [],
-    this.renalReviewStatus = RenalReviewStatus.reviewedWithTiers,
+    this.doseRules = const [],
+    this.renalReviewStatus = RenalReviewStatus.unreviewed,
     this.renalExemptionReason,
     this.formulation,
     this.contraindications = const [],
     this.availableStrengths,
     this.requiresRenalAdjustment = false,
-    this.requiresHepaticCaution = false,
+    this.renalDataPolicy = RenalDataPolicy.warn,
+    this.firstDoseUnadjustedOk = false,
+    this.firstDoseCitation,
+    bool requiresHepaticCaution = false,
     this.requiresTDM = false,
     this.isHighAlert = false,
     this.allergyClass,
@@ -381,16 +436,20 @@ class Drug {
     this.severeInteractions = const [],
     this.specialNotes,
     this.specialNotesTh,
-    this.sourceCitation = 'Lexicomp / Sanford Guide / UpToDate',
-    this.lastReviewedDate = '2026-10-04',
-    this.isSplittable = true,
-  });
+    this.sourceCitation = '',
+    this.lastReviewedDate = '',
+    this.tabletSplittable = false,
+    this.vialPartialAllowed = false,
+    bool? isSplittable,
+  })  : requiresHepationCaution = requiresHepaticCaution;
 
   /// Finds the regimen matching [route] and optional [indication].
   ///
-  /// Matching policy (A1, A9):
-  /// - Route matching: exact match (`r.route == route`), or if [route] is `DoseRoute.iv`,
-  ///   matches `ivPush` or `ivInfusion`.
+  /// Matching policy (A1, A9, F13):
+  /// - Route matching is completely symmetric:
+  ///   - Exact match (`r.route == route`)
+  ///   - If requested [route] is `iv`, matches `ivPush` or `ivInfusion`.
+  ///   - If regimen route `r.route` is `iv`, matches requested `ivPush` or `ivInfusion`.
   /// - Indication matching: if [indication] is provided, returns the matching regimen
   ///   or `null` if not found (no silent fallback).
   /// - If [indication] is omitted (`null`), returns the regimen only if exactly one exists
@@ -400,6 +459,10 @@ class Drug {
       if (r.route == route) return true;
       if (route == DoseRoute.iv &&
           (r.route == DoseRoute.ivInfusion || r.route == DoseRoute.ivPush)) {
+        return true;
+      }
+      if (r.route == DoseRoute.iv &&
+          (route == DoseRoute.ivInfusion || route == DoseRoute.ivPush)) {
         return true;
       }
       return false;
@@ -435,6 +498,10 @@ class Drug {
       .map((r) => r.indication!)
       .toSet()
       .toList();
+
+  /// Effective pharmacological drug class, falling back to DrugOntology if not explicitly specified.
+  DrugClass? get effectiveDrugClass =>
+      drugClass ?? DrugOntology.resolveDrugClass(id, genericName, allergyClass);
 
   @override
   String toString() => 'Drug($genericName [${category.nameEn}])';

@@ -12,9 +12,60 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import '../models/drug.dart';
+
 /// IV infusion rate calculations — all pure deterministic functions.
 class IvRateCalculator {
   const IvRateCalculator._();
+
+  /// Calculates pump rate in **mL/hr** for a structured dose rate and concentration (F10).
+  ///
+  /// Strictly checks unit compatibility between [doseRateUnit] and [concentration.unit].
+  /// Throws [ArgumentError] if units are incompatible (e.g. mass rate vs biological units).
+  static double calculateInfusionMlPerHour({
+    required double doseRatePerMin,
+    required RateUnit doseRateUnit,
+    required Concentration concentration,
+    double? weightKg,
+  }) {
+    if (doseRatePerMin < 0) {
+      throw ArgumentError.value(doseRatePerMin, 'doseRatePerMin', 'Must be >= 0');
+    }
+    if (concentration.value <= 0) {
+      throw ArgumentError.value(concentration.value, 'concentration', 'Must be > 0');
+    }
+
+    // Check unit compatibility
+    final isBiologicalRate = doseRateUnit == RateUnit.mUMin ||
+        doseRateUnit == RateUnit.uHr ||
+        doseRateUnit == RateUnit.uKgHr;
+    final isBiologicalConc = concentration.unit == ConcentrationUnit.unitsPerMl ||
+        concentration.unit == ConcentrationUnit.mUPerMl;
+
+    if (isBiologicalRate != isBiologicalConc) {
+      throw ArgumentError(
+        'Incompatible dose rate unit (${doseRateUnit.symbol}) and concentration unit (${concentration.unit.symbol})',
+      );
+    }
+
+    // Special case for mU/min with mU/mL
+    if (doseRateUnit == RateUnit.mUMin && concentration.unit == ConcentrationUnit.mUPerMl) {
+      final mUPerHour = doseRatePerMin * 60.0;
+      return mUPerHour / concentration.value;
+    }
+
+    final amountPerHour = doseRateUnit.toAmountPerHour(doseRatePerMin, weightKg ?? 1.0);
+    if (amountPerHour == null) {
+      throw ArgumentError('Unable to convert rate ${doseRateUnit.symbol} to amount per hour');
+    }
+
+    final baseConcPerMl = concentration.toBaseUnitPerMl();
+    if (baseConcPerMl <= 0) {
+      throw ArgumentError('Invalid concentration value');
+    }
+
+    return amountPerHour / baseConcPerMl;
+  }
 
   // ------------------------------------------------------------------
   // Infusion rate (mL/hr)

@@ -201,7 +201,7 @@ final List<Drug> anticoagulants = [
       ),
     ],
   ),
-  const Drug(
+  Drug(
     id: 'apixaban',
     genericName: 'Apixaban',
     brandNames: ['Eliquis'],
@@ -217,8 +217,67 @@ final List<Drug> anticoagulants = [
     contraindications: ['Active pathological bleeding', 'Severe hepatic impairment (Child-Pugh C)'],
     specialNotes: 'Dose reduction to 2.5 mg BID required if 2 of 3 criteria met: Age >= 80, Weight <= 60 kg, or SCr >= 1.5 mg/dL.',
     specialNotesTh: 'ยารักษาลิ่มเลือดอุดตัน (DOAC) ต้องลดโดสเหลือ 2.5 mg BID หากเข้าเกณฑ์ 2 ใน 3 ข้อนี้: (1) อายุ 80 ขึ้นไป (2) น้ำหนักตัว 60 กก. ลงมา (3) SCr >= 1.5',
+    doseRules: [
+      DoseRule(
+        id: 'apixaban_2_of_3_criteria',
+        name: 'Apixaban 2-of-3 Dose Reduction Criteria (AFib)',
+        sourceCitation: 'FDA Eliquis (apixaban) Prescribing Information §2.1; 2023 AHA/ACC/ACCP/NLA AFib Guidelines',
+        verificationStatus: VerificationStatus.verified,
+        applies: (ctx) {
+          final ind = ctx.regimen.indication?.toLowerCase() ?? '';
+          return RegExp(r'\bafib\b|atrial fibrillation|\bnvaf\b').hasMatch(ind);
+        },
+        evaluate: (ctx) {
+          final p = ctx.patient;
+          int criteriaCount = 0;
+          if (p.ageYears >= 80) criteriaCount++;
+          if (p.weightKg <= 60.0) criteriaCount++;
+          final warnings = <DoseWarning>[];
+          if (p.serumCreatinineMgDl != null) {
+            if (p.serumCreatinineMgDl! >= 1.5) criteriaCount++;
+          } else {
+            warnings.add(
+              const DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.scrMissing,
+                messageEn:
+                    'Serum creatinine is missing: Apixaban 2-of-3 dose reduction criteria cannot be fully evaluated.',
+                messageTh:
+                    'ไม่มีค่า Serum Creatinine: ไม่สามารถประเมินเกณฑ์การปรับลดขนาดยา Apixaban 2 ใน 3 ข้อได้อย่างสมบูรณ์',
+              ),
+            );
+          }
+
+          if (criteriaCount >= 2) {
+            warnings.add(
+              const DoseWarning(
+                severity: LimitSeverity.info,
+                code: DoseWarningCode.renalAdjustmentApplied,
+                messageEn:
+                    'Apixaban dose reduced to 2.5 mg BID (meets ≥2 criteria: Age ≥80, Weight ≤60 kg, SCr ≥1.5 mg/dL).',
+                messageTh:
+                    'ปรับลดขนาดยา Apixaban เป็น 2.5 mg วันละ 2 ครั้ง (เข้าเกณฑ์ ≥2 ข้อ: อายุ ≥80, นน. ≤60 กก., SCr ≥1.5 mg/dL)',
+              ),
+            );
+            return DoseRuleResult(
+              modifiedDose: 2.5,
+              modifiedFrequency: Frequency.q12h,
+              isDoseModified: true,
+              isRenallyAdjusted: false,
+              modificationReasonEn:
+                  'Apixaban dose reduced to 2.5 mg BID (meets ≥2 criteria: Age ≥80, Weight ≤60 kg, SCr ≥1.5 mg/dL).',
+              modificationReasonTh:
+                  'ปรับลดขนาดยา Apixaban เป็น 2.5 mg วันละ 2 ครั้ง (เข้าเกณฑ์ ≥2 ข้อ: อายุ ≥80, นน. ≤60 กก., SCr ≥1.5 mg/dL)',
+              warnings: warnings,
+            );
+          }
+
+          return DoseRuleResult(warnings: warnings);
+        },
+      ),
+    ],
     regimens: [
-      DosingRegimen(
+      const DosingRegimen(
         route: DoseRoute.po,
         indication: 'AFib (Stroke Prophylaxis)',
         dosingType: DosingType.fixed,
@@ -230,7 +289,7 @@ final List<Drug> anticoagulants = [
           RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.avoid, notes: 'Avoid in severe renal impairment (CrCl < 15 mL/min)'),
         ],
       ),
-      DosingRegimen(
+      const DosingRegimen(
         route: DoseRoute.po,
         indication: 'DVT/PE Treatment',
         dosingType: DosingType.fixed,
@@ -330,7 +389,11 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 20.0, // 20 mEq in 100mL over 1-2hr
         doseUnit: DoseUnit.mEq,
-        frequency: Frequency(displayEn: 'Over 1-2 hours', displayTh: 'ให้ใน 1-2 ชม.'),
+        frequency: Frequency(
+          displayEn: 'Over 1-2 hours',
+          displayTh: 'ให้ใน 1-2 ชม.',
+          customReason: 'ICU central line infusion over 1-2 hours',
+        ),
         limits: DoseLimit(maxInfusionRate: 10.0, infusionRateUnit: 'mEq/hr'),
       ),
     ],
@@ -355,7 +418,11 @@ final List<Drug> supplements = [
         dosingType: DosingType.fixed,
         fixedDose: 1000.0, // 1g (10mL of 10%)
         doseUnit: DoseUnit.mg,
-        frequency: Frequency(displayEn: 'Over 5-10 min', displayTh: 'ให้ใน 5-10 นาที (ซ้ำได้)'),
+        frequency: Frequency(
+          displayEn: 'Over 5-10 min',
+          displayTh: 'ให้ใน 5-10 นาที (ซ้ำได้)',
+          customReason: 'Slow IV push over 5-10 minutes under cardiac monitoring',
+        ),
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -363,7 +430,11 @@ final List<Drug> supplements = [
         dosingType: DosingType.weightBased,
         dosePerKg: 60.0, // 60-100 mg/kg slow IV
         doseUnit: DoseUnit.mg,
-        frequency: Frequency(displayEn: 'Over 5-10 min', displayTh: 'ให้ใน 5-10 นาที'),
+        frequency: Frequency(
+          displayEn: 'Over 5-10 min',
+          displayTh: 'ให้ใน 5-10 นาที',
+          customReason: 'Slow IV push over 5-10 minutes under cardiac monitoring',
+        ),
         limits: DoseLimit(maxSingleDose: 3000.0),
       ),
     ],

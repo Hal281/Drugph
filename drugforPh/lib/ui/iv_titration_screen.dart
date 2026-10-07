@@ -70,24 +70,35 @@ class IVTitrationScreen extends StatelessWidget {
 
     final wt = patient.weightKg;
     final dilutionMgPerMl = regimen.standardDilutionMgPerMl!;
+    final rateUnit = regimen.rateUnit ??
+        (regimen.continuousRateUnit != null
+            ? RateUnit.tryFromSymbol(regimen.continuousRateUnit!)
+            : null) ??
+        RateUnit.mcgKgMin;
 
-    // Convert dilution to mcg/ml for easier math with mcg/kg/min
-    final dilutionMcgPerMl = dilutionMgPerMl * 1000;
+    final isBioUnit = rateUnit == RateUnit.uHr || rateUnit == RateUnit.uKgHr;
+    final concUnitStr = isBioUnit ? 'Units/mL' : 'mg/mL';
 
-    // Typical rate range (e.g., 0.05 to 1.0 mcg/kg/min for Norepi, or whatever is passed)
-    // If none provided, we just generate a generic table from 0.05 to 1.0
+    // Typical rate range (e.g., 0.05 to 1.0 mcg/kg/min for Norepi, or 5 to 15 mg/hr for Nicardipine)
     final double minRate = regimen.continuousRateMin ?? 0.05;
-    final double maxRate = regimen.continuousRateMax ?? 1.0;
+    final double maxRate = regimen.continuousRateMax ?? (minRate > 0 ? minRate * 4 : 1.0);
 
-    // Generate steps (around 10-15 rows)
-    final double step = (maxRate - minRate) / 10;
+    // Generate steps (10 rows)
+    final double step = (maxRate > minRate)
+        ? (maxRate - minRate) / 10
+        : (minRate > 0 ? minRate / 10 : 0.1);
 
     List<Map<String, double>> tableData = [];
-    for (double r = minRate; r <= maxRate + 0.001; r += step) {
-      // Formula: Dose (mcg/kg/min) * Weight (kg) * 60 min = mcg / hr
-      // (mcg / hr) / Concentration (mcg / ml) = ml / hr
-      final mcgPerHr = r * wt * 60;
-      final mlPerHr = mcgPerHr / dilutionMcgPerMl;
+    for (double r = minRate; r <= maxRate + 0.0001; r += step) {
+      double mlPerHr = 0.0;
+      if (rateUnit == RateUnit.mlHr) {
+        mlPerHr = r;
+      } else {
+        final amountPerHr = rateUnit.toAmountPerHour(r, wt);
+        if (amountPerHr != null && dilutionMgPerMl > 0) {
+          mlPerHr = amountPerHr / dilutionMgPerMl;
+        }
+      }
 
       tableData.add({
         'dose': r,
@@ -115,7 +126,7 @@ class IVTitrationScreen extends StatelessWidget {
                   children: [
                     Text('Patient Weight: $wt kg',
                         style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Concentration: $dilutionMgPerMl mg/mL'),
+                    Text('Concentration: $dilutionMgPerMl $concUnitStr'),
                   ],
                 ),
                 Icon(Icons.monitor_heart, color: Colors.red.shade300, size: 40),
@@ -126,19 +137,27 @@ class IVTitrationScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: DataTable(
                 headingRowColor: WidgetStateProperty.all(Colors.red.shade100),
-                columns: const [
+                columns: [
                   DataColumn(
-                      label: Text('Dose\n(mcg/kg/min)',
+                      label: Text(
+                          '${isThai ? "ขนาดยา" : "Dose"}\n(${rateUnit.symbol})',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold))),
+                          style: const TextStyle(fontWeight: FontWeight.bold))),
                   DataColumn(
-                      label: Text('Pump Rate\n(mL/hr)',
+                      label: Text(
+                          '${isThai ? "อัตราหยด" : "Pump Rate"}\n(mL/hr)',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold))),
+                          style: const TextStyle(fontWeight: FontWeight.bold))),
                 ],
                 rows: tableData.map((row) {
+                  final doseVal = row['dose']!;
+                  final doseText = doseVal < 1.0
+                      ? doseVal.toStringAsFixed(2)
+                      : (doseVal == doseVal.roundToDouble()
+                          ? doseVal.toStringAsFixed(0)
+                          : doseVal.toStringAsFixed(1));
                   return DataRow(cells: [
-                    DataCell(Text(row['dose']!.toStringAsFixed(2))),
+                    DataCell(Text(doseText)),
                     DataCell(Text(row['rate']!.toStringAsFixed(1),
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,

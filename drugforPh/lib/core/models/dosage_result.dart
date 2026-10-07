@@ -13,6 +13,7 @@ import 'unit.dart';
 import 'rate_unit.dart';
 import 'frequency.dart';
 import 'dosing_phase.dart';
+import 'provenance.dart';
 
 /// The complete result of a dose calculation.
 ///
@@ -108,6 +109,18 @@ class DosageResult {
   /// Indicates if this dose was actively adjusted based on renal function.
   final bool isRenallyAdjusted;
 
+  /// Indicates if this dose was modified by a clinical dose rule (F6).
+  final bool isDoseModified;
+
+  /// Clinical rationale for dose modification (F6).
+  final String? doseModificationReason;
+
+  /// Indicates if this regimen is administered on a weekly schedule (F12).
+  final bool isWeeklySchedule;
+
+  /// Verification status of the calculated regimen (F1, F5).
+  final VerificationStatus verificationStatus;
+
   /// Error description if [success] is `false` (English).
   final String? errorMessage;
 
@@ -140,6 +153,10 @@ class DosageResult {
     this.renalNotesTh,
     this.roundedDose,
     this.isRenallyAdjusted = false,
+    this.isDoseModified = false,
+    this.doseModificationReason,
+    this.isWeeklySchedule = false,
+    this.verificationStatus = VerificationStatus.unverified,
     this.warnings = const [],
     this.errorMessage,
     this.errorMessageTh,
@@ -187,7 +204,15 @@ class DosageResult {
   bool get isBlocked => !success || hasHardLimitViolation;
 
   /// `true` if any hard-limit violation exists — UI should **block**.
-  bool get hasHardLimitViolation =>
+  /// Safety banners (e.g. weeklyRegimenBanner) do not block calculation.
+  bool get hasHardLimitViolation => warnings.any(
+        (w) =>
+            w.severity == LimitSeverity.hard &&
+            w.code != DoseWarningCode.weeklyRegimenBanner,
+      );
+
+  /// `true` if any hard warning exists (including safety banners).
+  bool get hasHardWarning =>
       warnings.any((w) => w.severity == LimitSeverity.hard);
 
   /// `true` if any soft-limit warning exists — UI should **warn**.
