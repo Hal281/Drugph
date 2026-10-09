@@ -24,7 +24,7 @@ class _AiConsultantScreenState extends State<AiConsultantScreen> {
   // ดึง API Key จาก Environment variable
   static const String _apiKey = String.fromEnvironment(
     'GEMINI_API_KEY',
-    defaultValue: 'AQ.Ab8RN6I5FW5LcnV6jrmADgeFYZwkBApkUdFnAggxVuiZJvuHjA',
+    defaultValue: 'AQ.Ab8RN6Kfu_npRDa4k0SCNkMximsItGehmpJmBRr-XBlZYsMoHw',
   );
 
   @override
@@ -80,7 +80,7 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
     ''');
 
     _model = GenerativeModel(
-      model: 'gemini-1.5-pro',
+      model: 'gemini-1.5-flash',
       apiKey: _apiKey,
       systemInstruction: systemInstruction,
       generationConfig: GenerationConfig(temperature: 0.1, topP: 0.8),
@@ -119,6 +119,7 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
       });
       _scrollToBottom();
     } catch (e) {
+      print("Gemini API Error: $e");
       setState(() {
         _messages.add({'isBot': true, 'text': 'Error: ${e.toString()}'});
         _isLoading = false;
