@@ -24,7 +24,7 @@ class _AiConsultantScreenState extends State<AiConsultantScreen> {
   // ดึง API Key จาก Environment variable
   static const String _apiKey = String.fromEnvironment(
     'GEMINI_API_KEY',
-    defaultValue: 'AQ.Ab8RN6J4HbD3qaqoDgZS8eNQZJgSDZhbODDkw3zy8pZZgXReXQ',
+    defaultValue: 'AQ.Ab8RN6I5FW5LcnV6jrmADgeFYZwkBApkUdFnAggxVuiZJvuHjA',
   );
 
   @override
