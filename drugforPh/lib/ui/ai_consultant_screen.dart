@@ -121,7 +121,7 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
     } catch (e) {
       print("Gemini API Error: $e");
       setState(() {
-        _messages.add({'isBot': true, 'text': 'Error: ${e.toString()}'});
+        _messages.add({'isBot':   true, 'text': 'Error: ${e.toString()}'});
         _isLoading = false;
       });
       _scrollToBottom();
