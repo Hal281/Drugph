@@ -1,0 +1,550 @@
+{
+  "schema_version": "1.2.0",
+  "renal_range_evaluation_rule": "crcl >= crcl_min_ml_min && crcl < crcl_max_ml_min",
+  "drugs": [
+    {
+      "drug_info": {
+        "drug_id": "paracetamol_oral_susp",
+        "generic_name": "Paracetamol (Acetaminophen)",
+        "synonyms": [
+          "Paracetamol",
+          "Acetaminophen",
+          "APAP",
+          "Tylenol",
+          "Sara",
+          "พาราเซตามอล",
+          "อะเซตามิโนเฟน"
+        ],
+        "rxnorm_id": "161",
+        "therapeutic_class": "Analgesic / Antipyretic (Non-Opioid)",
+        "dosage_form": "Oral Suspension",
+        "strength_label": "120 mg / 5 mL",
+        "concentration_mg_per_ml": 24.0,
+        "dispensing_unit": "mL"
+      },
+      "dosing_rules": {
+        "indication": "Fever and mild-to-moderate pain (Pediatric & Adult weight-based dosing)",
+        "patient_criteria": {
+          "min_age_months": 1,
+          "max_age_years": 18,
+          "min_weight_kg": 3.0
+        },
+        "formula_type": "mg_per_kg_per_dose",
+        "dose_range": {
+          "min_mg_per_kg_per_dose": 10.0,
+          "recommended_mg_per_kg_per_dose": 15.0,
+          "max_mg_per_kg_per_dose": 15.0
+        },
+        "frequency_hours": "q4-6h PRN",
+        "max_doses_per_day": 5,
+        "max_single_dose_mg": 1000.0,
+        "max_daily_dose_mg": 4000.0,
+        "max_daily_dose_mg_per_kg": 75.0,
+        "non_blocking_overdose_policy": true,
+        "renal_adjustment": [
+          {
+            "crcl_min_ml_min": 0.0,
+            "crcl_max_ml_min": 10.0,
+            "adjusted_interval": "q8h",
+            "adjusted_doses_per_day": 3,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ขยายระยะเวลาการให้ยาเป็นทุก 8 ชั่วโมง (0.0 <= CrCl < 10.0 mL/min)"
+          },
+          {
+            "crcl_min_ml_min": 10.0,
+            "crcl_max_ml_min": 50.0,
+            "adjusted_interval": "q6h",
+            "adjusted_doses_per_day": 4,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ขยายระยะเวลาการให้ยาเป็นทุก 6 ชั่วโมง (10.0 <= CrCl < 50.0 mL/min)"
+          },
+          {
+            "crcl_min_ml_min": 50.0,
+            "crcl_max_ml_min": 999.0,
+            "adjusted_interval": "q4-6h",
+            "adjusted_doses_per_day": 5,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ไม่ต้องปรับขนาดยา ให้ห่างกันทุก 4-6 ชั่วโมงตามปกติ (CrCl >= 50.0 mL/min)"
+          }
+        ]
+      },
+      "safety_checks": {
+        "allergy_cross_reactivity": [
+          {
+            "match_type": "synonym",
+            "allergen_group": "Identical Active Ingredient (Paracetamol / Acetaminophen Synonyms)",
+            "cross_reactive_agents": [
+              "Paracetamol",
+              "Acetaminophen",
+              "APAP",
+              "Tylenol",
+              "Sara",
+              "พาราเซตามอล",
+              "อะเซตามิโนเฟน"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Direct IgE-mediated hypersensitivity or T-cell mediated SCARs (SJS/TEN/DRESS) to the identical chemical molecule (N-acetyl-p-aminophenol).",
+            "action": "ห้ามใช้ยานี้เนื่องจากเป็นตัวยาสำคัญชนิดเดียวกันกับที่ผู้ป่วยมีประวัติแพ้ (Identical Active Ingredient / Synonym Match)",
+            "reference": "Lexicomp Drug Information Handbook 2024"
+          },
+          {
+            "match_type": "cross_reactivity",
+            "allergen_group": "Para-aminophenol Derivatives / Prodrug",
+            "cross_reactive_agents": [
+              "Propacetamol",
+              "Prodafalgan",
+              "Phenacetin",
+              "โปรพาราเซตามอล"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Propacetamol is hydrolyzed in plasma directly into Paracetamol (1 g Propacetamol = 0.5 g Paracetamol).",
+            "action": "ห้ามใช้ในผู้ป่วยที่มีประวัติแพ้ Propacetamol เนื่องจากถูกเปลี่ยนเป็น Paracetamol ในร่างกายโดยตรง",
+            "reference": "Martindale: The Complete Drug Reference, 40th Edition"
+          }
+        ],
+        "drug_interactions": [
+          {
+            "interacting_drug": "Warfarin",
+            "interacting_drug_aliases": [
+              "Warfarin",
+              "Marevan",
+              "Orfarin",
+              "Coumadin",
+              "วาร์ฟาริน",
+              "มาเรแวน"
+            ],
+            "interacting_rxnorm_id": "11289",
+            "severity": "Moderate",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating C: Monitor Therapy)",
+            "mechanism": "เมแทบอไลต์ NAPQI ของ Paracetamol ยับยั้งเอนไซม์ในวัฏจักร Vitamin K (VKORC1) เมื่อได้รับขนาดสูงต่อเนื่อง (>2,000 mg/day นานเกิน 3-5 วัน)",
+            "clinical_effect": "ค่า INR สูงขึ้น เพิ่มความเสี่ยงต่อภาวะเลือดออกผิดปกติ (Increased bleeding risk)",
+            "management": "ติดตามค่า INR อย่างใกล้ชิด และจำกัดขนาดยา Paracetamol ไม่ให้เกิน 2,000 mg/วัน ในผู้ป่วยที่ได้รับ Warfarin",
+            "reference": "Lexicomp Drug Interactions 2024; The Harriet Lane Handbook, 23rd Edition"
+          },
+          {
+            "interacting_drug": "Isoniazid",
+            "interacting_drug_aliases": [
+              "Isoniazid",
+              "INH",
+              "ไอโซไนอะซิด"
+            ],
+            "interacting_rxnorm_id": "6038",
+            "severity": "Major",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating D: Consider Therapy Modification)",
+            "mechanism": "เหนี่ยวนำเอนไซม์ตับ CYP2E1 ทำให้เพิ่มการสร้างสารพิษ NAPQI ต่อตับ",
+            "clinical_effect": "เพิ่มความเสี่ยงต่อภาวะตับอักเสบเฉียบพลัน (Hepatotoxicity)",
+            "management": "จำกัดการใช้ Paracetamol ร่วมกับ Isoniazid และเฝ้าระวังค่าเอนไซม์ตับ (AST/ALT)",
+            "reference": "Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th Edition, Chapter 38"
+          }
+        ]
+      },
+      "verification_metadata": {
+        "verified_status": "PENDING_HUMAN_VERIFICATION",
+        "source_verified": false,
+        "verified_by": null,
+        "verified_date": null,
+        "source_name": "The Harriet Lane Handbook (The Johns Hopkins Hospital) & บัญชียาหลักแห่งชาติ (Thai National Formulary)",
+        "edition_and_page": "23rd Edition (2023), Part IV: Formulary, Page 912-913 (Pending Pharmacist Page Verification)",
+        "reference_url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=acetaminophen",
+        "evidence_image_path": "assets/evidence/paracetamol_harriet_lane_p912.png",
+        "verified_by_role": "Awaiting Clinical Pharmacist / Faculty Sign-Off",
+        "last_verified_date": "2026-10-17"
+      }
+    },
+    {
+      "drug_info": {
+        "drug_id": "amoxicillin_oral_susp",
+        "generic_name": "Amoxicillin",
+        "synonyms": [
+          "Amoxicillin",
+          "Amoxycillin",
+          "Amoxil",
+          "Amoxicillin Trihydrate",
+          "อะม็อกซี่ซิลลิน",
+          "อะม็อกซิลลิน"
+        ],
+        "rxnorm_id": "723",
+        "therapeutic_class": "Beta-Lactam Antibiotic (Aminopenicillin)",
+        "dosage_form": "Oral Suspension",
+        "strength_label": "250 mg / 5 mL",
+        "concentration_mg_per_ml": 50.0,
+        "dispensing_unit": "mL"
+      },
+      "dosing_rules": {
+        "indication": "Acute Otitis Media, Rhinosinusitis, Community-Acquired Pneumonia, Streptococcal Pharyngitis",
+        "patient_criteria": {
+          "min_age_months": 1,
+          "max_age_years": 18,
+          "min_weight_kg": 3.0
+        },
+        "formula_type": "mg_per_kg_per_day",
+        "dose_range": {
+          "min_mg_per_kg_per_dose": 40.0,
+          "recommended_mg_per_kg_per_dose": 45.0,
+          "max_mg_per_kg_per_dose": 90.0
+        },
+        "frequency_hours": "q8h",
+        "max_doses_per_day": 3,
+        "max_single_dose_mg": 1000.0,
+        "max_daily_dose_mg": 3000.0,
+        "max_daily_dose_mg_per_kg": 90.0,
+        "non_blocking_overdose_policy": true,
+        "renal_adjustment": [
+          {
+            "crcl_min_ml_min": 0.0,
+            "crcl_max_ml_min": 10.0,
+            "adjusted_interval": "q24h",
+            "adjusted_doses_per_day": 1,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ยืดระยะห่างการให้ยาเป็นทุก 24 ชั่วโมง (1 มื้อ/วัน) โดยคงขนาดยาต่อครั้งตามปกติ และหลีกเลี่ยงสูตร High-dose (0.0 <= CrCl < 10.0 mL/min)"
+          },
+          {
+            "crcl_min_ml_min": 10.0,
+            "crcl_max_ml_min": 30.0,
+            "adjusted_interval": "q12h",
+            "adjusted_doses_per_day": 2,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ยืดระยะห่างการให้ยาเป็นทุก 12 ชั่วโมง (2 มื้อ/วัน) โดยคงขนาดยาต่อครั้งตามปกติ (10.0 <= CrCl < 30.0 mL/min)"
+          },
+          {
+            "crcl_min_ml_min": 30.0,
+            "crcl_max_ml_min": 999.0,
+            "adjusted_interval": "q8h",
+            "adjusted_doses_per_day": 3,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ไม่ต้องปรับขนาดยา ให้ทุก 8 ชั่วโมง (3 มื้อ/วัน) ตามปกติ (CrCl >= 30.0 mL/min)"
+          }
+        ]
+      },
+      "safety_checks": {
+        "allergy_cross_reactivity": [
+          {
+            "match_type": "synonym",
+            "allergen_group": "Identical Active Ingredient (Amoxicillin Synonyms)",
+            "cross_reactive_agents": [
+              "Amoxicillin",
+              "Amoxycillin",
+              "Amoxil",
+              "อะม็อกซี่ซิลลิน",
+              "อะม็อกซิลลิน"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Direct IgE or T-cell mediated hypersensitivity to the identical Amoxicillin molecule.",
+            "action": "ห้ามใช้ยานี้เนื่องจากเป็นตัวยาสำคัญชนิดเดียวกันกับที่ผู้ป่วยแพ้ (Synonym Match)",
+            "reference": "Lexicomp Drug Information Handbook 2024"
+          },
+          {
+            "match_type": "same_class",
+            "allergen_group": "Penicillins (Same Pharmacological Class — Core Beta-Lactam / Thiazolidine Ring)",
+            "cross_reactive_agents": [
+              "Penicillin",
+              "Penicillin G",
+              "Penicillin V",
+              "Pen V",
+              "Pen G",
+              "Ampicillin",
+              "Amoxicillin-Clavulanate",
+              "Augmentin",
+              "Co-amoxiclav",
+              "Piperacillin",
+              "Dicloxacillin",
+              "Cloxacillin",
+              "เพนิซิลลิน",
+              "แอมพิซิลลิน"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Shared core penicilloyl / penicillenate antigenic determinants from the beta-lactam and thiazolidine rings across all Penicillin-class antibiotics.",
+            "action": "ห้ามใช้ในผู้ป่วยที่มีประวัติแพ้ยากลุ่ม Penicillin (Same-Class Allergy)",
+            "reference": "AAAAI/ACAAI Drug Allergy Practice Parameter 2022; Lexicomp 2024"
+          },
+          {
+            "match_type": "cross_reactivity",
+            "allergen_group": "Aminocephalosporins with Identical/Similar R1 Side Chain",
+            "cross_reactive_agents": [
+              "Cephalexin",
+              "Cefalexin",
+              "Keflex",
+              "Cefadroxil",
+              "Duricef",
+              "Cefaclor",
+              "Cefprozil",
+              "เซฟาเลกซิน",
+              "เซฟาดร็อกซิล"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Cross-reactive IgE or T-cell recognition driven by identical/structurally homologous R1 aminobenzyl / para-hydroxybenzyl side chains between Amoxicillin/Ampicillin and first/second-generation aminocephalosporins.",
+            "action": "หลีกเลี่ยงการใช้ในผู้ป่วยที่มีประวัติแพ้ Cephalexin, Cefadroxil, Cefaclor หรือ Cefprozil (R1 Side-Chain Cross-Reactivity)",
+            "reference": "The Sanford Guide to Antimicrobial Therapy 2024, Table 8B; AAAAI/ACAAI Drug Allergy Practice Parameter 2022"
+          }
+        ],
+        "drug_interactions": [
+          {
+            "interacting_drug": "Methotrexate",
+            "interacting_drug_aliases": [
+              "Methotrexate",
+              "MTX",
+              "Trexall",
+              "เมโธเทรกเซท"
+            ],
+            "interacting_rxnorm_id": "6851",
+            "severity": "Major",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating D / Major for High-Dose MTX)",
+            "mechanism": "ยากลุ่ม Penicillins แย่งจับตัวขนส่ง Organic Anion Transporters (OAT1/OAT3) ที่ท่อไตส่วนต้น ทำให้ลดการขับออกของ Methotrexate ทางไต",
+            "clinical_effect": "ระดับยา Methotrexate ในเลือดสูงขึ้น เสี่ยงต่อภาวะไขกระดูกถูกกด (Myelosuppression) และเยื่อบุทางเดินอาหารอักเสบรุนแรง",
+            "management": "หลีกเลี่ยงการใช้ร่วมกันโดยเฉพาะกรณีได้ Methotrexate ขนาดสูง หากจำเป็นต้องใช้ร่วมกันให้ตรวจติดตามระดับยา Methotrexate และเม็ดเลือดอย่างใกล้ชิด",
+            "reference": "Lexicomp Drug Interactions 2024; Goodman & Gilman, 14th Edition, Chapter 61"
+          },
+          {
+            "interacting_drug": "Warfarin",
+            "interacting_drug_aliases": [
+              "Warfarin",
+              "Marevan",
+              "Orfarin",
+              "Coumadin",
+              "วาร์ฟาริน",
+              "มาเรแวน"
+            ],
+            "interacting_rxnorm_id": "11289",
+            "severity": "Moderate",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating C: Monitor Therapy)",
+            "mechanism": "เปลี่ยนแปลงสมดุลแบคทีเรียในลำไส้ที่สร้าง Vitamin K และอาจรบกวนกระบวนการแข็งตัวของเลือด",
+            "clinical_effect": "ค่า INR สูงขึ้น เพิ่มความเสี่ยงต่อภาวะเลือดออก (Elevated INR & bleeding risk)",
+            "management": "ตรวจติดตามค่า INR ภายใน 3-5 วันหลังเริ่มให้ยา Amoxicillin ร่วมกับ Warfarin",
+            "reference": "The Sanford Guide to Antimicrobial Therapy, 54th Edition (2024)"
+          },
+          {
+            "interacting_drug": "Allopurinol",
+            "interacting_drug_aliases": [
+              "Allopurinol",
+              "Zyloric",
+              "Puride",
+              "อัลโลพิวรินอล"
+            ],
+            "interacting_rxnorm_id": "519",
+            "severity": "Moderate",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating C: Monitor Therapy)",
+            "mechanism": "กลไกทางภูมิคุ้มกันร่วมกันที่ยังไม่ทราบแน่ชัด (Synergistic T-cell / hyperuricemia-associated cutaneous reactivity)",
+            "clinical_effect": "เพิ่มอุบัติการณ์การเกิดผื่นผิวหนังชนิด Maculopapular rash สูงขึ้นอย่างมีนัยสำคัญ",
+            "management": "เฝ้าระวังผื่นแพ้ยาทางผิวหนังอย่างใกล้ชิด และแยกแยะจากภาวะแพ้ยาชนิดรุนแรง (DRESS/SJS)",
+            "reference": "The Harriet Lane Handbook, 23rd Edition, Page 685"
+          }
+        ]
+      },
+      "verification_metadata": {
+        "verified_status": "PENDING_HUMAN_VERIFICATION",
+        "source_verified": false,
+        "verified_by": null,
+        "verified_date": null,
+        "source_name": "The Sanford Guide to Antimicrobial Therapy & The Harriet Lane Handbook",
+        "edition_and_page": "Sanford Guide 54th Edition (2024), Page 218 & Harriet Lane 23rd Edition (2023), Page 684-685 (Pending Pharmacist Page Verification)",
+        "reference_url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=amoxicillin",
+        "evidence_image_path": "assets/evidence/amoxicillin_sanford_2024_p218.png",
+        "verified_by_role": "Awaiting Clinical Pharmacist / Faculty Sign-Off",
+        "last_verified_date": "2026-10-17"
+      }
+    },
+    {
+      "drug_info": {
+        "drug_id": "ibuprofen_oral_susp",
+        "generic_name": "Ibuprofen",
+        "synonyms": [
+          "Ibuprofen",
+          "Brufen",
+          "Nurofen",
+          "Advil",
+          "Isobutylphenylpropionic acid",
+          "ไอบูโพรเฟน",
+          "บรูเฟน"
+        ],
+        "rxnorm_id": "5640",
+        "therapeutic_class": "Nonsteroidal Anti-Inflammatory Drug (NSAID - Propionic Acid Derivative)",
+        "dosage_form": "Oral Suspension",
+        "strength_label": "100 mg / 5 mL",
+        "concentration_mg_per_ml": 20.0,
+        "dispensing_unit": "mL"
+      },
+      "dosing_rules": {
+        "indication": "Fever and mild-to-moderate pain / inflammation (Age >= 6 months)",
+        "patient_criteria": {
+          "min_age_months": 6,
+          "max_age_years": 18,
+          "min_weight_kg": 5.0
+        },
+        "formula_type": "mg_per_kg_per_dose",
+        "dose_range": {
+          "min_mg_per_kg_per_dose": 5.0,
+          "recommended_mg_per_kg_per_dose": 10.0,
+          "max_mg_per_kg_per_dose": 10.0
+        },
+        "frequency_hours": "q6-8h PRN",
+        "max_doses_per_day": 4,
+        "max_single_dose_mg": 400.0,
+        "max_daily_dose_mg": 2400.0,
+        "max_daily_dose_mg_per_kg": 40.0,
+        "non_blocking_overdose_policy": true,
+        "renal_adjustment": [
+          {
+            "crcl_min_ml_min": 0.0,
+            "crcl_max_ml_min": 30.0,
+            "adjusted_interval": "Avoid / Contraindicated",
+            "adjusted_doses_per_day": 4,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": true,
+            "clinical_note": "หลีกเลี่ยงการใช้ NSAIDs ตามแนวทาง KDIGO เนื่องจากยับยั้ง Prostaglandin เสี่ยงต่อภาวะไตวายเฉียบพลัน (0.0 <= CrCl < 30.0 mL/min) — แสดงตัวเลขโดสตามนโยบาย Non-Blocking พร้อมป้ายเตือนสีแดง Avoid"
+          },
+          {
+            "crcl_min_ml_min": 30.0,
+            "crcl_max_ml_min": 60.0,
+            "adjusted_interval": "q8h PRN (Lowest effective dose)",
+            "adjusted_doses_per_day": 3,
+            "dose_adjustment_factor": 0.5,
+            "is_contraindicated": false,
+            "clinical_note": "ลดขนาดยาลง 50% ใช้ในระยะสั้นที่สุดและติดตามค่าการทำงานของไตอย่างใกล้ชิด (30.0 <= CrCl < 60.0 mL/min)"
+          },
+          {
+            "crcl_min_ml_min": 60.0,
+            "crcl_max_ml_min": 999.0,
+            "adjusted_interval": "q6-8h PRN",
+            "adjusted_doses_per_day": 4,
+            "dose_adjustment_factor": 1.0,
+            "is_contraindicated": false,
+            "clinical_note": "ไม่ต้องปรับขนาดยา ให้หลังอาหารทันทีและระวังในผู้ป่วยที่มีภาวะขาดน้ำ (CrCl >= 60.0 mL/min)"
+          }
+        ]
+      },
+      "safety_checks": {
+        "allergy_cross_reactivity": [
+          {
+            "match_type": "synonym",
+            "allergen_group": "Identical Active Ingredient (Ibuprofen Synonyms)",
+            "cross_reactive_agents": [
+              "Ibuprofen",
+              "Brufen",
+              "Nurofen",
+              "Advil",
+              "ไอบูโพรเฟน",
+              "บรูเฟน"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Direct IgE or COX-1 hypersensitivity to the identical Ibuprofen molecule.",
+            "action": "ห้ามใช้ยานี้เนื่องจากเป็นตัวยาสำคัญชนิดเดียวกันกับที่ผู้ป่วยแพ้ (Synonym Match)",
+            "reference": "Lexicomp Drug Information Handbook 2024"
+          },
+          {
+            "match_type": "same_class",
+            "allergen_group": "Propionic Acid Derivative NSAIDs (Same Chemical Subclass)",
+            "cross_reactive_agents": [
+              "Naproxen",
+              "Naprosyn",
+              "Ketoprofen",
+              "Flurbiprofen",
+              "Fenoprofen",
+              "Oxaprozin",
+              "นาพรอกเซน"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Shared propionic acid arylalkanoic chemical structure (T-cell / IgE cross-recognition) as well as shared COX-1 enzyme inhibition.",
+            "action": "ห้ามใช้ Ibuprofen ในผู้ป่วยที่แพ้ยากลุ่ม Propionic acid NSAIDs (เช่น Naproxen, Ketoprofen)",
+            "reference": "EAACI/ENDA Classification of NSAID Hypersensitivity; Lexicomp 2024"
+          },
+          {
+            "match_type": "cross_reactivity",
+            "allergen_group": "Non-Selective COX-1 Inhibiting NSAIDs & Salicylates (Cross-Intolerance)",
+            "cross_reactive_agents": [
+              "Aspirin",
+              "ASA",
+              "Acetylsalicylic acid",
+              "Aspent",
+              "Diclofenac",
+              "Voltaren",
+              "Indomethacin",
+              "Piroxicam",
+              "Meloxicam",
+              "Mefenamic acid",
+              "Ponstan",
+              "Ketorolac",
+              "แอสไพริน",
+              "ไดโคลฟีแนค"
+            ],
+            "risk_level": "Contraindicated",
+            "mechanism": "Pharmacological inhibition of COX-1 shifts arachidonic acid metabolism toward cysteinyl leukotriene overproduction (LTC4/LTD4/LTE4), triggering bronchospasm (AERD), urticaria, or angioedema across structurally unrelated COX-1 inhibitors.",
+            "action": "ห้ามใช้ Ibuprofen ในผู้ป่วยที่มีประวัติแพ้ Aspirin หรือยากลุ่ม NSAIDs แบบ Cross-intolerance (หอบหืดกำเริบ ลมพิษ หรือตาบวมปากบวม)",
+            "reference": "EAACI Position Paper on NSAIDs Hypersensitivity; The Harriet Lane Handbook, 23rd Edition, Page 815"
+          }
+        ],
+        "drug_interactions": [
+          {
+            "interacting_drug": "Warfarin",
+            "interacting_drug_aliases": [
+              "Warfarin",
+              "Marevan",
+              "Orfarin",
+              "Coumadin",
+              "วาร์ฟาริน",
+              "มาเรแวน"
+            ],
+            "interacting_rxnorm_id": "11289",
+            "severity": "Major",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating D: Consider Therapy Modification)",
+            "mechanism": "ยับยั้งการทำงานของเกล็ดเลือดผ่าน COX-1 และระคายเคืองเยื่อบุกระเพาะอาหาร เสริมฤทธิ์ต้านการแข็งตัวของเลือดของ Warfarin",
+            "clinical_effect": "เพิ่มความเสี่ยงต่อภาวะเลือดออกในทางเดินอาหารอย่างรุนแรง (Severe GI hemorrhage)",
+            "management": "หลีกเลี่ยงการใช้ Ibuprofen ร่วมกับ Warfarin แนะนำให้ใช้ Paracetamol แทนเพื่อลดไข้/แก้ปวด",
+            "reference": "CHEST Antithrombotic Therapy Guidelines; Lexicomp Drug Interactions 2024"
+          },
+          {
+            "interacting_drug": "Enalapril",
+            "interacting_drug_aliases": [
+              "Enalapril",
+              "Renitec",
+              "Anapril",
+              "อีนาลาพริล"
+            ],
+            "interacting_rxnorm_id": "3827",
+            "severity": "Moderate",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating C: Monitor Therapy)",
+            "mechanism": "NSAIDs ยับยั้งการสร้าง Prostaglandin ทำให้หลอดเลือดแดงขาเข้าไต (Afferent arteriole) หดตัว ขณะที่ ACEI (Enalapril) ขยายหลอดเลือดแดงขาออกไต (Efferent arteriole) ทำให้ความดันกรองในโกลเมอรูลัสลดลง",
+            "clinical_effect": "ลดประสิทธิภาพการลดความดันโลหิต และเพิ่มความเสี่ยงภาวะไตวายเฉียบพลัน (Acute Kidney Injury) โดยเฉพาะเมื่อมีภาวะขาดน้ำ",
+            "management": "ติดตามค่าความดันโลหิต การทำงานของไต (Serum Creatinine, eGFR) และดูแลภาวะสารน้ำให้เพียงพอ",
+            "reference": "Lexicomp Drug Interactions 2024; KDIGO 2024 Clinical Practice Guideline for CKD"
+          },
+          {
+            "interacting_drug": "Aspirin",
+            "interacting_drug_aliases": [
+              "Aspirin",
+              "ASA",
+              "Acetylsalicylic acid",
+              "Aspent",
+              "Cardiprin",
+              "แอสไพริน"
+            ],
+            "interacting_rxnorm_id": "1191",
+            "severity": "Major",
+            "database_source": "Lexicomp Drug Interactions (Risk Rating D) & US FDA Safety Communication",
+            "mechanism": "Ibuprofen แย่งจับแบบชั่วคราวที่ตำแหน่ง Serine-529 บนเอนไซม์ COX-1 ของเกล็ดเลือด ขัดขวางไม่ให้ Aspirin เข้าจับแบบถาวร (Irreversible acetylation) และยังถือเป็นการใช้ NSAIDs ซ้ำซ้อน",
+            "clinical_effect": "ลดฤทธิ์ต้านเกล็ดเลือดเพื่อป้องกันโรคหัวใจและหลอดเลือดของ Aspirin และเพิ่มความเสี่ยงแผลทะลุ/เลือดออกในกระเพาะอาหาร",
+            "management": "หลีกเลี่ยงการใช้ร่วมกัน หากจำเป็นต้องรับประทานต้องให้ Aspirin (Immediate-release) ก่อน Ibuprofen อย่างน้อย 30 นาที หรือหลัง Ibuprofen อย่างน้อย 8 ชั่วโมง",
+            "reference": "US FDA Drug Safety Communication: Concomitant Use of Ibuprofen and Aspirin; DiPiro's Pharmacotherapy, 12th Edition"
+          }
+        ]
+      },
+      "verification_metadata": {
+        "verified_status": "PENDING_HUMAN_VERIFICATION",
+        "source_verified": false,
+        "verified_by": null,
+        "verified_date": null,
+        "source_name": "The Harriet Lane Handbook & KDIGO Clinical Practice Guideline for CKD",
+        "edition_and_page": "Harriet Lane 23rd Edition (2023), Page 815 & KDIGO 2024 CKD Guideline, Chapter 4 (Pending Pharmacist Page Verification)",
+        "reference_url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=ibuprofen",
+        "evidence_image_path": "assets/evidence/ibuprofen_harriet_lane_p815.png",
+        "verified_by_role": "Awaiting Clinical Pharmacist / Faculty Sign-Off",
+        "last_verified_date": "2026-10-17"
+      }
+    }
+  ]
+}
