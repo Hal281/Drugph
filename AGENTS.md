@@ -49,5 +49,14 @@
 ## 3. เอกสารอ้างอิงเพิ่มเติมในโปรเจกต์
 หากมีข้อสงสัยหรือต้องการตรวจสอบรายละเอียดเชิงลึก ให้ศึกษาเอกสารในโฟลเดอร์ `docs/`:
 * [`docs/PROJECT_GUIDELINES.md`](file:///c:/Users/turbo/drugforPh/docs/PROJECT_GUIDELINES.md) — คู่มือแนวทางระบบเชิงละเอียด (Clinical & Engineering Charter)
+* [`docs/VERIFICATION_PROTOCOL.md`](file:///c:/Users/turbo/drugforPh/docs/VERIFICATION_PROTOCOL.md) — ระเบียบปฏิบัติการตรวจรับรองข้อมูลและสูตรคำนวณยาทางคลินิก
 * [`docs/01-charter/charter.md`](file:///c:/Users/turbo/drugforPh/docs/01-charter/charter.md) — ปัญหาจริงและ Root Cause Analysis
 * [`DECISIONS.md`](file:///c:/Users/turbo/drugforPh/DECISIONS.md) — บันทึกการตัดสินใจทางคลินิกและสถาปัตยกรรม
+
+---
+
+## 4. ระเบียบปฏิบัติการตรวจรับรองข้อมูลยา (Clinical Verification Protocol)
+1. **แหล่งอ้างอิงมาตรฐาน:** ข้อมูลยาทุกตัวต้องอ้างอิงจาก 7 ตำรามาตรฐานที่แพทย์และเภสัชกรไทยใช้จริง (The Sanford Guide 2024, Lexicomp 2024, คู่มือปรับยาโรคไตสมาคมโรคไตไทย, แนวทางสมาคมโรคติดเชื้อไทย IDAT, บัญชียาหลักแห่งชาติ/RDU Thailand, คู่มือยาฉีดรามาธิบดี/ศิริราช, DiPiro)
+2. **การแสดงผล Monograph:** หน้าจอคำนวณยาต้องเชื่อมต่อกับ `ClinicalEvidenceSheet` เพื่อให้แพทย์/เภสัชกรสามารถเปิดดูข้อมูลตำราของยานั้น ๆ ได้ทันที
+3. **การสร้างเอกสารให้เภสัชกรตรวจ:** ใช้คำสั่ง `dart run tool/generate_pharmacist_dossier_pdf.dart` เพื่อส่งออกเอกสาร `review/Clinical_Verification_Dossier.pdf` (พร้อมช่องลงนาม ภก. และ ว.)
+

@@ -1,0 +1,479 @@
+import '../../core/models/models.dart';
+
+/// Dermatology, Ophthalmology, ENT, and Topical drugs.
+final List<Drug> topical = [
+  const Drug(
+    id: 'silver_sulfadiazine',
+    genericName: 'Silver Sulfadiazine 1% Cream',
+    brandNames: ['Silvadene', 'Flamazine'],
+    nameTh: 'ซิลเวอร์ซัลฟาไดอะซีน ครีม',
+    category: DrugCategory.antibiotic,
+    allergyClass: 'Sulfonamide (Sulfa)',
+    contraindications: ['Premature infants', 'Newborns <2 months', 'Pregnancy at term'],
+    specialNotes: 'Apply to clean wound 1-2 times daily with sterile gloves. Transient leukopenia may occur.',
+    specialNotesTh: 'ทาบนแผลที่ทำความสะอาดแล้ว วันละ 1-2 ครั้ง ต้องสวมถุงมือปลอดเชื้อ อาจทำให้เม็ดเลือดขาวต่ำชั่วคราว',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.topical,
+        indication: 'Burns / Wound Infection',
+        dosingType: DosingType.fixed,
+        fixedDose: 1.0, // apply thin layer
+        doseUnit: DoseUnit.application,
+        frequency: Frequency(minIntervalHours: 12, maxIntervalHours: 24, displayEn: 'q12-24h', displayTh: 'ทุก 12-24 ชม.'),
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'mupirocin',
+    genericName: 'Mupirocin 2% Ointment',
+    brandNames: ['Bactroban'],
+    nameTh: 'มิวพิโรซิน',
+    category: DrugCategory.antibiotic,
+    specialNotes: 'Effective against MRSA skin infections. Apply thin layer to affected area TID for 5-14 days.',
+    specialNotesTh: 'ยาฆ่า MRSA ทาผิวหนัง ทาบางๆ วันละ 3 ครั้ง ติดต่อกัน 5-14 วัน',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.topical,
+        indication: 'Impetigo / MRSA Skin Infection',
+        dosingType: DosingType.fixed,
+        fixedDose: 1.0,
+        doseUnit: DoseUnit.application,
+        frequency: Frequency.q8h,
+      ),
+    ],
+  ),
+];
+
+/// Hematology & Anticoagulant drugs.
+final List<Drug> anticoagulants = [
+  const Drug(
+    id: 'warfarin',
+    genericName: 'Warfarin',
+    brandNames: ['Coumadin', 'Orfarin'],
+    nameTh: 'วาร์ฟาริน',
+    category: DrugCategory.cardiovascular,
+    isHighAlert: true,
+    requiresTDM: true, // INR monitoring
+    requiresHepaticCaution: true,
+    allergyClass: 'Coumarin',
+    drugClass: DrugClass.anticoagulantVka,
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'ibuprofen',
+        targetClass: DrugClass.nsaid,
+        severity: InteractionSeverity.major,
+        mechanismEn:
+            'NSAIDs inhibit platelet function and cause GI mucosal injury, synergistically increasing major bleeding risk with Warfarin.',
+        mechanismTh:
+            'ยากลุ่ม NSAIDs ยับยั้งการทำงานของเกล็ดเลือดและระคายเคืองกระเพาะอาหาร เพิ่มความเสี่ยงเลือดออกรุนแรงร่วมกับ Warfarin',
+        managementEn:
+            'Avoid concomitant NSAID use. Consider alternative analgesia (e.g. Paracetamol) and monitor INR closely.',
+        managementTh:
+            'หลีกเลี่ยงการใช้ร่วมกับ NSAIDs พิจารณาใช้ยาแก้ปวดตัวอื่น (เช่น พาราเซตามอล) และติดตามค่า INR อย่างใกล้ชิด',
+        source: 'AHFS Drug Information 2024',
+      ),
+    ],
+    severeInteractions: [
+      'NSAIDs (Increased bleeding risk)',
+      'Metronidazole (Increases INR significantly)',
+      'Antibiotics (Many alter INR - monitor closely)',
+      'Vitamin K-rich foods (Decreases effect)'
+    ],
+    contraindications: [
+      'Active bleeding',
+      'Pregnancy (Teratogenic)',
+      'Severe hepatic disease',
+      'Unsupervised patients'
+    ],
+    specialNotes: 'Narrow therapeutic index. Target INR 2.0-3.0 for most indications. Vitamin K is antidote.',
+    specialNotesTh: 'ยาละลายลิ่มเลือดที่ต้องเจาะเลือดดู INR (เป้าหมาย 2.0-3.0) กินวิตามิน K เป็นยาแก้พิษ ห้ามกินกับผักใบเขียวมากเกินไป',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Anticoagulation (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 5.0, // Initial 5 mg, then adjust by INR
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        limits: DoseLimit(maxDailyDose: 15.0), // Rarely >10mg/day
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'enoxaparin',
+    genericName: 'Enoxaparin',
+    brandNames: ['Clexane', 'Lovenox'],
+    nameTh: 'อีน็อกซาพาริน',
+    category: DrugCategory.cardiovascular,
+    isHighAlert: true,
+    requiresRenalAdjustment: true,
+    allergyClass: 'Heparin / LMWH',
+    severeInteractions: [
+      'Antiplatelet agents (Increased bleeding)',
+      'NSAIDs (Increased bleeding)'
+    ],
+    contraindications: [
+      'Active major bleeding',
+      'History of heparin-induced thrombocytopenia (HIT)',
+      'Severe thrombocytopenia'
+    ],
+    specialNotes: 'Subcutaneous injection in abdominal wall. Do NOT massage injection site. Anti-Xa monitoring in renal impairment.',
+    specialNotesTh: 'ฉีดใต้ผิวหนังบริเวณหน้าท้อง ห้ามนวดตำแหน่งที่ฉีด ต้องเจาะ Anti-Xa ในคนไข้ไตเสื่อม',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.sc,
+        indication: 'DVT/PE Treatment (Adult)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 1.0, // 1 mg/kg q12h
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        limits: DoseLimit(maxSingleDose: 100.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: 'Use 1 mg/kg q24h in CrCl < 30 mL/min'),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.sc,
+        indication: 'DVT Prophylaxis (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 40.0, // 40 mg SC q24h
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, absoluteDose: 30.0, adjustedFrequency: Frequency.q24h, notes: 'Use 30 mg q24h'),
+        ],
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'heparin',
+    genericName: 'Unfractionated Heparin (UFH)',
+    brandNames: ['Heparin'],
+    nameTh: 'เฮปาริน',
+    category: DrugCategory.cardiovascular,
+    isHighAlert: true,
+    requiresTDM: true, // aPTT monitoring
+    severeInteractions: [
+      'Antiplatelet agents (Increased bleeding)',
+      'NSAIDs (Increased bleeding)'
+    ],
+    contraindications: [
+      'Active bleeding',
+      'HIT (Heparin-Induced Thrombocytopenia)',
+      'Severe thrombocytopenia'
+    ],
+    specialNotes: 'Monitor aPTT every 6 hours. Target aPTT 1.5-2.5x normal. Protamine sulfate is the antidote.',
+    specialNotesTh: 'ต้องเจาะ aPTT ทุก 6 ชม. (เป้าหมาย 1.5-2.5 เท่าของค่าปกติ) ยาแก้พิษคือ Protamine sulfate',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Anticoagulation (Adult)',
+        dosingType: DosingType.titrated,
+        doseUnit: DoseUnit.units,
+        frequency: Frequency.continuous,
+        continuousRateMin: 18.0,
+        continuousRateMax: 18.0,
+        continuousRateUnit: 'units/kg/hr',
+        rateUnit: RateUnit.uKgHr,
+        standardDilutionMgPerMl: 100.0, // 25,000 units in 250 mL = 100 units/mL
+        phases: [
+          DosingPhase(
+            type: PhaseType.bolus,
+            role: DoseRole.start,
+            nameEn: 'Initial IV Bolus',
+            nameTh: 'ฉีดเข้าหลอดเลือดดำทันที (Bolus)',
+            dosePerKg: 80.0,
+            doseUnit: DoseUnit.units,
+            instructionsEn: '80 units/kg IV bolus (max 4,000-5,000 units)',
+            instructionsTh: '80 ยูนิต/กก. ฉีดเข้าหลอดเลือดดำทันที (สูงสุด 4,000-5,000 ยูนิต)',
+          ),
+          DosingPhase(
+            type: PhaseType.infusion,
+            role: DoseRole.usual,
+            nameEn: 'Continuous Infusion',
+            nameTh: 'หยดเข้าหลอดเลือดดำต่อเนื่อง (Infusion)',
+            rate: 18.0,
+            rateUnit: RateUnit.uKgHr,
+            instructionsEn: '18 units/kg/hr continuous infusion, titrated to target aPTT',
+            instructionsTh: '18 ยูนิต/กก./ชม. หยดเข้าหลอดเลือดดำต่อเนื่อง ปรับตามระดับ aPTT',
+          ),
+        ],
+      ),
+    ],
+  ),
+  Drug(
+    id: 'apixaban',
+    genericName: 'Apixaban',
+    brandNames: ['Eliquis'],
+    nameTh: 'อะพิกซาแบน (ยาละลายลิ่มเลือด)',
+    category: DrugCategory.cardiovascular,
+    requiresRenalAdjustment: true,
+    isHighAlert: true,
+    severeInteractions: [
+      'Strong CYP3A4 inhibitors (Ketoconazole, Itraconazole, Ritonavir)',
+      'Strong CYP3A4 inducers (Rifampin, Phenytoin)',
+      'NSAIDs (Bleeding risk)'
+    ],
+    contraindications: ['Active pathological bleeding', 'Severe hepatic impairment (Child-Pugh C)'],
+    specialNotes: 'Dose reduction to 2.5 mg BID required if 2 of 3 criteria met: Age >= 80, Weight <= 60 kg, or SCr >= 1.5 mg/dL.',
+    specialNotesTh: 'ยารักษาลิ่มเลือดอุดตัน (DOAC) ต้องลดโดสเหลือ 2.5 mg BID หากเข้าเกณฑ์ 2 ใน 3 ข้อนี้: (1) อายุ 80 ขึ้นไป (2) น้ำหนักตัว 60 กก. ลงมา (3) SCr >= 1.5',
+    doseRules: [
+      DoseRule(
+        id: 'apixaban_2_of_3_criteria',
+        name: 'Apixaban 2-of-3 Dose Reduction Criteria (AFib)',
+        sourceCitation: 'FDA Eliquis (apixaban) Prescribing Information §2.1; 2023 AHA/ACC/ACCP/NLA AFib Guidelines',
+        verificationStatus: VerificationStatus.verified,
+        applies: (ctx) {
+          final ind = ctx.regimen.indication?.toLowerCase() ?? '';
+          return RegExp(r'\bafib\b|atrial fibrillation|\bnvaf\b').hasMatch(ind);
+        },
+        evaluate: (ctx) {
+          final p = ctx.patient;
+          int criteriaCount = 0;
+          if (p.ageYears >= 80) criteriaCount++;
+          if (p.weightKg <= 60.0) criteriaCount++;
+          final warnings = <DoseWarning>[];
+          if (p.serumCreatinineMgDl != null) {
+            if (p.serumCreatinineMgDl! >= 1.5) criteriaCount++;
+          } else {
+            warnings.add(
+              const DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.scrMissing,
+                messageEn:
+                    'Serum creatinine is missing: Apixaban 2-of-3 dose reduction criteria cannot be fully evaluated.',
+                messageTh:
+                    'ไม่มีค่า Serum Creatinine: ไม่สามารถประเมินเกณฑ์การปรับลดขนาดยา Apixaban 2 ใน 3 ข้อได้อย่างสมบูรณ์',
+              ),
+            );
+          }
+
+          if (criteriaCount >= 2) {
+            warnings.add(
+              const DoseWarning(
+                severity: LimitSeverity.info,
+                code: DoseWarningCode.renalAdjustmentApplied,
+                messageEn:
+                    'Apixaban dose reduced to 2.5 mg BID (meets ≥2 criteria: Age ≥80, Weight ≤60 kg, SCr ≥1.5 mg/dL).',
+                messageTh:
+                    'ปรับลดขนาดยา Apixaban เป็น 2.5 mg วันละ 2 ครั้ง (เข้าเกณฑ์ ≥2 ข้อ: อายุ ≥80, นน. ≤60 กก., SCr ≥1.5 mg/dL)',
+              ),
+            );
+            return DoseRuleResult(
+              modifiedDose: 2.5,
+              modifiedFrequency: Frequency.q12h,
+              isDoseModified: true,
+              isRenallyAdjusted: false,
+              modificationReasonEn:
+                  'Apixaban dose reduced to 2.5 mg BID (meets ≥2 criteria: Age ≥80, Weight ≤60 kg, SCr ≥1.5 mg/dL).',
+              modificationReasonTh:
+                  'ปรับลดขนาดยา Apixaban เป็น 2.5 mg วันละ 2 ครั้ง (เข้าเกณฑ์ ≥2 ข้อ: อายุ ≥80, นน. ≤60 กก., SCr ≥1.5 mg/dL)',
+              warnings: warnings,
+            );
+          }
+
+          return DoseRuleResult(warnings: warnings);
+        },
+      ),
+    ],
+    regimens: [
+      const DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'AFib (Stroke Prophylaxis)',
+        dosingType: DosingType.fixed,
+        fixedDose: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        limits: DoseLimit(maxDailyDose: 10.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.avoid, notes: 'Avoid in severe renal impairment (CrCl < 15 mL/min)'),
+        ],
+      ),
+      const DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'DVT/PE Treatment',
+        dosingType: DosingType.fixed,
+        fixedDose: 10.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        limits: DoseLimit(maxDailyDose: 20.0),
+        phases: [
+          DosingPhase(
+            type: PhaseType.loading,
+            role: DoseRole.start,
+            nameEn: 'Initial Treatment (Days 1-7)',
+            nameTh: 'ระยะเริ่มต้น (วันที่ 1-7)',
+            dose: 10.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            durationDays: 7,
+            instructionsEn: '10 mg PO BID for 7 days',
+            instructionsTh: '10 มก. รับประทานวันละ 2 ครั้ง เป็นเวลา 7 วัน',
+          ),
+          DosingPhase(
+            type: PhaseType.maintenance,
+            role: DoseRole.usual,
+            nameEn: 'Maintenance (After Day 7)',
+            nameTh: 'ขนาดยาต่อเนื่อง (หลังวันที่ 7)',
+            dose: 5.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            instructionsEn: '5 mg PO BID thereafter',
+            instructionsTh: '5 มก. รับประทานวันละ 2 ครั้ง ต่อเนื่อง',
+          ),
+        ],
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 15,
+            action: RenalAction.avoid,
+            notes: 'Avoid in severe renal impairment (CrCl < 15 mL/min)',
+          ),
+        ],
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'rivaroxaban',
+    genericName: 'Rivaroxaban',
+    brandNames: ['Xarelto'],
+    nameTh: 'ริวาร็อกซาแบน (ยาละลายลิ่มเลือด)',
+    category: DrugCategory.cardiovascular,
+    requiresRenalAdjustment: true,
+    isHighAlert: true,
+    severeInteractions: [
+      'Strong CYP3A4 inhibitors & P-gp inhibitors',
+      'NSAIDs (Bleeding risk)'
+    ],
+    specialNotes: 'For doses >= 15 mg, must be taken WITH FOOD to ensure adequate absorption. Avoid if CrCl < 15.',
+    specialNotesTh: 'ถ้ารับประทานขนาด 15 mg หรือ 20 mg ต้องกิน "พร้อมอาหาร" เท่านั้นเพื่อการดูดซึมยา หลีกเลี่ยงถ้าไตวาย (CrCl < 15)',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'AFib (Stroke Prophylaxis)',
+        dosingType: DosingType.fixed,
+        fixedDose: 20.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        limits: DoseLimit(maxDailyDose: 20.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 15, crclMax: 50, action: RenalAction.adjust, absoluteDose: 15.0, adjustedFrequency: Frequency.q24h, notes: 'Reduce to 15 mg OD'),
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.avoid, notes: 'Avoid use in severe renal impairment (CrCl < 15 mL/min)'),
+        ],
+      ),
+    ],
+  ),
+];
+
+/// Vitamins, Supplements, and Electrolyte Replacements.
+final List<Drug> supplements = [
+  const Drug(
+    id: 'potassium_chloride',
+    genericName: 'Potassium Chloride (KCl)',
+    brandNames: ['KCl', 'K-Lor'],
+    nameTh: 'โพแทสเซียม คลอไรด์',
+    category: DrugCategory.supplement,
+    isHighAlert: true, // Concentrated KCl is high alert
+    severeInteractions: [
+      'ACE Inhibitors / ARBs (Hyperkalemia)',
+      'Potassium-sparing Diuretics (Hyperkalemia)'
+    ],
+    contraindications: ['Hyperkalemia', 'Severe renal impairment with oliguria'],
+    specialNotes: 'NEVER give undiluted IV push (cardiac arrest risk). Max IV rate: 10 mEq/hr via peripheral, 20 mEq/hr via central.',
+    specialNotesTh: 'ห้ามฉีด IV Push เด็ดขาด (หัวใจหยุดเต้น) อัตราหยดสูงสุด: 10 mEq/hr ทาง peripheral, 20 mEq/hr ทาง central line',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Hypokalemia Replacement (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 20.0, // 20-40 mEq
+        doseUnit: DoseUnit.mEq,
+        frequency: Frequency(minIntervalHours: 8, maxIntervalHours: 12, displayEn: 'q8-12h', displayTh: 'ทุก 8-12 ชม.'),
+        limits: DoseLimit(maxDailyDose: 200.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Severe Hypokalemia (Adult IV)',
+        dosingType: DosingType.fixed,
+        fixedDose: 20.0, // 20 mEq in 100mL over 1-2hr
+        doseUnit: DoseUnit.mEq,
+        frequency: Frequency(
+          displayEn: 'Over 1-2 hours',
+          displayTh: 'ให้ใน 1-2 ชม.',
+          customReason: 'ICU central line infusion over 1-2 hours',
+        ),
+        limits: DoseLimit(maxInfusionRate: 10.0, infusionRateUnit: 'mEq/hr'),
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'calcium_gluconate',
+    genericName: 'Calcium Gluconate',
+    brandNames: ['Calcium Gluconate'],
+    nameTh: 'แคลเซียม กลูโคเนต',
+    category: DrugCategory.supplement,
+    isHighAlert: true,
+    severeInteractions: [
+      'Digoxin (Increases toxicity - give slowly with ECG)',
+      'Ceftriaxone IV (Precipitation in neonates - CONTRAINDICATED in neonates)'
+    ],
+    specialNotes: 'Give slowly IV over 5-10 min. Monitor heart rate. Extravasation causes tissue necrosis.',
+    specialNotesTh: 'ฉีด IV ช้าๆ ใน 5-10 นาที ดูจอมอนิเตอร์หัวใจ ถ้ายารั่วซึมนอกหลอดเลือดจะทำให้เนื้อเยื่อตาย',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.ivPush,
+        indication: 'Hyperkalemia / Hypocalcemia (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 1000.0, // 1g (10mL of 10%)
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency(
+          displayEn: 'Over 5-10 min',
+          displayTh: 'ให้ใน 5-10 นาที (ซ้ำได้)',
+          customReason: 'Slow IV push over 5-10 minutes under cardiac monitoring',
+        ),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivPush,
+        indication: 'Hyperkalemia / Hypocalcemia (Pediatric)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 60.0, // 60-100 mg/kg slow IV
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency(
+          displayEn: 'Over 5-10 min',
+          displayTh: 'ให้ใน 5-10 นาที',
+          customReason: 'Slow IV push over 5-10 minutes under cardiac monitoring',
+        ),
+        limits: DoseLimit(maxSingleDose: 3000.0),
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'vitamin_k',
+    genericName: 'Phytonadione (Vitamin K1)',
+    brandNames: ['Konakion'],
+    nameTh: 'วิตามินเค (ไฟโตนาไดโอน)',
+    category: DrugCategory.supplement,
+    allergyClass: 'Vitamin K',
+    specialNotes: 'Antidote for warfarin overdose. SC or slow IV (risk of anaphylactoid reaction with IV). Takes 6-24h for effect.',
+    specialNotesTh: 'ยาแก้พิษวาร์ฟาริน ควรฉีดใต้ผิวหนังหรือ IV ช้าๆ ออกฤทธิ์ใน 6-24 ชม.',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Warfarin Reversal / Major Bleeding (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 10.0, // 10 mg slow IV
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.stat,
+        infusionTimeMinutes: 30,
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Supratherapeutic INR (No bleeding)',
+        dosingType: DosingType.fixed,
+        fixedDose: 2.5, // 2.5-5 mg PO
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.once,
+      ),
+    ],
+  ),
+];

@@ -9,3 +9,5 @@
 3. **Strict Evidence:** อ้างอิงตำราแพทย์/เภสัชกรรมระดับสากลเท่านั้น (Lexicomp, Sanford Guide, Goodman & Gilman, WHO, US FDA) ห้ามกุข้อมูล
 4. **Therapeutic Duplication:** ห้ามจ่ายยาซ้ำซ้อน ทั้งตัวยาเดิมและยาในกลุ่มเดียวกันที่เป็นข้อห้ามใช้ทางการแพทย์ (Dual NSAIDs, Dual RAS blockade, Dual anticoagulants, Dual statins)
 5. **Non-Blocking Overdose Policy:** อนุญาตให้คำนวณ Overdose ได้เพื่อช่วยคนไข้ในภาวะฉุกเฉิน ห้ามบล็อกหรือซ่อนตัวเลขโดสยา แต่ต้องแสดงคำเตือนสีแดงเด่นชัดเสมอ
+6. **Clinical Monograph & Verification:** หน้าคำนวณต้องเปิดดูข้อมูลยาในตำราได้ผ่าน `ClinicalEvidenceSheet` และเอกสารรับรองสำหรับเภสัชกร/อาจารย์แพทย์สร้างด้วย `dart run tool/generate_pharmacist_dossier_pdf.dart` ตาม [docs/VERIFICATION_PROTOCOL.md](file:///c:/Users/turbo/drugforPh/docs/VERIFICATION_PROTOCOL.md)
+

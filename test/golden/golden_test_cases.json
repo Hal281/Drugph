@@ -1,0 +1,759 @@
+{
+  "dataset_version": "1.2.0",
+  "rounding_policy": "ROUND_HALF_AWAY_FROM_ZERO",
+  "float_comparison_tolerance": 1e-6,
+  "non_blocking_policy": "UNIFIED_NON_BLOCKING (Overdose, Renal Contraindication 'Avoid', and Allergies NEVER zero out or hide calculated doses/volumes; they attach explicit flags and red alerts)",
+  "verification_policy": "A test case may only be moved to test_group='verified_golden' with source_verified=true AFTER a licensed pharmacist or faculty member physically inspects the cited textbook page and records verified_by and verified_date (YYYY-MM-DD).",
+  "cases": [
+    {
+      "case_id": "G-01",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "บัญชียาหลักแห่งชาติ (Thai National Formulary) & The Harriet Lane Handbook",
+        "edition": "Harriet Lane 23rd Edition (2023)",
+        "page": "Acetaminophen Formulary Monograph (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Paracetamol standard pediatric dosing (15 kg, 4 yr, pediatric Schwartz eGFR 90 mL/min/1.73m²)",
+      "input": {
+        "drug_id": "paracetamol_oral_susp",
+        "weight_kg": 15.0,
+        "age_years": 4.0,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 225.0,
+        "raw_calculated_daily_dose_mg": 1125.0,
+        "final_recommended_single_dose_mg": 225.0,
+        "final_recommended_daily_dose_mg": 1125.0,
+        "exact_volume_ml": 9.375,
+        "practical_volume_ml": 9.4,
+        "actual_delivered_single_dose_mg": 225.6,
+        "rounding_discrepancy_mg": 0.6,
+        "rounding_discrepancy_percent": 0.2666666667,
+        "recommended_frequency": "q4-6h",
+        "doses_per_day": 5,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": []
+      }
+    },
+    {
+      "case_id": "G-02",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "บัญชียาหลักแห่งชาติ (Thai National Formulary) & US FDA Acetaminophen Label",
+        "edition": "2024 Revision",
+        "page": "Acetaminophen Adult Dosing & Maximum Daily Limit Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Paracetamol adult ceiling overdose (80 kg -> raw 1,200 mg capped to 1,000 mg; doses/day reduced from 5 to 4 so 1,000 mg × 4 = 4,000 mg/day; volume 41.7 mL requires Graduated Medication Cup)",
+      "input": {
+        "drug_id": "paracetamol_oral_susp",
+        "weight_kg": 80.0,
+        "age_years": 25.0,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "crcl_cockcroft_gault_ml_min",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 1200.0,
+        "raw_calculated_daily_dose_mg": 6000.0,
+        "final_recommended_single_dose_mg": 1000.0,
+        "final_recommended_daily_dose_mg": 4000.0,
+        "exact_volume_ml": 41.6666666667,
+        "practical_volume_ml": 41.7,
+        "actual_delivered_single_dose_mg": 1000.8,
+        "rounding_discrepancy_mg": 0.8,
+        "rounding_discrepancy_percent": 0.08,
+        "recommended_frequency": "q4-6h (สูงสุดไม่เกิน 4 มื้อ/วัน)",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "Graduated Medication Cup",
+        "is_single_dose_capped_at_max": true,
+        "is_daily_dose_capped_at_max": true,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "overdoseWarning",
+            "severity": "criticalOverdose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-03",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Harriet Lane Handbook & คู่มือปรับยาโรคไตสมาคมโรคไตแห่งประเทศไทย",
+        "edition": "23rd Edition (Pending Pharmacist Verification)",
+        "page": "Drugs in Renal Failure — Acetaminophen Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Paracetamol renal boundary CrCl = 9.99 mL/min (< 10.0 mL/min -> q8h, 3 doses/day)",
+      "input": {
+        "drug_id": "paracetamol_oral_susp",
+        "weight_kg": 16.0,
+        "age_years": 5.0,
+        "crcl_ml_min": 9.99,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 240.0,
+        "raw_calculated_daily_dose_mg": 1200.0,
+        "final_recommended_single_dose_mg": 240.0,
+        "final_recommended_daily_dose_mg": 720.0,
+        "exact_volume_ml": 10.0,
+        "practical_volume_ml": 10.0,
+        "actual_delivered_single_dose_mg": 240.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q8h",
+        "doses_per_day": 3,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "renalAdjustment",
+            "severity": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-04",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "Lexicomp Drug Information & Interactions Handbook",
+        "edition": "2024 Edition",
+        "page": "Acetaminophen Monograph (Pending Human Page Verification)",
+        "interaction_database": "Lexicomp Drug Interactions 2024"
+      },
+      "description": "Paracetamol Synonym Match ('  ACETAMINOPHEN ' -> allergySynonymMatch, non-blocking dose 300 mg shown) + Warfarin DDI (Moderate)",
+      "input": {
+        "drug_id": "paracetamol_oral_susp",
+        "weight_kg": 20.0,
+        "age_years": 6.0,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [
+          "  ACETAMINOPHEN "
+        ],
+        "allergy_assessment_status": "hasAllergies",
+        "concomitant_medications": [
+          "warfarin"
+        ]
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 300.0,
+        "raw_calculated_daily_dose_mg": 1500.0,
+        "final_recommended_single_dose_mg": 300.0,
+        "final_recommended_daily_dose_mg": 1500.0,
+        "exact_volume_ml": 12.5,
+        "practical_volume_ml": 12.5,
+        "actual_delivered_single_dose_mg": 300.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q4-6h",
+        "doses_per_day": 5,
+        "dispensing_device_contains": "20 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": true,
+        "has_drug_interaction_alert": true,
+        "expected_alerts": [
+          {
+            "type": "allergySynonymMatch",
+            "severity": "contraindicated"
+          },
+          {
+            "type": "drugInteraction",
+            "severity": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-05",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "บัญชียาหลักแห่งชาติ & The Harriet Lane Handbook",
+        "edition": "23rd Edition (2023)",
+        "page": "Amoxicillin Formulary Monograph (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Amoxicillin mg_per_kg_per_day formula (20 kg × 45 mg/kg/day = 900 mg/day ÷ 3 doses = 300 mg/dose = 6.0 mL)",
+      "input": {
+        "drug_id": "amoxicillin_oral_susp",
+        "weight_kg": 20.0,
+        "age_years": 6.0,
+        "crcl_ml_min": 95.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 300.0,
+        "raw_calculated_daily_dose_mg": 900.0,
+        "final_recommended_single_dose_mg": 300.0,
+        "final_recommended_daily_dose_mg": 900.0,
+        "exact_volume_ml": 6.0,
+        "practical_volume_ml": 6.0,
+        "actual_delivered_single_dose_mg": 300.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q8h",
+        "doses_per_day": 3,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": []
+      }
+    },
+    {
+      "case_id": "G-06",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "บัญชียาหลักแห่งชาติ & The Harriet Lane Handbook",
+        "edition": "23rd Edition (2023)",
+        "page": "Amoxicillin Pediatric Dosing 40-45 mg/kg/day Divided q8h (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Amoxicillin repeating decimal (10 kg × 40 mg/kg/day ÷ 3 = 133.333333 mg -> exact 2.666667 mL -> practical 2.7 mL = 135.0 mg delivered, +1.25% discrepancy)",
+      "input": {
+        "drug_id": "amoxicillin_oral_susp",
+        "weight_kg": 10.0,
+        "age_years": 1.5,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "custom_dose_rate_mg_per_kg": 40.0,
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 133.3333333333,
+        "raw_calculated_daily_dose_mg": 400.0,
+        "final_recommended_single_dose_mg": 133.3333333333,
+        "final_recommended_daily_dose_mg": 400.0,
+        "exact_volume_ml": 2.6666666667,
+        "practical_volume_ml": 2.7,
+        "actual_delivered_single_dose_mg": 135.0,
+        "rounding_discrepancy_mg": 1.6666666667,
+        "rounding_discrepancy_percent": 1.25,
+        "recommended_frequency": "q8h",
+        "doses_per_day": 3,
+        "dispensing_device_contains": "5 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": []
+      }
+    },
+    {
+      "case_id": "G-07",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Sanford Guide to Antimicrobial Therapy",
+        "edition": "54th Edition (2024)",
+        "page": "Amoxicillin Dosing & Adult Ceiling Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Amoxicillin overweight adolescent/adult (75 kg -> raw 1,125 mg/dose & 3,375 mg/day capped at 1,000 mg/dose & 3,000 mg/day)",
+      "input": {
+        "drug_id": "amoxicillin_oral_susp",
+        "weight_kg": 75.0,
+        "age_years": 17.0,
+        "crcl_ml_min": 95.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 1125.0,
+        "raw_calculated_daily_dose_mg": 3375.0,
+        "final_recommended_single_dose_mg": 1000.0,
+        "final_recommended_daily_dose_mg": 3000.0,
+        "exact_volume_ml": 20.0,
+        "practical_volume_ml": 20.0,
+        "actual_delivered_single_dose_mg": 1000.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q8h",
+        "doses_per_day": 3,
+        "dispensing_device_contains": "20 mL Oral Syringe",
+        "is_single_dose_capped_at_max": true,
+        "is_daily_dose_capped_at_max": true,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "overdoseWarning",
+            "severity": "criticalOverdose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-08",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Sanford Guide to Antimicrobial Therapy",
+        "edition": "54th Edition (2024)",
+        "page": "Table 17A Renal Impairment Dosing — Amoxicillin (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Amoxicillin renal impairment CrCl = 29.99 mL/min ([10.0, 30.0) extends interval to q12h / 2 doses per day WITHOUT double-reducing single dose)",
+      "input": {
+        "drug_id": "amoxicillin_oral_susp",
+        "weight_kg": 20.0,
+        "age_years": 6.0,
+        "crcl_ml_min": 29.99,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 300.0,
+        "raw_calculated_daily_dose_mg": 900.0,
+        "final_recommended_single_dose_mg": 300.0,
+        "final_recommended_daily_dose_mg": 600.0,
+        "exact_volume_ml": 6.0,
+        "practical_volume_ml": 6.0,
+        "actual_delivered_single_dose_mg": 300.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q12h",
+        "doses_per_day": 2,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "renalAdjustment",
+            "severity": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-09",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Sanford Guide 2024 Table 8B & Lexicomp Drug Interactions",
+        "edition": "2024 Edition",
+        "page": "Table 8B Beta-Lactam Allergy & Methotrexate DDI (Pending Human Page Verification)",
+        "interaction_database": "Lexicomp Drug Interactions 2024"
+      },
+      "description": "Amoxicillin with 'penicillin v' (allergySameClass) AND 'CEPHALEXIN' (allergyCrossReactivity via R1 side chain) + Methotrexate DDI (Major)",
+      "input": {
+        "drug_id": "amoxicillin_oral_susp",
+        "weight_kg": 18.0,
+        "age_years": 5.0,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [
+          "penicillin v",
+          "CEPHALEXIN"
+        ],
+        "allergy_assessment_status": "hasAllergies",
+        "concomitant_medications": [
+          "Methotrexate"
+        ]
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 270.0,
+        "raw_calculated_daily_dose_mg": 810.0,
+        "final_recommended_single_dose_mg": 270.0,
+        "final_recommended_daily_dose_mg": 810.0,
+        "exact_volume_ml": 5.4,
+        "practical_volume_ml": 5.4,
+        "actual_delivered_single_dose_mg": 270.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q8h",
+        "doses_per_day": 3,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": true,
+        "has_drug_interaction_alert": true,
+        "expected_alerts": [
+          {
+            "type": "allergySameClass",
+            "severity": "contraindicated"
+          },
+          {
+            "type": "allergyCrossReactivity",
+            "severity": "contraindicated"
+          },
+          {
+            "type": "drugInteraction",
+            "severity": "major"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-10",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "บัญชียาหลักแห่งชาติ & The Harriet Lane Handbook",
+        "edition": "23rd Edition (2023)",
+        "page": "Ibuprofen Formulary Monograph (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Ibuprofen standard pediatric dosing (15 kg, 3 yr -> 150 mg = 7.5 mL)",
+      "input": {
+        "drug_id": "ibuprofen_oral_susp",
+        "weight_kg": 15.0,
+        "age_years": 3.0,
+        "crcl_ml_min": 95.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 150.0,
+        "raw_calculated_daily_dose_mg": 600.0,
+        "final_recommended_single_dose_mg": 150.0,
+        "final_recommended_daily_dose_mg": 600.0,
+        "exact_volume_ml": 7.5,
+        "practical_volume_ml": 7.5,
+        "actual_delivered_single_dose_mg": 150.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q6-8h PRN",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": []
+      }
+    },
+    {
+      "case_id": "G-11",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Harriet Lane Handbook",
+        "edition": "23rd Edition (2023)",
+        "page": "Ibuprofen Pediatric Ceiling Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Ibuprofen single-dose ceiling cap (55 kg -> raw 550 mg capped at 400 mg = 20.0 mL)",
+      "input": {
+        "drug_id": "ibuprofen_oral_susp",
+        "weight_kg": 55.0,
+        "age_years": 14.0,
+        "crcl_ml_min": 95.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 550.0,
+        "raw_calculated_daily_dose_mg": 2200.0,
+        "final_recommended_single_dose_mg": 400.0,
+        "final_recommended_daily_dose_mg": 1600.0,
+        "exact_volume_ml": 20.0,
+        "practical_volume_ml": 20.0,
+        "actual_delivered_single_dose_mg": 400.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q6-8h PRN",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "20 mL Oral Syringe",
+        "is_single_dose_capped_at_max": true,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "overdoseWarning",
+            "severity": "criticalOverdose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-12",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "KDIGO Clinical Practice Guideline for CKD",
+        "edition": "2024 Guideline",
+        "page": "Chapter 4 Medication Management in CKD (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Ibuprofen with severe renal impairment (eGFR 29.99 < 30.0) — Unified Non-Blocking Policy preserves 200 mg / 10 mL alongside red Contraindicated 'Avoid' alert",
+      "input": {
+        "drug_id": "ibuprofen_oral_susp",
+        "weight_kg": 20.0,
+        "age_years": 7.0,
+        "crcl_ml_min": 29.99,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 200.0,
+        "raw_calculated_daily_dose_mg": 800.0,
+        "final_recommended_single_dose_mg": 200.0,
+        "final_recommended_daily_dose_mg": 800.0,
+        "exact_volume_ml": 10.0,
+        "practical_volume_ml": 10.0,
+        "actual_delivered_single_dose_mg": 200.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "Avoid / Contraindicated",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": true,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "renalAdjustment",
+            "severity": "contraindicated"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-13",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "EAACI NSAID Hypersensitivity & Lexicomp Drug Interactions",
+        "edition": "2024 Edition",
+        "page": "Ibuprofen Cross-Reactivity & DDI Section (Pending Human Page Verification)",
+        "interaction_database": "Lexicomp Drug Interactions 2024"
+      },
+      "description": "Ibuprofen with 'Aspirin' allergy (allergyCrossReactivity) + 'ENALAPRIL' (Moderate DDI) + 'warfarin' (Major DDI)",
+      "input": {
+        "drug_id": "ibuprofen_oral_susp",
+        "weight_kg": 20.0,
+        "age_years": 7.0,
+        "crcl_ml_min": 90.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [
+          "Aspirin"
+        ],
+        "allergy_assessment_status": "hasAllergies",
+        "concomitant_medications": [
+          "ENALAPRIL",
+          "warfarin"
+        ]
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 200.0,
+        "raw_calculated_daily_dose_mg": 800.0,
+        "final_recommended_single_dose_mg": 200.0,
+        "final_recommended_daily_dose_mg": 800.0,
+        "exact_volume_ml": 10.0,
+        "practical_volume_ml": 10.0,
+        "actual_delivered_single_dose_mg": 200.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q6-8h PRN",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "10 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": true,
+        "has_drug_interaction_alert": true,
+        "expected_alerts": [
+          {
+            "type": "allergyCrossReactivity",
+            "severity": "contraindicated"
+          },
+          {
+            "type": "drugInteraction",
+            "severity": "major"
+          },
+          {
+            "type": "drugInteraction",
+            "severity": "moderate"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-14",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "US FDA & Thai National Formulary Acetaminophen Daily Ceiling",
+        "edition": "2024 Revision",
+        "page": "Acetaminophen Maximum Daily Dose Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Single dose safe (60 kg × 15 mg/kg = 900 mg <= 1,000 mg), but 5 doses/day = 4,500 mg/day exceeds 4,000 mg/day Max Daily Dose -> reduces doses_per_day to floor(4000/900) = 4 doses/day = 3,600 mg/day",
+      "input": {
+        "drug_id": "paracetamol_oral_susp",
+        "weight_kg": 60.0,
+        "age_years": 16.0,
+        "crcl_ml_min": 95.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 900.0,
+        "raw_calculated_daily_dose_mg": 4500.0,
+        "final_recommended_single_dose_mg": 900.0,
+        "final_recommended_daily_dose_mg": 3600.0,
+        "exact_volume_ml": 37.5,
+        "practical_volume_ml": 37.5,
+        "actual_delivered_single_dose_mg": 900.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q4-6h (สูงสุดไม่เกิน 4 มื้อ/วัน)",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "Graduated Medication Cup",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": true,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "overdoseWarning",
+            "severity": "criticalOverdose"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "G-15",
+      "test_group": "regression_only",
+      "source_verified": false,
+      "verified_by": null,
+      "verified_date": null,
+      "source": {
+        "source_name": "The Harriet Lane Handbook & US FDA Pediatric Ibuprofen Labeling",
+        "edition": "23rd Edition (2023)",
+        "page": "Ibuprofen Pediatric Minimum Age Section (Pending Human Page Verification)",
+        "interaction_database": null
+      },
+      "description": "Ibuprofen in 3-month-old infant (ageYears = 0.25 < 6 months minimum criteria) triggers patientCriteriaWarning (contraindicated)",
+      "input": {
+        "drug_id": "ibuprofen_oral_susp",
+        "weight_kg": 6.0,
+        "age_years": 0.25,
+        "crcl_ml_min": 80.0,
+        "renal_metric_type": "eGFR_schwartz_ml_min_1_73m2",
+        "allergies": [],
+        "allergy_assessment_status": "nkdaConfirmed",
+        "concomitant_medications": []
+      },
+      "expected": {
+        "raw_calculated_single_dose_mg": 60.0,
+        "raw_calculated_daily_dose_mg": 240.0,
+        "final_recommended_single_dose_mg": 60.0,
+        "final_recommended_daily_dose_mg": 240.0,
+        "exact_volume_ml": 3.0,
+        "practical_volume_ml": 3.0,
+        "actual_delivered_single_dose_mg": 60.0,
+        "rounding_discrepancy_mg": 0.0,
+        "rounding_discrepancy_percent": 0.0,
+        "recommended_frequency": "q6-8h PRN",
+        "doses_per_day": 4,
+        "dispensing_device_contains": "5 mL Oral Syringe",
+        "is_single_dose_capped_at_max": false,
+        "is_daily_dose_capped_at_max": false,
+        "is_renally_contraindicated": false,
+        "has_allergy_alert": false,
+        "has_drug_interaction_alert": false,
+        "expected_alerts": [
+          {
+            "type": "patientCriteriaWarning",
+            "severity": "contraindicated"
+          }
+        ]
+      }
+    }
+  ]
+}
