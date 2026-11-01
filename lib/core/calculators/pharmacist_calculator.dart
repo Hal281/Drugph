@@ -44,6 +44,7 @@ class PharmacistCalculator {
           reasonEn: errEn,
           reasonTh: errTh,
           formulaUsed: 'Input Validation',
+          renalReplacementMode: patient.renalReplacementMode,
           warnings: [
             DoseWarning(
               severity: LimitSeverity.hard,
@@ -76,16 +77,17 @@ class PharmacistCalculator {
             reasonEn: hardPopWarning.messageEn,
             reasonTh: hardPopWarning.messageTh,
             formulaUsed: 'Population Criteria Check',
+            renalReplacementMode: patient.renalReplacementMode,
             warnings: warnings,
           );
         }
       }
 
-      final hasExplicitAgeCriteria = regimen.population?.minAgeMonths != null ||
-          regimen.population?.maxAgeMonths != null;
+      final hasExplicitMinAge = regimen.population?.minAgeMonths != null;
+      final hasExplicitMaxAge = regimen.population?.maxAgeMonths != null;
       final isChild = patient.ageYears < 18;
 
-      if (!hasExplicitAgeCriteria &&
+      if (!hasExplicitMinAge &&
           regimen.effectiveAudience == RegimenAudience.adult &&
           isChild) {
         return DosageResult.failure(
@@ -93,6 +95,7 @@ class PharmacistCalculator {
               'Pediatric patients (< 18 years) are not supported by this adult dosing regimen.',
           reasonTh:
               'สูตรยานี้สำหรับผู้ใหญ่ ไม่รองรับผู้ป่วยเด็ก (อายุ < 18 ปี)',
+          renalReplacementMode: patient.renalReplacementMode,
           warnings: const [
             DoseWarning(
               severity: LimitSeverity.hard,
@@ -105,7 +108,7 @@ class PharmacistCalculator {
         );
       }
 
-      if (!hasExplicitAgeCriteria &&
+      if (!hasExplicitMaxAge &&
           regimen.effectiveAudience == RegimenAudience.pediatric &&
           !isChild) {
         return DosageResult.failure(
@@ -113,6 +116,7 @@ class PharmacistCalculator {
               'Adult patients (≥ 18 years) cannot be dosed using a pediatric-only regimen.',
           reasonTh:
               'ผู้ป่วยผู้ใหญ่ (อายุ ≥ 18 ปี) ไม่สามารถใช้สูตรยาเฉพาะสำหรับเด็กได้',
+          renalReplacementMode: patient.renalReplacementMode,
           warnings: const [
             DoseWarning(
               severity: LimitSeverity.hard,
@@ -349,9 +353,80 @@ class PharmacistCalculator {
         }
       }
 
-      // --- 5. Renal Function Evaluation & Database Review Check (D5, D6, A5, A11) ---
+      // --- 5. Renal Function Evaluation & Database Review Check (D5, D6, A5, A11, M1) ---
       double? crcl;
-      if (!patient.isScrStable) {
+      final bool isPatientOnRrt = patient.renalReplacementMode.isRrt;
+      final rrtProtocol = isPatientOnRrt
+          ? regimen.rrtProtocolFor(patient.renalReplacementMode)
+          : null;
+
+      if (isPatientOnRrt) {
+        if (rrtProtocol != null) {
+          // Explicit RRT protocol is defined. Cockcroft-Gault / SCr check is bypassed.
+        } else {
+          // Safe Clinical Fallback for Unmapped Drugs on RRT:
+          if (patient.renalReplacementMode == RenalReplacementMode.crrt) {
+            // CRRT continuous effluent clearance equivalent (25.0 mL/min) to prevent fatal sepsis underdosing
+            crcl = 25.0;
+            warnings.add(
+              DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.rrtFallbackAdvisory,
+                messageEn:
+                    'CRRT SEPSIS PROTECTION ADVISORY: Patient is on Continuous Renal Replacement Therapy (CRRT), '
+                    'but no drug-specific CRRT protocol is defined. Dosing evaluated using continuous effluent '
+                    'equivalent (CrCl 25.0 mL/min) to prevent fatal antimicrobial underdosing. '
+                    'Drug-specific CRRT protocol is pending; therapeutic drug monitoring (TDM) and clinical pharmacist review are strongly recommended.',
+                messageTh:
+                    'คำแนะนำป้องกันการได้รับยาต่ำเกินไปในผู้ป่วย CRRT: ผู้ป่วยได้รับการบำบัดทดแทนไตต่อเนื่อง (CRRT) '
+                    'แต่ยังไม่มีเกณฑ์ CRRT เฉพาะของยานี้ในระบบ ระบบคำนวณตามอัตราการกำจัดของเสียต่อเนื่องเทียบเท่า '
+                    'CrCl 25.0 มล./นาที เพื่อป้องกันการได้รับยาฆ่าเชื้อต่ำเกินไปในภาวะติดเชื้อรุนแรง '
+                    'แนะนำให้ตรวจวัดระดับยาในเลือด (TDM) และให้เภสัชกรคลินิกประเมินซ้ำ',
+                calculatedValue: crcl,
+                clinicalAlternativesEn: const [
+                  'TDM Monitoring: Order peak and trough levels to guide empiric CRRT titration.',
+                  'Clinical Pharmacist Consult: Request manual Sanford/Lexicomp Table 10B review for specific filter clearance.',
+                ],
+                clinicalAlternativesTh: const [
+                  'ตรวจวัดระดับยา (TDM): ส่งตรวจระดับยาสูงสุดและต่ำสุดเพื่อปรับขนาดยาตามตัวกรอง CRRT',
+                  'ปรึกษาเภสัชกรคลินิก: ตรวจสอบคู่มือ Sanford/Lexicomp ตาราง 10B ตามชนิดของตัวกรองและอัตราไหล',
+                ],
+              ),
+            );
+          } else {
+            // IHD and CAPD severe renal impairment equivalent (5.0 mL/min)
+            crcl = 5.0;
+            final isIhd = patient.renalReplacementMode == RenalReplacementMode.ihd;
+            warnings.add(
+              DoseWarning(
+                severity: LimitSeverity.soft,
+                code: DoseWarningCode.rrtFallbackAdvisory,
+                messageEn:
+                    'RRT FALLBACK ADVISORY: Patient is on ${patient.renalReplacementMode.labelEn}, '
+                    'but no drug-specific RRT protocol is defined. Dosing evaluated at severe impairment baseline '
+                    '(CrCl 5.0 mL/min). Clinical pharmacist verification of dialyzability and '
+                    '${isIhd ? "Post-HD supplemental dosing" : "peritoneal clearance"} is advised.',
+                messageTh:
+                    'คำแนะนำ RRT สำรอง: ผู้ป่วยอยู่ในโหมด ${patient.renalReplacementMode.labelTh} '
+                    'แต่ยังไม่มีตาราง RRT เฉพาะของยานี้ในระบบ ระบบคำนวณตามเกณฑ์ไตบกพร่องรุนแรง (CrCl 5.0 มล./นาที) '
+                    'แนะนำให้เภสัชกรคลินิกตรวจสอบความสามารถในการกรองผ่านตัวกรอง (dialyzability) และ'
+                    '${isIhd ? "การให้ยาเสริมหลังฟอกเลือด (Post-HD)" : "การขับออกทางช่องท้อง"}',
+                calculatedValue: crcl,
+                clinicalAlternativesEn: [
+                  if (isIhd)
+                    'Post-HD Dosing: Verify if drug is dialyzable; if dialyzable (>30%), administer dose post-dialysis on dialysis days.',
+                  'Consult Nephrology Formulary: Review specialized dialysis dosing references.',
+                ],
+                clinicalAlternativesTh: [
+                  if (isIhd)
+                    'การให้ยาหลังฟอกไต: ตรวจสอบการผ่านตัวกรอง หากถูกขับออก >30% ให้บริหารยาหลังฟอกเสร็จสิ้นในวันที่ฟอกเลือด',
+                  'ตรวจสอบคู่มือโรคไต: ตรวจสอบตารางการปรับยาในผู้ป่วยฟอกไตเฉพาะทาง',
+                ],
+              ),
+            );
+          }
+        }
+      } else if (!patient.isScrStable) {
         warnings.add(
           const DoseWarning(
             severity: LimitSeverity.hard,
@@ -468,6 +543,7 @@ class PharmacistCalculator {
       if (drug.requiresRenalAdjustment &&
           regimen.dosingType != DosingType.gfrBased &&
           drug.renalReviewStatus != RenalReviewStatus.notApplicable &&
+          (!isPatientOnRrt || rrtProtocol == null) &&
           (regimen.renalAdjustments == null || regimen.renalAdjustments!.isEmpty)) {
         final isKnownLowCrCl = crcl != null && crcl < 50.0;
         final crclSuffixEn =
@@ -585,6 +661,7 @@ class PharmacistCalculator {
                   'Calvert formula requires CrCl / GFR. Please provide SCr.',
               reasonTh: 'สูตร Calvert ต้องใช้ค่า CrCl / GFR กรุณาระบุค่า SCr',
               formulaUsed: 'Calvert Formula',
+              renalReplacementMode: patient.renalReplacementMode,
               warnings: const [
                 DoseWarning(
                   severity: LimitSeverity.hard,
@@ -631,6 +708,7 @@ class PharmacistCalculator {
               reasonEn: 'Renal-adjusted regimen has no base dose configured.',
               reasonTh: 'สูตรยาแบบปรับตามไตไม่ได้กำหนดขนาดยาเริ่มต้น',
               formulaUsed: 'Renal-adjusted',
+              renalReplacementMode: patient.renalReplacementMode,
             );
           }
           break;
@@ -707,19 +785,88 @@ class PharmacistCalculator {
         ));
       }
 
-      // --- 9. Automated Renal Adjustment & Half-Open Range Tiers (D5) ---
+      // --- 9. Automated Renal Adjustment & RRT Protocols (D5, M1) ---
       double finalDose = dose;
       Frequency finalFrequency = regimen.frequency;
       bool isRenallyAdjusted = false;
       double? appliedRenalFactor;
       String? renalNotesEn;
       String? renalNotesTh;
+      bool requiresPostHdSupplement = false;
+      String? rrtInstructionEn;
+      String? rrtInstructionTh;
 
-      // Do NOT apply secondary renal factor to Calvert (GFR-based) or titrated
-      if (regimen.dosingType != DosingType.gfrBased &&
-          regimen.dosingType != DosingType.titrated &&
+      if (rrtProtocol != null) {
+        // --- 9A. Explicit RRT Protocol ---
+        if (rrtProtocol.action == RenalAction.avoid ||
+            rrtProtocol.action == RenalAction.contraindicated) {
+          final noteEn = rrtProtocol.clinicalInstructionEn ??
+              'CONTRAINDICATED in ${patient.renalReplacementMode.labelEn}.';
+          final noteTh = rrtProtocol.clinicalInstructionTh ??
+              'ข้อห้ามใช้เด็ดขาดในผู้ป่วย ${patient.renalReplacementMode.labelTh}';
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.hard,
+            code: DoseWarningCode.contraindicationAlert,
+            messageEn: noteEn,
+            messageTh: noteTh,
+          ));
+          return DosageResult.failure(
+            reasonEn: noteEn,
+            reasonTh: noteTh,
+            formulaUsed: 'RRT Protocol (${patient.renalReplacementMode.badgeEn})',
+            renalReplacementMode: patient.renalReplacementMode,
+            requiresPostHdSupplement: rrtProtocol.requiresPostHdSupplement,
+            warnings: warnings,
+          );
+        }
+
+        if (rrtProtocol.action == RenalAction.monitorOnly) {
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.info,
+            code: DoseWarningCode.renalAdjustmentApplied,
+            messageEn: rrtProtocol.clinicalInstructionEn ?? 'Monitor clinical response closely.',
+            messageTh: rrtProtocol.clinicalInstructionTh ?? 'ติดตามผลการรักษาอย่างใกล้ชิด',
+          ));
+        } else if (rrtProtocol.action == RenalAction.adjust) {
+          if (rrtProtocol.specificDose != null) {
+            finalDose = rrtProtocol.specificDose!;
+            isRenallyAdjusted = true;
+          } else if (rrtProtocol.doseFactor != null && rrtProtocol.doseFactor! < 1.0) {
+            finalDose = finalDose * rrtProtocol.doseFactor!;
+            isRenallyAdjusted = true;
+            appliedRenalFactor = rrtProtocol.doseFactor;
+          }
+
+          if (rrtProtocol.frequency != null) {
+            finalFrequency = rrtProtocol.frequency!;
+            isRenallyAdjusted = true;
+          }
+
+          requiresPostHdSupplement = rrtProtocol.requiresPostHdSupplement;
+          rrtInstructionEn = rrtProtocol.clinicalInstructionEn;
+          rrtInstructionTh = rrtProtocol.clinicalInstructionTh;
+          renalNotesEn = rrtProtocol.clinicalInstructionEn;
+          renalNotesTh = rrtProtocol.clinicalInstructionTh;
+
+          warnings.add(
+            DoseWarning(
+              severity: LimitSeverity.info,
+              code: DoseWarningCode.renalAdjustmentApplied,
+              messageEn:
+                  'RRT Protocol (${patient.renalReplacementMode.badgeEn}) applied: '
+                  '${rrtProtocol.clinicalInstructionEn ?? "Dosing per protocol"}.'
+                  '${requiresPostHdSupplement ? " Post-HD supplemental dosing required." : ""}',
+              messageTh:
+                  'ปรับขนาดยาตามแนวทาง RRT (${patient.renalReplacementMode.badgeTh}): '
+                  '${rrtProtocol.clinicalInstructionTh ?? "ขนาดยาตามเกณฑ์การบำบัดทดแทนไต"}'
+                  '${requiresPostHdSupplement ? " ต้องบริหารยาเสริมหลังฟอกเลือด (Post-HD)" : ""}',
+            ),
+          );
+        }
+      } else if (regimen.dosingType != DosingType.gfrBased &&
           crcl != null &&
           regimen.renalAdjustments != null) {
+        // --- 9B. Standard Renal Tiers (and Unmapped RRT Fallback) ---
         for (final adj in regimen.renalAdjustments!) {
           if (adj.appliesTo(crcl)) {
             // Check for Hard Contraindication / Avoid Action (D5)
@@ -740,6 +887,8 @@ class PharmacistCalculator {
                 reasonTh: noteTh,
                 formulaUsed: formulaUsed,
                 crclMlMin: crcl,
+                renalReplacementMode: patient.renalReplacementMode,
+                requiresPostHdSupplement: patient.renalReplacementMode == RenalReplacementMode.ihd,
                 warnings: warnings,
               );
             }
@@ -771,7 +920,11 @@ class PharmacistCalculator {
 
               final doseChanged = finalDose != dose;
               final freqChanged = finalFrequency != regimen.frequency;
-              if (doseChanged || freqChanged) {
+              final titratedRateScaled =
+                  regimen.dosingType == DosingType.titrated &&
+                      appliedRenalFactor != null &&
+                      appliedRenalFactor < 1.0;
+              if (doseChanged || freqChanged || titratedRateScaled) {
                 warnings.add(
                   DoseWarning(
                     severity: LimitSeverity.info,
@@ -787,6 +940,10 @@ class PharmacistCalculator {
             break; // Stop at first matching tier
           }
         }
+      }
+
+      if (rrtProtocol == null && patient.renalReplacementMode == RenalReplacementMode.ihd) {
+        requiresPostHdSupplement = true;
       }
 
       // --- 9.5 Declarative Dose Rules (F6) ---
@@ -841,10 +998,15 @@ class PharmacistCalculator {
       // --- 10. Continuous Infusion & Titrated Regimens (D2) ---
       InfusionResult? infusionResult;
       if (regimen.dosingType == DosingType.titrated) {
-        final rate = regimen.continuousRateMin ?? 0.0;
+        final renalScale = (appliedRenalFactor != null &&
+                appliedRenalFactor > 0 &&
+                appliedRenalFactor < 1.0)
+            ? appliedRenalFactor
+            : 1.0;
+        final rate = (regimen.continuousRateMin ?? 0.0) * renalScale;
         final rateMax = (regimen.continuousRateMax != null &&
-                regimen.continuousRateMax! > rate)
-            ? regimen.continuousRateMax
+                regimen.continuousRateMax! * renalScale > rate)
+            ? regimen.continuousRateMax! * renalScale
             : null;
         // No silent default: an unknown/missing unit throws and is reported
         // as a calculation error (unit confusion is a dosing-error hazard).
@@ -903,6 +1065,12 @@ class PharmacistCalculator {
         final dPerDay = finalFrequency.dosesPerDay;
         if (dPerDay != null && dPerDay > 0) {
           dailyDose = finalDose * dPerDay;
+        } else if (isDailyBasis &&
+            !finalFrequency.isPrn &&
+            baseDose > 0 &&
+            !isRenallyAdjusted &&
+            !isDoseModified) {
+          dailyDose = baseDose;
         } else {
           warnings.add(
             const DoseWarning(
@@ -985,7 +1153,9 @@ class PharmacistCalculator {
         }
       }
 
-      if (regimen.maxInfusionRateMgPerMin != null && finalDose > 0) {
+      if (regimen.maxInfusionRateMgPerMin != null &&
+          regimen.maxInfusionRateMgPerMin! > 0 &&
+          finalDose > 0) {
         if (infusionDurationMinutes != null && infusionDurationMinutes > 0) {
           final actualRateMgPerMin = doseMg / infusionDurationMinutes;
           warnings.addAll(
@@ -1030,7 +1200,7 @@ class PharmacistCalculator {
         );
       }
 
-      // --- 14. Audit Inputs Snapshot (B2) ---
+      // --- 14. Audit Inputs Snapshot (B2, M1) ---
       final auditInputs = <String, dynamic>{
         'patientId': patient.id,
         'weightKg': patient.weightKg,
@@ -1040,6 +1210,8 @@ class PharmacistCalculator {
         'serumCreatinineMgDl': patient.serumCreatinineMgDl,
         'creatinineClearanceMlMin': crcl,
         'isScrStable': patient.isScrStable,
+        'renalReplacementMode': patient.renalReplacementMode.badgeEn,
+        'requiresPostHdSupplement': requiresPostHdSupplement,
         'dosingWeightUsedKg': weightForDosing,
         'weightStrategy': weightStrategyUsed,
         'route': regimen.route.abbreviation,
@@ -1070,12 +1242,20 @@ class PharmacistCalculator {
         isDoseModified: isDoseModified,
         doseModificationReason: doseModificationReason,
         renalAdjustmentFactor: appliedRenalFactor,
+        adjustedFrequency:
+            (isRenallyAdjusted && finalFrequency != regimen.frequency)
+                ? finalFrequency.displayEn
+                : null,
         renalNotes: renalNotesEn,
         renalNotesTh: renalNotesTh,
         roundedDose: roundedDose,
         activePhases: regimen.phases,
         isWeeklySchedule: isWeeklySchedule,
         verificationStatus: regimen.verificationStatus,
+        renalReplacementMode: patient.renalReplacementMode,
+        requiresPostHdSupplement: requiresPostHdSupplement,
+        rrtInstructionEn: rrtInstructionEn,
+        rrtInstructionTh: rrtInstructionTh,
         warnings: warnings,
       );
     } catch (e, stackTrace) {
@@ -1089,6 +1269,7 @@ class PharmacistCalculator {
         reasonEn: 'Calculation error occurred during dosing evaluation.',
         reasonTh: 'เกิดข้อผิดพลาดในการประมวลผลการคำนวณขนาดยา',
         formulaUsed: 'Error Handler',
+        renalReplacementMode: patient.renalReplacementMode,
         warnings: const [
           DoseWarning(
             severity: LimitSeverity.hard,

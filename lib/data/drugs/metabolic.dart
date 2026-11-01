@@ -42,6 +42,7 @@ final List<Drug> metabolic = [
     brandNames: ['Lipitor', 'Xarator'],
     nameTh: 'อะทอร์วาสแตติน',
     category: DrugCategory.endocrine, // Lipid lowering
+    drugClass: DrugClass.statin,
     requiresHepaticCaution: true,
     allergyClass: 'Statin',
     severeInteractions: [

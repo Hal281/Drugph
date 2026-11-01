@@ -5,33 +5,37 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Run Automated Tests
-        run: flutter test
+        run: flutter test --no-pub
 
       - name: Run Static Analysis
-        run: flutter analyze --no-fatal-infos
+        run: dart analyze
 
       - name: Build Web
-        run: flutter build web --base-href "/Drugph/" --dart-define=AI_PROXY_URL=${{ secrets.AI_PROXY_URL }} --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+        run: flutter build web --release --base-href "/Drugph/" --no-web-resources-cdn --pwa-strategy=offline-first --dart-define=AI_PROXY_URL=${{ secrets.AI_PROXY_URL }}
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web

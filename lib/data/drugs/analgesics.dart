@@ -13,11 +13,9 @@ final List<Drug> analgesics = [
     lastReviewedDate: '2024-10-12',
     provenance: const Provenance(
       source: 'Lexicomp Drug Information 2024 / แนวทางการใช้ยาอย่างสมเหตุผล (RDU Thailand)',
-      reviewedBy: 'ภก.คลินิก ด้านบริบาลเภสัชกรรมผู้ป่วยนอกและใน',
+      reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
       reviewedAt: '2024-10-12',
       sourceDetail: 'Acetaminophen Monograph & RDU Pain Practice Guidelines',
-      reviewerLicense: 'ภ. 14582',
-      approvedBy: 'คณะกรรมการเภสัชกรรมและการบำบัด (PTC)',
     ),
     monograph: const ClinicalMonograph(
       textbookName: 'Lexicomp Drug Information / RDU Thailand',
@@ -97,11 +95,9 @@ final List<Drug> analgesics = [
     lastReviewedDate: '2024-10-12',
     provenance: const Provenance(
       source: 'Lexicomp Drug Information 2024 / RDU NSAID Guidelines',
-      reviewedBy: 'ภก.คลินิก ด้านระบบหัวใจและหลอดเลือดและข้อ',
+      reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
       reviewedAt: '2024-10-12',
       sourceDetail: 'Ibuprofen Monograph: Renal & Cardiovascular Safety Profile',
-      reviewerLicense: 'ภ. 14582',
-      approvedBy: 'คณะกรรมการเภสัชกรรมและการบำบัด (PTC)',
     ),
     monograph: const ClinicalMonograph(
       textbookName: 'Lexicomp Drug Information / RDU Thailand',
@@ -222,9 +218,10 @@ final List<Drug> analgesics = [
   const Drug(
     id: 'tramadol',
     genericName: 'Tramadol',
-    brandNames: ['Tramal', 'Anarex'],
+    brandNames: ['Tramal'],
     nameTh: 'ทรามาดอล',
     category: DrugCategory.opioid,
+    drugClass: DrugClass.opioid,
     requiresRenalAdjustment: true,
     requiresHepaticCaution: true,
     isHighAlert: true,
@@ -283,11 +280,9 @@ final List<Drug> analgesics = [
     lastReviewedDate: '2024-10-12',
     provenance: const Provenance(
       source: 'Lexicomp Drug Information 2024 / แนวทางการระงับปวดในผู้ป่วยมะเร็งและวิกฤต',
-      reviewedBy: 'ภก.คลินิก ด้านการจัดการความปวดและการดูแลแบบประคับประคอง',
+      reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
       reviewedAt: '2024-10-12',
       sourceDetail: 'Morphine Monograph: Active Metabolites & Renal Clearance',
-      reviewerLicense: 'ภ. 14582',
-      approvedBy: 'คณะกรรมการเภสัชกรรมและการบำบัด (PTC)',
     ),
     monograph: const ClinicalMonograph(
       textbookName: 'Lexicomp Drug Information / รามาธิบดี',

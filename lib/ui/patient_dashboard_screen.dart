@@ -695,7 +695,7 @@ class PatientDashboardScreen extends StatelessWidget {
                         // Drug-specific TDM
                         if (drug.genericName
                             .toLowerCase()
-                            .contains('vancomycin')) ...[
+                            .contains('vancomycin') || const {'vancomycin', 'gentamicin', 'amikacin'}.contains(drug.id)) ...[
                           const SizedBox(height: 12),
                           Align(
                             alignment: Alignment.centerLeft,

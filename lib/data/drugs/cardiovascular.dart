@@ -9,15 +9,13 @@ final List<Drug> cardiovascular = [
     nameTh: 'นอร์เอพิเนฟริน',
     category: DrugCategory.vasopressor,
     isHighAlert: true,
-    sourceCitation: 'Surviving Sepsis Campaign Guidelines 2021 / คู่มือยาฉีดความเสี่ยงสูง รพ.รามาธิบดี',
+    sourceCitation: 'Surviving Sepsis Campaign Guidelines 2021 / คู่มือยาฉีดความเสี่ยงสูง รพ.รามาธิบดี / US FDA Levophed SPL',
     lastReviewedDate: '2024-10-12',
     provenance: const Provenance(
-      source: 'Surviving Sepsis Campaign 2021 / Ramathibodi High-Alert IV Infusion Guide',
-      reviewedBy: 'ภก.คลินิก ด้านผู้ป่วยวิกฤต (Critical Care Specialist)',
+      source: 'Surviving Sepsis Campaign 2021 / Ramathibodi High-Alert IV Infusion Guide / US FDA Levophed SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
       reviewedAt: '2024-10-12',
       sourceDetail: 'Vasoactive Agents Protocol & Extravasation Antidote Guidelines',
-      reviewerLicense: 'ภ. 14582',
-      approvedBy: 'คณะกรรมการเภสัชกรรมและการบำบัด (PTC)',
     ),
     monograph: const ClinicalMonograph(
       textbookName: 'Surviving Sepsis Campaign / รามาธิบดี',
@@ -44,6 +42,21 @@ final List<Drug> cardiovascular = [
         'Administer via central line to prevent extravasation necrosis.',
     specialNotesTh:
         'ควรให้ทางหลอดเลือดดำใหญ่เพื่อป้องกันเนื้อเยื่อตายจากการรั่วซึม',
+    ivDiluentCompatibility: const IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.d5w, IvDiluent.d5nss],
+      preferredDiluent: IvDiluent.d5w,
+      incompatibleDiluents: [IvDiluent.nss],
+      incompatibilityReasonEn:
+          'OXIDATION LOSS OF POTENCY: Per US FDA Levophed SPL §2.2, administration in saline solution alone (NSS) is NOT recommended because dextrose protects norepinephrine against significant loss of potency due to oxidation.',
+      incompatibilityReasonTh:
+          'ไม่แนะนำให้ผสมใน NSS เดี่ยวๆ: ตามฉลากยา US FDA Levophed §2.2 ยาจะเสื่อมฤทธิ์จากปฏิกิริยาออกซิเดชัน ต้องผสมในสารละลายที่มีน้ำตาล Dextrose (D5W หรือ D5NSS) เพื่อคงความแรงของยา',
+      stabilityNoteEn:
+          'Standard: 4 mg in 250 mL D5W or D5NSS (16 mcg/mL). Discard if solution turns pinkish, dark yellow, or brown, or contains precipitate.',
+      stabilityNoteTh:
+          'ผสมมาตรฐาน 4 mg ใน D5W หรือ D5NSS 250 mL (16 mcg/mL) ห้ามใช้หากสารละลายเปลี่ยนเป็นสีชมพู เหลืองเข้ม น้ำตาล หรือมีตะกอน',
+      sourceCitation:
+          'US FDA Levophed (norepinephrine) SPL §2.2 / คู่มือยาฉีดความเสี่ยงสูง รพ.รามาธิบดี 2024',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -52,6 +65,8 @@ final List<Drug> cardiovascular = [
         continuousRateMin: 0.01,
         continuousRateMax: 3.0,
         continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
         doseUnit: DoseUnit.mcg,
         frequency: Frequency.continuous,
         standardDilutionMgPerMl:
@@ -70,6 +85,53 @@ final List<Drug> cardiovascular = [
     nameTh: 'โดปามีน',
     category: DrugCategory.vasopressor,
     isHighAlert: true,
+    sourceCitation: 'Ramathibodi High-Alert IV Infusion Guide 2024 / AHA Shock Guidelines / US FDA Intropin SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'Ramathibodi High-Alert IV Infusion Guide 2024 / AHA Shock Guidelines / US FDA Intropin SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Inotropic & Vasopressor Titration Protocol §2.1-2.3',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'Ramathibodi High-Alert IV Infusion Guide / AHA Shock Guidelines',
+      editionYear: '2024 Manual',
+      sectionOrTable: 'Inotropic & Vasopressor Titration Protocol §2.1-2.3',
+      dosingGuideline:
+          '• อัตราการให้ยาต่อเนื่อง (Continuous IV Infusion): 2–20 mcg/kg/min โดยปรับ Titrate ตามการตอบสนองของระบบไหลเวียนโลหิต\n'
+          '• การออกฤทธิ์ตามระดับขนาดยา (Dose-dependent Receptor Specificity):\n'
+          '  - Low dose (1–5 mcg/kg/min): กระตุ้น Dopaminergic (D1) receptors ทำให้หลอดเลือดไตและลำไส้ขยายตัว (หมายเหตุ: ปัจจุบัน KDIGO ไม่แนะนำให้ใช้ "Renal dose dopamine" เพื่อป้องกันหรือรักษา AKI อีกต่อไป)\n'
+          '  - Medium dose (5–10 mcg/kg/min): กระตุ้น Beta-1 adrenergic receptors เพิ่มแรงบีบตัวและอัตราการเต้นของหัวใจ (Positive Inotropic & Chronotropic)\n'
+          '  - High dose (10–20 mcg/kg/min): กระตุ้น Alpha-1 adrenergic receptors เด่นชัด ทำให้หลอดเลือดส่วนปลายหดตัวอย่างรุนแรง เพิ่มความดันโลหิต (Systemic Vasoconstriction)',
+      renalGuideline:
+          '• ถูกเปลี่ยนแปลงอย่างรวดเร็วในตับ ไต และพลาสมาโดยเอนไซม์ MAO และ COMT\n'
+          '• ไม่จำเป็นต้องปรับลดขนาดยาในผู้ป่วยไตเสื่อม (No renal dose adjustment needed)\n'
+          '• การฟื้นฟูความดันเลือดช่วยเพิ่ม Renal perfusion pressure',
+      administrationGuideline:
+          '• สารละลายและการผสมยามาตรฐาน: 400 mg ใน D5W หรือ NSS 250 mL (ความเข้มข้น 1.6 mg/mL หรือ 1,600 mcg/mL)\n'
+          '• เส้นทางการให้ยา: ควรให้ผ่านหลอดเลือดดำใหญ่ (Central Venous Catheter) โดยใช้เครื่องควบคุมอัตราการให้ยา (Infusion Pump) เสมอ\n'
+          '• การจัดการยาซึมออกนอกเส้นเลือด (Extravasation): หากเกิดรั่วซึม หยุดยาทันทีและฉีด Antidote คือ Phentolamine 5–10 mg ละลายใน NSS 10–15 mL ฉีดแทรกกระจายรอบบริเวณเนื้อเยื่อที่ได้รับผลกระทบเพื่อป้องกันเนื้อเยื่อขาดเลือดและเน่าตาย (Ischemic necrosis)',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูงระดับวิกฤต (High-Alert Inotrope/Vasopressor)\n'
+          '• ผลข้างเคียงสำคัญ: หัวใจเต้นเร็ว (Tachycardia), ภาวะหัวใจเต้นผิดจังหวะ (Ventricular Arrhythmias), กล้ามเนื้อหัวใจขาดเลือดจาก Oxygen demand ที่เพิ่มสูงขึ้น\n'
+          '• ต้องแก้ไขภาวะขาดสารน้ำ (Hypovolemia) ให้เพียงพอก่อนเริ่มใช้ยาเสมอ',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=dopamine',
+    ),
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [
+        IvDiluent.d5w,
+        IvDiluent.nss,
+        IvDiluent.d5nss,
+        IvDiluent.lrs,
+      ],
+      preferredDiluent: IvDiluent.d5w,
+      stabilityNoteEn:
+          'Standard: 400 mg in 250 mL D5W or NSS (1.6 mg/mL = 1,600 mcg/mL). NEVER mix with sodium bicarbonate or alkaline IV solutions (inactivates dopamine).',
+      stabilityNoteTh:
+          'ผสมมาตรฐาน 400 mg ใน D5W หรือ NSS 250 mL (1.6 mg/mL) ห้ามผสมร่วมกับ Sodium Bicarbonate หรือสารละลายด่างเด็ดขาด (ทำให้ยาเสื่อมฤทธิ์)',
+      sourceCitation:
+          'US FDA Intropin (dopamine) SPL / Ramathibodi High-Alert IV Infusion Guide 2024',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -78,6 +140,8 @@ final List<Drug> cardiovascular = [
         continuousRateMin: 2.0,
         continuousRateMax: 20.0,
         continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
         doseUnit: DoseUnit.mcg,
         frequency: Frequency.continuous,
         standardDilutionMgPerMl:
@@ -96,6 +160,55 @@ final List<Drug> cardiovascular = [
     nameTh: 'อะมิโอดาโรน',
     category: DrugCategory.cardiovascular,
     isHighAlert: true,
+    sourceCitation: 'AHA ACLS Guidelines 2020 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี / US FDA Cordarone SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'AHA ACLS Guidelines 2020 / Ramathibodi High-Alert IV Infusion Guide / US FDA Cordarone SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Ventricular Arrhythmias & Cardiac Arrest Infusion Protocol §2.1-2.3',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'AHA ACLS Guidelines / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี',
+      editionYear: '2020 Guidelines / 2024 Manual',
+      sectionOrTable: 'Ventricular Arrhythmias & Cardiac Arrest Infusion Protocol',
+      dosingGuideline:
+          '• ภาวะหัวใจหยุดเต้นจาก Pulseless VT / VF (ACLS Cardiac Arrest):\n'
+          '  - เข็มแรก: 300 mg IV/IO push (เจือจางใน D5W 20–30 mL)\n'
+          '  - เข็มที่สอง: 150 mg IV/IO push หากยังมี VT/VF คงอยู่\n'
+          '• ภาวะ Stable Wide-Complex Tachycardia / Recurrent VT:\n'
+          '  - Rapid Loading Infusion: 150 mg ใน D5W 100 mL หยดเข้าหลอดเลือดดำช้าๆ นาน 10 นาที (อัตรา 15 mg/min)\n'
+          '  - Slow Loading Infusion: 360 mg หยดเข้าหลอดเลือดดำใน 6 ชั่วโมง (1 mg/min)\n'
+          '  - Maintenance Infusion: 540 mg หยดเข้าหลอดเลือดดำใน 18 ชั่วโมงถัดมา (0.5 mg/min) ขนาดยารวมสูงสุดไม่เกิน 2,200 mg ใน 24 ชั่วโมง',
+      renalGuideline:
+          '• ขับถ่ายผ่านตับและถุงน้ำดีเป็นหลัก (Biliary & Fecal excretion)\n'
+          '• ไม่จำเป็นต้องปรับลดขนาดยาในผู้ป่วยที่มีภาวะไตบกพร่องหรือผู้ป่วยที่ฟอกเลือด (No renal dose adjustment in CKD or Hemodialysis)',
+      administrationGuideline:
+          '• ข้อกำหนดความเข้ากันได้ของสารน้ำ (Compatibility Constraint):\n'
+          '  - ต้องเจือจางใน D5W เท่านั้น (Incompatible with NSS: เกิดการตกตะกอนเมื่อเวลาผ่านไป)\n'
+          '  - ความเข้มข้นของการหยดต่อเนื่อง > 2 mg/mL ต้องให้ผ่านสายสวนหลอดเลือดดำส่วนกลาง (Central Venous Catheter) เพื่อป้องกัน Severe Chemical Phlebitis\n'
+          '  - การหยดยานานกว่า 2 ชั่วโมง ต้องใช้ภาชนะชนิด Polyolefin หรือ Glass (หลีกเลี่ยง PVC bag) และใช้ In-line filter ขนาด 0.22 micron',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูงระดับวิกฤต (High-Alert Antiarrhythmic)\n'
+          '• Boxed Warning: เสี่ยงต่อภาวะพิษต่อปอด (Pulmonary Toxicity/Fibrosis), พิษต่อตับ (Hepatotoxicity) และการกระตุ้นหัวใจเต้นผิดจังหวะ (Proarrhythmic effects)\n'
+          '• อาการไม่พึงประสงค์เฉียบพลัน: ความดันโลหิตต่ำรุนแรง (Hypotension) และหัวใจเต้นช้า (Bradycardia) มักเกิดจากการหยดยาเร็วเกินไปอันเป็นผลจากสารทำละลาย Polysorbate 80',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=amiodarone',
+    ),
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.d5w],
+      preferredDiluent: IvDiluent.d5w,
+      incompatibleDiluents: [IvDiluent.nss, IvDiluent.lrs],
+      incompatibilityReasonEn:
+          'PRECIPITATION / INCOMPATIBILITY HAZARD: Amiodarone IV continuous infusion MUST be diluted in D5W only. Dilution in NSS or LRS causes physical instability and precipitation over time.',
+      incompatibilityReasonTh:
+          'ห้ามผสมหยดต่อเนื่องใน NSS หรือ LRS: Amiodarone IV ต้องเจือจางใน D5W เท่านั้น การผสมใน NSS เสี่ยงต่อการตกตะกอนเมื่อเวลาผ่านไป',
+      stabilityNoteEn:
+          'Use non-PVC (polyolefin or glass) container for infusions > 2 hours (amiodarone adsorbs to PVC and leaches DEHP) with a 0.22-micron inline filter. Concentrations > 2 mg/mL require a central venous line.',
+      stabilityNoteTh:
+          'การหยดนานเกิน 2 ชม. ต้องใช้ขวดแก้วหรือถุง Non-PVC (Polyolefin) ร่วมกับ 0.22-micron inline filter ความเข้มข้น > 2 mg/mL ต้องให้ทาง Central Line',
+      sourceCitation:
+          'US FDA Cordarone IV SPL §2.2 / Ramathibodi High-Alert IV Infusion Guide 2024',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -105,6 +218,7 @@ final List<Drug> cardiovascular = [
         doseUnit: DoseUnit.mg,
         frequency: Frequency.once,
         infusionTimeMinutes: 10.0,
+        verificationStatus: VerificationStatus.pendingReview,
       ),
     ],
   ),
@@ -145,6 +259,7 @@ final List<Drug> cardiovascular = [
     brandNames: ['Renitec', 'Enaril'],
     nameTh: 'อีนาลาพริล',
     category: DrugCategory.cardiovascular,
+    drugClass: DrugClass.aceInhibitor,
     requiresRenalAdjustment: true,
     allergyClass: 'ACE Inhibitor',
     severeInteractions: [
@@ -183,9 +298,10 @@ final List<Drug> cardiovascular = [
   const Drug(
     id: 'furosemide',
     genericName: 'Furosemide',
-    brandNames: ['Lasix', 'Hyles'],
+    brandNames: ['Lasix'],
     nameTh: 'ฟูโรซีไมด์',
     category: DrugCategory.cardiovascular, // or diuretic
+    drugClass: DrugClass.loopDiuretic,
     allergyClass: 'Sulfonamide (Sulfa)',
     severeInteractions: [
       'Aminoglycosides (Increased risk of ototoxicity)',
@@ -195,6 +311,21 @@ final List<Drug> cardiovascular = [
         'Monitor potassium (risk of hypokalemia). IV push slowly (max 20mg/min) to prevent ototoxicity.',
     specialNotesTh:
         'ระวังโพแทสเซียมต่ำ (Hypokalemia) การฉีด IV ควรดันยาช้าๆ (ไม่เกิน 20mg/min) เพื่อป้องกันหูหนวก',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.nss, IvDiluent.lrs],
+      preferredDiluent: IvDiluent.nss,
+      incompatibleDiluents: [IvDiluent.d5w],
+      incompatibilityReasonEn:
+          'ACIDIC PRECIPITATION HAZARD: Furosemide is an alkaline solution (pH ~9) and precipitates in acidic dextrose solutions (pH < 5.5) such as unbuffered D5W. Prefer 0.9% NaCl (NSS).',
+      incompatibilityReasonTh:
+          'เสี่ยงตกตะกอนใน D5W: Furosemide เป็นสารละลายด่าง (pH ~9) จะตกตะกอนเมื่อผสมในสารละลายที่เป็นกรด (pH < 5.5) เช่น D5W ที่ไม่ผ่านการบัฟเฟอร์ แนะนำผสมใน NSS เป็นหลัก',
+      stabilityNoteEn:
+          'Protect from light; do not use if solution is yellow/discolored. Max IV push/infusion rate <= 20 mg/min (<= 4 mg/min for high doses) to prevent ototoxicity.',
+      stabilityNoteTh:
+          'เก็บให้พ้นแสง ห้ามใช้หากยาเปลี่ยนเป็นสีเหลือง อัตราการฉีดไม่เกิน 20 mg/min (ขนาดยาสูง <= 4 mg/min) เพื่อป้องกันพิษต่อหู',
+      sourceCitation:
+          'US FDA Lasix Injection SPL / Trissel\'s Handbook on Injectable Drugs',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -341,6 +472,37 @@ final List<Drug> cardiovascular = [
     category: DrugCategory.cardiovascular,
     requiresHepaticCaution: true,
     isHighAlert: true,
+    sourceCitation: '2020 ACC/AHA Hypertensive Emergency Guidelines / คู่มือยาฉีดรามาธิบดี / US FDA Cardene IV SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: '2020 ACC/AHA Hypertensive Emergency Guidelines / Ramathibodi IV Manual / US FDA Cardene SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'IV Antihypertensive Titration Protocol §2.1-2.4',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'ACC/AHA Hypertensive Emergency Guidelines / คู่มือยาฉีดรามาธิบดี',
+      editionYear: '2020 Guidelines / 2024 Manual',
+      sectionOrTable: 'IV Antihypertensive Titration Protocol §2.1-2.4',
+      dosingGuideline:
+          '• อัตราการให้ยาต่อเนื่องในภาวะความดันโลหิตสูงวิกฤต (Hypertensive Emergency):\n'
+          '  - ขนาดยาเริ่มต้น: 5.0 mg/hr หยดเข้าหลอดเลือดดำต่อเนื่อง\n'
+          '  - การปรับขนาดยา (Titration): เพิ่มอัตราการหยด 2.5 mg/hr ทุก 5–15 นาที จนกระทั่งถึงระดับความดันเป้าหมาย (ขนาดยาสูงสุด 15.0 mg/hr)\n'
+          '  - เป้าหมายการลดความดันโลหิต: ลด Mean Arterial Pressure (MAP) ไม่เกิน 20–25% ในชั่วโมงแรกเพื่อป้องกัน Cerebral/Coronary Hypoperfusion\n'
+          '  - ขนาดยาคงที่ (Maintenance): เมื่อความดันโลหิตเข้าสู่เกณฑ์ควบคุมได้แล้ว แนะนำปรับลดอัตราการหยดลงเหลือ 3.0 mg/hr',
+      renalGuideline:
+          '• กำจัดยาผ่านตับเป็นหลัก (Hepatic CYP3A4 metabolism)\n'
+          '• ไม่จำเป็นต้องปรับลดขนาดยาในผู้ป่วยไตบกพร่อง (No renal dose adjustment needed)\n'
+          '• เป็นยาทางเลือกที่ปลอดภัยในภาวะความดันโลหิตสูงร่วมกับภาวะไตเสื่อมเฉียบพลัน/เรื้อรัง',
+      administrationGuideline:
+          '• การผสมยามาตรฐาน: Nicardipine 25 mg เจือจางใน D5W หรือ NSS 240 mL (ปริมาตรรวม 250 mL ได้ความเข้มข้น 0.1 mg/mL)\n'
+          '• เส้นทางการให้ยา: ให้ผ่าน Infusion Pump เสมอ ควรให้ผ่านหลอดเลือดดำส่วนกลาง (Central Line) หากให้ทาง Peripheral Line ต้องเปลี่ยนตำแหน่งแทงสายน้ำเกลือทุก 12 ชม. เพื่อป้องกันหลอดเลือดดำอักเสบ (Thrombophlebitis)',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูง (High-Alert Antihypertensive)\n'
+          '• ข้อห้ามใช้เด็ดขาด: ห้ามใช้ในผู้ป่วย Advanced Aortic Stenosis (เนื่องจากแรงบีบหัวใจลดลงอาจเกิด Severe Hypotension)\n'
+          '• ต้องตรวจวัดและติดตามความดันโลหิตและอัตราการเต้นของหัวใจอย่างต่อเนื่อง (Continuous Monitoring)',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=nicardipine',
+    ),
     allergyClass: 'Calcium Channel Blocker (CCB)',
     severeInteractions: [
       'Beta-blockers (May cause severe hypotension/heart failure)',
@@ -351,6 +513,26 @@ final List<Drug> cardiovascular = [
         'Frequent blood pressure monitoring required. Change infusion site q12h to prevent phlebitis.',
     specialNotesTh:
         'ต้องวัดความดันอย่างต่อเนื่อง (Continuous BP) และเปลี่ยนตำแหน่งแทงสายน้ำเกลือทุก 12 ชม. เพื่อลดหลอดเลือดอักเสบ',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [
+        IvDiluent.nss,
+        IvDiluent.d5w,
+        IvDiluent.d5nss,
+        IvDiluent.halfNss,
+      ],
+      preferredDiluent: IvDiluent.nss,
+      incompatibleDiluents: [IvDiluent.lrs],
+      incompatibilityReasonEn:
+          'INCOMPATIBLE WITH LRS: Per US FDA Cardene IV SPL §2.3, Nicardipine is NOT compatible with Lactated Ringer\'s (LRS) or Sodium Bicarbonate (risk of alkaline precipitation).',
+      incompatibilityReasonTh:
+          'ห้ามผสมใน LRS เด็ดขาด: ตามฉลากยา US FDA Cardene IV §2.3 ยาไม่เข้ากันกับ Lactated Ringer\'s (LRS) และ Sodium Bicarbonate เนื่องจากเสี่ยงตกตะกอน',
+      stabilityNoteEn:
+          'Standard dilution: 25 mg diluted to 250 mL total volume in NSS or D5W (0.1 mg/mL). Stable 24 hours at room temperature; rotate peripheral IV site every 12 hours.',
+      stabilityNoteTh:
+          'ผสมมาตรฐาน 25 mg เจือจางให้ได้ปริมาตรรวม 250 mL ใน NSS หรือ D5W (0.1 mg/mL) คงตัวที่อุณหภูมิห้อง 24 ชม. เปลี่ยนตำแหน่ง Peripheral line ทุก 12 ชม.',
+      sourceCitation:
+          'US FDA Cardene IV (nicardipine) SPL §2.3 / คู่มือยาฉีดรามาธิบดี 2024',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -359,6 +541,8 @@ final List<Drug> cardiovascular = [
         continuousRateMin: 5.0, // 5 mg/hr
         continuousRateMax: 15.0, // Max 15 mg/hr
         continuousRateUnit: 'mg/hr',
+        rateUnit: RateUnit.mgHr,
+        verificationStatus: VerificationStatus.pendingReview,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.continuous,
         standardDilutionMgPerMl: 0.1, // 25mg in 250mL = 0.1 mg/mL
@@ -375,6 +559,7 @@ final List<Drug> cardiovascular = [
     brandNames: ['Aldactone', 'Hyles'],
     nameTh: 'สไปโรโนแลคโตน',
     category: DrugCategory.cardiovascular,
+    drugClass: DrugClass.potassiumSparingDiuretic,
     pregnancyCategory: 'C',
     requiresRenalAdjustment: true,
     contraindications: ['Anuria', 'Hyperkalemia', 'Addison disease'],
@@ -446,6 +631,7 @@ final List<Drug> cardiovascular = [
     brandNames: ['Cozaar'],
     nameTh: 'ลอซาร์แทน',
     category: DrugCategory.cardiovascular,
+    drugClass: DrugClass.arb,
     pregnancyCategory: 'D',
     requiresHepaticCaution: true,
     severeInteractions: ['Spironolactone (Hyperkalemia)'],
@@ -521,6 +707,7 @@ final List<Drug> cardiovascular = [
     brandNames: ['Crestor'],
     nameTh: 'โรซูวาสแตติน',
     category: DrugCategory.cardiovascular,
+    drugClass: DrugClass.statin,
     pregnancyCategory: 'X', // Statins are category X
     contraindications: ['Active liver disease'],
     requiresRenalAdjustment: true,

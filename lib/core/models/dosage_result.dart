@@ -14,6 +14,7 @@ import 'rate_unit.dart';
 import 'frequency.dart';
 import 'dosing_phase.dart';
 import 'provenance.dart';
+import 'renal_replacement_mode.dart';
 
 /// The complete result of a dose calculation.
 ///
@@ -121,6 +122,18 @@ class DosageResult {
   /// Verification status of the calculated regimen (F1, F5).
   final VerificationStatus verificationStatus;
 
+  /// Active Renal Replacement Therapy modality for this calculation (M1).
+  final RenalReplacementMode renalReplacementMode;
+
+  /// Whether post-hemodialysis supplemental dose or post-session timing is required (M1).
+  final bool requiresPostHdSupplement;
+
+  /// Clinical instructions for RRT administration timing in English (M1).
+  final String? rrtInstructionEn;
+
+  /// Clinical instructions for RRT administration timing in Thai (M1).
+  final String? rrtInstructionTh;
+
   /// Error description if [success] is `false` (English).
   final String? errorMessage;
 
@@ -157,6 +170,10 @@ class DosageResult {
     this.doseModificationReason,
     this.isWeeklySchedule = false,
     this.verificationStatus = VerificationStatus.unverified,
+    this.renalReplacementMode = RenalReplacementMode.none,
+    this.requiresPostHdSupplement = false,
+    this.rrtInstructionEn,
+    this.rrtInstructionTh,
     this.warnings = const [],
     this.errorMessage,
     this.errorMessageTh,
@@ -188,6 +205,10 @@ class DosageResult {
     String formulaUsed = 'N/A',
     double? crclMlMin,
     Map<String, dynamic> calculationInputs = const {},
+    RenalReplacementMode renalReplacementMode = RenalReplacementMode.none,
+    bool requiresPostHdSupplement = false,
+    String? rrtInstructionEn,
+    String? rrtInstructionTh,
   }) {
     return DosageResult(
       success: false,
@@ -196,6 +217,10 @@ class DosageResult {
       errorMessageTh: reasonTh,
       crclMlMin: crclMlMin,
       calculationInputs: calculationInputs,
+      renalReplacementMode: renalReplacementMode,
+      requiresPostHdSupplement: requiresPostHdSupplement,
+      rrtInstructionEn: rrtInstructionEn,
+      rrtInstructionTh: rrtInstructionTh,
       warnings: warnings,
     );
   }

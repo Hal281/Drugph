@@ -187,13 +187,19 @@ class DoseChecker {
 
     for (final adj in adjustments) {
       if (adj.appliesTo(crclMlMin) &&
-          (adj.adjustmentFactor < 1.0 || adj.adjustedFrequency != null)) {
-        final actionTextEn = adj.adjustmentFactor < 1.0
-            ? 'reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
-            : 'maintain dose';
-        final actionTextTh = adj.adjustmentFactor < 1.0
-            ? 'ลดโดสเหลือ ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
-            : 'คงขนาดยาเดิม';
+          (adj.absoluteDose != null ||
+              adj.adjustmentFactor < 1.0 ||
+              adj.adjustedFrequency != null)) {
+        final actionTextEn = adj.absoluteDose != null
+            ? 'set dose to ${_fmt(adj.absoluteDose!)}'
+            : (adj.adjustmentFactor < 1.0
+                ? 'reduce dose to ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+                : 'maintain dose');
+        final actionTextTh = adj.absoluteDose != null
+            ? 'ปรับขนาดยาเป็น ${_fmt(adj.absoluteDose!)}'
+            : (adj.adjustmentFactor < 1.0
+                ? 'ลดโดสเหลือ ${(adj.adjustmentFactor * 100).toStringAsFixed(0)}%'
+                : 'คงขนาดยาเดิม');
         warnings.add(DoseWarning(
           severity: LimitSeverity.soft,
           code: DoseWarningCode.renalAdjustmentApplied,

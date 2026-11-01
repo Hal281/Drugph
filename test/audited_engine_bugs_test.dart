@@ -617,6 +617,197 @@ void main() {
       // CrCl < 30 -> 50% of 300 mg = 150 mg
       expect(lithiumResult.calculatedDose, equals(150.0));
     });
+
+    // -------------------------------------------------------------------------
+    // Bug 20: Titrated Regimens Apply Renal Adjustments (Magnesium Sulfate)
+    // -------------------------------------------------------------------------
+    test('Bug 20: Titrated Magnesium Sulfate Eclampsia maintenance scales rate by 50% when CrCl < 30 mL/min', () {
+      const renalFemale = Patient(
+        id: 'p-mg-renal',
+        weightKg: 60.0,
+        heightCm: 160.0,
+        ageYears: 30,
+        sex: Sex.female,
+        creatinineClearanceMlMin: 25.0,
+        isScrStable: true,
+      );
+
+      final mgSo4 = DrugDatabase.findById('magnesium_sulfate')!;
+      final maintRegimen = mgSo4.regimens.firstWhere(
+        (r) => r.dosingType == DosingType.titrated,
+      );
+
+      final res = PharmacistCalculator.calculateDose(
+        patient: renalFemale,
+        drug: mgSo4,
+        regimen: maintRegimen,
+      );
+
+      expect(res.success, isTrue);
+      expect(res.isRenallyAdjusted, isTrue);
+      expect(res.renalAdjustmentFactor, equals(0.5));
+      expect(res.infusionResult, isNotNull);
+      expect(res.infusionResult!.rate, closeTo(0.5, 0.01));
+      expect(res.infusionResult!.rateMax, closeTo(1.0, 0.01));
+      expect(res.warnings.any((w) => w.code == DoseWarningCode.renalAdjustmentApplied), isTrue);
+    });
+
+    // -------------------------------------------------------------------------
+    // Bug 21: verifyOrder Catches Unadjusted Frequency in Renal Impairment
+    // -------------------------------------------------------------------------
+    test('Bug 21: verifyOrder flags unadjusted frequency (q8h instead of q12h) even when dose is adjusted (500 mg)', () {
+      const renalPatient = Patient(
+        id: 'p-cef-freq-only',
+        ageYears: 65,
+        weightKg: 60.0,
+        heightCm: 165.0,
+        sex: Sex.male,
+        isScrStable: true,
+        serumCreatinineMgDl: 3.5, // CrCl ~ 15 mL/min
+      );
+
+      final cefazolin = DrugDatabase.findById('cefazolin')!;
+      final cefSystemic = cefazolin.regimens.firstWhere(
+        (r) => r.indication?.contains('Systemic') ?? false,
+      );
+
+      final verify = PharmacistCalculator.verifyOrder(
+        patient: renalPatient,
+        drug: cefazolin,
+        regimen: cefSystemic,
+        orderedDose: 500.0, // Renally adjusted dose
+        orderedFrequency: Frequency.q8h, // Unadjusted standard frequency (recommended is q12h)
+      );
+
+      expect(verify.recommendedResult.adjustedFrequency, equals('q12h'));
+      expect(verify.isAcceptable, isFalse);
+      expect(
+        verify.warnings.any((w) => w.code == DoseWarningCode.severeRenalImpairment),
+        isTrue,
+      );
+    });
+
+    // -------------------------------------------------------------------------
+    // Bug 22: DoseChecker.checkRenalAdjustment Supports absoluteDose
+    // -------------------------------------------------------------------------
+    test('Bug 22: DoseChecker.checkRenalAdjustment reports set dose when absoluteDose is specified', () {
+      const tierAbsDose = RenalAdjustment(
+        crclMin: 15.0,
+        crclMax: 50.0,
+        absoluteDose: 15.0,
+        adjustedFrequency: Frequency.q24h,
+      );
+
+      final warnings = DoseChecker.checkRenalAdjustment(
+        crclMlMin: 30.0,
+        adjustments: [tierAbsDose],
+      );
+
+      expect(warnings.any((w) => w.code == DoseWarningCode.renalAdjustmentApplied), isTrue);
+      final warn = warnings.firstWhere((w) => w.code == DoseWarningCode.renalAdjustmentApplied);
+      expect(warn.messageEn, contains('set dose to 15'));
+      expect(warn.messageEn, isNot(contains('maintain dose')));
+    });
+
+    // -------------------------------------------------------------------------
+    // Bug 23: Pediatric-Only Regimen with minAgeMonths Blocks Adults
+    // -------------------------------------------------------------------------
+    test('Bug 23: Pediatric regimen with minAgeMonths (and null maxAgeMonths) blocks adult patients', () {
+      const adult = Patient(
+        id: 'p-adult-30',
+        ageYears: 30,
+        weightKg: 70.0,
+        heightCm: 175.0,
+        sex: Sex.male,
+        isScrStable: true,
+      );
+
+      const pedDrug = Drug(
+        id: 'ped_min_age_drug',
+        genericName: 'Pediatric MinAge Drug',
+        category: DrugCategory.antibiotic,
+        regimens: [
+          DosingRegimen(
+            route: DoseRoute.po,
+            indication: 'Pediatric Infection (> 2 yrs)',
+            dosingType: DosingType.weightBased,
+            audience: RegimenAudience.pediatric,
+            population: PopulationCriteria(minAgeMonths: 24),
+            dosePerKg: 10.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+          ),
+        ],
+      );
+
+      final res = PharmacistCalculator.calculateDose(
+        patient: adult,
+        drug: pedDrug,
+        regimen: pedDrug.regimens.first,
+      );
+
+      expect(res.success, isFalse);
+      expect(res.warnings.any((w) => w.code == DoseWarningCode.populationMismatch), isTrue);
+    });
+
+    // -------------------------------------------------------------------------
+    // Bug 24: Daily Dose Basis with Range Frequency Preserves dailyDose
+    // -------------------------------------------------------------------------
+    test('Bug 24: Pediatric Clindamycin (DoseBasis.perDay, Divided q6-8h) preserves dailyDose = 300 mg/day', () {
+      const child = Patient(
+        id: 'p-ped-clinda-daily',
+        weightKg: 20.0,
+        heightCm: 110.0,
+        ageYears: 5,
+        sex: Sex.male,
+        isScrStable: true,
+      );
+
+      final clindamycin = DrugDatabase.findById('clindamycin')!;
+      final pedRegimen = clindamycin.regimens.firstWhere(
+        (r) => r.indication?.contains('Pediatric') ?? false,
+      );
+
+      final result = PharmacistCalculator.calculateDose(
+        patient: child,
+        drug: clindamycin,
+        regimen: pedRegimen,
+      );
+
+      expect(result.success, isTrue);
+      expect(result.dailyDose, closeTo(300.0, 0.5));
+      expect(result.warnings.any((w) => w.code == DoseWarningCode.unknownFrequency), isFalse);
+    });
+
+    // -------------------------------------------------------------------------
+    // Bug 25: Brand/Salt & LASA Drug Data Integrity (Kayexalate, Lasix, Tramal)
+    // -------------------------------------------------------------------------
+    test('Bug 25: Drug brand names and explicit drugClass tags prevent salt/LASA confusion', () {
+      final sps = DrugDatabase.findById('sodium_polystyrene_sulfonate')!;
+      expect(sps.brandNames, contains('Kayexalate'));
+      expect(sps.brandNames, isNot(contains('Kalimate')));
+
+      final furosemide = DrugDatabase.findById('furosemide')!;
+      expect(furosemide.brandNames, contains('Lasix'));
+      expect(furosemide.brandNames, isNot(contains('Hyles')));
+      expect(furosemide.drugClass, equals(DrugClass.loopDiuretic));
+
+      final spironolactone = DrugDatabase.findById('spironolactone')!;
+      expect(spironolactone.brandNames, contains('Hyles'));
+      expect(spironolactone.drugClass, equals(DrugClass.potassiumSparingDiuretic));
+
+      final tramadol = DrugDatabase.findById('tramadol')!;
+      expect(tramadol.brandNames, contains('Tramal'));
+      expect(tramadol.brandNames, isNot(contains('Anarex')));
+      expect(tramadol.drugClass, equals(DrugClass.opioid));
+
+      expect(DrugDatabase.findById('enalapril')!.drugClass, equals(DrugClass.aceInhibitor));
+      expect(DrugDatabase.findById('losartan')!.drugClass, equals(DrugClass.arb));
+      expect(DrugDatabase.findById('rosuvastatin')!.drugClass, equals(DrugClass.statin));
+      expect(DrugDatabase.findById('atorvastatin')!.drugClass, equals(DrugClass.statin));
+      expect(DrugDatabase.findById('apixaban')!.drugClass, equals(DrugClass.anticoagulantDoac));
+      expect(DrugDatabase.findById('rivaroxaban')!.drugClass, equals(DrugClass.anticoagulantDoac));
+    });
   });
 }
 

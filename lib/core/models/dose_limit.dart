@@ -110,6 +110,9 @@ enum DoseWarningCode {
   /// Mandatory critical alert for weekly methotrexate and weekly regimens (F12).
   weeklyRegimenBanner,
 
+  /// Fallback renal tier used for RRT patient because drug lacks explicit RRT protocol (M1).
+  rrtFallbackAdvisory,
+
   calculationError,
   generalAlert,
 }

@@ -1,0 +1,9 @@
+openFDA API Terms of Service and License Notification
+Recorded at: 2026-10-29T18:52:15+07:00
+Workspace: c:\Users\turbo\drugforPh
+
+User has been prominently notified to review the openFDA API Terms of Service and License terms at:
+- https://open.fda.gov/apis/
+- https://open.fda.gov/license
+
+Data retrieved from openFDA is public domain (CC0) and originates from US FDA regulatory submissions / Structured Product Labeling (SPL). Clinical dosing decisions in Drugph require verification by a licensed physician or clinical pharmacist against approved clinical references.

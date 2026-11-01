@@ -57,14 +57,14 @@ final List<Drug> nephrology = [
   const Drug(
     id: 'sodium_polystyrene_sulfonate',
     genericName: 'Sodium polystyrene sulfonate',
-    brandNames: ['Kalimate', 'Kayexalate'],
-    nameTh: 'คาลิเมท / โซเดียม โพลีสไตรีน ซัลโฟเนต',
+    brandNames: ['Kayexalate'],
+    nameTh: 'เคเอกซาเลท / โซเดียม โพลีสไตรีน ซัลโฟเนต',
     category: DrugCategory.nephrology,
     pregnancyCategory: 'C',
     contraindications: ['Bowel obstruction', 'Hypokalemia'],
     severeInteractions: ['Sorbitol (intestinal necrosis risk)'],
-    specialNotes: 'Separate from other oral meds by at least 3 hours.',
-    specialNotesTh: 'ควรรับประทานห่างจากยาอื่นอย่างน้อย 3 ชั่วโมง',
+    specialNotes: 'Contains ~100 mg (4.1 mEq) Na+ per gram; caution in HF/edema (Kalimate is Calcium polystyrene sulfonate). Separate from other oral meds by at least 3 hours.',
+    specialNotesTh: 'มีโซเดียม ~100 mg (4.1 mEq)/g ระวังในภาวะบวมน้ำ/หัวใจล้มเหลว (ส่วน Kalimate คือ Calcium polystyrene sulfonate) ควรทานห่างจากยาอื่นอย่างน้อย 3 ชั่วโมง',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,

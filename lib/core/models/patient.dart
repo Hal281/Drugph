@@ -9,6 +9,7 @@
 
 import 'unit.dart';
 import 'population_criteria.dart';
+import 'renal_replacement_mode.dart';
 
 /// Immutable patient data for dose calculations.
 ///
@@ -69,6 +70,9 @@ class Patient {
   /// Unique internal ID for managing lists.
   final String id;
 
+  /// Active Renal Replacement Therapy (RRT) modality (M1).
+  final RenalReplacementMode renalReplacementMode;
+
   /// Convenience alias for [patientName].
   String? get name => patientName;
 
@@ -89,6 +93,7 @@ class Patient {
     required this.sex,
     this.isPregnant = false,
     this.hepaticImpairment,
+    this.renalReplacementMode = RenalReplacementMode.none,
     this.serumCreatinineMgDl,
     this.creatinineClearanceMlMin,
     this.eGfrMlMinPer173m2,
@@ -139,6 +144,7 @@ class Patient {
     Sex? sex,
     bool? isPregnant,
     Object? hepaticImpairment = _sentinelObject,
+    RenalReplacementMode? renalReplacementMode,
     double? serumCreatinineMgDl = _sentinelDouble,
     double? creatinineClearanceMlMin = _sentinelDouble,
     double? eGfrMlMinPer173m2 = _sentinelDouble,
@@ -163,6 +169,8 @@ class Patient {
       hepaticImpairment: identical(hepaticImpairment, _sentinelObject)
           ? this.hepaticImpairment
           : (hepaticImpairment as ChildPughClass?),
+      renalReplacementMode:
+          renalReplacementMode ?? this.renalReplacementMode,
       serumCreatinineMgDl: serumCreatinineMgDl == _sentinelDouble
           ? this.serumCreatinineMgDl
           : serumCreatinineMgDl,
@@ -185,10 +193,13 @@ class Patient {
     final allergyStr =
         allergies.isNotEmpty ? 'Allergies: [REDACTED (${allergies.length})], ' : '';
     final pregStr = isPregnant ? 'pregnant, ' : '';
+    final rrtStr = renalReplacementMode != RenalReplacementMode.none
+        ? ', RRT: ${renalReplacementMode.badgeEn}'
+        : '';
     return 'Patient($nameStr$hnStr$allergyStr$pregStr'
         'wt: ${weightKg}kg, ht: ${heightCm}cm, '
         'age: $ageYears y${ageMonths != null ? " ${ageMonths}m" : ""}, '
         'sex: ${sex.nameEn}'
-        '${serumCreatinineMgDl != null ? ", SCr: $serumCreatinineMgDl" : ""})';
+        '${serumCreatinineMgDl != null ? ", SCr: $serumCreatinineMgDl" : ""}$rrtStr)';
   }
 }

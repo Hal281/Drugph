@@ -10,6 +10,39 @@ final List<Drug> emergency = [
     category: DrugCategory.vasopressor,
     isHighAlert: true,
     allergyClass: 'Catecholamine',
+    sourceCitation: 'AHA ACLS/PALS Guidelines 2020 / World Allergy Organization (WAO) 2020 / US FDA Adrenalin SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'AHA ACLS/PALS Guidelines 2020 / WAO Anaphylaxis Guidelines 2020 / US FDA Adrenalin SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Anaphylaxis Protocol & ACLS/PALS Cardiac Arrest Resuscitation',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO)',
+      editionYear: '2020 Guidelines / 2024 Update',
+      sectionOrTable: 'Anaphylaxis Management & ACLS/PALS Resuscitation Protocol',
+      dosingGuideline:
+          '• ภาวะแพ้รุนแรง (Anaphylaxis - Intramuscular):\n'
+          '  - ผู้ใหญ่: ฉีด 0.3–0.5 mg IM (ใช้ความเข้มข้น 1:1,000 หรือ 1 mg/mL โดยไม่ต้องเจือจาง) เข้าบริเวณกล้ามเนื้อต้นขาด้านนอกส่วนกลาง (Mid-anterolateral thigh) ซ้ำได้ทุก 5–15 นาทีตามอาการ\n'
+          '  - เด็ก: ฉีด 0.01 mg/kg IM (1:1,000, 0.01 mL/kg) สูงสุดไม่เกิน 0.3 mg ต่อครั้ง (เพดานผู้ใหญ่ไม่เกิน 0.5 mg) ซ้ำได้ทุก 5–15 นาทีตามอาการ\n'
+          '• ภาวะหัวใจหยุดเต้น (Cardiac Arrest - Intravenous):\n'
+          '  - ผู้ใหญ่ (ACLS): 1.0 mg IV/IO push (ใช้ความเข้มข้น 1:10,000 หรือ 0.1 mg/mL ปริมาตร 10 mL) ทุก 3–5 นาที ตามด้วย NSS flush 20 mL\n'
+          '  - เด็ก (PALS): 0.01 mg/kg IV/IO push (ใช้ความเข้มข้น 1:10,000, 0.1 mL/kg สูงสุดไม่เกิน 1 mg) ทุก 3–5 นาที',
+      renalGuideline:
+          '• สลายตัวอย่างรวดเร็วผ่านกระบวนการเมแทบอลิซึมของเอนไซม์ MAO และ COMT ในตับและเนื้อเยื่อส่วนปลาย\n'
+          '• ไม่จำเป็นต้องปรับขนาดยาในผู้ป่วยที่มีภาวะไตเสื่อม (No renal dose adjustment needed)',
+      administrationGuideline:
+          '• กฎเหล็กการบริหารยาในภาวะแพ้รุนแรง (Anaphylaxis Route Rule):\n'
+          '  - ต้องฉีดเข้ากล้ามเนื้อต้นขาด้านนอก (Mid-anterolateral thigh) เท่านั้น ห้ามฉีดเข้ากล้ามเนื้อสะโพกหรือเดลทอยด์ เนื่องจากต้นขามีหลอดเลือดมาเลี้ยงมาก ทำให้ระดับยาขึ้นสู่กระแสเลือดได้เร็วและสูงกว่า\n'
+          '• คำเตือนความปลอดภัยวิกฤต (Fatal Error Warning):\n'
+          '  - ห้ามนำสารละลาย 1:1,000 (1 mg/mL) ไปฉีดเข้าหลอดเลือดดำโดยตรง (IV Push) โดยเด็ดขาด เพราะอาจทำให้เกิด Severe Hypertensive Crisis, Intracranial Hemorrhage หรือ Fatal Ventricular Fibrillation\n'
+          '  - การให้ทาง IV Push ในภาวะ Cardiac Arrest ต้องใช้ความเข้มข้นเจือจาง 1:10,000 (0.1 mg/mL) เท่านั้น',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูงระดับวิกฤตสูงสุด (Critical High-Alert Medication)\n'
+          '• ในภาวะช็อกที่ไม่ตอบสนองต่อสารน้ำ (Septic/Cardiogenic Shock): อาจให้เป็น Continuous IV Infusion 0.05–0.5 mcg/kg/min ผ่าน Central Line โดยใช้ Infusion Pump',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=epinephrine',
+    ),
     severeInteractions: [
       'Non-selective Beta-blockers (Paradoxical hypertension)',
       'MAOIs (Severe hypertensive crisis)',
@@ -17,6 +50,16 @@ final List<Drug> emergency = [
     ],
     specialNotes: 'Anaphylaxis: IM into anterolateral thigh. Cardiac arrest: IV/IO. Dilute 1:10,000 for IV push.',
     specialNotesTh: 'แพ้ยารุนแรง: ฉีด IM ที่ต้นขาด้านนอก, หัวใจหยุดเต้น: IV/IO ใช้ความเข้มข้น 1:10,000 ฉีด IV Push',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.d5w, IvDiluent.nss, IvDiluent.d5nss],
+      preferredDiluent: IvDiluent.d5w,
+      stabilityNoteEn:
+          'Continuous IV infusion: dilute in D5W or NSS (e.g., 4 mg in 250 mL = 16 mcg/mL). Protect from light; discard if pinkish or brown. NEVER mix with sodium bicarbonate (alkaline inactivation).',
+      stabilityNoteTh:
+          'สำหรับการหยดต่อเนื่อง: ผสมใน D5W หรือ NSS (เช่น 4 mg ใน 250 mL = 16 mcg/mL) เก็บพ้นแสง ห้ามใช้หากเปลี่ยนเป็นสีชมพูหรือน้ำตาล และห้ามผสมร่วมกับ Sodium Bicarbonate',
+      sourceCitation:
+          'US FDA Adrenalin (epinephrine) SPL / AHA ACLS Guidelines 2020 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.im,
@@ -26,6 +69,7 @@ final List<Drug> emergency = [
         doseUnit: DoseUnit.mg,
         frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
         limits: DoseLimit(maxSingleDose: 0.5),
+        verificationStatus: VerificationStatus.pendingReview,
       ),
       DosingRegimen(
         route: DoseRoute.im,
@@ -35,6 +79,7 @@ final List<Drug> emergency = [
         doseUnit: DoseUnit.mg,
         frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
         limits: DoseLimit(maxSingleDose: 0.3),
+        verificationStatus: VerificationStatus.pendingReview,
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -47,6 +92,7 @@ final List<Drug> emergency = [
           displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ',
           customReason: 'ACLS cardiac arrest protocol every 3-5 minutes',
         ),
+        verificationStatus: VerificationStatus.pendingReview,
       ),
       DosingRegimen(
         route: DoseRoute.ivPush,
@@ -60,6 +106,7 @@ final List<Drug> emergency = [
           customReason: 'PALS cardiac arrest protocol every 3-5 minutes',
         ),
         limits: DoseLimit(maxSingleDose: 1.0),
+        verificationStatus: VerificationStatus.pendingReview,
       ),
     ],
   ),
@@ -104,6 +151,43 @@ final List<Drug> emergency = [
     category: DrugCategory.cardiovascular,
     isHighAlert: true,
     requiresRenalAdjustment: true,
+    sourceCitation: 'ACOG Practice Bulletin No. 222 / AHA ACLS Guidelines 2020 / US FDA SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'ACOG Practice Bulletin No. 222 / AHA ACLS Guidelines 2020 / US FDA SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Preeclampsia Seizure Prophylaxis & Torsades Management',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'ACOG Guidelines (Bulletin 222) / AHA ACLS Guidelines',
+      editionYear: '2020 Guidelines / 2024 Update',
+      sectionOrTable: 'Preeclampsia Seizure Prophylaxis & Eclampsia Management',
+      dosingGuideline:
+          '• การป้องกันและรักษาอาการชักใน Preeclampsia / Eclampsia:\n'
+          '  - ขนาดยาเริ่มต้น (Loading Dose): 4–6 g IV เจือจางใน D5W หรือ NSS 100 mL หยดเข้าหลอดเลือดดำช้าๆ นาน 15–20 นาที\n'
+          '  - ขนาดยาต่อเนื่อง (Maintenance Infusion): 1–2 g/hr หยดต่อเนื่องผ่าน Infusion Pump ตลอดระยะเวลาการคลอดจนถึง 24 ชั่วโมงหลังคลอด\n'
+          '• ภาวะหัวใจเต้นผิดจังหวะ Torsades de Pointes / Hypomagnesemia:\n'
+          '  - ผู้ใหญ่: 1–2 g IV เจือจางใน D5W 50–100 mL หยดนาน 15 นาที (หรือฉีดช้าๆ 1–2 นาที ในภาวะ Pulseless Arrest / VT)',
+      renalGuideline:
+          '• ขับถ่ายออกทางไตเกือบ 100% ในรูปที่ไม่เปลี่ยนแปลง (Almost 100% renal elimination)\n'
+          '• ผู้ป่วย CrCl < 30 mL/min หรือ Serum Creatinine >= 1.2 mg/dL:\n'
+          '  - ขนาดยาเริ่มต้น (Loading Dose) ให้ขนาดเต็มตามปกติ (4 g) เพื่อกระจายตัวใน Volume of distribution\n'
+          '  - ขนาดยาต่อเนื่อง (Maintenance Infusion): ปรับลดอัตราการหยดลง 50% (เหลือ 0.5–1.0 g/hr) หรืออาจพิจารณาหยุดให้ยาต่อเนื่องแล้วตรวจติดตามระดับ Mg ในเลือดเป็นระยะ\n'
+          '  - เป้าหมายระดับยาในการรักษา (Therapeutic Range): Serum Magnesium 4.8–8.4 mg/dL (2.0–3.5 mmol/L หรือ 4.0–7.0 mEq/L)',
+      administrationGuideline:
+          '• สารละลายและการผสมยามาตรฐาน:\n'
+          '  - Maintenance: Magnesium sulfate 20 g ใน NSS 500 mL (ความเข้มข้น 40 mg/mL หรือ 4% solution) หยดผ่านเครื่องควบคุมอัตราการให้ยา (Infusion Pump)\n'
+          '• การตรวจติดตามความปลอดภัยทางคลินิก (Monitoring Parameters):\n'
+          '  1. Deep Tendon Reflexes (Patellar reflex) ต้องมีอยู่เสมอ (หายไปเมื่อ Mg > 9.6–12 mg/dL)\n'
+          '  2. อัตราการหายใจ (Respiratory Rate) ต้องไม่ต่ำกว่า 16 ครั้ง/นาที (กดการหายใจเมื่อ Mg > 12–14 mg/dL)\n'
+          '  3. ปริมาณปัสสาวะ (Urine Output) ต้องออกไม่น้อยกว่า 25–30 mL/hr (หรือ >= 100 mL ใน 4 ชม.)',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูงระดับวิกฤต (High-Alert Electrolyte/Anticonvulsant)\n'
+          '• ยาแก้พิษจำเพาะ (Specific Antidote):\n'
+          '  - หากเกิดภาวะพิษจากแมกนีเซียม (Loss of patellar reflexes หรือ Respiratory depression): ให้หยุดหยด Magnesium sulfate ทันที และให้ 10% Calcium Gluconate ขนาด 10 mL (1 g) ฉีดเข้าหลอดเลือดดำช้าๆ นาน 3–5 นาที',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=magnesium+sulfate',
+    ),
     severeInteractions: [
       'Calcium Channel Blockers (Potentiates hypotension)',
       'Neuromuscular blockers (Prolongs paralysis)'
@@ -111,6 +195,16 @@ final List<Drug> emergency = [
     contraindications: ['Heart block', 'Myocardial damage'],
     specialNotes: 'Monitor deep tendon reflexes, respiratory rate, and urine output. Calcium gluconate is the antidote.',
     specialNotesTh: 'ต้องวัดรีเฟล็กซ์เข่า อัตราการหายใจ และปัสสาวะอย่างต่อเนื่อง ถ้าเกิดพิษ ให้ Calcium gluconate เป็นยาแก้พิษ',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.d5w, IvDiluent.nss],
+      preferredDiluent: IvDiluent.d5w,
+      stabilityNoteEn:
+          'Dilute 50% MgSO4 solution to <= 20% (<= 200 mg/mL) prior to IV infusion (standard maintenance: 20 g in 500 mL NSS or D5W = 40 mg/mL) via infusion pump.',
+      stabilityNoteTh:
+          'ต้องเจือจาง 50% MgSO4 ให้มีความเข้มข้น <= 20% ก่อนหยดเข้าหลอดเลือดดำ (ผสมมาตรฐาน: 20 g ใน NSS หรือ D5W 500 mL = 40 mg/mL) ผ่าน Infusion Pump เสมอ',
+      sourceCitation:
+          'US FDA Magnesium Sulfate Injection SPL / ACOG Practice Bulletin No. 222 / คู่มือยาฉีดรามาธิบดี',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -121,6 +215,7 @@ final List<Drug> emergency = [
         frequency: Frequency.once,
         notes: 'Loading dose over 15-20 min, then 1-2g/hr maintenance',
         infusionTimeMinutes: 20,
+        verificationStatus: VerificationStatus.pendingReview,
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 0,
@@ -141,6 +236,7 @@ final List<Drug> emergency = [
         continuousRateMax: 2.0,
         continuousRateUnit: 'g/hr',
         standardDilutionMgPerMl: 40.0,
+        verificationStatus: VerificationStatus.pendingReview,
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 0,
@@ -160,6 +256,7 @@ final List<Drug> emergency = [
         doseUnit: DoseUnit.mg,
         frequency: Frequency.stat,
         notes: 'Slow IV push over 2-5 min',
+        verificationStatus: VerificationStatus.pendingReview,
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 0,
@@ -300,9 +397,55 @@ final List<Drug> emergency = [
     nameTh: 'โดบูทามีน',
     category: DrugCategory.vasopressor,
     isHighAlert: true,
+    sourceCitation: 'AHA/ACC Heart Failure Guidelines 2022 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี / US FDA Dobutrex SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'AHA/ACC Heart Failure Guidelines 2022 / Ramathibodi High-Alert IV Infusion Guide / US FDA Dobutrex SPL',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Inotrope Support for Acute Decompensated Heart Failure §2.1-2.2',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'AHA/ACC Heart Failure Guidelines / รามาธิบดี',
+      editionYear: '2022 Guidelines / 2024 Manual',
+      sectionOrTable: 'Inotrope Support for Acute Decompensated Heart Failure',
+      dosingGuideline:
+          '• อัตราการให้ยาต่อเนื่อง (Continuous IV Infusion):\n'
+          '  - ขนาดยาเริ่มต้น: 2.0–2.5 mcg/kg/min ปรับ Titrate เพิ่มขึ้นทีละ 2.5 mcg/kg/min ทุก 15–30 นาที ตามการตอบสนองของระบบไหลเวียนโลหิต\n'
+          '  - ขนาดยาในการรักษาทั่วไป: 2.5–15.0 mcg/kg/min (ขนาดยาสูงสุด 20.0 mcg/kg/min)\n'
+          '  - เป้าหมายทางคลินิก: เพิ่ม Cardiac Output, บรรเทาภาวะคั่งของน้ำ (Congestion) และฟื้นฟูการไหลเวียนเลือดไปยังอวัยวะสำคัญ (End-organ perfusion)',
+      renalGuideline:
+          '• สลายตัวผ่านกระบวนการเมแทบอลิซึมในตับและเนื้อเยื่อโดยเอนไซม์ COMT\n'
+          '• ไม่จำเป็นต้องปรับลดขนาดยาในผู้ป่วยไตเสื่อม (No renal dose adjustment needed)\n'
+          '• การเพิ่มแรงบีบตัวของหัวใจช่วยเพิ่ม Renal blood flow และ GFR ส่งผลให้ผู้ป่วยตอบสนองต่อยาขับปัสสาวะ (Diuretic responsiveness) ได้ดีขึ้น',
+      administrationGuideline:
+          '• สารละลายและการผสมยามาตรฐาน: Dobutamine 250 mg ใน D5W หรือ NSS 250 mL (ความเข้มข้น 1.0 mg/mL หรือ 1,000 mcg/mL); สำหรับสูตร Double strength: 500 mg ใน 250 mL (2.0 mg/mL)\n'
+          '• เส้นทางการให้ยา: ควรให้ผ่านเครื่องควบคุมอัตราการให้ยา (Infusion Pump) เสมอ สามารถให้ผ่านหลอดเลือดดำส่วนปลายขนาดใหญ่หรือหลอดเลือดดำส่วนกลางได้',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูง (High-Alert Inotrope)\n'
+          '• กลไกหลัก: กระตุ้น Beta-1 receptor เพิ่ม Inotropy และมีฤทธิ์กระตุ้น Beta-2 receptor เล็กน้อย ทำให้เกิด Vasodilation\n'
+          '• ข้อควรระวัง: อาจทำให้เกิด Tachyarrhythmias, Ventricular Ectopy หรือ Myocardial Ischemia ในผู้ป่วย Coronary Artery Disease\n'
+          '• หากผู้ป่วยมีภาวะขาดสารน้ำรุนแรง ยาอาจทำให้ความดันโลหิตลดต่ำลง (Hypotension) ได้จากฤทธิ์คลายหลอดเลือด',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=dobutamine',
+    ),
     severeInteractions: ['Beta-blockers (Antagonistic effect)'],
     specialNotes: 'Inotrope for acute decompensated heart failure. Increases cardiac output. May cause tachycardia.',
     specialNotesTh: 'ยาเพิ่มแรงบีบตัวของหัวใจ สำหรับหัวใจล้มเหลวเฉียบพลัน อาจทำให้หัวใจเต้นเร็ว',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [
+        IvDiluent.d5w,
+        IvDiluent.nss,
+        IvDiluent.d5nss,
+        IvDiluent.lrs,
+      ],
+      preferredDiluent: IvDiluent.d5w,
+      stabilityNoteEn:
+          'Standard: 250 mg in 250 mL D5W or NSS (1.0 mg/mL = 1,000 mcg/mL); use within 24 hours. Slight pink discoloration over time reflects mild oxidation without significant potency loss. Incompatible with alkaline sodium bicarbonate.',
+      stabilityNoteTh:
+          'ผสมมาตรฐาน 250 mg ใน D5W หรือ NSS 250 mL (1.0 mg/mL) ใช้ภายใน 24 ชม. ห้ามผสมร่วมกับ Sodium Bicarbonate หรือสารละลายด่าง',
+      sourceCitation:
+          'US FDA Dobutrex (dobutamine) SPL / Ramathibodi High-Alert IV Infusion Guide 2024',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -311,6 +454,8 @@ final List<Drug> emergency = [
         continuousRateMin: 2.0,
         continuousRateMax: 20.0,
         continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
         doseUnit: DoseUnit.mcg,
         frequency: Frequency.continuous,
         standardDilutionMgPerMl: 1.0, // 250mg in 250mL

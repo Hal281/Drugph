@@ -75,7 +75,8 @@ class ClinicalEvidenceSheet extends StatelessWidget {
     final edition = mono?.editionYear ?? (drug.lastReviewedDate.isNotEmpty ? drug.lastReviewedDate : 'Current Version');
     final section = mono?.sectionOrTable;
 
-    final isVerified = drug.provenance != null ||
+    final isVerified = (drug.provenance?.reviewerLicense != null &&
+            drug.provenance!.reviewerLicense!.trim().isNotEmpty) ||
         (regimen?.verificationStatus == VerificationStatus.verified);
 
     return Scaffold(
@@ -529,7 +530,7 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  prov != null
+                  isVerified && prov != null
                       ? '${isThai ? "ผู้ตรวจ:" : "Reviewer:"} ${prov.reviewedBy} ${prov.reviewerLicense != null ? "(${prov.reviewerLicense})" : ""} • ${prov.reviewedAt}'
                       : (isThai
                           ? 'ข้อมูลอยู่ในชุดตรวจสอบ Clinical Dossier เพื่อให้อาจารย์และเภสัชกรตรวจเซ็นรับรอง'

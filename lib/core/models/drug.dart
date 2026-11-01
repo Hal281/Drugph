@@ -15,14 +15,19 @@ import 'rate_unit.dart';
 import 'dosing_phase.dart';
 import 'population_criteria.dart';
 import 'renal_adjustment.dart';
+import 'renal_replacement_mode.dart';
+import 'renal_replacement_protocol.dart';
 import 'drug_class.dart';
 import 'interaction.dart';
 import 'formulation.dart';
 import 'provenance.dart';
+import 'iv_diluent.dart';
 import 'dose_rule.dart';
 import 'drug_ontology.dart';
 
 export 'renal_adjustment.dart';
+export 'renal_replacement_mode.dart';
+export 'renal_replacement_protocol.dart';
 export 'frequency.dart';
 export 'dose_basis.dart';
 export 'rate_unit.dart';
@@ -33,6 +38,7 @@ export 'interaction.dart';
 export 'dose_rule.dart';
 export 'formulation.dart';
 export 'provenance.dart';
+export 'iv_diluent.dart';
 
 /// Unit of medication concentration (E6).
 enum ConcentrationUnit {
@@ -195,6 +201,9 @@ class DosingRegimen {
   /// Renal dose adjustment tiers sorted by CrCl range.
   final List<RenalAdjustment>? renalAdjustments;
 
+  /// Evidence-based dosing protocols for patients on RRT (IHD, CAPD, CRRT) (M1).
+  final List<RenalReplacementProtocol>? renalReplacementProtocols;
+
   /// Clinician notes (English).
   final String? notes;
 
@@ -222,6 +231,9 @@ class DosingRegimen {
 
   /// Source citation for the explicit dose cap (F3).
   final String? doseCapCitation;
+
+  /// Bedside IV diluent compatibility override for this specific regimen.
+  final IvDiluentCompatibility? ivDiluentCompatibility;
 
   const DosingRegimen({
     required this.route,
@@ -252,6 +264,7 @@ class DosingRegimen {
     this.infusionTimeMinutes,
     this.maxInfusionRateMgPerMin,
     this.renalAdjustments,
+    this.renalReplacementProtocols,
     this.notes,
     this.notesTh,
     this.dosingWeightStrategy = DosingWeightStrategy.actual,
@@ -261,8 +274,24 @@ class DosingRegimen {
     this.doseRangeMax,
     this.doseCap,
     this.doseCapCitation,
+    this.ivDiluentCompatibility,
     this.verificationStatus = VerificationStatus.unverified,
   });
+
+  /// Resolves regimen-specific IV diluent compatibility, falling back to [drug].
+  IvDiluentCompatibility? effectiveIvDiluentCompatibility(Drug drug) =>
+      ivDiluentCompatibility ?? drug.ivDiluentCompatibility;
+
+  /// Finds the explicit RRT protocol for the given [mode], or `null` if none defined.
+  RenalReplacementProtocol? rrtProtocolFor(RenalReplacementMode mode) {
+    if (renalReplacementProtocols == null || mode == RenalReplacementMode.none) {
+      return null;
+    }
+    for (final protocol in renalReplacementProtocols!) {
+      if (protocol.mode == mode) return protocol;
+    }
+    return null;
+  }
 
   /// Effective standard dilution concentration in base unit per mL equivalent.
   double? get effectiveStandardDilutionMgPerMl =>
@@ -406,6 +435,9 @@ class Drug {
   /// Structured clinical textbook monograph for this drug.
   final ClinicalMonograph? monograph;
 
+  /// Bedside IV diluent compatibility and physical precipitation metadata.
+  final IvDiluentCompatibility? ivDiluentCompatibility;
+
   /// Whether oral tablets of this drug may be split (F1).
   final bool tabletSplittable;
 
@@ -450,6 +482,7 @@ class Drug {
     this.lastReviewedDate = '',
     this.provenance,
     this.monograph,
+    this.ivDiluentCompatibility,
     this.tabletSplittable = false,
     this.vialPartialAllowed = false,
     bool? isSplittable,

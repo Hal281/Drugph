@@ -53,6 +53,17 @@ class SchemaValidator {
     'enalapril': '3827',
     'aspirin (high-dose / anti-inflammatory)': '1191',
     'aspirin': '1191',
+    'meropenem': '29561',
+    'vancomycin': '11124',
+    'colistimethate sodium (colistin)': '2709',
+    'colistimethate': '2708',
+    'colistin': '2709',
+    'piperacillin / tazobactam': '74169',
+    'piperacillin': '8339',
+    'tazobactam': '37617',
+    'valproic acid': '11118',
+    'gentamicin': '1596450',
+    'probenecid': '8698',
   };
 
   static SchemaValidationReport validateKnowledgeBase(

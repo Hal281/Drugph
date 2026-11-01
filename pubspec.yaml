@@ -37,3 +37,12 @@ flutter:
     - assets/fonts/
     - assets/data/
     - assets/evidence/
+
+  fonts:
+    - family: ThaiFont
+      fonts:
+        - asset: assets/fonts/ThaiFont.ttf
+    - family: Sarabun
+      fonts:
+        - asset: assets/fonts/ThaiFont.ttf
+

@@ -56,3 +56,4 @@ secrets.json
 secrets.yaml
 .wrangler/
 .continue/
+.agents/

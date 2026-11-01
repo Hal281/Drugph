@@ -1,12 +1,20 @@
 {
-    "name": "drug_dosage_calculator",
-    "short_name": "drug_dosage_calculator",
+    "name": "Drugph — Clinical Dosage & Medication Safety",
+    "short_name": "Drugph",
     "start_url": ".",
+    "scope": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F8FAFC",
+    "theme_color": "#00796B",
+    "description": "Deterministic Clinical Dosage Calculation & Medication Safety System for Physicians and Clinical Pharmacists",
+    "orientation": "any",
+    "lang": "th",
+    "dir": "ltr",
+    "categories": [
+        "medical",
+        "health",
+        "productivity"
+    ],
     "prefer_related_applications": false,
     "icons": [
         {

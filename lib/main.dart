@@ -30,7 +30,8 @@ class _DrugDosageAppState extends State<DrugDosageApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
-        fontFamily: 'Sarabun', // Suggesting a clean font for numbers
+        fontFamily: 'ThaiFont',
+        fontFamilyFallback: const ['ThaiFont', 'Sarabun', 'sans-serif'],
       ),
       locale: _locale,
       localizationsDelegates: const [

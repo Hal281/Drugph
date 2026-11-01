@@ -74,6 +74,21 @@ final List<Drug> neurology = [
     contraindications: ['Sinus bradycardia', 'Sinoatrial block'],
     specialNotes: 'Non-linear pharmacokinetics. Target TDM: 10-20 mcg/mL. Max IV rate 50mg/min to prevent arrhythmias.',
     specialNotesTh: 'ต้องเจาะเลือดดูระดับยา (Target 10-20) การให้ IV ห้ามเกิน 50mg/min ป้องกันหัวใจหยุดเต้น',
+    ivDiluentCompatibility: IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.nss],
+      preferredDiluent: IvDiluent.nss,
+      incompatibleDiluents: [IvDiluent.d5w, IvDiluent.d5nss, IvDiluent.lrs],
+      incompatibilityReasonEn:
+          'CRITICAL PRECIPITATION HAZARD: Phenytoin sodium (pH ~12) immediately precipitates into microcrystals in dextrose (D5W/D5NSS) or Lactated Ringer\'s (LRS). Dilute ONLY in 0.9% NaCl (NSS).',
+      incompatibilityReasonTh:
+          'ห้ามผสมใน D5W, D5NSS หรือ LRS เด็ดขาด: Phenytoin (pH ~12) จะตกตะกอนเป็นผลึกทันทีในสารละลายน้ำตาลหรือกรดอ่อน ต้องผสมใน 0.9% NaCl (NSS) เท่านั้น',
+      stabilityNoteEn:
+          'Dilute in NSS to <= 10 mg/mL, administer via 0.22-micron inline filter at <= 50 mg/min (<= 25 mg/min in elderly/cardiac disease), and complete within 1 hour of preparation.',
+      stabilityNoteTh:
+          'เจือจางใน NSS ความเข้มข้น <= 10 mg/mL ให้ผ่านตัวกรอง 0.22-micron inline filter อัตราไม่เกิน 50 mg/min (ผู้สูงอายุ/โรคหัวใจ <= 25 mg/min) และใช้ให้หมดภายใน 1 ชม. หลังผสม',
+      sourceCitation:
+          'US FDA Phenytoin Sodium Injection SPL / Trissel\'s Handbook on Injectable Drugs / คู่มือยาฉีดรามาธิบดี',
+    ),
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -151,7 +166,57 @@ final List<Drug> neurology = [
         renalAdjustments: [
           RenalAdjustment(crclMin: 30, crclMax: 60, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h, notes: '400-1400 mg/day divided BID'),
           RenalAdjustment(crclMin: 15, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '200-700 mg/day (OD)'),
-          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h, notes: '100-300 mg/day (OD)'),
+          RenalAdjustment(crclMin: 0, crclMax: 15, action: RenalAction.adjust, absoluteDose: 100.0, adjustedFrequency: Frequency.q24h, notes: 'Start at 100 mg OD (100-300 mg/day) to prevent neurotoxicity', notesTh: 'เริ่มต้นที่ 100 mg วันละครั้ง (100-300 mg/วัน) ป้องกันพิษต่อระบบประสาท'),
+        ],
+        renalReplacementProtocols: [
+          RenalReplacementProtocol(
+            mode: RenalReplacementMode.ihd,
+            specificDose: 200.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q24h,
+            requiresPostHdSupplement: true,
+            clinicalInstructionEn:
+                '100–300 mg PO administered immediately AFTER each hemodialysis session (e.g. 100–300 mg post-HD 3 times/week). Dialysis removes 35–50% of drug. Monitor closely for sedation and neurotoxicity.',
+            clinicalInstructionTh:
+                '100–300 มก. รับประทานทันทีหลังการฟอกเลือดเสร็จสิ้นในแต่ละครั้ง (เช่น 100–300 มก. หลังฟอกไต สัปดาห์ละ 3 ครั้ง) การฟอกไตขจัดยาออก 35–50% ต้องเฝ้าระวังอาการง่วงซึมและพิษต่อระบบประสาทอย่างใกล้ชิด',
+            provenance: Provenance(
+              source: 'Lexicomp 2024 / FDA Neurontin Package Insert §2.2 / KDIGO 2023',
+              reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+              reviewedAt: '2024-10-29',
+            ),
+          ),
+          RenalReplacementProtocol(
+            mode: RenalReplacementMode.capd,
+            specificDose: 100.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q48h,
+            requiresPostHdSupplement: false,
+            clinicalInstructionEn:
+                '100–200 mg PO every 48 hours (or 100 mg PO once daily with caution). Peritoneal clearance is minimal.',
+            clinicalInstructionTh:
+                '100–200 มก. รับประทาน ทุก 48 ชม. (หรือ 100 มก. วันละครั้งอย่างระมัดระวัง) การล้างไตทางช่องท้องขจัดยาน้อยมาก',
+            provenance: Provenance(
+              source: 'Lexicomp 2024 / KDIGO 2023',
+              reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+              reviewedAt: '2024-10-29',
+            ),
+          ),
+          RenalReplacementProtocol(
+            mode: RenalReplacementMode.crrt,
+            specificDose: 100.0,
+            doseUnit: DoseUnit.mg,
+            frequency: Frequency.q12h,
+            requiresPostHdSupplement: false,
+            clinicalInstructionEn:
+                'CRRT (CVVH/CVVHD/CVVHDF): 100–200 mg PO q12–24h. CRRT filters clear gabapentin readily (sieving coefficient ~1.0). Titrate slowly and monitor for central nervous system depression, ataxia, and myoclonus.',
+            clinicalInstructionTh:
+                'CRRT (CVVH/CVVHD/CVVHDF): 100–200 มก. รับประทาน ทุก 12–24 ชม. ตัวกรอง CRRT ขจัดยาออกได้อย่างมีประสิทธิภาพ (sieving coeff ~1.0) ค่อยๆ ปรับขนาดยาและติดตามอาการซึม กล้ามเนื้อกระตุก และพิษต่อระบบประสาทอย่างใกล้ชิด',
+            provenance: Provenance(
+              source: 'Lexicomp 2024 / KDIGO 2023',
+              reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+              reviewedAt: '2024-10-29',
+            ),
+          ),
         ],
       ),
     ],
