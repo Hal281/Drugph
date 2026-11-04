@@ -186,6 +186,8 @@ class UnitConverter {
         f.contains('continuous') ||
         f.contains('prn') ||
         f.contains('as needed') ||
+        f.contains('เมื่อจำเป็น') ||
+        f.contains('เมื่อมีอาการ') ||
         f.contains('titrate') ||
         f.contains('per week') ||
         f.contains('cycle') ||
@@ -194,15 +196,32 @@ class UnitConverter {
       return 0.0;
     }
 
-    // 1. qNh pattern (e.g. q4h, q6h, q8h, q12h, q24h, q48h)
-    final qhMatch = RegExp(r'\bq(\d+)h\b').firstMatch(f);
+    // 1. qNh / every N hours pattern (e.g. q4h, q6hr, q8hrs, every 8 hours)
+    final qhMatch =
+        RegExp(r'(?:\bq|every\s*)(\d+)\s*(?:h|hr|hrs|hours)\b').firstMatch(f);
     if (qhMatch != null) {
       final hours = int.parse(qhMatch.group(1)!);
       if (hours <= 0) return 0.0;
       return 24.0 / hours;
     }
 
-    // 2. Named standard frequencies
+    // 2. Thai interval pattern (e.g. ทุก 8 ชม., ทุก 8 ชั่วโมง)
+    final thaiIntervalMatch =
+        RegExp(r'ทุก\s*(\d+)\s*(?:ชม\.?|ชั่วโมง)').firstMatch(f);
+    if (thaiIntervalMatch != null) {
+      final hours = int.parse(thaiIntervalMatch.group(1)!);
+      if (hours <= 0) return 0.0;
+      return 24.0 / hours;
+    }
+
+    // 3. Thai daily frequency (e.g. วันละ 2 ครั้ง)
+    final thaiDailyMatch = RegExp(r'วันละ\s*(\d+)\s*ครั้ง').firstMatch(f);
+    if (thaiDailyMatch != null) {
+      final times = double.tryParse(thaiDailyMatch.group(1)!);
+      if (times != null && times > 0) return times;
+    }
+
+    // 4. Named standard frequencies
     if (RegExp(r'\b(qid|qds)\b').hasMatch(f)) {
       return 4.0;
     }
@@ -212,7 +231,8 @@ class UnitConverter {
     if (RegExp(r'\b(bid|bd)\b').hasMatch(f)) {
       return 2.0;
     }
-    if (RegExp(r'\b(once|stat|daily|od|qd|single dose)\b').hasMatch(f)) {
+    if (RegExp(r'\b(once|stat|daily|od|qd|single dose)\b').hasMatch(f) ||
+        f == 'ครั้งเดียว') {
       return 1.0;
     }
 

@@ -485,12 +485,22 @@ class AllergyService {
       // 3. CROSS-REACTIVITY EVALUATION
       bool evaluatedCrossReactivity = false;
 
-      // Penicillin <-> Cephalosporin (2–5% unified cross-reactivity rate)
-      if ((allergenClass == DrugClass.betaLactamPenicillin ||
-              canonicalToken == 'penicillin' ||
-              canonicalToken == 'amoxicillin' ||
-              canonicalToken == 'ampicillin') &&
-          drugClass == DrugClass.betaLactamCephalosporin) {
+      // 1. Penicillin <-> Cephalosporin (Bidirectional, 2–5% unified cross-reactivity rate)
+      final isAllergenPenicillin = allergenClass == DrugClass.betaLactamPenicillin ||
+          canonicalToken == 'penicillin' ||
+          canonicalToken == 'amoxicillin' ||
+          canonicalToken == 'ampicillin';
+      final isAllergenCephalosporin = allergenClass == DrugClass.betaLactamCephalosporin ||
+          canonicalToken == 'cephalosporin' ||
+          canonicalToken.startsWith('cef') ||
+          canonicalToken.startsWith('ceph');
+      final isAllergenCarbapenem = allergenClass == DrugClass.betaLactamCarbapenem ||
+          canonicalToken == 'carbapenem' ||
+          canonicalToken == 'meropenem' ||
+          canonicalToken == 'imipenem' ||
+          canonicalToken == 'ertapenem';
+
+      if (isAllergenPenicillin && drugClass == DrugClass.betaLactamCephalosporin) {
         alerts.add(AllergyAlert(
           hasDirectMatch: false,
           hasCrossReactivity: true,
@@ -503,12 +513,23 @@ class AllergyService {
               'คำเตือนการแพ้ข้ามกลุ่ม: ผู้ป่วยมีประวัติแพ้เพนิซิลลิน ยาเซฟาโลสปอรินมีความเสี่ยงแพ้ข้ามกลุ่มประมาณ 2–5% โปรดเฝ้าระวังอาการแพ้อย่างใกล้ชิด',
         ));
         evaluatedCrossReactivity = true;
+      } else if (isAllergenCephalosporin && drugClass == DrugClass.betaLactamPenicillin) {
+        alerts.add(AllergyAlert(
+          hasDirectMatch: false,
+          hasCrossReactivity: true,
+          allergen: rawAllergy,
+          matchedAgent: drugGenericName,
+          severity: LimitSeverity.soft,
+          messageEn:
+              'CROSS-REACTIVITY WARNING: Patient has cephalosporin allergy. Penicillins have potential cross-reactivity (2–5%). Monitor closely for allergic manifestations.',
+          messageTh:
+              'คำเตือนการแพ้ข้ามกลุ่ม: ผู้ป่วยมีประวัติแพ้เซฟาโลสปอริน ยาเพนิซิลลินมีความเสี่ยงแพ้ข้ามกลุ่มประมาณ 2–5% โปรดเฝ้าระวังอาการแพ้อย่างใกล้ชิด',
+        ));
+        evaluatedCrossReactivity = true;
       }
 
-      // Penicillin <-> Carbapenem (~1% cross-reactivity)
-      if ((allergenClass == DrugClass.betaLactamPenicillin ||
-              canonicalToken == 'penicillin') &&
-          drugClass == DrugClass.betaLactamCarbapenem) {
+      // 2. Penicillin / Cephalosporin <-> Carbapenem (Bidirectional, ~1% cross-reactivity)
+      if (isAllergenPenicillin && drugClass == DrugClass.betaLactamCarbapenem) {
         alerts.add(AllergyAlert(
           hasDirectMatch: false,
           hasCrossReactivity: true,
@@ -519,6 +540,32 @@ class AllergyService {
               'CROSS-REACTIVITY WARNING: Patient has penicillin allergy. Carbapenems have ~1% cross-reactivity. Use with clinical caution.',
           messageTh:
               'คำเตือนการแพ้ข้ามกลุ่ม: ผู้ป่วยมีประวัติแพ้เพนิซิลลิน ยาคาร์บาพีเนมมีความเสี่ยงแพ้ข้ามกลุ่มประมาณ 1% ควรใช้ด้วยความระมัดระวัง',
+        ));
+        evaluatedCrossReactivity = true;
+      } else if (isAllergenCarbapenem && (drugClass == DrugClass.betaLactamPenicillin || drugClass == DrugClass.betaLactamCephalosporin)) {
+        alerts.add(AllergyAlert(
+          hasDirectMatch: false,
+          hasCrossReactivity: true,
+          allergen: rawAllergy,
+          matchedAgent: drugGenericName,
+          severity: LimitSeverity.soft,
+          messageEn:
+              'CROSS-REACTIVITY WARNING: Patient has carbapenem allergy. Other beta-lactams have potential cross-reactivity (~1%). Use with clinical caution.',
+          messageTh:
+              'คำเตือนการแพ้ข้ามกลุ่ม: ผู้ป่วยมีประวัติแพ้คาร์บาพีเนม ยากลุ่มเบต้า-แลคแทมอื่นมีความเสี่ยงแพ้ข้ามกลุ่มประมาณ 1% ควรใช้ด้วยความระมัดระวัง',
+        ));
+        evaluatedCrossReactivity = true;
+      } else if (isAllergenCephalosporin && drugClass == DrugClass.betaLactamCarbapenem) {
+        alerts.add(AllergyAlert(
+          hasDirectMatch: false,
+          hasCrossReactivity: true,
+          allergen: rawAllergy,
+          matchedAgent: drugGenericName,
+          severity: LimitSeverity.soft,
+          messageEn:
+              'CROSS-REACTIVITY WARNING: Patient has cephalosporin allergy. Carbapenems have ~1% cross-reactivity. Use with clinical caution.',
+          messageTh:
+              'คำเตือนการแพ้ข้ามกลุ่ม: ผู้ป่วยมีประวัติแพ้เซฟาโลสปอริน ยาคาร์บาพีเนมมีความเสี่ยงแพ้ข้ามกลุ่มประมาณ 1% ควรใช้ด้วยความระมัดระวัง',
         ));
         evaluatedCrossReactivity = true;
       }

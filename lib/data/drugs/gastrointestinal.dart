@@ -146,7 +146,7 @@ final List<Drug> gastrointestinal = [
       ),
     ],
   ),
-  const Drug(
+  Drug(
     id: 'ondansetron',
     genericName: 'Ondansetron',
     brandNames: ['Zofran', 'Onsia'],
@@ -161,7 +161,41 @@ final List<Drug> gastrointestinal = [
     contraindications: ['Concurrent use with Apomorphine'],
     specialNotes: 'Dose-dependent QT prolongation. Max 8mg/day in severe liver disease (Child-Pugh C).',
     specialNotesTh: 'ระวังคลื่นไฟฟ้าหัวใจ (QT) ผิดปกติ ผู้ป่วยโรคตับรุนแรงห้ามใช้เกิน 8 mg/วัน',
-    regimens: [
+    doseRules: [
+      DoseRule(
+        id: 'ondansetron_child_pugh_c_cap',
+        name: 'Ondansetron Severe Hepatic Impairment Ceiling (Child-Pugh C)',
+        sourceCitation: 'US FDA Zofran (ondansetron) SPL §2.2 / Lexicomp 2024',
+        verificationStatus: VerificationStatus.verified,
+        applies: (ctx) =>
+            ctx.patient.hepaticClass == ChildPughClass.classC,
+        evaluate: (ctx) {
+          final warnings = <DoseWarning>[
+            const DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.contraindicationAlert,
+              messageEn:
+                  'HEPATIC DOSE CEILING: In severe hepatic impairment (Child-Pugh C), ondansetron daily dose must not exceed 8 mg/day. Frequency capped at once daily (q24h).',
+              messageTh:
+                  'จำกัดขนาดยาสูงสุดในภาวะตับวายรุนแรง (Child-Pugh C): ห้ามให้ยาออนแดนเซทรอนเกิน 8 mg/วัน ปรับความถี่เป็นวันละครั้ง (ทุก 24 ชม.)',
+            ),
+          ];
+          final modifiedDose = ctx.currentDose > 8.0 ? 8.0 : ctx.currentDose;
+          final isDoseModified =
+              ctx.currentDose > 8.0 || ctx.currentFrequency != Frequency.q24h;
+          return DoseRuleResult(
+            modifiedDose: modifiedDose,
+            modifiedFrequency: Frequency.q24h,
+            isDoseModified: isDoseModified,
+            modificationReasonEn: 'Ondansetron capped at 8 mg/day in Child-Pugh C.',
+            modificationReasonTh:
+                'จำกัดขนาดยา Ondansetron ไม่เกิน 8 mg/วัน ในผู้ป่วย Child-Pugh C',
+            warnings: warnings,
+          );
+        },
+      ),
+    ],
+    regimens: const [
       DosingRegimen(
         route: DoseRoute.ivPush,
         indication: 'CINV / PONV (Adult)',

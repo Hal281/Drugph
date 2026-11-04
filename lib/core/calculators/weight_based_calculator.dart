@@ -10,6 +10,7 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import 'dart:math' as math;
 import '../models/unit.dart';
 
 /// Weight-based dosing calculations.
@@ -35,15 +36,19 @@ class WeightBasedCalculator {
     required double heightCm,
     required Sex sex,
   }) {
-    if (heightCm <= 0) {
-      throw ArgumentError.value(heightCm, 'heightCm', 'Must be > 0');
+    if (!heightCm.isFinite || heightCm <= 0) {
+      throw ArgumentError.value(
+        heightCm,
+        'heightCm',
+        'Height must be a positive finite number (> 0)',
+      );
     }
 
     final double heightInches = heightCm / 2.54;
     final double base = sex == Sex.male ? 50.0 : 45.5;
 
     if (heightInches <= 60.0) {
-      return base;
+      return math.max(10.0, base - 2.3 * (60.0 - heightInches));
     }
 
     return base + 2.3 * (heightInches - 60.0);
@@ -67,13 +72,23 @@ class WeightBasedCalculator {
     required double ibwKg,
     double factor = 0.4,
   }) {
-    if (actualWeightKg <= 0) {
+    if (!actualWeightKg.isFinite || actualWeightKg <= 0) {
       throw ArgumentError.value(
-        actualWeightKg, 'actualWeightKg', 'Must be > 0',
+        actualWeightKg,
+        'actualWeightKg',
+        'Must be a positive finite number (> 0)',
       );
     }
-    if (ibwKg <= 0) {
-      throw ArgumentError.value(ibwKg, 'ibwKg', 'Must be > 0');
+    if (!ibwKg.isFinite || ibwKg <= 0) {
+      throw ArgumentError.value(
+        ibwKg,
+        'ibwKg',
+        'Must be a positive finite number (> 0)',
+      );
+    }
+
+    if (actualWeightKg <= ibwKg) {
+      return actualWeightKg;
     }
 
     return ibwKg + factor * (actualWeightKg - ibwKg);
@@ -85,7 +100,7 @@ class WeightBasedCalculator {
     required double actualWeightKg,
     required double ibwKg,
   }) {
-    if (ibwKg <= 0) return false;
+    if (!ibwKg.isFinite || ibwKg <= 0 || !actualWeightKg.isFinite) return false;
     return actualWeightKg >= ibwKg * 1.2;
   }
 
@@ -136,10 +151,10 @@ class WeightBasedCalculator {
     required double dosePerKg,
     double? maxDose,
   }) {
-    if (weightKg <= 0) {
+    if (!weightKg.isFinite || weightKg <= 0) {
       throw ArgumentError.value(weightKg, 'weightKg', 'Must be > 0');
     }
-    if (dosePerKg < 0) {
+    if (!dosePerKg.isFinite || dosePerKg < 0) {
       throw ArgumentError.value(dosePerKg, 'dosePerKg', 'Must be ≥ 0');
     }
 
@@ -164,10 +179,10 @@ class WeightBasedCalculator {
     required double dosePerM2,
     double? maxDose,
   }) {
-    if (bsaM2 <= 0) {
+    if (!bsaM2.isFinite || bsaM2 <= 0) {
       throw ArgumentError.value(bsaM2, 'bsaM2', 'Must be > 0');
     }
-    if (dosePerM2 < 0) {
+    if (!dosePerM2.isFinite || dosePerM2 < 0) {
       throw ArgumentError.value(dosePerM2, 'dosePerM2', 'Must be ≥ 0');
     }
 
@@ -198,10 +213,10 @@ class WeightBasedCalculator {
     required double gfrMlMin,
     bool capGfrAt125 = true,
   }) {
-    if (targetAuc <= 0) {
+    if (!targetAuc.isFinite || targetAuc <= 0) {
       throw ArgumentError.value(targetAuc, 'targetAuc', 'Must be > 0');
     }
-    if (gfrMlMin < 0) {
+    if (!gfrMlMin.isFinite || gfrMlMin < 0) {
       throw ArgumentError.value(gfrMlMin, 'gfrMlMin', 'Must be ≥ 0');
     }
 

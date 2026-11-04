@@ -98,14 +98,14 @@ class BsaCalculator {
   // ------------------------------------------------------------------
 
   static void _validateInputs(double heightCm, double weightKg) {
-    if (heightCm <= 0) {
+    if (!heightCm.isFinite || heightCm <= 0) {
       throw ArgumentError.value(
-        heightCm, 'heightCm', 'Height must be positive',
+        heightCm, 'heightCm', 'Height must be a positive finite number',
       );
     }
-    if (weightKg <= 0) {
+    if (!weightKg.isFinite || weightKg <= 0) {
       throw ArgumentError.value(
-        weightKg, 'weightKg', 'Weight must be positive',
+        weightKg, 'weightKg', 'Weight must be a positive finite number',
       );
     }
     if (heightCm > 300) {

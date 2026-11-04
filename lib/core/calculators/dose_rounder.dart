@@ -29,25 +29,47 @@ class DoseRounder {
     bool isSplittable = true,
     double maxDeviation = 0.05,
   }) {
-    if (strengths.isEmpty || calculatedDose <= 0) return null;
-
-    final sortedStrengths = List<double>.from(strengths)..sort();
-    final smallestStrength = sortedStrengths.first;
-    if (smallestStrength <= 0) return null;
-
-    final step = isSplittable ? (smallestStrength / 2.0) : smallestStrength;
-
-    // Nearest integer multiple of step
-    final multiple = (calculatedDose / step).round();
-    if (multiple <= 0) return null;
-
-    final roundedDose = multiple * step;
-    final deviation = (roundedDose - calculatedDose).abs() / calculatedDose;
-
-    if (deviation > maxDeviation) {
+    if (!calculatedDose.isFinite || calculatedDose <= 0 || strengths.isEmpty) {
       return null;
     }
 
-    return roundedDose;
+    final validStrengths =
+        strengths.where((s) => s.isFinite && s > 0).toList()..sort();
+    if (validStrengths.isEmpty) return null;
+
+    // 1. Check for an exact single strength match within maxDeviation
+    double? bestExact;
+    double minExactDev = double.infinity;
+    for (final s in validStrengths) {
+      final dev = (s - calculatedDose).abs() / calculatedDose;
+      if (dev <= maxDeviation && dev < minExactDev) {
+        minExactDev = dev;
+        bestExact = s;
+      }
+    }
+    if (bestExact != null && minExactDev == 0.0) {
+      return bestExact;
+    }
+
+    // 2. Step-based multiple of smallest strength
+    final smallestStrength = validStrengths.first;
+    final step = isSplittable ? (smallestStrength / 2.0) : smallestStrength;
+    if (!step.isFinite || step <= 0) return null;
+
+    final multiple = (calculatedDose / step).round();
+    if (multiple <= 0) return null;
+
+    final rawRounded = multiple * step;
+    final roundedDose = double.parse(rawRounded.toStringAsFixed(4));
+    final deviation = (roundedDose - calculatedDose).abs() / calculatedDose;
+
+    if (deviation <= maxDeviation + 1e-9) {
+      if (bestExact != null && minExactDev < deviation) {
+        return bestExact;
+      }
+      return roundedDose;
+    }
+
+    return bestExact;
   }
 }

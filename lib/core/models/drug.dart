@@ -397,10 +397,10 @@ class Drug {
   final String? firstDoseCitation;
 
   /// Whether hepatic dose adjustment/caution is required.
-  final bool requiresHepationCaution;
+  final bool requiresHepaticCaution;
 
-  /// Alias for hepatic caution requirement.
-  bool get requiresHepaticCaution => requiresHepationCaution;
+  /// Backward-compatible alias for [requiresHepaticCaution].
+  bool get requiresHepationCaution => requiresHepaticCaution;
 
   /// Whether TDM (Therapeutic Drug Monitoring) is required.
   final bool requiresTDM;
@@ -470,7 +470,7 @@ class Drug {
     this.renalDataPolicy = RenalDataPolicy.warn,
     this.firstDoseUnadjustedOk = false,
     this.firstDoseCitation,
-    bool requiresHepaticCaution = false,
+    this.requiresHepaticCaution = false,
     this.requiresTDM = false,
     this.isHighAlert = false,
     this.allergyClass,
@@ -486,7 +486,7 @@ class Drug {
     this.tabletSplittable = false,
     this.vialPartialAllowed = false,
     bool? isSplittable,
-  })  : requiresHepationCaution = requiresHepaticCaution;
+  });
 
   /// Finds the regimen matching [route] and optional [indication].
   ///

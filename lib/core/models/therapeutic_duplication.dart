@@ -204,6 +204,54 @@ class TherapeuticDuplicationService {
       );
     }
 
+    // 14. Dual Sulfonylurea Duplication
+    if (classA == DrugClass.sulfonylurea && classB == DrugClass.sulfonylurea) {
+      return DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.therapeuticDuplication,
+        messageEn:
+            'THERAPEUTIC DUPLICATION (Contraindicated): Concurrent use of multiple sulfonylureas (${drugA.genericName} + ${drugB.genericName}) is contraindicated due to severe risk of prolonged, refractory hypoglycemia.',
+        messageTh:
+            'ข้อห้ามใช้จากการจ่ายยาซ้ำซ้อน: การใช้ยากลุ่มซัลโฟนิลยูเรียซ้ำซ้อน (${drugA.genericName} + ${drugB.genericName}) เสี่ยงต่อภาวะน้ำตาลในเลือดต่ำขั้นวิกฤตและยาวนาน',
+      );
+    }
+
+    // 15. Dual DPP-4 Inhibitor Duplication
+    if (classA == DrugClass.dpp4Inhibitor && classB == DrugClass.dpp4Inhibitor) {
+      return DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.therapeuticDuplication,
+        messageEn:
+            'THERAPEUTIC DUPLICATION (Contraindicated): Concurrent use of multiple DPP-4 inhibitors (${drugA.genericName} + ${drugB.genericName}) is contraindicated without additive glycemic benefit.',
+        messageTh:
+            'ข้อห้ามใช้จากการจ่ายยาซ้ำซ้อน: การใช้ยากลุ่ม DPP-4 inhibitor ซ้ำซ้อน (${drugA.genericName} + ${drugB.genericName}) ไม่มีประโยชน์เพิ่มและเป็นข้อห้ามใช้',
+      );
+    }
+
+    // 16. Dual SGLT2 Inhibitor Duplication
+    if (classA == DrugClass.sglt2Inhibitor && classB == DrugClass.sglt2Inhibitor) {
+      return DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.therapeuticDuplication,
+        messageEn:
+            'THERAPEUTIC DUPLICATION (Contraindicated): Concurrent use of multiple SGLT2 inhibitors (${drugA.genericName} + ${drugB.genericName}) is contraindicated due to additive risk of euglycemic DKA and volume depletion.',
+        messageTh:
+            'ข้อห้ามใช้จากการจ่ายยาซ้ำซ้อน: การใช้ยากลุ่ม SGLT2 inhibitor ซ้ำซ้อน (${drugA.genericName} + ${drugB.genericName}) เสี่ยงต่อภาวะเลือดเป็นกรด euglycemic DKA และขาดน้ำรุนแรง',
+      );
+    }
+
+    // 17. Dual Thiazide Diuretic Duplication
+    if (classA == DrugClass.thiazideDiuretic && classB == DrugClass.thiazideDiuretic) {
+      return DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.therapeuticDuplication,
+        messageEn:
+            'THERAPEUTIC DUPLICATION (Contraindicated): Concurrent use of multiple thiazide diuretics (${drugA.genericName} + ${drugB.genericName}) is contraindicated due to severe electrolyte wasting (hypokalemia, hyponatremia).',
+        messageTh:
+            'ข้อห้ามใช้จากการจ่ายยาซ้ำซ้อน: การใช้ยาขับปัสสาวะกลุ่ม Thiazide ซ้ำซ้อน (${drugA.genericName} + ${drugB.genericName}) เสี่ยงต่อภาวะโพแทสเซียมและโซเดียมในเลือดต่ำขั้นรุนแรง',
+      );
+    }
+
     return null;
   }
 }
@@ -296,17 +344,34 @@ class ClinicalInteractionRegistry {
       ));
     }
 
-    // 5. Statin + Macrolides (CYP3A4 inhibition / Rhabdomyolysis)
-    final isStatinMacrolide = (curClass == DrugClass.statin && actClass == DrugClass.macrolide) ||
-        (curClass == DrugClass.macrolide && actClass == DrugClass.statin);
-    if (isStatinMacrolide) {
-      warnings.add(const DoseWarning(
+    // 5. Statin + Strong CYP3A4 Macrolide Inhibitors (Simvastatin/Atorvastatin/Lovastatin + Clarithromycin/Erythromycin)
+    const cyp3a4Statins = {'simvastatin', 'atorvastatin', 'lovastatin'};
+    const cyp3a4Macrolides = {'clarithromycin', 'erythromycin'};
+
+    final isCyp3a4StatinMacrolide =
+        (cyp3a4Statins.contains(curId) && cyp3a4Macrolides.contains(actId)) ||
+        (cyp3a4Statins.contains(actId) && cyp3a4Macrolides.contains(curId));
+
+    if (isCyp3a4StatinMacrolide) {
+      final statinName =
+          cyp3a4Statins.contains(curId) ? currentDrug.genericName : activeDrug.genericName;
+      final macrolideName =
+          cyp3a4Macrolides.contains(curId) ? currentDrug.genericName : activeDrug.genericName;
+      warnings.add(DoseWarning(
         severity: LimitSeverity.hard,
         code: DoseWarningCode.severeInteractionAlert,
         messageEn:
-            'Contraindicated Interaction: Macrolides strongly inhibit CYP3A4, markedly increasing statin exposure and triggering life-threatening rhabdomyolysis and acute renal failure.',
+            'Contraindicated Interaction: $macrolideName strongly inhibits CYP3A4, markedly increasing $statinName exposure and triggering life-threatening rhabdomyolysis and acute renal failure.',
         messageTh:
-            'ข้อห้ามใช้จากปฏิกิริยาระหว่างยา: ยาแมคโครไลด์ยับยั้งเอนไซม์ CYP3A4 อย่างรุนแรง ทำให้ระดับยา Statin สูงขึ้นหลายเท่า เสี่ยงกล้ามเนื้อลายสลาย (Rhabdomyolysis) และไตวายเฉียบพลัน',
+            'ข้อห้ามใช้จากปฏิกิริยาระหว่างยา: $macrolideName ยับยั้งเอนไซม์ CYP3A4 อย่างรุนแรง ทำให้ระดับยา $statinName สูงขึ้นหลายเท่า เสี่ยงกล้ามเนื้อลายสลาย (Rhabdomyolysis) และไตวายเฉียบพลัน',
+        clinicalAlternativesEn: [
+          'Switch macrolide to Azithromycin (no significant CYP3A4 inhibition).',
+          'Temporarily withhold $statinName during short-course macrolide antimicrobial therapy.',
+        ],
+        clinicalAlternativesTh: [
+          'เปลี่ยนยาฆ่าเชื้อเป็น Azithromycin (ไม่ยับยั้ง CYP3A4)',
+          'หยุดยา $statinName ชั่วคราวระหว่างการรับประทานยาฆ่าเชื้อ',
+        ],
       ));
     }
 
@@ -321,6 +386,63 @@ class ClinicalInteractionRegistry {
             'Major Interaction: Amiodarone inhibits P-glycoprotein-mediated Digoxin elimination, doubling serum Digoxin concentrations and risking lethal digitalis toxicity.',
         messageTh:
             'ปฏิกิริยารุนแรง: อะมิโอดาโรนยับยั้งการขับออกของ Digoxin ทำให้ระดับยาในเลือดเพิ่มขึ้นเป็น 2 เท่า เสี่ยงพิษจาก Digoxin ที่เป็นอันตรายถึงชีวิต',
+      ));
+    }
+
+    // 7. Anticoagulant (VKA/DOAC) + NSAID (Major GI Bleeding)
+    final isAnticoagNsaid =
+        ((curClass == DrugClass.anticoagulantVka || curClass == DrugClass.anticoagulantDoac) &&
+                actClass == DrugClass.nsaid) ||
+            ((actClass == DrugClass.anticoagulantVka || actClass == DrugClass.anticoagulantDoac) &&
+                curClass == DrugClass.nsaid);
+    if (isAnticoagNsaid) {
+      warnings.add(const DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.severeInteractionAlert,
+        messageEn:
+            'Major Interaction: Concomitant anticoagulant and NSAID markedly increases the risk of severe gastrointestinal ulceration and major hemorrhage. Avoid combination.',
+        messageTh:
+            'ปฏิกิริยารุนแรง: การใช้ยาต้านการแข็งตัวของเลือดร่วมกับ NSAIDs เพิ่มความเสี่ยงเลือดออกรุนแรงในทางเดินอาหารอย่างมาก ควรหลีกเลี่ยง',
+        clinicalAlternativesEn: ['Use Paracetamol or topical analgesics for pain relief.'],
+        clinicalAlternativesTh: ['ใช้พาราเซตามอลหรือยาทาภายนอกแทน'],
+      ));
+    }
+
+    // 8. Potassium-Sparing Diuretics + Potassium Supplement (KCl) (Fatal Hyperkalemia)
+    final isSpiroKcl =
+        (curClass == DrugClass.potassiumSparingDiuretic &&
+                (actId == 'potassium_chloride' || actId == 'kcl' || actId.contains('potassium'))) ||
+            (actClass == DrugClass.potassiumSparingDiuretic &&
+                (curId == 'potassium_chloride' || curId == 'kcl' || curId.contains('potassium')));
+    if (isSpiroKcl) {
+      warnings.add(const DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.severeInteractionAlert,
+        messageEn:
+            'Contraindicated Interaction: Potassium-sparing diuretics combined with potassium supplements can produce rapid, fatal hyperkalemia.',
+        messageTh:
+            'ข้อห้ามใช้: การให้ยาขับปัสสาวะประหยัดโพแทสเซียมร่วมกับโพแทสเซียมเสริม เสี่ยงต่อภาวะโพแทสเซียมสูงวิกฤตจนหัวใจหยุดเต้น',
+      ));
+    }
+
+    // 9. Lithium + NSAID / ACEI / ARB (Lithium Toxicity)
+    final isLithiumNsaidOrRas =
+        (curId == 'lithium' &&
+                (actClass == DrugClass.nsaid ||
+                    actClass == DrugClass.aceInhibitor ||
+                    actClass == DrugClass.arb)) ||
+            (actId == 'lithium' &&
+                (curClass == DrugClass.nsaid ||
+                    curClass == DrugClass.aceInhibitor ||
+                    curClass == DrugClass.arb));
+    if (isLithiumNsaidOrRas) {
+      warnings.add(const DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.severeInteractionAlert,
+        messageEn:
+            'Major Interaction: NSAIDs and ACEI/ARBs reduce renal lithium clearance by 20–40%, risking severe lithium toxicity.',
+        messageTh:
+            'ปฏิกิริยารุนแรง: ยากลุ่ม NSAIDs หรือ ACEI/ARB ลดการขับลิเทียมทางไต ทำให้ระดับลิเทียมสูงขึ้นจนเกิดพิษอันตราย',
       ));
     }
 

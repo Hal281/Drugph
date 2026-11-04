@@ -461,6 +461,7 @@ class ClinicalOrderFormatter {
   }
 
   static String _formatNumber(double value) {
+    if (!value.isFinite) return value.toString();
     if (value == value.roundToDouble()) {
       return value.toInt().toString();
     }

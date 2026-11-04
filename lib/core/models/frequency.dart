@@ -273,7 +273,9 @@ class Frequency {
 
     final withoutParens = lower.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
 
-    if (withoutParens == 'once' || withoutParens == 'single dose') {
+    if (withoutParens == 'once' ||
+        withoutParens == 'single dose' ||
+        withoutParens == 'ครั้งเดียว') {
       return Frequency.once;
     }
     if (withoutParens == 'stat') {
@@ -286,14 +288,49 @@ class Frequency {
       return Frequency.weekly;
     }
 
-    // Interval patterns
-    final qhMatch = RegExp(r'\bq(\d+)h\b').firstMatch(withoutParens);
-    final isPrnMatch = withoutParens.contains('prn') || withoutParens.contains('as needed');
-    final rangeMatch = RegExp(r'q?(\d+)h?\s*-\s*q?(\d+)h').firstMatch(withoutParens);
+    final isPrnMatch = withoutParens.contains('prn') ||
+        withoutParens.contains('as needed') ||
+        withoutParens.contains('เมื่อจำเป็น') ||
+        withoutParens.contains('เมื่อมีอาการ');
 
-    if (rangeMatch != null) {
-      final minH = int.parse(rangeMatch.group(1)!);
-      final maxH = int.parse(rangeMatch.group(2)!);
+    // 1. Thai daily frequency (e.g. วันละ 2 ครั้ง)
+    final thaiDailyMatch = RegExp(r'วันละ\s*(\d+)\s*ครั้ง').firstMatch(withoutParens);
+    if (thaiDailyMatch != null) {
+      final times = int.tryParse(thaiDailyMatch.group(1)!);
+      if (times == 1 && !isPrnMatch) return Frequency.q24h;
+      if (times == 2 && !isPrnMatch) {
+        return const Frequency(intervalHours: 12, displayEn: 'BID', displayTh: 'วันละ 2 ครั้ง');
+      }
+      if (times == 3 && !isPrnMatch) {
+        return const Frequency(intervalHours: 8, displayEn: 'TID', displayTh: 'วันละ 3 ครั้ง');
+      }
+      if (times == 4 && !isPrnMatch) {
+        return const Frequency(intervalHours: 6, displayEn: 'QID', displayTh: 'วันละ 4 ครั้ง');
+      }
+      if (times != null && times > 0) {
+        final hours = (24 / times).round();
+        return Frequency(
+          intervalHours: hours,
+          isPrn: isPrnMatch,
+          displayEn: 'Every $hours hours${isPrnMatch ? ' PRN' : ''}',
+          displayTh: 'ทุก $hours ชม.${isPrnMatch ? ' เมื่อจำเป็น' : ''}',
+          doseBasis: doseBasis,
+        );
+      }
+    }
+
+    // 2. Interval range patterns (e.g. q4-6h, every 4-6 hours, ทุก 4-6 ชม.)
+    final rangeMatch = RegExp(
+      r'(?:q|every\s*)?(\d+)\s*(?:h|hr|hrs|hours)?\s*-\s*(?:q|every\s*)?(\d+)\s*(?:h|hr|hrs|hours)\b',
+      caseSensitive: false,
+    ).firstMatch(withoutParens);
+    final thaiRangeMatch =
+        RegExp(r'ทุก\s*(\d+)\s*-\s*(\d+)\s*(?:ชม\.?|ชั่วโมง)').firstMatch(withoutParens);
+
+    final activeRangeMatch = rangeMatch ?? thaiRangeMatch;
+    if (activeRangeMatch != null) {
+      final minH = int.parse(activeRangeMatch.group(1)!);
+      final maxH = int.parse(activeRangeMatch.group(2)!);
       return Frequency(
         minIntervalHours: minH,
         maxIntervalHours: maxH,
@@ -304,8 +341,17 @@ class Frequency {
       );
     }
 
-    if (qhMatch != null) {
-      final hours = int.parse(qhMatch.group(1)!);
+    // 3. Fixed interval patterns (e.g. q8h, q8hr, q8hrs, every 8 hours, ทุก 8 ชม.)
+    final qhMatch = RegExp(
+      r'(?:\bq|every\s*)(\d+)\s*(?:h|hr|hrs|hours)\b',
+      caseSensitive: false,
+    ).firstMatch(withoutParens);
+    final thaiIntervalMatch =
+        RegExp(r'ทุก\s*(\d+)\s*(?:ชม\.?|ชั่วโมง)').firstMatch(withoutParens);
+
+    final activeIntervalMatch = qhMatch ?? thaiIntervalMatch;
+    if (activeIntervalMatch != null) {
+      final hours = int.parse(activeIntervalMatch.group(1)!);
       if (hours == 4 && !isPrnMatch) return Frequency.q4h;
       if (hours == 6 && !isPrnMatch) return Frequency.q6h;
       if (hours == 8 && !isPrnMatch) return Frequency.q8h;

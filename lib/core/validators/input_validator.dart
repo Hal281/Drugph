@@ -82,7 +82,7 @@ class InputValidator {
     if (weightKg == null) {
       errorsEn['weightKg'] = 'Weight is required';
       errorsTh['weightKg'] = 'กรุณาระบุน้ำหนัก';
-    } else if (weightKg <= 0) {
+    } else if (!weightKg.isFinite || weightKg <= 0) {
       errorsEn['weightKg'] = 'Weight must be greater than 0';
       errorsTh['weightKg'] = 'น้ำหนักต้องมากกว่า 0';
     } else if (weightKg < (allowNeonatalLowWeight ? minNeonatalWeightKg : 1.0)) {
@@ -102,7 +102,7 @@ class InputValidator {
     if (heightCm == null) {
       errorsEn['heightCm'] = 'Height is required';
       errorsTh['heightCm'] = 'กรุณาระบุส่วนสูง';
-    } else if (heightCm <= 0) {
+    } else if (!heightCm.isFinite || heightCm <= 0) {
       errorsEn['heightCm'] = 'Height must be greater than 0';
       errorsTh['heightCm'] = 'ส่วนสูงต้องมากกว่า 0';
     } else if (heightCm < 30.0) {
@@ -114,10 +114,17 @@ class InputValidator {
     }
 
     // Swapped height/weight cross-field check (implausible BMI)
-    if (weightKg != null && heightCm != null && weightKg > 0 && heightCm > 0) {
+    if (weightKg != null &&
+        heightCm != null &&
+        weightKg.isFinite &&
+        heightCm.isFinite &&
+        weightKg > 0 &&
+        heightCm > 0) {
       final heightM = heightCm / 100.0;
       final bmi = weightKg / (heightM * heightM);
-      if (bmi > 120.0 || bmi < 8.0) {
+      final minBmi =
+          (ageYears != null && ageYears < 2) || allowNeonatalLowWeight ? 3.0 : 8.0;
+      if (bmi > 120.0 || bmi < minBmi) {
         errorsEn['bmi'] =
             'Implausible BMI (${bmi.toStringAsFixed(1)}) — check if height and weight are swapped';
         errorsTh['bmi'] =
@@ -145,7 +152,7 @@ class InputValidator {
 
     // Serum creatinine (optional but validated if provided)
     if (serumCreatinineMgDl != null) {
-      if (serumCreatinineMgDl <= 0) {
+      if (!serumCreatinineMgDl.isFinite || serumCreatinineMgDl <= 0) {
         errorsEn['serumCreatinineMgDl'] =
             'Serum creatinine must be greater than 0';
         errorsTh['serumCreatinineMgDl'] = 'ค่าครีเอตินินต้องมากกว่า 0';
@@ -178,7 +185,7 @@ class InputValidator {
         errorsTh: {fieldName: 'กรุณาระบุขนาดยา'},
       );
     }
-    if (dose < 0) {
+    if (!dose.isFinite || dose < 0) {
       return ValidationResult(
         isValid: false,
         errorsEn: {fieldName: 'Dose cannot be negative'},
@@ -205,7 +212,7 @@ class InputValidator {
         errorsTh: {key: 'กรุณาระบุ$fieldNameTh'},
       );
     }
-    if (value <= 0) {
+    if (!value.isFinite || value <= 0) {
       return ValidationResult(
         isValid: false,
         errorsEn: {key: '$fieldNameEn must be greater than 0'},

@@ -38,18 +38,22 @@ class RenalCalculator {
     required Sex sex,
     required double serumCreatinineMgDl,
   }) {
-    if (serumCreatinineMgDl <= 0) {
+    if (!serumCreatinineMgDl.isFinite || serumCreatinineMgDl <= 0) {
       throw ArgumentError.value(
         serumCreatinineMgDl,
         'serumCreatinineMgDl',
-        'Serum creatinine must be > 0',
+        'Serum creatinine must be a positive finite number (> 0)',
       );
     }
     if (ageYears < 0 || ageYears > 150) {
       throw ArgumentError.value(ageYears, 'ageYears', 'Invalid age');
     }
-    if (weightKg <= 0) {
-      throw ArgumentError.value(weightKg, 'weightKg', 'Weight must be > 0');
+    if (!weightKg.isFinite || weightKg <= 0) {
+      throw ArgumentError.value(
+        weightKg,
+        'weightKg',
+        'Weight must be a positive finite number (> 0)',
+      );
     }
 
     double crcl =
@@ -79,15 +83,19 @@ class RenalCalculator {
     required double heightCm,
     required double serumCreatinineMgDl,
   }) {
-    if (serumCreatinineMgDl <= 0) {
+    if (!serumCreatinineMgDl.isFinite || serumCreatinineMgDl <= 0) {
       throw ArgumentError.value(
         serumCreatinineMgDl,
         'serumCreatinineMgDl',
-        'Serum creatinine must be > 0',
+        'Serum creatinine must be a positive finite number (> 0)',
       );
     }
-    if (heightCm <= 0) {
-      throw ArgumentError.value(heightCm, 'heightCm', 'Height must be > 0');
+    if (!heightCm.isFinite || heightCm <= 0) {
+      throw ArgumentError.value(
+        heightCm,
+        'heightCm',
+        'Height must be a positive finite number (> 0)',
+      );
     }
     return 0.413 * heightCm / serumCreatinineMgDl;
   }
@@ -114,11 +122,11 @@ class RenalCalculator {
     required Sex sex,
     required double serumCreatinineMgDl,
   }) {
-    if (serumCreatinineMgDl <= 0) {
+    if (!serumCreatinineMgDl.isFinite || serumCreatinineMgDl <= 0) {
       throw ArgumentError.value(
         serumCreatinineMgDl,
         'serumCreatinineMgDl',
-        'Serum creatinine must be > 0',
+        'Serum creatinine must be a positive finite number (> 0)',
       );
     }
     if (ageYears < 18) {

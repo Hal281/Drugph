@@ -28,11 +28,23 @@ class IvRateCalculator {
     required Concentration concentration,
     double? weightKg,
   }) {
-    if (doseRatePerMin < 0) {
+    if (!doseRatePerMin.isFinite || doseRatePerMin < 0) {
       throw ArgumentError.value(doseRatePerMin, 'doseRatePerMin', 'Must be >= 0');
     }
-    if (concentration.value <= 0) {
+    if (!concentration.value.isFinite || concentration.value <= 0) {
       throw ArgumentError.value(concentration.value, 'concentration', 'Must be > 0');
+    }
+
+    final isWeightBased = doseRateUnit == RateUnit.mcgKgMin ||
+        doseRateUnit == RateUnit.mcgKgHr ||
+        doseRateUnit == RateUnit.mgKgHr ||
+        doseRateUnit == RateUnit.mgKgMin ||
+        doseRateUnit == RateUnit.uKgHr;
+
+    if (isWeightBased && (weightKg == null || !weightKg.isFinite || weightKg <= 0)) {
+      throw ArgumentError(
+        'Weight in kg must be > 0 for weight-based infusion rate unit (${doseRateUnit.symbol})',
+      );
     }
 
     // Check unit compatibility
@@ -81,10 +93,10 @@ class IvRateCalculator {
     required double volumeMl,
     required double timeMinutes,
   }) {
-    if (volumeMl < 0) {
+    if (!volumeMl.isFinite || volumeMl < 0) {
       throw ArgumentError.value(volumeMl, 'volumeMl', 'Must be ≥ 0');
     }
-    if (timeMinutes <= 0) {
+    if (!timeMinutes.isFinite || timeMinutes <= 0) {
       throw ArgumentError.value(timeMinutes, 'timeMinutes', 'Must be > 0');
     }
 
@@ -111,10 +123,10 @@ class IvRateCalculator {
     required double timeMinutes,
     int dropFactor = 20,
   }) {
-    if (volumeMl < 0) {
+    if (!volumeMl.isFinite || volumeMl < 0) {
       throw ArgumentError.value(volumeMl, 'volumeMl', 'Must be ≥ 0');
     }
-    if (timeMinutes <= 0) {
+    if (!timeMinutes.isFinite || timeMinutes <= 0) {
       throw ArgumentError.value(timeMinutes, 'timeMinutes', 'Must be > 0');
     }
     if (dropFactor <= 0) {
@@ -138,12 +150,12 @@ class IvRateCalculator {
     required double desiredDoseMg,
     required double concentrationMgPerMl,
   }) {
-    if (desiredDoseMg < 0) {
+    if (!desiredDoseMg.isFinite || desiredDoseMg < 0) {
       throw ArgumentError.value(
         desiredDoseMg, 'desiredDoseMg', 'Must be ≥ 0',
       );
     }
-    if (concentrationMgPerMl <= 0) {
+    if (!concentrationMgPerMl.isFinite || concentrationMgPerMl <= 0) {
       throw ArgumentError.value(
         concentrationMgPerMl,
         'concentrationMgPerMl',
@@ -165,14 +177,14 @@ class IvRateCalculator {
     required double concentrationMgPerMl,
     required double rateMlPerHr,
   }) {
-    if (concentrationMgPerMl <= 0) {
+    if (!concentrationMgPerMl.isFinite || concentrationMgPerMl <= 0) {
       throw ArgumentError.value(
         concentrationMgPerMl,
         'concentrationMgPerMl',
         'Must be > 0',
       );
     }
-    if (rateMlPerHr < 0) {
+    if (!rateMlPerHr.isFinite || rateMlPerHr < 0) {
       throw ArgumentError.value(rateMlPerHr, 'rateMlPerHr', 'Must be ≥ 0');
     }
 
@@ -196,8 +208,13 @@ class IvRateCalculator {
     required double rateMlPerHr,
     required double weightKg,
   }) {
-    if (concentrationMcgPerMl <= 0 || rateMlPerHr < 0 || weightKg <= 0) {
-      throw ArgumentError('All values must be positive');
+    if (!concentrationMcgPerMl.isFinite ||
+        concentrationMcgPerMl <= 0 ||
+        !rateMlPerHr.isFinite ||
+        rateMlPerHr < 0 ||
+        !weightKg.isFinite ||
+        weightKg <= 0) {
+      throw ArgumentError('All values must be positive and finite');
     }
 
     return (concentrationMcgPerMl * rateMlPerHr) / (weightKg * 60.0);
@@ -209,8 +226,13 @@ class IvRateCalculator {
     required double weightKg,
     required double concentrationMcgPerMl,
   }) {
-    if (desiredMcgKgMin < 0 || weightKg <= 0 || concentrationMcgPerMl <= 0) {
-      throw ArgumentError('All values must be positive');
+    if (!desiredMcgKgMin.isFinite ||
+        desiredMcgKgMin < 0 ||
+        !weightKg.isFinite ||
+        weightKg <= 0 ||
+        !concentrationMcgPerMl.isFinite ||
+        concentrationMcgPerMl <= 0) {
+      throw ArgumentError('All values must be positive and finite');
     }
 
     return (desiredMcgKgMin * weightKg * 60.0) / concentrationMcgPerMl;
@@ -228,8 +250,11 @@ class IvRateCalculator {
     required double desiredUnitsPerHr,
     required double concentrationUnitsPerMl,
   }) {
-    if (desiredUnitsPerHr < 0 || concentrationUnitsPerMl <= 0) {
-      throw ArgumentError('All values must be positive');
+    if (!desiredUnitsPerHr.isFinite ||
+        desiredUnitsPerHr < 0 ||
+        !concentrationUnitsPerMl.isFinite ||
+        concentrationUnitsPerMl <= 0) {
+      throw ArgumentError('All values must be positive and finite');
     }
 
     return desiredUnitsPerHr / concentrationUnitsPerMl;

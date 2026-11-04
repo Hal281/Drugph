@@ -30,12 +30,15 @@ class PharmacistCalculator {
       final warnings = <DoseWarning>[];
 
       // --- 0. Input Validation (A12) ---
+      final isNeonateOrInfant =
+          patient.ageYears < 1 || patient.isNeonatal || patient.isInfant;
       final valRes = InputValidator.validatePatientInputs(
         weightKg: patient.weightKg,
         heightCm: patient.heightCm,
         ageYears: patient.ageYears,
         ageMonths: patient.ageMonths,
         serumCreatinineMgDl: patient.serumCreatinineMgDl,
+        allowNeonatalLowWeight: isNeonateOrInfant,
       );
       if (!valRes.isValid) {
         final errEn = valRes.errorsEn.values.join('; ');
@@ -176,7 +179,7 @@ class PharmacistCalculator {
       }
 
       if (patient.hepaticClass != null && patient.hepaticClass != ChildPughClass.none) {
-        if (drug.requiresHepationCaution) {
+        if (drug.requiresHepaticCaution) {
           final isSevere = patient.hepaticClass == ChildPughClass.classC;
           warnings.add(DoseWarning(
             severity: isSevere ? LimitSeverity.hard : LimitSeverity.soft,
@@ -338,10 +341,12 @@ class PharmacistCalculator {
           actualWeightKg: patient.weightKg,
           ibwKg: ibw,
         );
-        adjBw = WeightBasedCalculator.adjustedBodyWeight(
-          actualWeightKg: patient.weightKg,
-          ibwKg: ibw,
-        );
+        adjBw = isObese
+            ? WeightBasedCalculator.adjustedBodyWeight(
+                actualWeightKg: patient.weightKg,
+                ibwKg: ibw,
+              )
+            : patient.weightKg;
 
         // Weight for Cockcroft-Gault CrCl (Winter 2010 guideline)
         if (patient.weightKg < ibw) {
@@ -723,7 +728,7 @@ class PharmacistCalculator {
             (regimen.frequency.maxIntervalHours != null &&
                     regimen.frequency.maxIntervalHours! > 0
                 ? (24.0 / regimen.frequency.maxIntervalHours!)
-                : null);
+                : regimen.frequency.worstCaseDosesPerDay);
         if (dPerDay != null && dPerDay > 0) {
           dose = baseDose / dPerDay;
           final dosesStr = dPerDay == dPerDay.roundToDouble()
@@ -1134,8 +1139,10 @@ class PharmacistCalculator {
       double? dripRateDropsPerMin;
 
       // Normalize dose to milligrams (mg) for dilution and infusion rate checks
-      double doseMg = finalDose;
-      if (regimen.doseUnit == DoseUnit.g) {
+      double? doseMg;
+      if (regimen.doseUnit == DoseUnit.mg) {
+        doseMg = finalDose;
+      } else if (regimen.doseUnit == DoseUnit.g) {
         doseMg = UnitConverter.convertDoseUnit(finalDose, DoseUnit.g, DoseUnit.mg);
       } else if (regimen.doseUnit == DoseUnit.mcg) {
         doseMg = UnitConverter.convertDoseUnit(finalDose, DoseUnit.mcg, DoseUnit.mg);
@@ -1145,7 +1152,8 @@ class PharmacistCalculator {
       if (regimen.dosingType != DosingType.titrated &&
           effDilution != null &&
           effDilution > 0 &&
-          finalDose > 0) {
+          finalDose > 0 &&
+          doseMg != null) {
         volumeMl = doseMg / effDilution;
         if (infusionDurationMinutes != null && infusionDurationMinutes > 0) {
           infusionRateMlPerHr = (volumeMl / infusionDurationMinutes) * 60.0;
@@ -1153,7 +1161,8 @@ class PharmacistCalculator {
         }
       }
 
-      if (regimen.maxInfusionRateMgPerMin != null &&
+      if (doseMg != null &&
+          regimen.maxInfusionRateMgPerMin != null &&
           regimen.maxInfusionRateMgPerMin! > 0 &&
           finalDose > 0) {
         if (infusionDurationMinutes != null && infusionDurationMinutes > 0) {
@@ -1294,6 +1303,42 @@ class PharmacistCalculator {
     Drug? Function(String id)? drugLookup,
     List<Drug>? activeDrugs,
   }) {
+    final verificationWarnings = <DoseWarning>[];
+
+    // Explicitly reject non-positive (<= 0) and non-finite (NaN / Infinity) ordered doses
+    if (!orderedDose.isFinite || orderedDose <= 0) {
+      verificationWarnings.add(
+        DoseWarning(
+          severity: LimitSeverity.hard,
+          code: DoseWarningCode.calculationError,
+          messageEn:
+              'INVALID ORDERED DOSE: Ordered dose must be a positive number (> 0). Received: $orderedDose.',
+          messageTh:
+              'ขนาดยาไม่ถูกต้อง: ขนาดยาที่สั่งต้องเป็นตัวเลขที่มากกว่า 0 (ได้รับค่า: $orderedDose)',
+          calculatedValue: orderedDose,
+          unit: regimen.doseUnit.symbol,
+        ),
+      );
+      final recommended = calculateDose(
+        patient: patient,
+        drug: drug,
+        regimen: regimen,
+        drugLookup: drugLookup,
+        activeDrugs: activeDrugs,
+      );
+      return OrderVerificationResult(
+        isAcceptable: false,
+        recommendedResult: recommended,
+        orderedDose: orderedDose,
+        orderedFrequency: orderedFrequency,
+        deviationPercent: null,
+        warnings: verificationWarnings,
+        summaryEn:
+            'Order rejected: Ordered dose must be a positive number (> 0).',
+        summaryTh: 'ไม่อนุมัติคำสั่งยา: ขนาดยาที่สั่งต้องมากกว่า 0',
+      );
+    }
+
     final recommended = calculateDose(
       patient: patient,
       drug: drug,
@@ -1301,8 +1346,6 @@ class PharmacistCalculator {
       drugLookup: drugLookup,
       activeDrugs: activeDrugs,
     );
-
-    final verificationWarnings = <DoseWarning>[];
 
     // Inherit non-dose specific warnings (allergies, contraindications, severe interactions, weekly banner)
     for (final w in recommended.warnings) {
