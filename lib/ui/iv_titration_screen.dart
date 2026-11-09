@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/models/drug.dart';
+import '../core/models/unit.dart';
 import '../data/patient_session.dart';
 
 class IVTitrationScreen extends StatefulWidget {
@@ -278,6 +279,68 @@ class _IVTitrationScreenState extends State<IVTitrationScreen> {
       );
     }
 
+    if (regimen.dosingType != DosingType.titrated) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(isThai ? 'ตารางดริปยา' : 'IV Titration Table'),
+          backgroundColor: Colors.red.shade800,
+          foregroundColor: Colors.white,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              if (compat != null) _buildDiluentCompatibilitySection(compat),
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Container(
+                  key: const Key('iv_titration_non_titrated_guard'),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade700, width: 2),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.dangerous_rounded,
+                        size: 56,
+                        color: Colors.red.shade800,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        isThai
+                            ? 'ข้อบ่งใช้นี้ไม่ใช่การหยดยาต่อเนื่อง (Non-Titrated Regimen)'
+                            : 'Not a Continuous Titrated IV Infusion',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red.shade900,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isThai
+                            ? 'สูตร "${regimen.indication ?? drug.genericName}" (${regimen.route.abbreviation}) ไม่ใช่สูตรดริปต่อเนื่อง กรุณาเลือกข้อบ่งใช้ชนิด IV Infusion (mcg/kg/min) หากต้องการตารางปรับอัตราหยดยา'
+                            : 'Regimen "${regimen.indication ?? drug.genericName}" (${regimen.route.abbreviation}) is not a continuous titrated infusion. Select the continuous IV Infusion regimen for titration pump rates.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.red.shade900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (regimen.effectiveStandardDilutionMgPerMl == null) {
       return Scaffold(
         appBar: AppBar(
@@ -338,18 +401,100 @@ class _IVTitrationScreenState extends State<IVTitrationScreen> {
     final isBioUnit = rateUnit == RateUnit.uHr ||
         rateUnit == RateUnit.uKgHr ||
         rateUnit == RateUnit.mUMin;
-    final concUnitStr = isBioUnit ? 'Units/mL' : 'mg/mL';
+    final isVasoactive = !isBioUnit &&
+        (rateUnit == RateUnit.mcgKgMin ||
+            rateUnit == RateUnit.mcgKgHr ||
+            drug.category == DrugCategory.vasopressor);
+
+    String concentrationDisplay;
+    if (isBioUnit) {
+      concentrationDisplay = '$dilutionMgPerMl Units/mL';
+    } else if (isVasoactive) {
+      final mcgPerMl = dilutionMgPerMl * 1000.0;
+      final mcgStr = mcgPerMl == mcgPerMl.roundToDouble()
+          ? mcgPerMl.toStringAsFixed(0)
+          : mcgPerMl.toStringAsFixed(1);
+
+      String bagNote = '';
+      if ((dilutionMgPerMl - 0.016).abs() < 0.001) {
+        bagNote = ' [4 mg in 250 mL]';
+      } else if ((dilutionMgPerMl - 0.032).abs() < 0.001) {
+        bagNote = ' [8 mg in 250 mL]';
+      } else if ((dilutionMgPerMl - 1.6).abs() < 0.01) {
+        bagNote = ' [400 mg in 250 mL]';
+      } else if ((dilutionMgPerMl - 1.0).abs() < 0.01) {
+        bagNote = ' [250 mg in 250 mL]';
+      }
+      concentrationDisplay = '$mcgStr mcg/mL ($dilutionMgPerMl mg/mL)$bagNote';
+    } else {
+      concentrationDisplay = '$dilutionMgPerMl mg/mL';
+    }
 
     final double minRate = regimen.continuousRateMin ?? 0.05;
     final double maxRate =
         regimen.continuousRateMax ?? (minRate > 0 ? minRate * 4 : 1.0);
 
-    final double step = (maxRate > minRate)
-        ? (maxRate - minRate) / 10
-        : (minRate > 0 ? minRate / 10 : 0.1);
+    List<double> doseSteps;
+    if (rateUnit == RateUnit.mcgKgMin &&
+        (minRate - 0.05).abs() < 1e-6 &&
+        (maxRate - 1.0).abs() < 1e-6) {
+      // Standard clinical bedside steps for Adrenaline (Epinephrine) 0.05–1.0 mcg/kg/min
+      doseSteps = const [
+        0.05,
+        0.10,
+        0.15,
+        0.20,
+        0.25,
+        0.30,
+        0.40,
+        0.50,
+        0.75,
+        1.00,
+      ];
+    } else if (rateUnit == RateUnit.mcgKgMin &&
+        (minRate - 0.01).abs() < 1e-6 &&
+        (maxRate - 3.0).abs() < 1e-6) {
+      // Standard clinical bedside steps for Norepinephrine 0.01–3.0 mcg/kg/min
+      doseSteps = const [
+        0.01,
+        0.02,
+        0.05,
+        0.10,
+        0.15,
+        0.20,
+        0.25,
+        0.50,
+        1.00,
+        2.00,
+        3.00,
+      ];
+    } else if (rateUnit == RateUnit.mcgKgMin &&
+        (minRate - 2.0).abs() < 1e-6 &&
+        (maxRate - 20.0).abs() < 1e-6) {
+      // Standard clinical bedside steps for Dopamine / Dobutamine 2.0–20.0 mcg/kg/min
+      doseSteps = const [
+        2.0,
+        2.5,
+        5.0,
+        7.5,
+        10.0,
+        12.5,
+        15.0,
+        17.5,
+        20.0,
+      ];
+    } else {
+      final double step = (maxRate > minRate)
+          ? (maxRate - minRate) / 10
+          : (minRate > 0 ? minRate / 10 : 0.1);
+      doseSteps = [];
+      for (double r = minRate; r <= maxRate + 0.0001; r += step) {
+        doseSteps.add(r);
+      }
+    }
 
     final List<Map<String, double>> tableData = [];
-    for (double r = minRate; r <= maxRate + 0.0001; r += step) {
+    for (final r in doseSteps) {
       double mlPerHr = 0.0;
       if (rateUnit == RateUnit.mlHr) {
         mlPerHr = r;
@@ -390,7 +535,7 @@ class _IVTitrationScreenState extends State<IVTitrationScreen> {
                         'Patient Weight: $wt kg',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text('Concentration: $dilutionMgPerMl $concUnitStr'),
+                      Text('Concentration: $concentrationDisplay'),
                     ],
                   ),
                 ),

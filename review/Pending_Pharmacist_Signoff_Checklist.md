@@ -37,7 +37,7 @@
 ```
 * **สาขาคลินิก:** โรคติดเชื้อและการกำกับการใช้ยาต้านจุลชีพ (`PendingDecisionCategory.antimicrobialStewardship`)
 * **ตัวยาที่เกี่ยวข้อง:** `acyclovir` (Acyclovir Sodium for Injection)
-* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/antibiotics.dart` (lines 1188–1213)
+* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/antibiotics.dart` (lines 1690–1718)
 * **ข้อถกเถียงและปัญหาทางคลินิก (Clinical Dilemma):**
   * *ภาษาไทย:* สูตรการให้ยา Acyclovir IV ในภาวะ Herpes Simplex Encephalitis (10 mg/kg ทุก 8 ชม.) ในระบบ มีการตั้งเพดานขนาดยาสูงสุดต่อครั้ง (maxSingleDose) ไว้ที่ 800 mg ซึ่งเป็นตัวเลขตกค้างของยารับประทาน (Oral Zoster) ทำให้ผู้ป่วยผู้ใหญ่ที่มีน้ำหนัก $\ge 85\text{ kg}$ ถูกแจ้งเตือนว่าได้รับยาเกินขนาด (Overdose) ทั้งที่ขนาดมาตรฐานในการรักษาต้องการยา 850–1,000 mg/dose นอกจากนี้ ในหมายเหตุแนะนำให้ใช้ IBW ในคนอ้วน แต่สูตรคำนวณปัจจุบันยังคำนวณตามน้ำหนักจริง (TBW)
   * *English:* The IV Herpes Simplex Encephalitis regimen (10 mg/kg q8h) currently enforces an oral 800 mg maxSingleDose ceiling. Consequently, patients $\ge 85\text{ kg}$ trigger an Overdose Warning (> 800 mg), even though high-dose CNS penetration requires 850–1,000 mg per dose. Additionally, the engine calculates on TBW despite text notes advising IBW in obesity.
@@ -72,7 +72,7 @@
 ```
 * **สาขาคลินิก:** เวชศาสตร์ฉุกเฉินและการกู้ชีพ (`PendingDecisionCategory.emergencyResuscitation`)
 * **ตัวยาที่เกี่ยวข้อง:** `atropine` (Atropine Sulfate Injection)
-* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 88–97)
+* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 158–166)
 * **ข้อถกเถียงและปัญหาทางคลินิก (Clinical Dilemma):**
   * *ภาษาไทย:* การรักษาภาวะ Bradycardia ในเด็กตามแนวทาง PALS แนะนำให้ใช้ Atropine 0.02 mg/kg IV/IO ในอดีตเคยมีข้อกำหนดขนาดยาขั้นต่ำ 0.1 mg เพื่อป้องกันภาวะ Paradoxical Bradycardia แต่แนวทาง AHA PALS 2020 ได้ตัดคำแนะนำขนาดยาขั้นต่ำ 0.1 mg ออกเนื่องจากไม่มีหลักฐานเชิงประจักษ์ชัดเจน ขณะที่คงเพดานสูงสุดต่อครั้งไว้ที่ 0.5 mg ในเด็ก (1.0 mg ในวัยรุ่น) ใน Drugph ปัจจุบันกำหนด minSingleDose: 0.1 และ maxSingleDose: 0.5 แต่ยังไม่มีการใส่ doseCap ทำให้เด็กหนัก > 25 kg ติดเตือน Overdose
   * *English:* PALS recommends 0.02 mg/kg IV/IO. Historically, a minimum dose of 0.1 mg was required to avoid paradoxical bradycardia, but AHA PALS 2020 removed the 0.1 mg floor due to lack of evidence, retaining a 0.5 mg child ceiling (1.0 mg adolescent). Drugph currently uses DoseLimit(min: 0.1, max: 0.5) without an explicit doseCap, triggering Overdose for children > 25 kg.
@@ -107,7 +107,7 @@
 ```
 * **สาขาคลินิก:** ระบบทางเดินหายใจและโรคภูมิแพ้ในเด็ก (`PendingDecisionCategory.respiratoryAllergy`)
 * **ตัวยาที่เกี่ยวข้อง:** `dexamethasone` (Dexamethasone Oral / Injection)
-* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 212–220)
+* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 332–340)
 * **ข้อถกเถียงและปัญหาทางคลินิก (Clinical Dilemma):**
   * *ภาษาไทย:* การใช้ Dexamethasone ในโรคครูป (Croup) ในเด็ก แนะนำขนาดยา 0.6 mg/kg รับประทานหรือฉีดครั้งเดียว ตำราแพทย์และแนวทางปฏิบัติของโรงพยาบาลมีความแตกต่างกันระหว่างเพดานสูงสุด 10 mg (ตามแนวทาง RCH Melbourne, CPS แคนาดา) กับ 16 mg (ตาม Nelson Pediatrics, Lexicomp, UpToDate) ในระบบ Drugph ปัจจุบันตั้งค่า maxSingleDose: 10.0 mg ทำให้เด็กน้ำหนักเกิน 16.7 kg ติดเตือน Overdose โดยยังไม่ได้ตัดยอดขนาดยา (doseCap) ให้คงที่
   * *English:* Dexamethasone for croup is dosed at 0.6 mg/kg single dose. Guidelines vary between a 10 mg maximum (RCH Melbourne, CPS) and a 16 mg maximum (Nelson, Lexicomp, UpToDate). Drugph currently sets maxSingleDose: 10.0 mg, triggering an Overdose Warning for children > 16.7 kg without capping.
@@ -142,7 +142,7 @@
 ```
 * **สาขาคลินิก:** เวชศาสตร์ฉุกเฉินและการกู้ชีพ (`PendingDecisionCategory.emergencyResuscitation`)
 * **ตัวยาที่เกี่ยวข้อง:** `epinephrine` (Adrenaline / Epinephrine 1:1,000 Injection)
-* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 30–38)
+* **ตำแหน่งโค้ดในระบบ:** `lib/data/drugs/emergency.dart` (lines 75–87)
 * **ข้อถกเถียงและปัญหาทางคลินิก (Clinical Dilemma):**
   * *ภาษาไทย:* การฉีด Epinephrine (1:1,000) กล้ามเนื้อต้นขาในภาวะ Anaphylaxis ในเด็ก แนะนำขนาดยา 0.01 mg/kg แนวทางปฏิบัติสากลมีความแตกต่างกันในจุดเปลี่ยนผ่านระหว่างเพดานเด็ก (0.3 mg) กับเพดานผู้ใหญ่ (0.5 mg) โดย WAO และ AAP แนะนำเพดาน 0.3 mg ในเด็กก่อนวัยเจริญพันธุ์ (< 30 kg หรือ < 12 ปี) แต่ EAACI และ Resuscitation Council UK อนุญาตให้ขยายถึง 0.5 mg ในเด็กอายุ $\ge 12$ ปี ในระบบ Drugph ปัจจุบันตั้งค่า maxSingleDose: 0.3 mg โดยไม่มี doseCap ทำให้เด็กหนัก > 30 kg ติดเตือน Overdose
   * *English:* Epinephrine (1:1000 IM) for anaphylaxis is dosed at 0.01 mg/kg. WAO and AAP recommend a 0.3 mg ceiling for prepubertal children (< 30 kg / < 12 years). EAACI and RCUK allow 0.5 mg for children $\ge 12$ years. Drugph currently sets maxSingleDose: 0.3 mg without explicit doseCap, triggering Overdose for children > 30 kg.

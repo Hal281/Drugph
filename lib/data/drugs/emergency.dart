@@ -40,7 +40,7 @@ final List<Drug> emergency = [
           '  - การให้ทาง IV Push ในภาวะ Cardiac Arrest ต้องใช้ความเข้มข้นเจือจาง 1:10,000 (0.1 mg/mL) เท่านั้น',
       clinicalNotes:
           '• จัดเป็นยาเตือนภัยสูงระดับวิกฤตสูงสุด (Critical High-Alert Medication)\n'
-          '• ในภาวะช็อกที่ไม่ตอบสนองต่อสารน้ำ (Septic/Cardiogenic Shock): อาจให้เป็น Continuous IV Infusion 0.05–0.5 mcg/kg/min ผ่าน Central Line โดยใช้ Infusion Pump',
+          '• ในภาวะช็อกที่ไม่ตอบสนองต่อสารน้ำ (Septic/Cardiogenic Shock): อาจให้เป็น Continuous IV Infusion 0.05–1.0 mcg/kg/min ผ่าน Central Line โดยใช้ Infusion Pump',
       externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=epinephrine',
     ),
     severeInteractions: [
@@ -68,6 +68,7 @@ final List<Drug> emergency = [
         fixedDose: 0.3, // 0.3-0.5 mg IM (1:1,000)
         doseUnit: DoseUnit.mg,
         frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
+        standardDilutionMgPerMl: 1.0,
         limits: DoseLimit(maxSingleDose: 0.5),
         verificationStatus: VerificationStatus.pendingReview,
       ),
@@ -78,6 +79,7 @@ final List<Drug> emergency = [
         dosePerKg: 0.01, // 0.01 mg/kg IM
         doseUnit: DoseUnit.mg,
         frequency: Frequency(isOnce: true, isPrn: true, displayEn: 'Stat (repeat 5-15min PRN)', displayTh: 'ทันที (ซ้ำได้ทุก 5-15 นาที)'),
+        standardDilutionMgPerMl: 1.0,
         limits: DoseLimit(maxSingleDose: 0.3),
         verificationStatus: VerificationStatus.pendingReview,
       ),
@@ -92,6 +94,8 @@ final List<Drug> emergency = [
           displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ',
           customReason: 'ACLS cardiac arrest protocol every 3-5 minutes',
         ),
+        standardDilutionMgPerMl: 0.1,
+        limits: DoseLimit(maxSingleDose: 1.0),
         verificationStatus: VerificationStatus.pendingReview,
       ),
       DosingRegimen(
@@ -105,7 +109,26 @@ final List<Drug> emergency = [
           displayTh: 'ทุก 3-5 นาที ระหว่างกู้ชีพ',
           customReason: 'PALS cardiac arrest protocol every 3-5 minutes',
         ),
+        standardDilutionMgPerMl: 0.1,
         limits: DoseLimit(maxSingleDose: 1.0),
+        verificationStatus: VerificationStatus.pendingReview,
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Septic / Cardiogenic Shock (Inotropic Support)',
+        dosingType: DosingType.titrated,
+        continuousRateMin: 0.05,
+        continuousRateMax: 1.0,
+        continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        doseUnit: DoseUnit.mcg,
+        frequency: Frequency.continuous,
+        standardDilutionMgPerMl: 0.016,
+        standardDilution: Concentration(16.0, ConcentrationUnit.mcgPerMl),
+        limits: DoseLimit(
+          maxInfusionRate: 1.0,
+          infusionRateUnit: 'mcg/kg/min',
+        ),
         verificationStatus: VerificationStatus.pendingReview,
       ),
     ],

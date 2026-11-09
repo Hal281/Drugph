@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../data/drug_database.dart';
+import '../data/drug_search_engine.dart';
 import '../core/models/models.dart';
 import 'calculator_screen.dart';
 import 'history_screen.dart';
 import 'widgets/patient_banner.dart';
+import 'widgets/clinical_search_bar.dart';
 import '../data/prescription_cart.dart';
 import 'prescription_cart_screen.dart';
 import 'ai_consultant_screen.dart';
@@ -24,9 +26,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
+  final List<String> _recentSearches = [];
   DrugCategory? _selectedCategory;
   Drug? _selectedDrugForDesktop; // Track selected drug for desktop view
   final ScrollController _categoryScrollController = ScrollController();
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+      final trimmed = query.trim();
+      if (trimmed.isNotEmpty) {
+        _recentSearches.remove(trimmed);
+        _recentSearches.insert(0, trimmed);
+        if (_recentSearches.length > 5) {
+          _recentSearches.removeLast();
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -223,12 +240,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // The actual Drug List UI (reused in both Mobile and Left Panel of Desktop)
   Widget _buildDrugList(bool isDesktop) {
-    List<Drug> displayDrugs = DrugDatabase.search(_searchQuery);
+    final List<DrugSearchResult> searchResults =
+        DrugDatabase.searchDetailed(_searchQuery);
+    var filteredResults = searchResults;
     if (_selectedCategory != null) {
-      displayDrugs =
-          displayDrugs.where((d) => d.category == _selectedCategory).toList();
+      filteredResults = filteredResults
+          .where((r) => r.drug.category == _selectedCategory)
+          .toList();
     }
-    displayDrugs.sort((a, b) => a.genericName.compareTo(b.genericName));
+    if (_searchQuery.trim().isEmpty) {
+      filteredResults = List.of(filteredResults)
+        ..sort((a, b) => a.drug.genericName.compareTo(b.drug.genericName));
+    }
 
     final categories = DrugCategory.values.where((c) {
       return DrugDatabase.allDrugs.any((d) => d.category == c);
@@ -356,22 +379,23 @@ class _HomeScreenState extends State<HomeScreen> {
           // Search Bar
           Container(
             color: Colors.teal,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: isThai ? 'ค้นหายา...' : 'Search...',
-                prefixIcon: const Icon(Icons.search, color: Colors.teal),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onChanged: (val) {
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            child: ClinicalSearchBar(
+              query: _searchQuery,
+              isThai: isThai,
+              recentQueries: _recentSearches,
+              onQueryChanged: _updateSearchQuery,
+              onClear: () {
                 setState(() {
-                  _searchQuery = val;
+                  _searchQuery = '';
+                });
+              },
+              onRecentQuerySelected: (q) {
+                _updateSearchQuery(q);
+              },
+              onClearHistory: () {
+                setState(() {
+                  _recentSearches.clear();
                 });
               },
             ),
@@ -478,7 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Drug List
           Expanded(
-            child: displayDrugs.isEmpty
+            child: filteredResults.isEmpty
                 ? Center(
                     child: Text(
                       isThai ? 'ไม่พบข้อมูลยา' : 'No drugs found',
@@ -489,9 +513,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12.0, vertical: 8.0),
-                    itemCount: displayDrugs.length,
+                    itemCount: filteredResults.length,
                     itemBuilder: (context, index) {
-                      final drug = displayDrugs[index];
+                      final result = filteredResults[index];
+                      final drug = result.drug;
                       final catColor = _getCategoryColor(drug.category);
                       final isSelected =
                           isDesktop && _selectedDrugForDesktop?.id == drug.id;
@@ -542,8 +567,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: Text(
-                                                drug.genericName,
+                                              child: ClinicalHighlightText(
+                                                text: drug.genericName,
+                                                query: _searchQuery,
                                                 style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: isSelected
@@ -586,6 +612,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                               color: Colors.grey.shade700,
                                               fontSize: 12),
                                         ),
+                                        if (_searchQuery.trim().isNotEmpty &&
+                                            result.matchedReasons.isNotEmpty) ...[
+                                          const SizedBox(height: 4),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.teal.shade50,
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: Colors.teal.shade200),
+                                            ),
+                                            child: Text(
+                                              isThai
+                                                  ? result.primaryReasonTh
+                                                  : result.primaryReason,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.teal.shade800,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),

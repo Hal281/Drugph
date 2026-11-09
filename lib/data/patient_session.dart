@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 
 import '../core/models/patient.dart';
+import '../core/models/population_criteria.dart';
+import '../core/models/renal_replacement_mode.dart';
+import '../core/models/unit.dart';
 
 /// Singleton service to manage the current active patient session and ward list.
 class PatientSession {
@@ -31,6 +34,77 @@ class PatientSession {
   /// Clears the active patient.
   void clearPatient() {
     currentPatient.value = null;
+  }
+
+  /// Updates the active patient's clinical parameters and persists changes
+  /// to the Ward List. If no patient is currently active, a new [Patient]
+  /// instance is initialized with safe clinical defaults.
+  ///
+  /// Notifies all listeners of [currentPatient] and [wardPatients].
+  Patient updateCurrentPatient({
+    double? weightKg,
+    double? heightCm,
+    int? ageYears,
+    int? ageMonths,
+    Sex? sex,
+    double? serumCreatinineMgDl,
+    double? creatinineClearanceMlMin,
+    double? eGfrMlMinPer173m2,
+    bool? isScrStable,
+    RenalReplacementMode? renalReplacementMode,
+    ChildPughClass? hepaticImpairment,
+    List<String>? activeDrugIds,
+    List<String>? allergies,
+    bool? isPregnant,
+    String? patientName,
+    String? hospitalNumber,
+  }) {
+    final existing = currentPatient.value;
+    final Patient updated;
+
+    if (existing != null) {
+      updated = existing.copyWith(
+        weightKg: weightKg,
+        heightCm: heightCm,
+        ageYears: ageYears,
+        ageMonths: ageMonths,
+        sex: sex,
+        serumCreatinineMgDl: serumCreatinineMgDl,
+        creatinineClearanceMlMin: creatinineClearanceMlMin,
+        eGfrMlMinPer173m2: eGfrMlMinPer173m2,
+        isScrStable: isScrStable,
+        renalReplacementMode: renalReplacementMode,
+        hepaticImpairment: hepaticImpairment,
+        activeDrugIds: activeDrugIds,
+        allergies: allergies,
+        isPregnant: isPregnant,
+        patientName: patientName,
+        hospitalNumber: hospitalNumber,
+      );
+    } else {
+      updated = Patient(
+        id: 'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
+        patientName: patientName,
+        hospitalNumber: hospitalNumber,
+        weightKg: weightKg ?? 70.0,
+        heightCm: heightCm ?? 170.0,
+        ageYears: ageYears ?? 35,
+        ageMonths: ageMonths,
+        sex: sex ?? Sex.male,
+        serumCreatinineMgDl: serumCreatinineMgDl,
+        creatinineClearanceMlMin: creatinineClearanceMlMin,
+        eGfrMlMinPer173m2: eGfrMlMinPer173m2,
+        isScrStable: isScrStable ?? true,
+        renalReplacementMode: renalReplacementMode ?? RenalReplacementMode.none,
+        hepaticImpairment: hepaticImpairment,
+        activeDrugIds: activeDrugIds ?? const [],
+        allergies: allergies ?? const [],
+        isPregnant: isPregnant ?? false,
+      );
+    }
+
+    savePatient(updated, setAsCurrent: true);
+    return updated;
   }
 
   /// Saves or updates a patient in the Ward List.
