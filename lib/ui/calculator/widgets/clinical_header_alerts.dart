@@ -120,31 +120,74 @@ class ClinicalHeaderAlerts extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                t
-                                    ? 'แหล่งอ้างอิงทางคลินิก (Textbook Reference)'
-                                    : 'Clinical Evidence Reference',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.teal.shade900,
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final textScale =
+                                MediaQuery.textScalerOf(context).scale(1.0);
+                            final isCompact = constraints.maxWidth < 280 ||
+                                textScale > 1.15;
+
+                            if (isCompact) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    t
+                                        ? 'แหล่งอ้างอิงทางคลินิก (Textbook Reference)'
+                                        : 'Clinical Evidence Reference',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal.shade900,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    t ? 'แตะเพื่อเปิดดูตำรา ↗' : 'Tap to view ↗',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.teal.shade700,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              );
+                            }
+
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    t
+                                        ? 'แหล่งอ้างอิงทางคลินิก (Textbook Reference)'
+                                        : 'Clinical Evidence Reference',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal.shade900,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              t ? 'แตะเพื่อเปิดดูตำรา ↗' : 'Tap to view ↗',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.teal.shade700,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    t ? 'แตะเพื่อเปิดดูตำรา ↗' : 'Tap to view ↗',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.teal.shade700,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         const SizedBox(height: 2),
                         Text(

@@ -20,6 +20,10 @@ import 'package:drug_dosage_calculator/data/drug_search_engine.dart';
 
 void main() {
   group('Milestone 1 — Clinical Drug Search Engine Verification Suite', () {
+    setUpAll(() {
+      DrugDatabase.warmUp();
+    });
+
     // ------------------------------------------------------------
     // 1. 10-Tier Relevance Scoring & Ranking Hierarchy
     // ------------------------------------------------------------

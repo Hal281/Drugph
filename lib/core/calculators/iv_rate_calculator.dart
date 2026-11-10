@@ -50,6 +50,7 @@ class IvRateCalculator {
     // Check unit compatibility
     final isBiologicalRate = doseRateUnit == RateUnit.mUMin ||
         doseRateUnit == RateUnit.uHr ||
+        doseRateUnit == RateUnit.uMin ||
         doseRateUnit == RateUnit.uKgHr;
     final isBiologicalConc = concentration.unit == ConcentrationUnit.unitsPerMl ||
         concentration.unit == ConcentrationUnit.mUPerMl;
@@ -239,6 +240,45 @@ class IvRateCalculator {
   }
 
   // ------------------------------------------------------------------
+  // mcg/min — absolute mass rate for vasopressor titrations
+  //
+  // mcg/min = (concentration_mcg_per_mL × rate_mL_per_hr) / 60
+  //
+  // OR inverse:
+  // rate (mL/hr) = (desired_mcg_min × 60) / concentration_mcg_per_mL
+  // ------------------------------------------------------------------
+
+  /// Calculates dose rate in **mcg/min** from pump settings.
+  static double mcgPerMin({
+    required double concentrationMcgPerMl,
+    required double rateMlPerHr,
+  }) {
+    if (!concentrationMcgPerMl.isFinite ||
+        concentrationMcgPerMl <= 0 ||
+        !rateMlPerHr.isFinite ||
+        rateMlPerHr < 0) {
+      throw ArgumentError('All values must be positive and finite');
+    }
+
+    return (concentrationMcgPerMl * rateMlPerHr) / 60.0;
+  }
+
+  /// Calculates pump rate in **mL/hr** for a desired mcg/min.
+  static double rateMlPerHrFromMcgMin({
+    required double desiredMcgMin,
+    required double concentrationMcgPerMl,
+  }) {
+    if (!desiredMcgMin.isFinite ||
+        desiredMcgMin < 0 ||
+        !concentrationMcgPerMl.isFinite ||
+        concentrationMcgPerMl <= 0) {
+      throw ArgumentError('All values must be positive and finite');
+    }
+
+    return (desiredMcgMin * 60.0) / concentrationMcgPerMl;
+  }
+
+  // ------------------------------------------------------------------
   // units/hr — for Insulin and Heparin infusions
   //
   // rate (mL/hr) = desired_units_per_hr / concentration_units_per_mL
@@ -258,5 +298,42 @@ class IvRateCalculator {
     }
 
     return desiredUnitsPerHr / concentrationUnitsPerMl;
+  }
+
+  // ------------------------------------------------------------------
+  // units/min — for Vasopressin infusions
+  //
+  // rate (mL/hr) = (desired_units_per_min × 60) / concentration_units_per_mL
+  // ------------------------------------------------------------------
+
+  /// Calculates pump rate in **mL/hr** for unit/min-based drugs
+  /// (e.g. Vasopressin).
+  static double rateMlPerHrFromUnitsPerMin({
+    required double desiredUnitsPerMin,
+    required double concentrationUnitsPerMl,
+  }) {
+    if (!desiredUnitsPerMin.isFinite ||
+        desiredUnitsPerMin < 0 ||
+        !concentrationUnitsPerMl.isFinite ||
+        concentrationUnitsPerMl <= 0) {
+      throw ArgumentError('All values must be positive and finite');
+    }
+
+    return (desiredUnitsPerMin * 60.0) / concentrationUnitsPerMl;
+  }
+
+  /// Calculates dose rate in **units/min** from pump settings.
+  static double unitsPerMin({
+    required double concentrationUnitsPerMl,
+    required double rateMlPerHr,
+  }) {
+    if (!concentrationUnitsPerMl.isFinite ||
+        concentrationUnitsPerMl <= 0 ||
+        !rateMlPerHr.isFinite ||
+        rateMlPerHr < 0) {
+      throw ArgumentError('All values must be positive and finite');
+    }
+
+    return (concentrationUnitsPerMl * rateMlPerHr) / 60.0;
   }
 }

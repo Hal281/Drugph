@@ -49,12 +49,12 @@ void main() {
   ];
 
   group('Dimension 1: SchemaValidator & KnowledgeBase vs DrugDatabase Audit', () {
-    test('1.1: DrugDatabase contains exactly 117 drugs across 16 categories', () {
+    test('1.1: DrugDatabase contains exactly 121 drugs across 16 categories', () {
       final totalDrugs = DrugDatabase.allDrugs.length;
       expect(
         totalDrugs,
-        equals(117),
-        reason: 'DrugDatabase.allDrugs must contain exactly 117 formulary drugs',
+        equals(121),
+        reason: 'DrugDatabase.allDrugs must contain exactly 121 formulary drugs',
       );
     });
 
@@ -165,12 +165,12 @@ void main() {
       expect(tail.contains('%%EOF'), isTrue, reason: 'PDF must end with %%EOF');
     });
 
-    test('2.2: Generated PDF contains exactly 47 pages verified by PDF page dictionary count', () {
+    test('2.2: Generated PDF contains exactly 48 pages verified by PDF page dictionary count', () {
       final pdfFile = File('review/Clinical_Verification_Dossier.pdf');
       final content = pdfFile.readAsStringSync(encoding: latin1);
 
       // In PDF format, each page has a page dictionary containing "/Type /Page"
-      // or the catalog /Pages has "/Count 47".
+      // or the catalog /Pages has "/Count 48".
       // Let's verify both count occurrences:
       final pageMatches = RegExp(r'/Type\s*/Page\b').allMatches(content).length;
       final pagesCountMatch = RegExp(r'/Type\s*/Pages\b[^>]*?/Count\s+(\d+)').firstMatch(content);
@@ -178,8 +178,8 @@ void main() {
 
       expect(
         catalogCount ?? pageMatches,
-        equals(47),
-        reason: 'Generated PDF must have exactly 47 pages (catalog count: $catalogCount, page dicts: $pageMatches)',
+        equals(48),
+        reason: 'Generated PDF must have exactly 48 pages (catalog count: $catalogCount, page dicts: $pageMatches)',
       );
     });
   });

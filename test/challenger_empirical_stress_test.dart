@@ -30,6 +30,10 @@ import 'package:drug_dosage_calculator/ui/calculator/models/calculator_ui_state.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  setUpAll(() {
+    DrugDatabase.warmUp();
+  });
+
   const testRegimen = DosingRegimen(
     route: DoseRoute.po,
     indication: 'Acute Severe Pain',

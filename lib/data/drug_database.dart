@@ -61,6 +61,9 @@ class DrugDatabase {
   /// Pre-computed multi-dimensional search engine instance over [allDrugs].
   static final DrugSearchEngine _searchEngine = DrugSearchEngine(allDrugs);
 
+  /// Pre-warms the search index and JIT cache to prevent cold-start latency jitter.
+  static void warmUp() => _searchEngine.warmUp();
+
   /// Searches drugs using the 10-tier multi-dimensional relevance scoring engine.
   ///
   /// Maintains 100% backward compatibility returning [List<Drug>] sorted by

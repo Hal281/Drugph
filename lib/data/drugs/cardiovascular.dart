@@ -769,4 +769,77 @@ final List<Drug> cardiovascular = [
       ),
     ],
   ),
+  Drug(
+    id: 'vasopressin',
+    genericName: 'Vasopressin',
+    brandNames: ['Pitressin', 'Vasostrict'],
+    nameTh: 'วาโซเพรสซิน',
+    category: DrugCategory.vasopressor,
+    isHighAlert: true,
+    sourceCitation:
+        'Surviving Sepsis Campaign Guidelines 2021 / US FDA Vasostrict SPL / Lexicomp 2024',
+    lastReviewedDate: '2024-10-12',
+    provenance: const Provenance(
+      source:
+          'Surviving Sepsis Campaign Guidelines 2021 / US FDA Vasostrict SPL / Lexicomp 2024',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail:
+          'Second-line Vasopressor in Septic Shock & ACLS Cardiac Arrest Protocol',
+    ),
+    monograph: const ClinicalMonograph(
+      textbookName: 'Surviving Sepsis Campaign Guidelines / US FDA Vasostrict SPL',
+      editionYear: '2021 Guidelines / 2024 Manual',
+      sectionOrTable:
+          'Vasopressin Fixed-Rate Infusion in Vasodilatory / Septic Shock',
+      dosingGuideline:
+          '• อัตราการให้ยาต่อเนื่อง (Continuous IV Infusion): 0.03 units/min (ช่วงแนะนำ 0.01–0.04 units/min) อัตราคงที่ (Fixed-rate infusion)\n'
+          '• ข้อบ่งใช้: ยาขนานที่ 2 ร่วมกับ Norepinephrine ในภาวะ Septic Shock เพื่อเพิ่ม Mean Arterial Pressure (MAP) หรือลดขนาด Norepinephrine\n'
+          '• คำแนะนำสำคัญ: ห้าม Titrate ขึ้นลงตามอำเภอใจเหมือน Catecholamines เพราะเสี่ยงต่อภาวะขาดเลือดของอวัยวะภายในอย่างรุนแรง (Splanchnic & peripheral ischemia)',
+      renalGuideline:
+          '• ไม่จำเป็นต้องปรับขนาดยาตามการทำงานของไต (No renal dose adjustment needed)\n'
+          '• ถูกสลายโดยเอนไซม์ Vasopressinase ในตับและไต',
+      administrationGuideline:
+          '• การผสมยามาตรฐาน: 20 units ใน NSS หรือ D5W 100 mL (ความเข้มข้น 0.2 units/mL) อัตราหยด 0.03 units/min = 9.0 mL/hr\n'
+          '• สูตร Double Strength: 40 units ใน 100 mL (0.4 units/mL) อัตราหยด 0.03 units/min = 4.5 mL/hr\n'
+          '• สูตร Syringe Pump: 50 units ใน 50 mL (1.0 unit/mL) อัตราหยด 0.03 units/min = 1.8 mL/hr\n'
+          '• เส้นทางการให้ยา: ควรให้ผ่าน Central Line เสมอเพื่อป้องกันยาซึมออกนอกเส้นเลือด',
+      clinicalNotes:
+          '• จัดเป็นยาเตือนภัยสูงระดับวิกฤต (High-Alert Vasopressor)\n'
+          '• เฝ้าระวังภาวะ Digital ischemia, Myocardial ischemia และ Hyponatremia จากฤทธิ์ Antidiuretic (V2 receptor)',
+      externalUrl: 'https://www.sccm.org/SurvivingSepsisCampaign',
+    ),
+    specialNotes:
+        'Administer via central line. Fixed-dose infusion (0.03 units/min) in septic shock; do not titrate.',
+    specialNotesTh:
+        'ควรให้ผ่านหลอดเลือดดำใหญ่ อัตราคงที่ 0.03 units/min ในภาวะ Septic Shock ไม่ควรปรับขนาดยาขึ้นลง',
+    ivDiluentCompatibility: const IvDiluentCompatibility(
+      compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
+      preferredDiluent: IvDiluent.nss,
+      stabilityNoteEn:
+          '20 units in 100 mL NSS or D5W (0.2 units/mL). Stable for 24 hours at room temperature.',
+      stabilityNoteTh:
+          '20 ยูนิต ใน NSS หรือ D5W 100 มล. (0.2 ยูนิต/มล.) คงตัว 24 ชั่วโมงที่อุณหภูมิห้อง',
+      sourceCitation: 'US FDA Vasostrict SPL §2.2 / Lexicomp 2024',
+    ),
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Septic Shock / Vasodilatory Shock',
+        dosingType: DosingType.titrated,
+        doseUnit: DoseUnit.units,
+        continuousRateMin: 0.01,
+        continuousRateMax: 0.04,
+        continuousRateUnit: 'units/min',
+        rateUnit: RateUnit.uMin,
+        standardDilutionMgPerMl: 0.2, // 0.2 units/mL
+        verificationStatus: VerificationStatus.pendingReview,
+        frequency: Frequency.continuous,
+        limits: DoseLimit(
+          maxInfusionRate: 0.04,
+          infusionRateUnit: 'units/min',
+        ),
+      ),
+    ],
+  ),
 ];

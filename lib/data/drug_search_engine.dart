@@ -183,7 +183,7 @@ class _IndexedDrug {
 
     // Extract individual word tokens from generic name
     final genTokens = drug.genericName
-        .split(RegExp(r'[\s\-_/(),]'))
+        .split(DrugSearchEngine._tokenSplitRegex)
         .map(DrugSearchEngine.normalize)
         .where((t) => t.isNotEmpty)
         .toSet()
@@ -198,7 +198,7 @@ class _IndexedDrug {
     final bTokens = <String>{};
     for (final b in drug.brandNames) {
       final tokens = b
-          .split(RegExp(r'[\s\-_/(),]'))
+          .split(DrugSearchEngine._tokenSplitRegex)
           .map(DrugSearchEngine.normalize)
           .where((t) => t.isNotEmpty);
       bTokens.addAll(tokens);
@@ -246,7 +246,7 @@ class _IndexedDrug {
     final indTokens = <String>{};
     for (final ind in rawInds) {
       final tokens = ind
-          .split(RegExp(r'[\s\-_/(),:•]'))
+          .split(DrugSearchEngine._indicationSplitRegex)
           .map(DrugSearchEngine.normalize)
           .where((t) => t.isNotEmpty);
       indTokens.addAll(tokens);
@@ -722,12 +722,22 @@ class DrugSearchEngine {
     return _index.search(query, categoryFilter: categoryFilter, limit: limit);
   }
 
+  static final RegExp _punctRegex = RegExp(r'[\s\-_/.,!?;:\(\)\[\]]');
+  static final RegExp _tokenSplitRegex = RegExp(r'[\s\-_/(),]');
+  static final RegExp _indicationSplitRegex = RegExp(r'[\s\-_/(),:•]');
+
+  /// Pre-warms the search index and JIT compiler caches.
+  void warmUp() {
+    search('ceftriaxone');
+    search('paracetamol');
+  }
+
   /// Normalizes a query or text string by lowercasing and stripping punctuation.
   static String normalize(String input) {
     return input
         .trim()
         .toLowerCase()
-        .replaceAll(RegExp(r'[\s\-_/.,!?;:\(\)\[\]]'), '');
+        .replaceAll(_punctRegex, '');
   }
 
   static final List<int> _scratchPrev = List<int>.filled(128, 0);

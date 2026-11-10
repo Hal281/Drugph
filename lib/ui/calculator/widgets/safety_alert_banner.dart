@@ -34,7 +34,8 @@ class SafetyAlertBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = isThai;
-    final isOd = hasOverdose(warnings);
+    final effectiveWarnings = warnings.isNotEmpty ? warnings : result.warnings;
+    final isOd = hasOverdose(effectiveWarnings);
 
     if (isOd) {
       return Container(

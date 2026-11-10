@@ -2,10 +2,12 @@
 enum RateUnit {
   mcgKgMin(symbol: 'mcg/kg/min', nameEn: 'mcg/kg/min', nameTh: 'มคก./กก./นาที'),
   mcgKgHr(symbol: 'mcg/kg/hr', nameEn: 'mcg/kg/hr', nameTh: 'มคก./กก./ชม.'),
+  mcgMin(symbol: 'mcg/min', nameEn: 'mcg/min', nameTh: 'มคก./นาที'),
   mgKgHr(symbol: 'mg/kg/hr', nameEn: 'mg/kg/hr', nameTh: 'มก./กก./ชม.'),
   mgKgMin(symbol: 'mg/kg/min', nameEn: 'mg/kg/min', nameTh: 'มก./กก./นาที'),
   uKgHr(symbol: 'units/kg/hr', nameEn: 'units/kg/hr', nameTh: 'ยูนิต/กก./ชม.'),
   uHr(symbol: 'units/hr', nameEn: 'units/hr', nameTh: 'ยูนิต/ชม.'),
+  uMin(symbol: 'units/min', nameEn: 'units/min', nameTh: 'ยูนิต/นาที'),
   mgHr(symbol: 'mg/hr', nameEn: 'mg/hr', nameTh: 'มก./ชม.'),
   gHr(symbol: 'g/hr', nameEn: 'g/hr', nameTh: 'กรัม/ชม.'),
   mUMin(symbol: 'mU/min', nameEn: 'mU/min', nameTh: 'มิลลิยูนิต/นาที'),
@@ -29,6 +31,15 @@ enum RateUnit {
     final lower = raw.trim().toLowerCase();
     if (lower == 'milliunits/min' || lower == 'milliunit/min') {
       return RateUnit.mUMin;
+    }
+    if (lower == 'mcg/min' || lower == 'mcg/minute' || lower == 'mcgmin') {
+      return RateUnit.mcgMin;
+    }
+    if (lower == 'units/min' ||
+        lower == 'unit/min' ||
+        lower == 'u/min' ||
+        lower == 'umin') {
+      return RateUnit.uMin;
     }
     for (final unit in RateUnit.values) {
       if (unit.symbol.toLowerCase() == lower ||
@@ -62,6 +73,8 @@ enum RateUnit {
         return weightKg > 0 ? rate * weightKg * 60.0 / 1000.0 : null;
       case RateUnit.mcgKgHr:
         return weightKg > 0 ? rate * weightKg / 1000.0 : null;
+      case RateUnit.mcgMin:
+        return rate * 60.0 / 1000.0;
       case RateUnit.mgKgHr:
         return weightKg > 0 ? rate * weightKg : null;
       case RateUnit.mgKgMin:
@@ -70,6 +83,8 @@ enum RateUnit {
         return weightKg > 0 ? rate * weightKg : null;
       case RateUnit.uHr:
         return rate;
+      case RateUnit.uMin:
+        return rate * 60.0;
       case RateUnit.mgHr:
         return rate;
       case RateUnit.gHr:

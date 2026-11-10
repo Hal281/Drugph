@@ -18,6 +18,7 @@ import 'package:drug_dosage_calculator/data/patient_session.dart';
 import 'package:drug_dosage_calculator/ui/calculator/calculator_screen.dart';
 import 'package:drug_dosage_calculator/ui/calculator/controllers/calculator_controller.dart';
 import 'package:drug_dosage_calculator/ui/calculator/models/calculator_ui_state.dart';
+import 'package:drug_dosage_calculator/ui/calculator/widgets/dosage_result_card.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -342,6 +343,463 @@ void main() {
         expect(pharmNote, contains('CRRT'));
 
         controller.dispose();
+      },
+    );
+
+    testWidgets(
+      '7. Result Card Safety & Contrast: calculatedDose has no lineThrough, WCAG AAA contrast, and semantic overdose label',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(createTestApp(drug: testOverdoseDrug));
+        await tester.pumpAndSettle();
+
+        // Trigger overdose: 70kg * 15mg/kg = 1050mg (max 1000mg)
+        await tester.enterText(
+          find.byKey(const Key('calculator_weight_field')),
+          '70',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_height_field')),
+          '170',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_age_field')),
+          '35',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_scr_field')),
+          '0.9',
+        );
+        await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+        await tester.pumpAndSettle();
+
+        // 1. Semantic label: DosageResultCard MUST NOT say 'Recommended Dose (Rounded)' during overdose
+        expect(
+          find.descendant(
+            of: find.byType(DosageResultCard),
+            matching: find.text('Recommended Dose (Rounded)'),
+          ),
+          findsNothing,
+        );
+        final statusLabelFinder =
+            find.byKey(const Key('dosage_result_status_label'));
+        expect(statusLabelFinder, findsOneWidget);
+        expect(
+          find.descendant(
+            of: statusLabelFinder,
+            matching: find.text('Calculated Dose (Exceeds Limit)'),
+          ),
+          findsOneWidget,
+        );
+
+        // Verify crimson alert styling on status label container
+        final statusContainer = tester.widget<Container>(statusLabelFinder);
+        final boxDec = statusContainer.decoration as BoxDecoration;
+        expect(boxDec.color, const Color(0xFFFEE2E2));
+
+        // 2. Raw calculated dose: MUST be clearly labeled without lineThrough and high contrast (grey.shade900)
+        final rawTextFinder =
+            find.textContaining('Raw Calculated Dose: 1050.00 mg');
+        expect(rawTextFinder, findsOneWidget);
+        final rawTextWidget = tester.widget<Text>(rawTextFinder);
+        expect(
+          rawTextWidget.style?.decoration,
+          isNot(TextDecoration.lineThrough),
+        );
+        expect(rawTextWidget.style?.color, Colors.grey.shade900);
+
+        // 3. Compact Viewport (320dp) overflow check
+        tester.view.physicalSize = const Size(320, 640);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      '8. Textbook Monograph Button: meets WCAG AAA >= 48x48 dp touch target size and has explicit key',
+      (tester) async {
+        tester.view.physicalSize = const Size(1024, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(createTestApp(drug: meropenem));
+        await tester.pumpAndSettle();
+
+        // Enter valid parameters to trigger active DosageResultCard
+        await tester.enterText(
+          find.byKey(const Key('calculator_weight_field')),
+          '70',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_height_field')),
+          '170',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_age_field')),
+          '50',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_scr_field')),
+          '1.0',
+        );
+        await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+        await tester.pumpAndSettle();
+
+        final monographFinder =
+            find.byKey(const Key('calculator_view_monograph_btn'));
+        expect(monographFinder, findsOneWidget);
+
+        final monographSize = tester.getSize(monographFinder);
+        expect(
+          monographSize.height,
+          greaterThanOrEqualTo(48.0),
+          reason: 'Monograph button height must be >= 48dp (WCAG AAA)',
+        );
+        expect(
+          monographSize.width,
+          greaterThanOrEqualTo(48.0),
+          reason: 'Monograph button width must be >= 48dp (WCAG AAA)',
+        );
+      },
+    );
+
+    testWidgets(
+      '9. ClinicalActionBar: responsive layout switches to vertical column on narrow viewports (< 380dp) and maintains >= 48dp touch targets',
+      (tester) async {
+        // --- 1. Narrow Mobile Viewport (360x640) ---
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await tester.pumpWidget(createTestApp(drug: meropenem));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byKey(const Key('calculator_weight_field')),
+          '70',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_height_field')),
+          '170',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_age_field')),
+          '50',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_scr_field')),
+          '1.0',
+        );
+        await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+        await tester.pumpAndSettle();
+
+        final hisOrderFinder = find.byKey(const Key('copy_his_order_button'));
+        final pharmNoteFinder =
+            find.byKey(const Key('copy_pharmacist_note_button'));
+
+        expect(hisOrderFinder, findsOneWidget);
+        expect(pharmNoteFinder, findsOneWidget);
+
+        // On narrow screens (< 380 dp inside card): buttons are stacked vertically
+        final hisOrderBottom = tester.getBottomLeft(hisOrderFinder).dy;
+        final pharmNoteTop = tester.getTopLeft(pharmNoteFinder).dy;
+        expect(
+          pharmNoteTop,
+          greaterThanOrEqualTo(hisOrderBottom),
+          reason:
+              'Pharmacist Note button must be stacked vertically below HIS Order button on narrow screens',
+        );
+
+        // Buttons expand to full card width (> 250 dp) to prevent text downscaling
+        expect(tester.getSize(hisOrderFinder).width, greaterThan(250.0));
+        expect(tester.getSize(pharmNoteFinder).width, greaterThan(250.0));
+        expect(
+          tester.getSize(hisOrderFinder).height,
+          greaterThanOrEqualTo(48.0),
+        );
+        expect(
+          tester.getSize(pharmNoteFinder).height,
+          greaterThanOrEqualTo(48.0),
+        );
+
+        // --- 2. Wide Viewport (1024x900) ---
+        tester.view.physicalSize = const Size(1024, 900);
+        await tester.pumpWidget(createTestApp(drug: meropenem));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byKey(const Key('calculator_weight_field')),
+          '70',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_height_field')),
+          '170',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_age_field')),
+          '50',
+        );
+        await tester.enterText(
+          find.byKey(const Key('calculator_scr_field')),
+          '1.0',
+        );
+        await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+        await tester.pumpAndSettle();
+
+        // On wide screens (>= 380 dp inside card): buttons are side-by-side
+        final hisOrderTopWide = tester.getTopLeft(hisOrderFinder).dy;
+        final pharmNoteTopWide = tester.getTopLeft(pharmNoteFinder).dy;
+        expect(
+          (hisOrderTopWide - pharmNoteTopWide).abs(),
+          lessThan(1.0),
+          reason:
+              'Buttons must be horizontally aligned at identical Y-position on wide screens',
+        );
+        expect(
+          tester.getTopLeft(pharmNoteFinder).dx,
+          greaterThan(tester.getTopRight(hisOrderFinder).dx),
+          reason:
+              'Pharmacist Note button must be horizontally to the right of HIS Order button',
+        );
+        expect(
+          tester.getSize(hisOrderFinder).height,
+          greaterThanOrEqualTo(48.0),
+        );
+        expect(
+          tester.getSize(pharmNoteFinder).height,
+          greaterThanOrEqualTo(48.0),
+        );
+      },
+    );
+
+    testWidgets(
+      '10. Continuous Infusion: renders side-by-side dual tiles on wide viewports (800 dp) and shows pump rate',
+      (tester) async {
+        tester.view.physicalSize = const Size(800, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final epi = DrugDatabase.findById('epinephrine')!;
+        final infReg =
+            epi.regimens.firstWhere((r) => r.route == DoseRoute.ivInfusion);
+        const pt60 = Patient(
+          id: 'pt-60-dual',
+          weightKg: 60.0,
+          heightCm: 168.0,
+          ageYears: 45,
+          sex: Sex.female,
+          isScrStable: true,
+        );
+        final res = PharmacistCalculator.calculateDose(
+          patient: pt60,
+          drug: epi,
+          regimen: infReg,
+        );
+        final state = CalculatorUiState.initial(epi).copyWith(
+          selectedRegimen: infReg,
+          result: res,
+          status: CalculatorUiStatus.active,
+          lastEvaluatedPatient: pt60,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: DosageResultCard(
+                  state: state,
+                  isThai: true,
+                  onBuildPatient: () => pt60,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify presence of keys
+        expect(
+          find.byKey(const Key('dosage_result_dose_rate_tile')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('dosage_result_pump_rate_tile')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('dosage_result_concentration_context')),
+          findsOneWidget,
+        );
+
+        // Verify Side-by-Side: Y coordinates must be approximately equal
+        final dosePos = tester.getTopLeft(
+          find.byKey(const Key('dosage_result_dose_rate_tile')),
+        );
+        final pumpPos = tester.getTopLeft(
+          find.byKey(const Key('dosage_result_pump_rate_tile')),
+        );
+        expect((dosePos.dy - pumpPos.dy).abs(), lessThan(1.0));
+
+        // Verify metrics
+        expect(find.text('0.05–1.0 mcg/kg/min'), findsOneWidget);
+        expect(find.text('Pump Rate: 11.3–225.0 mL/hr'), findsOneWidget);
+
+        // Verify concentration context content
+        expect(
+          find.textContaining('16 mcg/mL (0.016 mg/mL) [4 mg in 250 mL]'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('D5W'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      '11. Continuous Infusion: stacks dual tiles vertically on narrow viewport (320 dp) without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final epi = DrugDatabase.findById('epinephrine')!;
+        final infReg =
+            epi.regimens.firstWhere((r) => r.route == DoseRoute.ivInfusion);
+        const pt60 = Patient(
+          id: 'pt-60-dual-narrow',
+          weightKg: 60.0,
+          heightCm: 168.0,
+          ageYears: 45,
+          sex: Sex.female,
+          isScrStable: true,
+        );
+        final res = PharmacistCalculator.calculateDose(
+          patient: pt60,
+          drug: epi,
+          regimen: infReg,
+        );
+        final state = CalculatorUiState.initial(epi).copyWith(
+          selectedRegimen: infReg,
+          result: res,
+          status: CalculatorUiStatus.active,
+          lastEvaluatedPatient: pt60,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: DosageResultCard(
+                  state: state,
+                  isThai: true,
+                  onBuildPatient: () => pt60,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final doseTile = find.byKey(const Key('dosage_result_dose_rate_tile'));
+        final pumpTile = find.byKey(const Key('dosage_result_pump_rate_tile'));
+
+        expect(doseTile, findsOneWidget);
+        expect(pumpTile, findsOneWidget);
+
+        // On narrow screens (320 dp): pump tile must be vertically below dose tile
+        final doseBottom = tester.getBottomLeft(doseTile).dy;
+        final pumpTop = tester.getTopLeft(pumpTile).dy;
+        expect(pumpTop, greaterThanOrEqualTo(doseBottom));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      '12. Concentration Context Banner: Stacks titration button below text column without overflow at 320dp x 2.5x text scale',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 900);
+        tester.view.devicePixelRatio = 1.0;
+        tester.platformDispatcher.textScaleFactorTestValue = 2.5;
+
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+          tester.platformDispatcher.clearTextScaleFactorTestValue();
+        });
+
+        final epi = DrugDatabase.findById('epinephrine')!;
+        final infReg =
+            epi.regimens.firstWhere((r) => r.route == DoseRoute.ivInfusion);
+        const pt60 = Patient(
+          id: 'pt-60-banner-stress',
+          weightKg: 60.0,
+          heightCm: 168.0,
+          ageYears: 45,
+          sex: Sex.female,
+          isScrStable: true,
+        );
+        final res = PharmacistCalculator.calculateDose(
+          patient: pt60,
+          drug: epi,
+          regimen: infReg,
+        );
+        final state = CalculatorUiState.initial(epi).copyWith(
+          selectedRegimen: infReg,
+          result: res,
+          status: CalculatorUiStatus.active,
+          lastEvaluatedPatient: pt60,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: DosageResultCard(
+                  state: state,
+                  isThai: true,
+                  onBuildPatient: () => pt60,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Zero RenderFlex Overflow Verification
+        expect(tester.takeException(), isNull);
+
+        // Verify presence of keys
+        final bannerFinder =
+            find.byKey(const Key('dosage_result_concentration_context'));
+        final btnFinder =
+            find.byKey(const Key('dosage_result_open_titration_btn'));
+        expect(bannerFinder, findsOneWidget);
+        expect(btnFinder, findsOneWidget);
+
+        // Verify vertical stacking: button top must be >= science icon bottom
+        final iconFinder = find.byIcon(Icons.science_outlined);
+        final iconBottom = tester.getBottomLeft(iconFinder).dy;
+        final btnTop = tester.getTopLeft(btnFinder).dy;
+        expect(btnTop, greaterThan(iconBottom));
+
+        // Verify button takes full card width
+        expect(tester.getSize(btnFinder).width, greaterThan(200.0));
       },
     );
   });

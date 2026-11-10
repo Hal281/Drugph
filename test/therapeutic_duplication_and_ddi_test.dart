@@ -114,6 +114,110 @@ void main() {
       expect(dupWarnings.first.messageEn, contains('DUPLICATE ACTIVE DRUG'));
     });
 
+    test('4b. Dual Statins: Atorvastatin with active Simvastatin triggers Hard Contraindication Alert', () {
+      const patient = Patient(
+        id: 'p-statin-dup',
+        weightKg: 70.0,
+        heightCm: 175.0,
+        ageYears: 55,
+        sex: Sex.male,
+        isScrStable: true,
+        activeDrugIds: ['simvastatin'],
+      );
+
+      final atorvastatin = DrugDatabase.findById('atorvastatin')!;
+      final result = PharmacistCalculator.calculateDose(
+        patient: patient,
+        drug: atorvastatin,
+        regimen: atorvastatin.regimens.first,
+      );
+
+      final dupWarnings = result.warnings.where(
+        (w) => w.code == DoseWarningCode.therapeuticDuplication,
+      );
+      expect(dupWarnings, isNotEmpty);
+      expect(dupWarnings.first.severity, equals(LimitSeverity.hard));
+      expect(dupWarnings.first.messageEn, contains('statins'));
+    });
+
+    test('4c. Dual Potassium-Sparing Diuretics: Spironolactone with active Eplerenone triggers Hard Contraindication Alert', () {
+      const patient = Patient(
+        id: 'p-ksparing-dup',
+        weightKg: 70.0,
+        heightCm: 175.0,
+        ageYears: 65,
+        sex: Sex.male,
+        isScrStable: true,
+        activeDrugIds: ['eplerenone'],
+      );
+
+      final spironolactone = DrugDatabase.findById('spironolactone')!;
+      final result = PharmacistCalculator.calculateDose(
+        patient: patient,
+        drug: spironolactone,
+        regimen: spironolactone.regimens.first,
+      );
+
+      final dupWarnings = result.warnings.where(
+        (w) => w.code == DoseWarningCode.therapeuticDuplication,
+      );
+      expect(dupWarnings, isNotEmpty);
+      expect(dupWarnings.first.severity, equals(LimitSeverity.hard));
+      expect(dupWarnings.first.messageEn, contains('potassium-sparing'));
+    });
+
+    test('4d. Dual DOAC + DOAC: Apixaban with active Rivaroxaban triggers Hard Contraindication Alert', () {
+      const patient = Patient(
+        id: 'p-doac-dup',
+        weightKg: 70.0,
+        heightCm: 170.0,
+        ageYears: 68,
+        sex: Sex.female,
+        isScrStable: true,
+        activeDrugIds: ['rivaroxaban'],
+      );
+
+      final apixaban = DrugDatabase.findById('apixaban')!;
+      final result = PharmacistCalculator.calculateDose(
+        patient: patient,
+        drug: apixaban,
+        regimen: apixaban.regimens.first,
+      );
+
+      final dupWarnings = result.warnings.where(
+        (w) => w.code == DoseWarningCode.therapeuticDuplication,
+      );
+      expect(dupWarnings, isNotEmpty);
+      expect(dupWarnings.first.severity, equals(LimitSeverity.hard));
+      expect(dupWarnings.first.messageEn, contains('Anticoagulant'));
+    });
+
+    test('4e. Dual Parenteral Anticoagulant: Heparin with active Enoxaparin triggers Hard Contraindication Alert', () {
+      const patient = Patient(
+        id: 'p-heparin-dup',
+        weightKg: 70.0,
+        heightCm: 175.0,
+        ageYears: 60,
+        sex: Sex.male,
+        isScrStable: true,
+        activeDrugIds: ['enoxaparin'],
+      );
+
+      final heparin = DrugDatabase.findById('heparin')!;
+      final result = PharmacistCalculator.calculateDose(
+        patient: patient,
+        drug: heparin,
+        regimen: heparin.regimens.first,
+      );
+
+      final dupWarnings = result.warnings.where(
+        (w) => w.code == DoseWarningCode.therapeuticDuplication,
+      );
+      expect(dupWarnings, isNotEmpty);
+      expect(dupWarnings.first.severity, equals(LimitSeverity.hard));
+      expect(dupWarnings.first.messageEn, contains('parenteral anticoagulants'));
+    });
+
     test('5. PrescriptionCart flags Therapeutic Duplication between items in cart', () {
       final cart = PrescriptionCart.instance;
       cart.clearCart();
@@ -274,6 +378,68 @@ void main() {
       );
       expect(ddiWarnings, isNotEmpty);
       expect(ddiWarnings.any((w) => w.messageEn.contains('CYP3A4') || w.messageEn.contains('rhabdomyolysis') || w.messageEn.contains('statin')), isTrue);
+    });
+
+    // -------------------------------------------------------------------------
+    // 4. Emergency Vasoactive Regimens End-to-End Pump Rate Verification
+    // -------------------------------------------------------------------------
+    group('4. Emergency Vasoactive Regimens End-to-End Pump Rate Verification', () {
+      const patient70 = Patient(
+        id: 'pt-70',
+        weightKg: 70.0,
+        heightCm: 175.0,
+        ageYears: 50,
+        sex: Sex.male,
+        isScrStable: true,
+      );
+
+      test('Norepinephrine: 70 kg at 0.01 mcg/kg/min yields 2.625 mL/hr, at 3.0 mcg/kg/min yields 787.5 mL/hr', () {
+        final norepi = DrugDatabase.findById('norepinephrine')!;
+        final reg = norepi.regimens.first;
+        final res = PharmacistCalculator.calculateDose(
+          patient: patient70,
+          drug: norepi,
+          regimen: reg,
+        );
+        expect(res.infusionResult, isNotNull);
+        expect(res.infusionResult!.rateUnit, equals(RateUnit.mcgKgMin));
+        expect(res.infusionResult!.rate, equals(0.01));
+        expect(res.infusionResult!.rateMax, equals(3.0));
+        expect(res.infusionResult!.rateMlPerHr, closeTo(2.625, 0.001));
+        expect(res.infusionResult!.rateMlPerHrMax, closeTo(787.5, 0.01));
+      });
+
+      test('Dopamine: 70 kg at 2.0 mcg/kg/min yields 5.25 mL/hr, at 20.0 mcg/kg/min yields 52.5 mL/hr', () {
+        final dopa = DrugDatabase.findById('dopamine')!;
+        final reg = dopa.regimens.first;
+        final res = PharmacistCalculator.calculateDose(
+          patient: patient70,
+          drug: dopa,
+          regimen: reg,
+        );
+        expect(res.infusionResult, isNotNull);
+        expect(res.infusionResult!.rateUnit, equals(RateUnit.mcgKgMin));
+        expect(res.infusionResult!.rate, equals(2.0));
+        expect(res.infusionResult!.rateMax, equals(20.0));
+        expect(res.infusionResult!.rateMlPerHr, closeTo(5.25, 0.001));
+        expect(res.infusionResult!.rateMlPerHrMax, closeTo(52.5, 0.01));
+      });
+
+      test('Dobutamine: 70 kg at 2.0 mcg/kg/min yields 8.4 mL/hr, at 20.0 mcg/kg/min yields 84.0 mL/hr', () {
+        final dobut = DrugDatabase.findById('dobutamine')!;
+        final reg = dobut.regimens.first;
+        final res = PharmacistCalculator.calculateDose(
+          patient: patient70,
+          drug: dobut,
+          regimen: reg,
+        );
+        expect(res.infusionResult, isNotNull);
+        expect(res.infusionResult!.rateUnit, equals(RateUnit.mcgKgMin));
+        expect(res.infusionResult!.rate, equals(2.0));
+        expect(res.infusionResult!.rateMax, equals(20.0));
+        expect(res.infusionResult!.rateMlPerHr, closeTo(8.4, 0.001));
+        expect(res.infusionResult!.rateMlPerHrMax, closeTo(84.0, 0.01));
+      });
     });
   });
 }

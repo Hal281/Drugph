@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../core/core.dart';
 import '../../widgets/child_pugh_sheet.dart';
@@ -65,58 +66,90 @@ class DosingParametersForm extends StatelessWidget {
               children: [
                 Icon(Icons.person, color: categoryColor),
                 const SizedBox(width: 8),
-                Text(
-                  t ? 'ข้อมูลผู้ป่วย' : 'Patient Data',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    t ? 'ข้อมูลผู้ป่วย' : 'Patient Data',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    weightCtrl,
-                    t ? 'น้ำหนัก (kg)' : 'Weight (kg)',
-                    Icons.monitor_weight_outlined,
-                    key: const Key('calculator_weight_field'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    heightCtrl,
-                    t ? 'ส่วนสูง (cm)' : 'Height (cm)',
-                    Icons.height,
-                    key: const Key('calculator_height_field'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTextField(
-                    ageCtrl,
-                    t ? 'อายุ (ปี)' : 'Age (years)',
-                    Icons.cake_outlined,
-                    key: const Key('calculator_age_field'),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildTextField(
-                    scrCtrl,
-                    t ? 'Cr (mg/dL)' : 'SCr (mg/dL)',
-                    Icons.water_drop_outlined,
-                    key: const Key('calculator_scr_field'),
-                  ),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.sizeOf(context).width;
+                final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+                final shouldStack = screenWidth < 340 ||
+                    constraints.maxWidth < 280 ||
+                    textScale > 1.25;
+
+                final weightField = _buildTextField(
+                  weightCtrl,
+                  t ? 'น้ำหนัก (kg)' : 'Weight (kg)',
+                  Icons.monitor_weight_outlined,
+                  key: const Key('calculator_weight_field'),
+                );
+
+                final heightField = _buildTextField(
+                  heightCtrl,
+                  t ? 'ส่วนสูง (cm)' : 'Height (cm)',
+                  Icons.height,
+                  key: const Key('calculator_height_field'),
+                );
+
+                final ageField = _buildTextField(
+                  ageCtrl,
+                  t ? 'อายุ (ปี)' : 'Age (years)',
+                  Icons.cake_outlined,
+                  key: const Key('calculator_age_field'),
+                  isInteger: true,
+                );
+
+                final scrField = _buildTextField(
+                  scrCtrl,
+                  t ? 'Cr (mg/dL)' : 'SCr (mg/dL)',
+                  Icons.water_drop_outlined,
+                  key: const Key('calculator_scr_field'),
+                );
+
+                if (shouldStack) {
+                  return Column(
+                    children: [
+                      weightField,
+                      const SizedBox(height: 12),
+                      heightField,
+                      const SizedBox(height: 12),
+                      ageField,
+                      const SizedBox(height: 12),
+                      scrField,
+                    ],
+                  );
+                }
+
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: weightField),
+                        const SizedBox(width: 16),
+                        Expanded(child: heightField),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: ageField),
+                        const SizedBox(width: 16),
+                        Expanded(child: scrField),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 8),
             CheckboxListTile(
@@ -389,12 +422,18 @@ class DosingParametersForm extends StatelessWidget {
                 segments: [
                   ButtonSegment(
                     value: Sex.male,
-                    label: Text(t ? 'ชาย' : 'Male'),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(t ? 'ชาย' : 'Male'),
+                    ),
                     icon: const Icon(Icons.male),
                   ),
                   ButtonSegment(
                     value: Sex.female,
-                    label: Text(t ? 'หญิง' : 'Female'),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(t ? 'หญิง' : 'Female'),
+                    ),
                     icon: const Icon(Icons.female),
                   ),
                 ],
@@ -425,11 +464,18 @@ class DosingParametersForm extends StatelessWidget {
     String label,
     IconData icon, {
     Key? key,
+    bool isInteger = false,
   }) {
     return TextField(
       key: key,
       controller: ctrl,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      keyboardType: TextInputType.numberWithOptions(decimal: !isInteger),
+      inputFormatters: [
+        if (isInteger)
+          FilteringTextInputFormatter.digitsOnly
+        else
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+      ],
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, size: 20, color: Colors.grey),
