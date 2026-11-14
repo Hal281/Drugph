@@ -48,9 +48,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w, IvDiluent.lrs],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Reconstitute vial with SWFI, then dilute in NSS or D5W to <= 5 mg/mL (up to 10 mg/mL ONLY via central line in fluid-restricted patients). Infuse over >= 60 min (max rate <= 10–15 mg/min) to prevent Vancomycin Infusion Reaction.',
+          'Reconstitute with SWFI; dilute in NSS/D5W to <=5 mg/mL (<=10 mg/mL via central line if fluid-restricted). Infuse over >=60 min (<=10–15 mg/min).',
       stabilityNoteTh:
-          'ละลายผงยาด้วย SWFI แล้วเจือจางใน NSS หรือ D5W ความเข้มข้น <= 5 mg/mL (กรณีจำกัดน้ำให้ <= 10 mg/mL ทาง Central Line เท่านั้น) หยดนาน >= 60 นาที (<= 10–15 mg/min) ป้องกัน Red Man Syndrome',
+          'ละลายด้วย SWFI; เจือจางใน NSS/D5W <=5 mg/mL (จำกัดน้ำใช้ <=10 mg/mL ทาง Central Line). หยด >=60 นาที (<=10–15 mg/min)',
       sourceCitation:
           'US FDA Vancomycin HCl SPL / ASHP/IDSA Vancomycin Guidelines 2020 / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -294,9 +294,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Dilute in 50–200 mL NSS or D5W and infuse over 30–60 minutes. Do NOT mix or infuse simultaneously via Y-site with beta-lactams (penicillins/cephalosporins cause chemical inactivation of aminoglycosides).',
+          'Dilute in 50–200 mL NSS/D5W; infuse over 30–60 min. Do not mix or co-infuse via Y-site with beta-lactams.',
       stabilityNoteTh:
-          'เจือจางใน NSS หรือ D5W 50–200 mL หยดนาน 30–60 นาที ห้ามผสมในถุงเดียวกันหรือเปิด Y-site พร้อมกับยากลุ่ม Beta-lactams เนื่องจากทำให้ Aminoglycoside เสื่อมฤทธิ์',
+          'เจือจางใน NSS/D5W 50–200 mL; หยด 30–60 นาที. ห้ามผสมถุงเดียวกันหรือให้ร่วม Y-site กับ Beta-lactams',
       sourceCitation:
           'The Sanford Guide 2024 / US FDA Gentamicin Sulfate SPL / Trissel\'s Handbook',
     ),
@@ -459,9 +459,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w, IvDiluent.lrs],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Dilute in 100–200 mL NSS or D5W and infuse over 30–60 minutes. Flush line before/after administration; do NOT co-infuse via Y-site with beta-lactam antibiotics.',
+          'Dilute in 100–200 mL NSS/D5W; infuse over 30–60 min. Flush line before/after; do not co-infuse with beta-lactams via Y-site.',
       stabilityNoteTh:
-          'เจือจางใน NSS หรือ D5W 100–200 mL หยดนาน 30–60 นาที ห้ามเปิด Y-site พร้อมกับยากลุ่ม Beta-lactams (ต้อง Flush สายคั่นเสมอ)',
+          'เจือจางใน NSS/D5W 100–200 mL; หยด 30–60 นาที. Flush สายก่อนและหลัง; ห้ามให้ร่วม Y-site กับ Beta-lactams',
       sourceCitation:
           'The Sanford Guide 2024 / US FDA Amikin (amikacin) SPL / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -594,9 +594,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'STRONGLY PREFER NSS FOR EXTENDED INFUSION: Meropenem diluted in NSS is stable ~4 hours at room temperature (up to 24h refrigerated), whereas stability in D5W is ONLY ~1 hour at room temperature (unsuitable for 3-hour extended infusion).',
+          'Prefer NSS for extended infusion: stable ~4 hours at room temperature (24 hours refrigerated); D5W stable ~1 hour at room temperature.',
       stabilityNoteTh:
-          'แนะนำผสมใน NSS เป็นหลักโดยเฉพาะการดริปยาว 3 ชม.: Meropenem ใน NSS คงตัวที่อุณหภูมิห้อง ~4 ชม. ในขณะที่ใน D5W คงตัวเพียง ~1 ชม. (ห้ามใช้ D5W สำหรับ Extended Infusion 3 ชม.)',
+          'การหยดยาวแนะนำ NSS: คงตัว ~4 ชม. ที่อุณหภูมิห้อง (แช่เย็น 24 ชม.); D5W คงตัว ~1 ชม. ที่อุณหภูมิห้อง',
       sourceCitation:
           'US FDA Merrem IV (meropenem) SPL §2.4 / Trissel\'s Handbook / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -822,13 +822,13 @@ final List<Drug> antibiotics = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.lrs],
       incompatibilityReasonEn:
-          'FATAL CALCIUM PRECIPITATION HAZARD: NEVER reconstitute, dilute, or co-administer Ceftriaxone with calcium-containing solutions such as Lactated Ringer\'s (LRS) or Hartmann\'s solution — forms insoluble ceftriaxone-calcium precipitates.',
+          'Do not mix or co-infuse with calcium-containing fluids (e.g., LRS); precipitation may occur. Do not use with calcium-containing IV fluids in neonates.',
       incompatibilityReasonTh:
-          'ห้ามผสมหรือเปิดสายร่วมกับ LRS เด็ดขาด: LRS มีแคลเซียมซึ่งทำปฏิกิริยากับ Ceftriaxone เกิดตะกอนผลึก Ceftriaxone-Calcium ที่ไม่ละลายน้ำ อุดตันปอดและไตได้ (ในทารกแรกเกิดเป็นข้อห้ามเด็ดขาดถึงชีวิต ในผู้ใหญ่ห้ามให้สายเดียวกันโดยไม่ Flush สาย)',
+          'ห้ามผสมหรือให้ร่วมสายกับสารน้ำที่มีแคลเซียม (เช่น LRS) เนื่องจากเสี่ยงตกตะกอน; ทารกแรกเกิดห้ามใช้ร่วมกับสารน้ำที่มีแคลเซียมทางหลอดเลือดดำ',
       stabilityNoteEn:
-          'Dilute in 50–100 mL NSS or D5W and infuse over 30 minutes. In non-neonates, sequential administration with calcium fluids requires thorough line flushing between infusions.',
+          'Dilute in 50–100 mL NSS/D5W; infuse over 30 min. In non-neonates, flush line before sequential calcium-containing fluids.',
       stabilityNoteTh:
-          'เจือจางใน NSS หรือ D5W 50–100 mL หยดนาน 30 นาที ในผู้ใหญ่หากต้องให้สารน้ำที่มีแคลเซียมตามหลัง ต้อง Flush สายด้วย NSS คั่นให้สะอาดก่อนและหลังเสมอ',
+          'เจือจางใน NSS/D5W 50–100 mL; หยด 30 นาที. ผู้ที่ไม่ใช่ทารกแรกเกิด ให้ Flush สายก่อนให้สารน้ำที่มีแคลเซียมตามลำดับ',
       sourceCitation:
           'US FDA Rocephin (ceftriaxone) SPL §4 & §5.2 / The Sanford Guide 2024 / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -1159,9 +1159,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w, IvDiluent.lrs],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Reconstitute vial with SWFI, then administer slow IV push over 3–5 min or dilute in 50–100 mL NSS or D5W over 30 min. Stable 24 hours at room temperature.',
+          'Reconstitute with SWFI; slow IV push over 3–5 min, or dilute in 50–100 mL NSS/D5W and infuse over 30 min. Stable 24 h at room temperature.',
       stabilityNoteTh:
-          'ละลายผงยาด้วย SWFI ฉีด IV Push ช้าๆ ใน 3–5 นาที หรือเจือจางใน NSS หรือ D5W 50–100 mL หยดนาน 30 นาที คงตัวที่อุณหภูมิห้อง 24 ชม.',
+          'ละลายด้วย SWFI; IV push 3–5 นาที หรือเจือจางใน NSS/D5W 50–100 mL หยด 30 นาที. คงตัว 24 ชม. ที่อุณหภูมิห้อง',
       sourceCitation:
           'US FDA Cefazolin for Injection SPL / ASHP Surgical Prophylaxis Guidelines / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -1306,13 +1306,13 @@ final List<Drug> antibiotics = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.lrs],
       incompatibilityReasonEn:
-          'LRS INCOMPATIBILITY WARNING: Non-EDTA generic Piperacillin/Tazobactam formulations commonly stocked in hospitals are NOT compatible with Lactated Ringer\'s (LRS). Use NSS or D5W unless EDTA-stabilized formulation is verified.',
+          'Avoid LRS unless an EDTA-stabilized formulation is confirmed; use NSS or D5W.',
       incompatibilityReasonTh:
-          'หลีกเลี่ยงการผสมใน LRS: ยา Piperacillin/Tazobactam สูตรที่ไม่มีสารคงตัว EDTA (พบได้บ่อยในโรงพยาบาล) ไม่เข้ากันกับสารละลาย LRS แนะนำผสมใน NSS หรือ D5W เท่านั้น',
+          'หลีกเลี่ยง LRS หากไม่ยืนยันสูตรที่มี EDTA; ใช้ NSS หรือ D5W',
       stabilityNoteEn:
-          'Reconstitute with 20 mL SWFI or NSS, then dilute in 50–150 mL NSS or D5W. Stable 24 hours at room temperature (suitable for 4-hour extended infusion). Do NOT Y-site with aminoglycosides or vancomycin without checking concentration compatibility.',
+          'Reconstitute with 20 mL SWFI/NSS; dilute in 50–150 mL NSS/D5W. Stable 24 h at room temperature (4-h extended infusion). Check concentration compatibility before Y-site with aminoglycosides or vancomycin.',
       stabilityNoteTh:
-          'ละลายผงยาด้วย SWFI หรือ NSS 20 mL แล้วเจือจางใน NSS หรือ D5W 50–150 mL คงตัวที่อุณหภูมิห้อง 24 ชม. (รองรับ Extended Infusion 4 ชม.) ห้ามเปิด Y-site พร้อมกับ Aminoglycosides',
+          'ละลายด้วย SWFI/NSS 20 mL; เจือจางใน NSS/D5W 50–150 mL. คงตัว 24 ชม. (หยดยาว 4 ชม.). ตรวจสอบความเข้ากันได้ก่อนให้ Y-site กับ Aminoglycosides หรือ Vancomycin',
       sourceCitation:
           'US FDA Zosyn SPL §2.5 / Trissel\'s Handbook / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -1570,9 +1570,9 @@ final List<Drug> antibiotics = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Reconstitute gently with SWFI or NSS (avoid vigorous shaking to prevent foaming), dilute in 50–100 mL NSS or D5W, and administer promptly after dilution (CMS hydrolyzes in aqueous solution to toxic polymyxin E over prolonged storage).',
+          'Gently reconstitute with SWFI/NSS; avoid shaking. Dilute in 50–100 mL NSS/D5W and administer promptly after dilution.',
       stabilityNoteTh:
-          'ละลายผงยาเบาๆ ด้วย SWFI หรือ NSS (ห้ามเขย่าแรงเพื่อลดการเกิดฟอง) เจือจางใน NSS หรือ D5W 50–100 mL และควรบริหารยาทันทีหลังผสม (เนื่องจาก CMS ในสารละลายจะค่อยๆ สลายตัวเป็น Colistin อิสระที่มีพิษเพิ่มขึ้นหากตั้งทิ้งไว้นาน)',
+          'ละลายเบาๆ ด้วย SWFI/NSS ห้ามเขย่าแรง; เจือจางใน NSS/D5W 50–100 mL และให้ยาทันทีหลังผสม',
       sourceCitation:
           'US FDA Coly-Mycin M Parenteral SPL / Tsuji BT et al. Pharmacotherapy 2019 / คู่มือยาฉีดรามาธิบดี',
     ),

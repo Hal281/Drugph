@@ -367,9 +367,9 @@ final List<Drug> anticoagulants = [
       compatibleDiluents: [IvDiluent.d5w, IvDiluent.nss],
       preferredDiluent: IvDiluent.d5w,
       stabilityNoteEn:
-          'Standard dilution: 25,000 units in 250 mL D5W or NSS (100 units/mL). Invert bag at least 6 times after mixing to prevent pooling.',
+          'Standard: 25,000 units/250 mL (100 units/mL) in D5W or NSS. Invert bag at least 6 times after mixing.',
       stabilityNoteTh:
-          'ผสมมาตรฐาน 25,000 units ใน D5W หรือ NSS 250 mL (100 units/mL) ต้องพลิกถุงกลับไปมาอย่างน้อย 6 ครั้งเพื่อป้องกันยาตกก้นถุง',
+          'ผสม 25,000 units/250 mL (100 units/mL) ใน D5W หรือ NSS; พลิกถุงอย่างน้อย 6 ครั้งหลังผสม',
       sourceCitation:
           'US FDA Heparin Sodium SPL / Ramathibodi High-Alert IV Infusion Guide 2024',
     ),
@@ -684,9 +684,9 @@ final List<Drug> supplements = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.halfNss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Prefer NSS over D5W during initial severe hypokalemia replacement (dextrose stimulates insulin release and may transiently worsen hypokalemia). Mix thoroughly before hanging.',
+          'For initial severe hypokalemia replacement, prefer NSS over D5W. Mix thoroughly before administration.',
       stabilityNoteTh:
-          'แนะนำผสมใน NSS เป็นหลักในการแก้โพแทสเซียมต่ำรุนแรงระยะแรก (การให้ D5W กระตุ้นอินซูลินดึง K+ เข้าเซลล์ อาจทำให้น้ำผลโพแทสเซียมในเลือดต่ำลงชั่วคราว) ต้องเขย่าถุงให้เข้ากันดีก่อนแขวน',
+          'ช่วงแรกของการแก้โพแทสเซียมต่ำรุนแรง แนะนำ NSS แทน D5W; ผสมให้เข้ากันก่อนให้ยา',
       sourceCitation:
           'Lexicomp Drug Information 2024 / Ramathibodi High-Alert Electrolyte Manual',
     ),

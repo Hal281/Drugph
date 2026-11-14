@@ -280,13 +280,13 @@ final List<Drug> endocrine = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.d5w],
       incompatibilityReasonEn:
-          'CLINICAL DKA/HHS DILUENT HAZARD: Prepare continuous insulin drip in 0.9% NaCl (NSS) 100 units/100 mL (1 unit/mL) — do NOT mix the insulin bag itself in D5W. Add separate D5W maintenance fluid via Y-site only once glucose falls to <= 200 mg/dL (DKA) or <= 300 mg/dL (HHS).',
+          'Prepare the insulin infusion in NSS (100 units/100 mL); do not use D5W in the insulin bag. Give D5W separately via Y-site when glucose is <=200 mg/dL (DKA) or <=300 mg/dL (HHS).',
       incompatibilityReasonTh:
-          'ห้ามผสมถุงอินซูลินดริปใน D5W: ต้องเตรียม Regular Insulin 100 units ใน 0.9% NaCl (NSS) 100 mL (1 unit/mL) เท่านั้น และต่อสาย D5W แยกต่างหากเมื่อระดับน้ำตาลลดลงถึง <= 200 mg/dL (DKA) หรือ <= 300 mg/dL (HHS)',
+          'ผสมอินซูลิน 100 units ใน NSS 100 mL; ห้ามผสม D5W ในถุงอินซูลิน. ให้ D5W แยกทาง Y-site เมื่อ glucose <=200 mg/dL (DKA) หรือ <=300 mg/dL (HHS)',
       stabilityNoteEn:
-          'Flush 20–50 mL of prepared insulin solution through PVC IV tubing before connecting to patient to saturate plastic adsorption sites.',
+          'Prime PVC tubing with 20–50 mL of prepared insulin solution before connection.',
       stabilityNoteTh:
-          'ต้องเปิดสารละลายอินซูลินที่ผสมแล้วไล่ผ่านสายน้ำเกลือทิ้ง 20–50 mL ก่อนต่อเข้าผู้ป่วยเสมอ เพื่อให้ผนังสาย PVC อิ่มตัวจากการดูดซับยา',
+          'ไล่สารละลายอินซูลิน 20–50 mL ผ่านสาย PVC ก่อนต่อเข้าผู้ป่วย',
       sourceCitation:
           'ADA Standards of Care in Diabetes 2024 / US FDA Humulin R SPL / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี',
     ),

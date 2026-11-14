@@ -47,13 +47,13 @@ final List<Drug> cardiovascular = [
       preferredDiluent: IvDiluent.d5w,
       incompatibleDiluents: [IvDiluent.nss],
       incompatibilityReasonEn:
-          'OXIDATION LOSS OF POTENCY: Per US FDA Levophed SPL §2.2, administration in saline solution alone (NSS) is NOT recommended because dextrose protects norepinephrine against significant loss of potency due to oxidation.',
+          'Do not use NSS alone; use D5W or D5NSS to reduce oxidation-related potency loss.',
       incompatibilityReasonTh:
-          'ไม่แนะนำให้ผสมใน NSS เดี่ยวๆ: ตามฉลากยา US FDA Levophed §2.2 ยาจะเสื่อมฤทธิ์จากปฏิกิริยาออกซิเดชัน ต้องผสมในสารละลายที่มีน้ำตาล Dextrose (D5W หรือ D5NSS) เพื่อคงความแรงของยา',
+          'ไม่ใช้ NSS เดี่ยว; ใช้ D5W หรือ D5NSS เพื่อลดการเสื่อมฤทธิ์จากออกซิเดชัน',
       stabilityNoteEn:
-          'Standard: 4 mg in 250 mL D5W or D5NSS (16 mcg/mL). Discard if solution turns pinkish, dark yellow, or brown, or contains precipitate.',
+          'Standard: 4 mg/250 mL (16 mcg/mL). Discard if pink, dark yellow, brown, or precipitated.',
       stabilityNoteTh:
-          'ผสมมาตรฐาน 4 mg ใน D5W หรือ D5NSS 250 mL (16 mcg/mL) ห้ามใช้หากสารละลายเปลี่ยนเป็นสีชมพู เหลืองเข้ม น้ำตาล หรือมีตะกอน',
+          'ผสม 4 mg/250 mL (16 mcg/mL); งดใช้หากเปลี่ยนเป็นสีชมพู เหลืองเข้ม น้ำตาล หรือมีตะกอน',
       sourceCitation:
           'US FDA Levophed (norepinephrine) SPL §2.2 / คู่มือยาฉีดความเสี่ยงสูง รพ.รามาธิบดี 2024',
     ),
@@ -126,9 +126,9 @@ final List<Drug> cardiovascular = [
       ],
       preferredDiluent: IvDiluent.d5w,
       stabilityNoteEn:
-          'Standard: 400 mg in 250 mL D5W or NSS (1.6 mg/mL = 1,600 mcg/mL). NEVER mix with sodium bicarbonate or alkaline IV solutions (inactivates dopamine).',
+          'Standard: 400 mg/250 mL (1.6 mg/mL). Do not mix with sodium bicarbonate or alkaline solutions.',
       stabilityNoteTh:
-          'ผสมมาตรฐาน 400 mg ใน D5W หรือ NSS 250 mL (1.6 mg/mL) ห้ามผสมร่วมกับ Sodium Bicarbonate หรือสารละลายด่างเด็ดขาด (ทำให้ยาเสื่อมฤทธิ์)',
+          'ผสม 400 mg/250 mL (1.6 mg/mL); ห้ามผสมกับ Sodium Bicarbonate หรือสารละลายด่าง',
       sourceCitation:
           'US FDA Intropin (dopamine) SPL / Ramathibodi High-Alert IV Infusion Guide 2024',
     ),
@@ -185,9 +185,9 @@ final List<Drug> cardiovascular = [
           '• ไม่จำเป็นต้องปรับลดขนาดยาในผู้ป่วยที่มีภาวะไตบกพร่องหรือผู้ป่วยที่ฟอกเลือด (No renal dose adjustment in CKD or Hemodialysis)',
       administrationGuideline:
           '• ข้อกำหนดความเข้ากันได้ของสารน้ำ (Compatibility Constraint):\n'
-          '  - ต้องเจือจางใน D5W เท่านั้น (Incompatible with NSS: เกิดการตกตะกอนเมื่อเวลาผ่านไป)\n'
-          '  - ความเข้มข้นของการหยดต่อเนื่อง > 2 mg/mL ต้องให้ผ่านสายสวนหลอดเลือดดำส่วนกลาง (Central Venous Catheter) เพื่อป้องกัน Severe Chemical Phlebitis\n'
-          '  - การหยดยานานกว่า 2 ชั่วโมง ต้องใช้ภาชนะชนิด Polyolefin หรือ Glass (หลีกเลี่ยง PVC bag) และใช้ In-line filter ขนาด 0.22 micron',
+          '  - ใช้ D5W เท่านั้น; หลีกเลี่ยง NSS/LRS (เสี่ยงตกตะกอน)\n'
+          '  - ความเข้มข้น > 2 mg/mL ให้ทาง Central Line\n'
+          '  - หยด > 2 ชม. ใช้ภาชนะ Non-PVC/แก้ว และ 0.22-micron inline filter',
       clinicalNotes:
           '• จัดเป็นยาเตือนภัยสูงระดับวิกฤต (High-Alert Antiarrhythmic)\n'
           '• Boxed Warning: เสี่ยงต่อภาวะพิษต่อปอด (Pulmonary Toxicity/Fibrosis), พิษต่อตับ (Hepatotoxicity) และการกระตุ้นหัวใจเต้นผิดจังหวะ (Proarrhythmic effects)\n'
@@ -199,13 +199,13 @@ final List<Drug> cardiovascular = [
       preferredDiluent: IvDiluent.d5w,
       incompatibleDiluents: [IvDiluent.nss, IvDiluent.lrs],
       incompatibilityReasonEn:
-          'PRECIPITATION / INCOMPATIBILITY HAZARD: Amiodarone IV continuous infusion MUST be diluted in D5W only. Dilution in NSS or LRS causes physical instability and precipitation over time.',
+          'For continuous infusion, use D5W only; NSS and LRS may cause precipitation.',
       incompatibilityReasonTh:
-          'ห้ามผสมหยดต่อเนื่องใน NSS หรือ LRS: Amiodarone IV ต้องเจือจางใน D5W เท่านั้น การผสมใน NSS เสี่ยงต่อการตกตะกอนเมื่อเวลาผ่านไป',
+          'หยดต่อเนื่องให้ใช้ D5W เท่านั้น; NSS และ LRS เสี่ยงตกตะกอน',
       stabilityNoteEn:
-          'Use non-PVC (polyolefin or glass) container for infusions > 2 hours (amiodarone adsorbs to PVC and leaches DEHP) with a 0.22-micron inline filter. Concentrations > 2 mg/mL require a central venous line.',
+          'For infusions >2 h, use a non-PVC (glass/polyolefin) container and 0.22-micron inline filter. Concentrations >2 mg/mL require a central line.',
       stabilityNoteTh:
-          'การหยดนานเกิน 2 ชม. ต้องใช้ขวดแก้วหรือถุง Non-PVC (Polyolefin) ร่วมกับ 0.22-micron inline filter ความเข้มข้น > 2 mg/mL ต้องให้ทาง Central Line',
+          'หยด >2 ชม. ใช้ภาชนะแก้ว/Polyolefin และ 0.22-micron inline filter; ความเข้มข้น >2 mg/mL ให้ทาง Central Line',
       sourceCitation:
           'US FDA Cordarone IV SPL §2.2 / Ramathibodi High-Alert IV Infusion Guide 2024',
     ),
@@ -316,13 +316,13 @@ final List<Drug> cardiovascular = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.d5w],
       incompatibilityReasonEn:
-          'ACIDIC PRECIPITATION HAZARD: Furosemide is an alkaline solution (pH ~9) and precipitates in acidic dextrose solutions (pH < 5.5) such as unbuffered D5W. Prefer 0.9% NaCl (NSS).',
+          'Avoid D5W due to precipitation risk; NSS is preferred.',
       incompatibilityReasonTh:
-          'เสี่ยงตกตะกอนใน D5W: Furosemide เป็นสารละลายด่าง (pH ~9) จะตกตะกอนเมื่อผสมในสารละลายที่เป็นกรด (pH < 5.5) เช่น D5W ที่ไม่ผ่านการบัฟเฟอร์ แนะนำผสมใน NSS เป็นหลัก',
+          'หลีกเลี่ยง D5W เนื่องจากเสี่ยงตกตะกอน; แนะนำ NSS',
       stabilityNoteEn:
-          'Protect from light; do not use if solution is yellow/discolored. Max IV push/infusion rate <= 20 mg/min (<= 4 mg/min for high doses) to prevent ototoxicity.',
+          'Protect from light; do not use if discolored. Max rate: 20 mg/min (4 mg/min for high doses) to limit ototoxicity.',
       stabilityNoteTh:
-          'เก็บให้พ้นแสง ห้ามใช้หากยาเปลี่ยนเป็นสีเหลือง อัตราการฉีดไม่เกิน 20 mg/min (ขนาดยาสูง <= 4 mg/min) เพื่อป้องกันพิษต่อหู',
+          'เก็บพ้นแสง; งดใช้หากสีเปลี่ยน. อัตราสูงสุด 20 mg/min (ขนาดสูง 4 mg/min) เพื่อลดพิษต่อหู',
       sourceCitation:
           'US FDA Lasix Injection SPL / Trissel\'s Handbook on Injectable Drugs',
     ),
@@ -523,13 +523,13 @@ final List<Drug> cardiovascular = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.lrs],
       incompatibilityReasonEn:
-          'INCOMPATIBLE WITH LRS: Per US FDA Cardene IV SPL §2.3, Nicardipine is NOT compatible with Lactated Ringer\'s (LRS) or Sodium Bicarbonate (risk of alkaline precipitation).',
+          'Avoid LRS and sodium bicarbonate due to precipitation risk.',
       incompatibilityReasonTh:
-          'ห้ามผสมใน LRS เด็ดขาด: ตามฉลากยา US FDA Cardene IV §2.3 ยาไม่เข้ากันกับ Lactated Ringer\'s (LRS) และ Sodium Bicarbonate เนื่องจากเสี่ยงตกตะกอน',
+          'หลีกเลี่ยง LRS และ Sodium Bicarbonate เนื่องจากเสี่ยงตกตะกอน',
       stabilityNoteEn:
-          'Standard dilution: 25 mg diluted to 250 mL total volume in NSS or D5W (0.1 mg/mL). Stable 24 hours at room temperature; rotate peripheral IV site every 12 hours.',
+          'Dilute 25 mg to 250 mL (0.1 mg/mL) in NSS or D5W. Stable 24 h at room temperature; rotate peripheral IV site every 12 h.',
       stabilityNoteTh:
-          'ผสมมาตรฐาน 25 mg เจือจางให้ได้ปริมาตรรวม 250 mL ใน NSS หรือ D5W (0.1 mg/mL) คงตัวที่อุณหภูมิห้อง 24 ชม. เปลี่ยนตำแหน่ง Peripheral line ทุก 12 ชม.',
+          'เจือจาง 25 mg ให้ครบ 250 mL (0.1 mg/mL) ใน NSS หรือ D5W; คงตัว 24 ชม. และเปลี่ยนตำแหน่ง Peripheral line ทุก 12 ชม.',
       sourceCitation:
           'US FDA Cardene IV (nicardipine) SPL §2.3 / คู่มือยาฉีดรามาธิบดี 2024',
     ),

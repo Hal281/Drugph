@@ -53,9 +53,9 @@ final List<Drug> obstetric = [
       compatibleDiluents: [IvDiluent.nss, IvDiluent.lrs, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
       stabilityNoteEn:
-          'Prefer isotonic electrolyte fluid (NSS or LRS, 10 units in 1,000 mL = 10 mU/mL) over electrolyte-free D5W during prolonged or high-dose infusions to prevent ADH-like water intoxication and severe maternal/neonatal hyponatremia.',
+          'For prolonged/high-dose infusion, prefer NSS or LRS over D5W. Standard: 10 units/1,000 mL (10 mU/mL).',
       stabilityNoteTh:
-          'แนะนำผสมในสารน้ำเกลือแร่ไอโซโทนิก (NSS หรือ LRS: 10 units ใน 1,000 mL = 10 mU/mL) แทน D5W เมื่อต้องหยดนานหรือขนาดสูง เพื่อป้องกันภาวะน้ำคั่งและโซเดียมต่ำรุนแรง (Water intoxication)',
+          'หยดนานหรือใช้ขนาดสูง แนะนำ NSS หรือ LRS แทน D5W. ขนาดมาตรฐาน 10 units/1,000 mL (10 mU/mL)',
       sourceCitation:
           'US FDA Pitocin (oxytocin) SPL / ACOG Practice Bulletins No. 107 & 183',
     ),
