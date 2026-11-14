@@ -180,7 +180,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   children: [
                     ClinicalHeaderAlerts(
                       drug: widget.drug,
-                      selectedRegimen: state.selectedRegimen,
                       isThai: t,
                       categoryColor: widget.categoryColor,
                     ),
@@ -307,7 +306,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: [
               ClinicalHeaderAlerts(
                 drug: widget.drug,
-                selectedRegimen: state.selectedRegimen,
                 isThai: t,
                 categoryColor: widget.categoryColor,
               ),
