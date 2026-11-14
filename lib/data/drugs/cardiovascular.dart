@@ -84,6 +84,16 @@ final List<Drug> cardiovascular = [
     brandNames: ['Intropin'],
     nameTh: 'โดปามีน',
     category: DrugCategory.vasopressor,
+    sideEffects: [
+      'Tachycardia',
+      'Ventricular arrhythmias',
+      'Myocardial ischemia',
+    ],
+    sideEffectsTh: [
+      'หัวใจเต้นเร็ว',
+      'หัวใจเต้นผิดจังหวะ',
+      'กล้ามเนื้อหัวใจขาดเลือด',
+    ],
     isHighAlert: true,
     sourceCitation: 'Ramathibodi High-Alert IV Infusion Guide 2024 / AHA Shock Guidelines / US FDA Intropin SPL',
     lastReviewedDate: '2024-10-12',
@@ -159,6 +169,18 @@ final List<Drug> cardiovascular = [
     brandNames: ['Cordarone'],
     nameTh: 'อะมิโอดาโรน',
     category: DrugCategory.cardiovascular,
+    sideEffects: [
+      'Pulmonary toxicity/fibrosis',
+      'Hepatotoxicity',
+      'Proarrhythmic effects',
+      'Acute hypotension and bradycardia with rapid infusion',
+    ],
+    sideEffectsTh: [
+      'พิษต่อปอด/พังผืดในปอด',
+      'พิษต่อตับ',
+      'กระตุ้นหัวใจเต้นผิดจังหวะ',
+      'ความดันโลหิตต่ำและหัวใจเต้นช้าเมื่อหยดยาเร็ว',
+    ],
     isHighAlert: true,
     sourceCitation: 'AHA ACLS Guidelines 2020 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี / US FDA Cordarone SPL',
     lastReviewedDate: '2024-10-12',
@@ -230,6 +252,8 @@ final List<Drug> cardiovascular = [
     category: DrugCategory.cardiovascular,
     requiresHepaticCaution: true,
     allergyClass: 'Calcium Channel Blocker (CCB)',
+    sideEffects: ['Peripheral edema'],
+    sideEffectsTh: ['ขาบวม'],
     severeInteractions: [
       'Simvastatin (Max simvastatin dose 20 mg/day)',
       'CYP3A4 Inhibitors (e.g. Clarithromycin, Itraconazole - increases Amlodipine level)'

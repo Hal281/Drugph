@@ -1857,6 +1857,8 @@ final List<Drug> antibiotics = [
     requiresRenalAdjustment: true,
     severeInteractions: ['Antacids (Decreases absorption)'],
     contraindications: ['Optic neuritis', 'Patients unable to report visual changes (e.g., young children)'],
+    sideEffects: ['Reduced visual acuity', 'Red-green color blindness'],
+    sideEffectsTh: ['การมองเห็นลดลง', 'ตาบอดสีแดง-เขียว'],
     specialNotes: 'High risk of optic neuritis (decreased visual acuity, red-green color blindness). Requires renal dose adjustment.',
     specialNotesTh: 'ผลข้างเคียงสำคัญคือ **ตาบอดสี (ตาบอดสีแดง-เขียว)** หรือมองไม่ชัด ต้องตรวจตาก่อนและระหว่างใช้ยา ต้องปรับโดสในคนไข้ไตวาย',
     regimens: [

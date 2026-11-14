@@ -481,6 +481,8 @@ final List<Drug> neurology = [
     brandNames: ['Precedex'],
     nameTh: 'เดกซ์เมดีโทมิดีน',
     category: DrugCategory.sedative,
+    sideEffects: ['Bradycardia', 'Hypotension'],
+    sideEffectsTh: ['หัวใจเต้นช้า', 'ความดันโลหิตต่ำ'],
     isHighAlert: true,
     sourceCitation:
         'PADIS Guidelines 2018 / Lexicomp 2024 / US FDA Precedex SPL',

@@ -102,11 +102,19 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   Widget build(BuildContext context) {
     final t = widget.isThai;
     final state = _controller.state;
+    final drugClass = widget.drug.effectiveDrugClass;
+    final drugClassName = t
+        ? drugClass?.nameTh ?? widget.drug.category.nameTh
+        : drugClass?.nameEn ?? widget.drug.category.nameEn;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: Text(widget.drug.genericName),
+        title: Text(
+          '${widget.drug.genericName} ($drugClassName)',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         backgroundColor: widget.categoryColor,
         foregroundColor: Colors.white,
         elevation: 0,

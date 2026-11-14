@@ -21,6 +21,12 @@ class ClinicalHeaderAlerts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = isThai;
+    final indications = drug.availableIndications.take(3).toList();
+    final sideEffects = t
+        ? (drug.sideEffectsTh.isNotEmpty
+            ? drug.sideEffectsTh
+            : drug.sideEffects)
+        : drug.sideEffects;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,6 +41,29 @@ class ClinicalHeaderAlerts extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+
+        if (indications.isNotEmpty)
+          _buildListAlertCard(
+            Icons.medical_services_outlined,
+            Colors.teal,
+            t ? 'ข้อบ่งใช้หลัก (Indications)' : 'Indications',
+            indications,
+          ),
+
+        _buildListAlertCard(
+          Icons.health_and_safety_outlined,
+          Colors.deepOrange,
+          t
+              ? 'ผลข้างเคียงสำคัญ (Side Effects)'
+              : 'Important Side Effects',
+          sideEffects.isNotEmpty
+              ? sideEffects
+              : [
+                  t
+                      ? 'ยังไม่มีข้อมูลที่ยืนยันในฐานข้อมูล'
+                      : 'No verified side-effect data in the database.',
+                ],
+        ),
 
         // Pre-calculate Warnings
         if (drug.pregnancyCategory != null)
@@ -55,15 +84,6 @@ class ClinicalHeaderAlerts extends StatelessWidget {
             t
                 ? 'ควรปรับขนาดหรือระวังในผู้ป่วยโรคตับ (Hepatic caution)'
                 : 'Hepatic dose adjustment / caution required',
-          ),
-
-        if (drug.allergyClass != null)
-          _buildAlertCard(
-            Icons.medical_information,
-            Colors.purple,
-            t
-                ? 'ตรวจสอบประวัติแพ้ยากลุ่ม: ${drug.allergyClass}'
-                : 'Check patient allergy to: ${drug.allergyClass}',
           ),
 
         if (drug.severeInteractions.isNotEmpty)
