@@ -174,8 +174,8 @@ final List<Drug> cardiovascular = [
       sectionOrTable: 'Ventricular Arrhythmias & Cardiac Arrest Infusion Protocol',
       dosingGuideline:
           '• ภาวะหัวใจหยุดเต้นจาก Pulseless VT / VF (ACLS Cardiac Arrest):\n'
-          '  - เข็มแรก: 300 mg IV/IO push (เจือจางใน D5W 20–30 mL)\n'
-          '  - เข็มที่สอง: 150 mg IV/IO push หากยังมี VT/VF คงอยู่\n'
+          '  - โดสที่ 1: 300 mg IV/IO push (เจือจางใน D5W 20–30 mL)\n'
+          '  - โดสที่ 2: 150 mg IV/IO push หากยังมี VT/VF คงอยู่\n'
           '• ภาวะ Stable Wide-Complex Tachycardia / Recurrent VT:\n'
           '  - Rapid Loading Infusion: 150 mg ใน D5W 100 mL หยดเข้าหลอดเลือดดำช้าๆ นาน 10 นาที (อัตรา 15 mg/min)\n'
           '  - Slow Loading Infusion: 360 mg หยดเข้าหลอดเลือดดำใน 6 ชั่วโมง (1 mg/min)\n'
