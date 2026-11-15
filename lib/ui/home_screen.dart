@@ -364,8 +364,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: Text(
                     isThai
-                        ? '⚠️ ซอฟต์แวร์ต้นแบบเพื่อการศึกษา (Educational Prototype) — ไม่ใช่เครื่องมือแพทย์ ห้ามใช้กับผู้ป่วยจริง'
-                        : '⚠️ Educational SaMD Prototype — Not a certified medical device. Never for real patient use.',
+                        ? ''
+                        : '',
                     style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
