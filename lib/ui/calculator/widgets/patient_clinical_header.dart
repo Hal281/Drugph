@@ -27,9 +27,12 @@ class PatientClinicalHeader extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final weight = state.weightKg ?? patient?.weightKg;
-    final height = state.heightCm ?? patient?.heightCm;
-    final age = state.ageYears ?? patient?.ageYears;
+    final weight =
+        state.usedDefaultDemographics ? null : (state.weightKg ?? patient?.weightKg);
+    final height =
+        state.usedDefaultDemographics ? null : (state.heightCm ?? patient?.heightCm);
+    final age =
+        state.usedDefaultDemographics ? null : (state.ageYears ?? patient?.ageYears);
     final crcl = res.crclMlMin;
 
     final maxBadgeWidth = MediaQuery.of(context).size.width - 64;
@@ -83,8 +86,21 @@ class PatientClinicalHeader extends StatelessWidget {
             spacing: 8,
             runSpacing: 6,
             children: [
-              // Weight & Demographics
-              if (weight != null)
+              // Weight & Demographics (or Fixed-Dose Adult badge when optional)
+              if (state.usedDefaultDemographics &&
+                  state.dosingWeightValue == null)
+                _buildBadge(
+                  Icons.medication_outlined,
+                  t
+                      ? 'ผู้ใหญ่ (ขนาดยาคงที่ — ไม่ใช้น้ำหนัก/ส่วนสูง)'
+                      : 'Adult (Fixed Dose — Weight/Height Not Used)',
+                  Colors.teal.shade900,
+                  Colors.teal.shade50,
+                  Colors.teal.shade200,
+                  maxBadgeWidth,
+                  key: const Key('patient_header_fixed_dose_badge'),
+                )
+              else if (weight != null)
                 _buildBadge(
                   Icons.monitor_weight_outlined,
                   '$weight kg${height != null ? " • $height cm" : ""}${age != null ? " • $age y" : ""}',
@@ -147,9 +163,11 @@ class PatientClinicalHeader extends StatelessWidget {
     Color textColor,
     Color bgColor,
     Color borderColor,
-    double maxWidth,
-  ) {
+    double maxWidth, {
+    Key? key,
+  }) {
     return Container(
+      key: key,
       constraints: BoxConstraints(maxWidth: maxWidth),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(

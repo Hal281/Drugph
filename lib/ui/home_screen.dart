@@ -86,6 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Colors.cyan;
       case DrugCategory.supplement:
         return Colors.green.shade600;
+      case DrugCategory.antidote:
+        return Colors.purple.shade600;
       default:
         return Colors.grey;
     }
@@ -124,6 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Icons.eco;
       case DrugCategory.supplement:
         return Icons.science;
+      case DrugCategory.antidote:
+        return Icons.shield_outlined;
       default:
         return Icons.healing;
     }
@@ -244,9 +248,14 @@ class _HomeScreenState extends State<HomeScreen> {
         DrugDatabase.searchDetailed(_searchQuery);
     var filteredResults = searchResults;
     if (_selectedCategory != null) {
-      filteredResults = filteredResults
-          .where((r) => r.drug.category == _selectedCategory)
-          .toList();
+      filteredResults = filteredResults.where((r) {
+        if (_selectedCategory == DrugCategory.analgesic) {
+          return r.drug.category == DrugCategory.analgesic ||
+              r.drug.category == DrugCategory.nsaid ||
+              r.drug.category == DrugCategory.opioid;
+        }
+        return r.drug.category == _selectedCategory;
+      }).toList();
     }
     if (_searchQuery.trim().isEmpty) {
       filteredResults = List.of(filteredResults)

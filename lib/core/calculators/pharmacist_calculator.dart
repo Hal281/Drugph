@@ -22,6 +22,7 @@ class PharmacistCalculator {
     required Patient patient,
     required Drug drug,
     required DosingRegimen regimen,
+    OralLiquidConcentration? liquidConcentration,
     Drug? Function(String id)? drugLookup,
     List<Drug>? activeDrugs,
     double dripFactor = 20.0,
@@ -325,37 +326,37 @@ class PharmacistCalculator {
       final double ibw;
       final bool isObese;
       final double adjBw;
-      double crclDosingWeight = patient.weightKg;
+      final double crclDosingWeight;
+      final String crclWeightStrategy;
+      final String crclWeightReasonEn;
+      final String crclWeightReasonTh;
 
       if (isChild) {
         ibw = patient.weightKg;
         isObese = false;
         adjBw = patient.weightKg;
         crclDosingWeight = patient.weightKg;
+        crclWeightStrategy = 'TBW';
+        crclWeightReasonEn =
+            'Pediatric (< 18 years): Bedside Schwartz eGFR uses height (${patient.heightCm.toStringAsFixed(1)} cm) and SCr';
+        crclWeightReasonTh =
+            'ผู้ป่วยเด็ก (< 18 ปี): ประเมินค่าไตด้วยสูตร Bedside Schwartz จากส่วนสูง (${patient.heightCm.toStringAsFixed(1)} ซม.) และ SCr';
       } else {
-        ibw = WeightBasedCalculator.idealBodyWeight(
+        final cgWeight = RenalCalculator.selectCockcroftGaultWeight(
+          weightKg: patient.weightKg,
           heightCm: patient.heightCm,
           sex: patient.sex,
         );
+        ibw = cgWeight.ibwKg;
+        adjBw = cgWeight.adjBwKg;
         isObese = WeightBasedCalculator.isObese(
           actualWeightKg: patient.weightKg,
           ibwKg: ibw,
         );
-        adjBw = isObese
-            ? WeightBasedCalculator.adjustedBodyWeight(
-                actualWeightKg: patient.weightKg,
-                ibwKg: ibw,
-              )
-            : patient.weightKg;
-
-        // Weight for Cockcroft-Gault CrCl (Winter 2010 guideline)
-        if (patient.weightKg < ibw) {
-          crclDosingWeight = patient.weightKg; // TBW
-        } else if (patient.weightKg < 1.20 * ibw) {
-          crclDosingWeight = ibw; // IBW
-        } else {
-          crclDosingWeight = adjBw; // AdjBW
-        }
+        crclDosingWeight = cgWeight.selectedWeightKg;
+        crclWeightStrategy = cgWeight.strategy;
+        crclWeightReasonEn = cgWeight.reasonEn;
+        crclWeightReasonTh = cgWeight.reasonTh;
       }
 
       // --- 5. Renal Function Evaluation & Database Review Check (D5, D6, A5, A11, M1) ---
@@ -1132,30 +1133,137 @@ class PharmacistCalculator {
         warnings.insert(0, DoseChecker.highAlertWarning(drug.genericName));
       }
 
-      // --- 13. Infusion Preparation (A8, F10) ---
+      // --- 13. Oral Liquid & Infusion Preparation (R1, R2, A8, F10) ---
       double? volumeMl;
+      double? teaspoons;
+      OralLiquidConcentration? activeLiquidConcentration;
+      String? liquidConcentrationLabel;
+
+      double? vialDrawVolumeMl;
+      double? reconstitutionConcentrationMgPerMl;
+      double? diluentBagVolumeMl;
+      double? totalInfusionVolumeMl;
+      int? vialsNeeded;
       double? infusionRateMlPerHr;
       double? infusionDurationMinutes = regimen.infusionTimeMinutes;
       double? dripRateDropsPerMin;
 
-      // Normalize dose to milligrams (mg) for dilution and infusion rate checks
+      // Normalize dose to milligrams (mg) for dilution, oral liquid, and infusion rate checks
       double? doseMg;
+      final administeredDose = roundedDose ?? finalDose;
       if (regimen.doseUnit == DoseUnit.mg) {
-        doseMg = finalDose;
+        doseMg = administeredDose;
       } else if (regimen.doseUnit == DoseUnit.g) {
-        doseMg = UnitConverter.convertDoseUnit(finalDose, DoseUnit.g, DoseUnit.mg);
+        doseMg = UnitConverter.convertDoseUnit(administeredDose, DoseUnit.g, DoseUnit.mg);
       } else if (regimen.doseUnit == DoseUnit.mcg) {
-        doseMg = UnitConverter.convertDoseUnit(finalDose, DoseUnit.mcg, DoseUnit.mg);
+        doseMg = UnitConverter.convertDoseUnit(administeredDose, DoseUnit.mcg, DoseUnit.mg);
       }
 
-      final effDilution = regimen.effectiveStandardDilutionMgPerMl;
-      if (regimen.dosingType != DosingType.titrated &&
-          effDilution != null &&
-          effDilution > 0 &&
+      // Step 13.1: Pediatric Oral Liquid Formulations (R1)
+      final isOralLiquid = regimen.route == DoseRoute.po &&
+          (regimen.hasLiquidConcentrations ||
+              regimen.formulation == DrugFormulation.oralLiquid ||
+              liquidConcentration != null);
+
+      if (isOralLiquid && finalDose > 0 && doseMg != null) {
+        activeLiquidConcentration =
+            liquidConcentration ?? regimen.defaultLiquidConcentration;
+        if (activeLiquidConcentration != null) {
+          volumeMl = activeLiquidConcentration.doseToVolumeMl(doseMg);
+          teaspoons = UnitConverter.mlToTeaspoons(volumeMl);
+          liquidConcentrationLabel = activeLiquidConcentration.label;
+        }
+      }
+
+      // Step 13.2: Hospital IV Injectables (R2)
+      final isInjectable = regimen.route == DoseRoute.iv ||
+          regimen.route == DoseRoute.ivInfusion ||
+          regimen.route == DoseRoute.ivPush ||
+          regimen.route == DoseRoute.im ||
+          regimen.route == DoseRoute.sc ||
+          regimen.reconstitution != null ||
+          regimen.effectiveReconstitutionMgPerMl != null;
+
+      if (isInjectable && finalDose > 0 && doseMg != null) {
+        // Step A: Reconstitution & Syringe Draw Volume (R2)
+        final effectiveReconstConc = regimen.effectiveReconstitutionMgPerMl;
+        if (effectiveReconstConc != null && effectiveReconstConc > 0) {
+          reconstitutionConcentrationMgPerMl = effectiveReconstConc;
+          vialDrawVolumeMl = IvRateCalculator.vialDrawVolume(
+            desiredDoseMg: doseMg,
+            concentrationMgPerMl: effectiveReconstConc,
+          );
+          if (regimen.reconstitution?.vialStrengthMg != null) {
+            vialsNeeded = IvRateCalculator.vialsCount(
+              doseMg: doseMg,
+              vialStrengthMg: regimen.reconstitution!.vialStrengthMg,
+            );
+          } else if (drug.availableStrengths != null &&
+              drug.availableStrengths!.isNotEmpty) {
+            vialsNeeded = IvRateCalculator.vialsCount(
+              doseMg: doseMg,
+              vialStrengthMg: drug.availableStrengths!.first,
+            );
+          }
+        }
+
+        // Step B: Dilution Bag & Total Infusion Volume (R2)
+        diluentBagVolumeMl = regimen.standardDilutionBagMl;
+        final effDilution = regimen.effectiveStandardDilutionMgPerMl;
+        if (diluentBagVolumeMl != null && diluentBagVolumeMl > 0) {
+          totalInfusionVolumeMl = diluentBagVolumeMl;
+        } else if (effDilution != null && effDilution > 0) {
+          totalInfusionVolumeMl = doseMg / effDilution;
+        }
+
+        final dilutionVolume = (effDilution != null && effDilution > 0)
+            ? doseMg / effDilution
+            : null;
+
+        // Volume to administer: vial draw for push/bolus/draw, or total bag volume
+        if (regimen.route == DoseRoute.ivPush ||
+            regimen.route == DoseRoute.im ||
+            regimen.route == DoseRoute.sc) {
+          volumeMl ??= vialDrawVolumeMl ?? dilutionVolume;
+        } else {
+          volumeMl ??= totalInfusionVolumeMl ?? dilutionVolume ?? vialDrawVolumeMl;
+        }
+
+        // If infusion duration is null, but max rate is specified, determine safe duration
+        if (infusionDurationMinutes == null &&
+            regimen.maxInfusionRateMgPerMin != null &&
+            regimen.maxInfusionRateMgPerMin! > 0) {
+          infusionDurationMinutes = (doseMg / regimen.maxInfusionRateMgPerMin!).ceilToDouble();
+          if (infusionDurationMinutes < 60.0) {
+            infusionDurationMinutes = 60.0;
+          }
+        }
+
+        // Step C: Infusion Rate (mL/hr) and Gravity Drip Rate
+        if (totalInfusionVolumeMl != null &&
+            totalInfusionVolumeMl > 0 &&
+            infusionDurationMinutes != null &&
+            infusionDurationMinutes > 0) {
+          infusionRateMlPerHr = IvRateCalculator.infusionRateMlPerHr(
+            volumeMl: totalInfusionVolumeMl,
+            timeMinutes: infusionDurationMinutes,
+          );
+          dripRateDropsPerMin = IvRateCalculator.dripRateDropsPerMin(
+            volumeMl: totalInfusionVolumeMl,
+            timeMinutes: infusionDurationMinutes,
+            dropFactor: dripFactor.round(),
+          );
+        }
+      } else if (regimen.dosingType != DosingType.titrated &&
+          regimen.effectiveStandardDilutionMgPerMl != null &&
+          regimen.effectiveStandardDilutionMgPerMl! > 0 &&
           finalDose > 0 &&
           doseMg != null) {
-        volumeMl = doseMg / effDilution;
-        if (infusionDurationMinutes != null && infusionDurationMinutes > 0) {
+        // Fallback for any other regimen with standard dilution
+        final effDilution = regimen.effectiveStandardDilutionMgPerMl!;
+        volumeMl ??= doseMg / effDilution;
+        if (infusionDurationMinutes != null &&
+            infusionDurationMinutes > 0) {
           infusionRateMlPerHr = (volumeMl / infusionDurationMinutes) * 60.0;
           dripRateDropsPerMin = (volumeMl * dripFactor) / infusionDurationMinutes;
         }
@@ -1165,8 +1273,9 @@ class PharmacistCalculator {
           regimen.maxInfusionRateMgPerMin != null &&
           regimen.maxInfusionRateMgPerMin! > 0 &&
           finalDose > 0) {
-        if (infusionDurationMinutes != null && infusionDurationMinutes > 0) {
-          final actualRateMgPerMin = doseMg / infusionDurationMinutes;
+        if (regimen.infusionTimeMinutes != null &&
+            regimen.infusionTimeMinutes! > 0) {
+          final actualRateMgPerMin = doseMg / regimen.infusionTimeMinutes!;
           warnings.addAll(
             DoseChecker.checkInfusionRate(
               rateMgPerMin: actualRateMgPerMin,
@@ -1223,6 +1332,19 @@ class PharmacistCalculator {
         'requiresPostHdSupplement': requiresPostHdSupplement,
         'dosingWeightUsedKg': weightForDosing,
         'weightStrategy': weightStrategyUsed,
+        'crclWeightUsedKg': crclDosingWeight,
+        'crclWeightStrategy': crclWeightStrategy,
+        'crclWeightReasonEn': crclWeightReasonEn,
+        'crclWeightReasonTh': crclWeightReasonTh,
+        'ibwKg': isChild ? null : ibw,
+        'adjBwKg': isChild ? null : adjBw,
+        'renalEquationUsed': isPatientOnRrt
+            ? 'RRT Protocol'
+            : (crcl != null
+                ? (patient.serumCreatinineMgDl != null
+                    ? (isChild ? 'Bedside Schwartz' : 'Cockcroft-Gault')
+                    : 'Manual CrCl')
+                : 'None'),
         'route': regimen.route.abbreviation,
         'indication': regimen.indication,
       };
@@ -1238,6 +1360,14 @@ class PharmacistCalculator {
         dailyDose: dailyDose,
         infusionResult: infusionResult,
         volumeMl: volumeMl,
+        teaspoons: teaspoons,
+        liquidConcentration: activeLiquidConcentration,
+        liquidConcentrationLabel: liquidConcentrationLabel,
+        vialDrawVolumeMl: vialDrawVolumeMl,
+        reconstitutionConcentrationMgPerMl: reconstitutionConcentrationMgPerMl,
+        diluentBagVolumeMl: diluentBagVolumeMl,
+        totalInfusionVolumeMl: totalInfusionVolumeMl,
+        vialsNeeded: vialsNeeded,
         infusionRateMlPerHr: infusionRateMlPerHr,
         infusionDurationMinutes: infusionDurationMinutes,
         dripRateDropsPerMin: dripRateDropsPerMin,

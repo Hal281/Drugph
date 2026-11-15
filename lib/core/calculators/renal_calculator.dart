@@ -14,6 +14,29 @@
 
 import 'dart:math' as math;
 import '../models/unit.dart';
+import 'weight_based_calculator.dart';
+
+/// Selected body weight metric and clinical rationale for the Cockcroft-Gault
+/// CrCl equation per Winter MA et al. (*Am J Health-Syst Pharm* 2012;69:293-301).
+class CockcroftGaultWeightSelection {
+  final double actualWeightKg;
+  final double ibwKg;
+  final double adjBwKg;
+  final double selectedWeightKg;
+  final String strategy;
+  final String reasonEn;
+  final String reasonTh;
+
+  const CockcroftGaultWeightSelection({
+    required this.actualWeightKg,
+    required this.ibwKg,
+    required this.adjBwKg,
+    required this.selectedWeightKg,
+    required this.strategy,
+    required this.reasonEn,
+    required this.reasonTh,
+  });
+}
 
 /// Deterministic renal function calculations.
 class RenalCalculator {
@@ -25,9 +48,99 @@ class RenalCalculator {
   // CrCl (mL/min) = ((140 − age) × weight_kg × [0.85 if female])
   //                  / (72 × serum_creatinine_mg_dL)
   //
-  // Note: Uses ACTUAL body weight by default. For obese patients
-  // consider using Adjusted Body Weight via WeightBasedCalculator.
+  // Body weight selection per Winter 2012 / Lexicomp:
+  //   - TBW < IBW        → TBW
+  //   - IBW ≤ TBW < 120% → IBW
+  //   - TBW ≥ 120% IBW   → AdjBW (IBW + 0.4 × [TBW − IBW])
   // ------------------------------------------------------------------
+
+  /// Selects the appropriate adult body weight (TBW, IBW, or AdjBW 0.4) for
+  /// Cockcroft-Gault creatinine clearance estimation per Winter 2012 guidelines.
+  static CockcroftGaultWeightSelection selectCockcroftGaultWeight({
+    required double weightKg,
+    required double heightCm,
+    required Sex sex,
+  }) {
+    if (!weightKg.isFinite || weightKg <= 0) {
+      throw ArgumentError.value(
+        weightKg,
+        'weightKg',
+        'Weight must be a positive finite number (> 0)',
+      );
+    }
+
+    final ibw = WeightBasedCalculator.idealBodyWeight(
+      heightCm: heightCm,
+      sex: sex,
+    );
+    final adjBw = WeightBasedCalculator.adjustedBodyWeight(
+      actualWeightKg: weightKg,
+      ibwKg: ibw,
+      factor: 0.4,
+    );
+
+    if (weightKg < ibw) {
+      return CockcroftGaultWeightSelection(
+        actualWeightKg: weightKg,
+        ibwKg: ibw,
+        adjBwKg: adjBw,
+        selectedWeightKg: weightKg,
+        strategy: 'TBW',
+        reasonEn:
+            'Underweight (TBW ${weightKg.toStringAsFixed(1)} kg < IBW ${ibw.toStringAsFixed(1)} kg): Using Actual Body Weight (TBW) for Cockcroft-Gault per Winter 2012.',
+        reasonTh:
+            'น้ำหนักน้อยกว่าเกณฑ์ (TBW ${weightKg.toStringAsFixed(1)} กก. < IBW ${ibw.toStringAsFixed(1)} กก.): ใช้ TBW คำนวณ Cockcroft-Gault ตามเกณฑ์ Winter 2012',
+      );
+    }
+
+    if (weightKg >= 1.20 * ibw) {
+      return CockcroftGaultWeightSelection(
+        actualWeightKg: weightKg,
+        ibwKg: ibw,
+        adjBwKg: adjBw,
+        selectedWeightKg: adjBw,
+        strategy: 'AdjBW',
+        reasonEn:
+            'Overweight / Obese (TBW ${weightKg.toStringAsFixed(1)} kg ≥ 120% IBW ${ibw.toStringAsFixed(1)} kg): Using Adjusted Body Weight (AdjBW₀.₄ = ${adjBw.toStringAsFixed(1)} kg) for Cockcroft-Gault.',
+        reasonTh:
+            'น้ำหนักเกิน / อ้วน (TBW ${weightKg.toStringAsFixed(1)} กก. ≥ 120% IBW ${ibw.toStringAsFixed(1)} กก.): ใช้ AdjBW₀.₄ (${adjBw.toStringAsFixed(1)} กก.) คำนวณ Cockcroft-Gault',
+      );
+    }
+
+    return CockcroftGaultWeightSelection(
+      actualWeightKg: weightKg,
+      ibwKg: ibw,
+      adjBwKg: adjBw,
+      selectedWeightKg: ibw,
+      strategy: 'IBW',
+      reasonEn:
+          'Normal habitus (TBW ${weightKg.toStringAsFixed(1)} kg within IBW–120% IBW): Using Ideal Body Weight (IBW = ${ibw.toStringAsFixed(1)} kg) for Cockcroft-Gault.',
+      reasonTh:
+          'น้ำหนักอยู่ในเกณฑ์ปกติ (TBW ${weightKg.toStringAsFixed(1)} กก. อยู่ระหว่าง IBW–120% IBW): ใช้ IBW (${ibw.toStringAsFixed(1)} กก.) คำนวณ Cockcroft-Gault',
+    );
+  }
+
+  /// Estimates Cockcroft-Gault CrCl automatically selecting TBW, IBW, or AdjBW
+  /// based on height and sex per Winter 2012 / Lexicomp guidelines.
+  static double cockcroftGaultAutoWeight({
+    required int ageYears,
+    required double weightKg,
+    required double heightCm,
+    required Sex sex,
+    required double serumCreatinineMgDl,
+  }) {
+    final weightSelection = selectCockcroftGaultWeight(
+      weightKg: weightKg,
+      heightCm: heightCm,
+      sex: sex,
+    );
+    return cockcroftGault(
+      ageYears: ageYears,
+      weightKg: weightSelection.selectedWeightKg,
+      sex: sex,
+      serumCreatinineMgDl: serumCreatinineMgDl,
+    );
+  }
 
   /// Estimates creatinine clearance using the **Cockcroft-Gault** equation.
   ///

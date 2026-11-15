@@ -182,7 +182,9 @@ class ClinicalEvidenceSheet extends StatelessWidget {
             ],
 
             // IV Infusion / Preparation (ถ้ามี)
-            if (regimen?.standardDilutionMgPerMl != null ||
+            if (regimen?.reconstitution != null ||
+                regimen?.standardDilutionBagMl != null ||
+                regimen?.standardDilutionMgPerMl != null ||
                 regimen?.standardDilution != null ||
                 mono?.administrationGuideline != null) ...[
               _buildSectionCard(
@@ -197,6 +199,28 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                         mono!.administrationGuideline!,
                         style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF1E293B)),
                       ),
+                    if (regimen?.reconstitution != null) ...[
+                      const SizedBox(height: 8),
+                      _buildKeyValue(
+                        isThai ? 'การละลายผงยา (Reconstitution)' : 'Reconstitution',
+                        '${regimen!.reconstitution!.vialStrengthMg.toStringAsFixed(0)} mg + ${regimen!.reconstitution!.diluentName} ${regimen!.reconstitution!.diluentVolumeMl} mL ➔ ${regimen!.reconstitution!.resultingConcentrationMgPerMl} mg/mL',
+                      ),
+                      if (regimen!.reconstitution!.sourceCitation.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            'อ้างอิง: ${regimen!.reconstitution!.sourceCitation}',
+                            style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF64748B)),
+                          ),
+                        ),
+                    ],
+                    if (regimen?.standardDilutionBagMl != null) ...[
+                      const SizedBox(height: 8),
+                      _buildKeyValue(
+                        isThai ? 'ปริมาตรถุงสารน้ำมาตรฐาน' : 'Standard Diluent Bag',
+                        '${regimen!.standardDilutionBagMl!.toStringAsFixed(0)} mL',
+                      ),
+                    ],
                     if (regimen?.effectiveStandardDilutionMgPerMl != null) ...[
                       const SizedBox(height: 8),
                       _buildKeyValue(

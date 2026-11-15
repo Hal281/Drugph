@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -24,40 +26,87 @@ class CalculatorController extends ChangeNotifier {
   CalculatorUiState _state;
   bool _isDisposed = false;
   bool _isSyncingToSession = false;
+  bool _isSyncingFromSession = false;
+  bool _hasManuallySelectedRegimen = false;
 
   CalculatorController({required Drug drug})
-      : _state = CalculatorUiState.initial(drug) {
+      : _state = CalculatorUiState.initial(
+          drug,
+          patientAgeYears:
+              PatientSession.instance.currentPatient.value?.ageYears,
+          patientWeightKg:
+              PatientSession.instance.currentPatient.value?.weightKg,
+        ) {
     _syncFromSession();
     PatientSession.instance.currentPatient.addListener(_syncFromSession);
+    weightCtrl.addListener(_onDemographicsEdited);
+    ageCtrl.addListener(_onDemographicsEdited);
   }
 
   CalculatorUiState get state => _state;
+
+  void _onDemographicsEdited() {
+    if (_isDisposed || _isSyncingFromSession || _hasManuallySelectedRegimen) {
+      return;
+    }
+    final weight = double.tryParse(weightCtrl.text);
+    final age = int.tryParse(ageCtrl.text);
+    final best = CalculatorUiState.selectBestRegimenForPatient(
+      _state.drug,
+      ageYears: age,
+      weightKg: weight,
+      current: _state.selectedRegimen,
+    );
+    if (best != null && best != _state.selectedRegimen) {
+      _state = _state.copyWith(
+        selectedRegimen: best,
+        clearResult: true,
+        status: CalculatorUiStatus.empty,
+      );
+      notifyListeners();
+    }
+  }
 
   void _syncFromSession() {
     if (_isDisposed || _isSyncingToSession) return;
     final p = PatientSession.instance.currentPatient.value;
     if (p != null) {
-      final currentWeight = double.tryParse(weightCtrl.text);
-      if (currentWeight != p.weightKg) {
-        weightCtrl.text = p.weightKg.toString();
+      _isSyncingFromSession = true;
+      try {
+        final currentWeight = double.tryParse(weightCtrl.text);
+        if (currentWeight != p.weightKg) {
+          weightCtrl.text = p.weightKg.toString();
+        }
+
+        final currentHeight = double.tryParse(heightCtrl.text);
+        if (currentHeight != p.heightCm) {
+          heightCtrl.text = p.heightCm.toString();
+        }
+
+        final currentAge = int.tryParse(ageCtrl.text);
+        if (currentAge != p.ageYears) {
+          ageCtrl.text = p.ageYears.toString();
+        }
+
+        final currentScr = double.tryParse(scrCtrl.text);
+        if (currentScr != p.serumCreatinineMgDl) {
+          scrCtrl.text = p.serumCreatinineMgDl?.toString() ?? '';
+        }
+      } finally {
+        _isSyncingFromSession = false;
       }
 
-      final currentHeight = double.tryParse(heightCtrl.text);
-      if (currentHeight != p.heightCm) {
-        heightCtrl.text = p.heightCm.toString();
-      }
-
-      final currentAge = int.tryParse(ageCtrl.text);
-      if (currentAge != p.ageYears) {
-        ageCtrl.text = p.ageYears.toString();
-      }
-
-      final currentScr = double.tryParse(scrCtrl.text);
-      if (currentScr != p.serumCreatinineMgDl) {
-        scrCtrl.text = p.serumCreatinineMgDl?.toString() ?? '';
-      }
+      final autoRegimen = _hasManuallySelectedRegimen
+          ? _state.selectedRegimen
+          : CalculatorUiState.selectBestRegimenForPatient(
+              _state.drug,
+              ageYears: p.ageYears,
+              weightKg: p.weightKg,
+              current: _state.selectedRegimen,
+            );
 
       _state = _state.copyWith(
+        selectedRegimen: autoRegimen,
         weightKg: p.weightKg,
         heightCm: p.heightCm,
         ageYears: p.ageYears,
@@ -76,10 +125,15 @@ class CalculatorController extends ChangeNotifier {
     final valResult = validateInputs();
     if (!valResult.isValid) return;
 
-    final weight = double.tryParse(weightCtrl.text);
-    final height = double.tryParse(heightCtrl.text);
-    final age = int.tryParse(ageCtrl.text);
-    final scr = double.tryParse(scrCtrl.text);
+    final weight = double.tryParse(weightCtrl.text.trim());
+    final height = double.tryParse(heightCtrl.text.trim());
+    final age = int.tryParse(ageCtrl.text.trim());
+    final scr = double.tryParse(scrCtrl.text.trim());
+
+    final hasExistingSession = PatientSession.instance.currentPatient.value != null;
+    final hasAnyEnteredInput =
+        weight != null || height != null || age != null || scr != null;
+    if (!hasExistingSession && !hasAnyEnteredInput) return;
 
     _isSyncingToSession = true;
     try {
@@ -102,13 +156,29 @@ class CalculatorController extends ChangeNotifier {
 
   /// Selects a dosing regimen and clears previous calculation results.
   void selectRegimen(DosingRegimen? regimen) {
+    _hasManuallySelectedRegimen = true;
     _state = _state.copyWith(
       selectedRegimen: regimen,
       clearRegimen: regimen == null,
+      selectedLiquidConcentration: regimen?.defaultLiquidConcentration,
+      clearLiquidConcentration: regimen?.defaultLiquidConcentration == null,
       clearResult: true,
       status: CalculatorUiStatus.empty,
     );
     notifyListeners();
+  }
+
+  /// Selects commercial oral liquid concentration (R1).
+  void selectLiquidConcentration(OralLiquidConcentration? concentration) {
+    _state = _state.copyWith(
+      selectedLiquidConcentration: concentration,
+      clearLiquidConcentration: concentration == null,
+    );
+    notifyListeners();
+    // If a calculation result is already displayed, recompute with the new concentration
+    if (_state.hasCalculatedResult) {
+      calculate(isThai: true);
+    }
   }
 
   /// Sets patient sex.
@@ -143,16 +213,86 @@ class CalculatorController extends ChangeNotifier {
     _syncToSessionIfValid();
   }
 
+  ({int age, double? height})? _inferredPediatricDemographics({
+    required double? weight,
+    required double? height,
+    required int? age,
+  }) {
+    if (_state.selectedRegimen?.effectiveAudience != RegimenAudience.pediatric ||
+        weight == null ||
+        weight <= 0 ||
+        weight >= 25.0 ||
+        age == null ||
+        age < 18 ||
+        age > 150) {
+      return null;
+    }
+    final inferredAge = weight <= 15.0 ? 2 : 6;
+    final inferredHeight = (height != null && (height - 170.0).abs() < 0.01)
+        ? (weight <= 15.0 ? 85.0 : 115.0)
+        : height;
+    return (age: inferredAge, height: inferredHeight);
+  }
+
+  ({double weight, double height, int age}) _resolvePatientDemographics({
+    required double? enteredWeight,
+    required double? enteredHeight,
+    required int? enteredAge,
+  }) {
+    final age = enteredAge ?? 35;
+    if (enteredWeight != null && enteredHeight != null) {
+      return (weight: enteredWeight, height: enteredHeight, age: age);
+    }
+    if (enteredWeight != null) {
+      final bmiAt170 = enteredWeight / (1.70 * 1.70);
+      final safeHeight = (bmiAt170 >= 12.0 && bmiAt170 <= 50.0)
+          ? 170.0
+          : ((enteredWeight / 22.0) > 0
+              ? (math.sqrt(enteredWeight / 22.0) * 100.0).clamp(45.0, 220.0)
+              : 170.0);
+      return (weight: enteredWeight, height: safeHeight, age: age);
+    }
+    if (enteredHeight != null) {
+      final heightM = enteredHeight / 100.0;
+      final bmiAt70 = heightM > 0 ? 70.0 / (heightM * heightM) : 22.0;
+      final safeWeight = (bmiAt70 >= 12.0 && bmiAt70 <= 50.0)
+          ? 70.0
+          : (22.0 * heightM * heightM).clamp(3.0, 250.0);
+      return (weight: safeWeight, height: enteredHeight, age: age);
+    }
+    return (weight: 70.0, height: 170.0, age: age);
+  }
+
   /// Constructs a [Patient] instance from the current form inputs and active session.
   Patient buildCurrentPatient() {
     final sessionPatient = PatientSession.instance.currentPatient.value;
-    final weight =
-        double.tryParse(weightCtrl.text) ?? sessionPatient?.weightKg ?? 70.0;
-    final height =
-        double.tryParse(heightCtrl.text) ?? sessionPatient?.heightCm ?? 170.0;
-    final age = int.tryParse(ageCtrl.text) ?? sessionPatient?.ageYears ?? 35;
-    final scr =
-        double.tryParse(scrCtrl.text) ?? sessionPatient?.serumCreatinineMgDl;
+    final enteredWeight =
+        double.tryParse(weightCtrl.text.trim()) ?? sessionPatient?.weightKg;
+    final enteredHeight =
+        double.tryParse(heightCtrl.text.trim()) ?? sessionPatient?.heightCm;
+    final enteredAge =
+        int.tryParse(ageCtrl.text.trim()) ?? sessionPatient?.ageYears;
+    final scr = double.tryParse(scrCtrl.text.trim()) ??
+        sessionPatient?.serumCreatinineMgDl;
+
+    final resolved = _resolvePatientDemographics(
+      enteredWeight: enteredWeight,
+      enteredHeight: enteredHeight,
+      enteredAge: enteredAge,
+    );
+    var weight = resolved.weight;
+    var height = resolved.height;
+    var age = resolved.age;
+
+    final inferred = _inferredPediatricDemographics(
+      weight: weight,
+      height: height,
+      age: age,
+    );
+    if (inferred != null) {
+      age = inferred.age;
+      height = inferred.height ?? height;
+    }
 
     return Patient(
       id: sessionPatient?.id ??
@@ -177,22 +317,91 @@ class CalculatorController extends ChangeNotifier {
 
   /// Validates inputs and returns [ValidationResult].
   ValidationResult validateInputs() {
-    final weight = double.tryParse(weightCtrl.text);
-    final height = double.tryParse(heightCtrl.text);
-    final age = int.tryParse(ageCtrl.text);
-    final scr = double.tryParse(scrCtrl.text);
+    final weightText = weightCtrl.text.trim();
+    final heightText = heightCtrl.text.trim();
+    final ageText = ageCtrl.text.trim();
+    final scrText = scrCtrl.text.trim();
 
-    return InputValidator.validatePatientInputs(
+    final weight = weightText.isEmpty ? null : double.tryParse(weightText);
+    final height = heightText.isEmpty ? null : double.tryParse(heightText);
+    final age = ageText.isEmpty ? null : int.tryParse(ageText);
+    final scr = scrText.isEmpty ? null : double.tryParse(scrText);
+
+    final reqs = _state.inputRequirements;
+    final baseResult = InputValidator.validatePatientInputs(
       weightKg: weight,
       heightCm: height,
       ageYears: age,
       serumCreatinineMgDl: scr,
+      requireWeight: reqs.isWeightRequired,
+      requireHeight: reqs.isHeightRequired,
+      requireAge: reqs.isAgeRequired,
+      requireScr: reqs.isScrRequired,
+    );
+
+    final errorsEn = Map<String, String>.from(baseResult.errorsEn);
+    final errorsTh = Map<String, String>.from(baseResult.errorsTh);
+
+    if (weightText.isNotEmpty && weight == null) {
+      errorsEn['weightKg'] = 'Invalid weight format';
+      errorsTh['weightKg'] = 'รูปแบบน้ำหนักไม่ถูกต้อง';
+    }
+    if (heightText.isNotEmpty && height == null) {
+      errorsEn['heightCm'] = 'Invalid height format';
+      errorsTh['heightCm'] = 'รูปแบบส่วนสูงไม่ถูกต้อง';
+    }
+    if (ageText.isNotEmpty && age == null) {
+      errorsEn['ageYears'] = 'Invalid age format';
+      errorsTh['ageYears'] = 'รูปแบบอายุไม่ถูกต้อง';
+    }
+    if (scrText.isNotEmpty && scr == null) {
+      errorsEn['serumCreatinineMgDl'] = 'Invalid serum creatinine format';
+      errorsTh['serumCreatinineMgDl'] = 'รูปแบบค่าครีเอตินิน (SCr) ไม่ถูกต้อง';
+    }
+
+    return ValidationResult(
+      isValid: errorsEn.isEmpty,
+      errorsEn: errorsEn,
+      errorsTh: errorsTh,
+      warningsEn: baseResult.warningsEn,
+      warningsTh: baseResult.warningsTh,
     );
   }
 
   /// Executes pure deterministic dosage calculation via [PharmacistCalculator],
   /// records audit trail log, and transitions UI state.
   ValidationResult calculate({required bool isThai}) {
+    if (!_hasManuallySelectedRegimen) {
+      final best = CalculatorUiState.selectBestRegimenForPatient(
+        _state.drug,
+        ageYears: int.tryParse(ageCtrl.text.trim()),
+        weightKg: double.tryParse(weightCtrl.text.trim()),
+        current: _state.selectedRegimen,
+      );
+      if (best != null && best != _state.selectedRegimen) {
+        _state = _state.copyWith(selectedRegimen: best);
+      }
+    }
+
+    // Prevent the Default Adult Age Trap: if pediatric regimen + child weight
+    // (< 25 kg) with untouched adult age (18–150), align age & default height.
+    final inferred = _inferredPediatricDemographics(
+      weight: double.tryParse(weightCtrl.text.trim()),
+      height: double.tryParse(heightCtrl.text.trim()),
+      age: int.tryParse(ageCtrl.text.trim()),
+    );
+    if (inferred != null) {
+      _isSyncingFromSession = true;
+      try {
+        ageCtrl.text = inferred.age.toString();
+        if (inferred.height != null) {
+          heightCtrl.text = inferred.height!.toStringAsFixed(0);
+        }
+      } finally {
+        _isSyncingFromSession = false;
+      }
+    }
+
     final valResult = validateInputs();
 
     if (!valResult.isValid) {
@@ -209,29 +418,57 @@ class CalculatorController extends ChangeNotifier {
 
     if (_state.selectedRegimen == null) return valResult;
 
-    final weight = double.tryParse(weightCtrl.text)!;
-    final height = double.tryParse(heightCtrl.text)!;
-    final age = int.tryParse(ageCtrl.text)!;
-    final scr = double.tryParse(scrCtrl.text);
+    final enteredWeight = double.tryParse(weightCtrl.text.trim());
+    final enteredHeight = double.tryParse(heightCtrl.text.trim());
+    final enteredAge = int.tryParse(ageCtrl.text.trim());
+    final enteredScr = double.tryParse(scrCtrl.text.trim());
 
-    // Sync validated parameters back to PatientSession
-    _isSyncingToSession = true;
+    final resolved = _resolvePatientDemographics(
+      enteredWeight: enteredWeight,
+      enteredHeight: enteredHeight,
+      enteredAge: enteredAge,
+    );
+    final usedDefaultDemographics =
+        enteredWeight == null && enteredHeight == null && enteredAge == null;
+
+    final hasExistingSession = PatientSession.instance.currentPatient.value != null;
+    final shouldSyncSession = hasExistingSession ||
+        (enteredWeight != null && enteredHeight != null && enteredAge != null);
+
+    // Sync validated parameters back to PatientSession when active or complete
     final Patient patient;
-    try {
-      patient = PatientSession.instance.updateCurrentPatient(
-        weightKg: weight,
-        heightCm: height,
-        ageYears: age,
-        serumCreatinineMgDl: scr,
+    if (shouldSyncSession) {
+      _isSyncingToSession = true;
+      try {
+        patient = PatientSession.instance.updateCurrentPatient(
+          weightKg: resolved.weight,
+          heightCm: resolved.height,
+          ageYears: resolved.age,
+          serumCreatinineMgDl: enteredScr,
+          sex: _state.sex,
+          isScrStable: _state.isScrStable,
+          renalReplacementMode: _state.renalReplacementMode,
+          hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
+              ? null
+              : _state.hepaticImpairment,
+        );
+      } finally {
+        _isSyncingToSession = false;
+      }
+    } else {
+      patient = Patient(
+        id: 'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
+        weightKg: resolved.weight,
+        heightCm: resolved.height,
+        ageYears: resolved.age,
         sex: _state.sex,
+        serumCreatinineMgDl: enteredScr,
         isScrStable: _state.isScrStable,
         renalReplacementMode: _state.renalReplacementMode,
         hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
             ? null
             : _state.hepaticImpairment,
       );
-    } finally {
-      _isSyncingToSession = false;
     }
 
     // Pure deterministic calculation call
@@ -239,12 +476,53 @@ class CalculatorController extends ChangeNotifier {
       patient: patient,
       drug: _state.drug,
       regimen: _state.selectedRegimen!,
+      liquidConcentration: _state.selectedLiquidConcentration,
     );
 
     final weightStrategy =
         dosageResult.calculationInputs['weightStrategy'] as String? ?? 'TBW';
     final dosingWeightUsed =
-        dosageResult.calculationInputs['dosingWeightUsedKg'] as double?;
+        (dosageResult.calculationInputs['dosingWeightUsedKg'] as num?)
+            ?.toDouble();
+    final crclWeightStrategy =
+        dosageResult.calculationInputs['crclWeightStrategy'] as String?;
+    final crclWeightUsed =
+        (dosageResult.calculationInputs['crclWeightUsedKg'] as num?)
+            ?.toDouble();
+    final crclReason = isThai
+        ? dosageResult.calculationInputs['crclWeightReasonTh'] as String?
+        : dosageResult.calculationInputs['crclWeightReasonEn'] as String?;
+
+    final useRenalWeightForDisplay =
+        _state.selectedRegimen!.dosingWeightStrategy ==
+                DosingWeightStrategy.actual &&
+            crclWeightStrategy != null &&
+            crclWeightUsed != null;
+
+    final reqs = _state.inputRequirements;
+    final showDosingWeight = enteredWeight != null ||
+        reqs.isWeightRequired ||
+        (useRenalWeightForDisplay && dosageResult.crclMlMin != null);
+
+    final String? displayWeightLabel;
+    final double? displayWeightValue;
+    final String? displayWeightReason;
+    if (showDosingWeight) {
+      displayWeightLabel =
+          useRenalWeightForDisplay ? crclWeightStrategy : weightStrategy;
+      displayWeightValue = useRenalWeightForDisplay
+          ? crclWeightUsed
+          : (dosingWeightUsed ?? resolved.weight);
+      displayWeightReason = useRenalWeightForDisplay && crclReason != null
+          ? crclReason
+          : (isThai
+              ? 'ใช้ $displayWeightLabel ในการคำนวณขนาดยาตามเกณฑ์คลินิก'
+              : 'Using $displayWeightLabel for clinical regimen dosing calculation');
+    } else {
+      displayWeightLabel = null;
+      displayWeightValue = null;
+      displayWeightReason = null;
+    }
 
     // Determine status (Active vs Warning/Overdose)
     final hasOverdose = dosageResult.warnings.any(
@@ -263,12 +541,19 @@ class CalculatorController extends ChangeNotifier {
         : CalculatorUiStatus.active;
 
     _state = _state.copyWith(
+      clearDemographics: true,
+      weightKg: showDosingWeight ? (enteredWeight ?? resolved.weight) : enteredWeight,
+      heightCm: showDosingWeight ? (enteredHeight ?? resolved.height) : enteredHeight,
+      ageYears: showDosingWeight ? (enteredAge ?? resolved.age) : enteredAge,
+      scrMgDl: enteredScr,
       lastEvaluatedPatient: patient,
+      usedDefaultDemographics: usedDefaultDemographics,
       warnings: dosageResult.warnings,
       result: dosageResult,
-      dosingWeightLabel: weightStrategy,
-      dosingWeightValue: dosingWeightUsed ?? weight,
-      dosingWeightReason: 'ใช้ $weightStrategy ในการคำนวณตามเกณฑ์คลินิก',
+      clearDosingWeight: !showDosingWeight,
+      dosingWeightLabel: displayWeightLabel,
+      dosingWeightValue: displayWeightValue,
+      dosingWeightReason: displayWeightReason,
       status: status,
     );
     notifyListeners();
@@ -321,6 +606,8 @@ class CalculatorController extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     PatientSession.instance.currentPatient.removeListener(_syncFromSession);
+    weightCtrl.removeListener(_onDemographicsEdited);
+    ageCtrl.removeListener(_onDemographicsEdited);
     weightCtrl.dispose();
     heightCtrl.dispose();
     ageCtrl.dispose();

@@ -26,6 +26,7 @@ class DosingParametersForm extends StatelessWidget {
   final ValueChanged<Sex> onSexChanged;
   final bool isThai;
   final Color categoryColor;
+  final RegimenInputRequirements? inputRequirements;
 
   const DosingParametersForm({
     super.key,
@@ -44,6 +45,7 @@ class DosingParametersForm extends StatelessWidget {
     required this.onSexChanged,
     required this.isThai,
     this.categoryColor = Colors.teal,
+    this.inputRequirements,
   });
 
   @override
@@ -78,6 +80,10 @@ class DosingParametersForm extends StatelessWidget {
                 ),
               ],
             ),
+            if (inputRequirements != null) ...[
+              const SizedBox(height: 12),
+              _buildRequirementsBanner(t, inputRequirements!),
+            ],
             const SizedBox(height: 16),
             LayoutBuilder(
               builder: (context, constraints) {
@@ -87,23 +93,42 @@ class DosingParametersForm extends StatelessWidget {
                     constraints.maxWidth < 280 ||
                     textScale > 1.25;
 
+                final weightLabel = inputRequirements?.isWeightRequired == false
+                    ? (t ? 'น้ำหนัก (kg) • ไม่บังคับ' : 'Weight (kg) • Optional')
+                    : (t ? 'น้ำหนัก (kg)' : 'Weight (kg)');
+                final heightLabel = inputRequirements?.isHeightRequired == false
+                    ? (t ? 'ส่วนสูง (cm) • ไม่บังคับ' : 'Height (cm) • Optional')
+                    : (t ? 'ส่วนสูง (cm)' : 'Height (cm)');
+                final ageLabel = inputRequirements?.isAgeRequired == false
+                    ? (t ? 'อายุ (ปี) • ไม่บังคับ' : 'Age (years) • Optional')
+                    : (t ? 'อายุ (ปี)' : 'Age (years)');
+                final String scrLabel;
+                if (inputRequirements?.isScrRequired == true) {
+                  scrLabel = t ? 'Cr (mg/dL) • จำเป็น' : 'SCr (mg/dL) • Required';
+                } else if (inputRequirements?.requiresRenalEvaluation == false) {
+                  scrLabel =
+                      t ? 'Cr (mg/dL) • ไม่บังคับ' : 'SCr (mg/dL) • Optional';
+                } else {
+                  scrLabel = t ? 'Cr (mg/dL)' : 'SCr (mg/dL)';
+                }
+
                 final weightField = _buildTextField(
                   weightCtrl,
-                  t ? 'น้ำหนัก (kg)' : 'Weight (kg)',
+                  weightLabel,
                   Icons.monitor_weight_outlined,
                   key: const Key('calculator_weight_field'),
                 );
 
                 final heightField = _buildTextField(
                   heightCtrl,
-                  t ? 'ส่วนสูง (cm)' : 'Height (cm)',
+                  heightLabel,
                   Icons.height,
                   key: const Key('calculator_height_field'),
                 );
 
                 final ageField = _buildTextField(
                   ageCtrl,
-                  t ? 'อายุ (ปี)' : 'Age (years)',
+                  ageLabel,
                   Icons.cake_outlined,
                   key: const Key('calculator_age_field'),
                   isInteger: true,
@@ -111,7 +136,7 @@ class DosingParametersForm extends StatelessWidget {
 
                 final scrField = _buildTextField(
                   scrCtrl,
-                  t ? 'Cr (mg/dL)' : 'SCr (mg/dL)',
+                  scrLabel,
                   Icons.water_drop_outlined,
                   key: const Key('calculator_scr_field'),
                 );
@@ -332,6 +357,24 @@ class DosingParametersForm extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                key: const Key('calculator_hepatic_optional_hint'),
+                inputRequirements?.requiresHepaticEvaluation == false
+                    ? (t
+                        ? 'ไม่บังคับ — ยานี้ไม่ต้องปรับขนาดยาตามตับ'
+                        : 'Optional — No hepatic dose adjustment required')
+                    : (t
+                        ? 'ไม่บังคับ — ระบุเฉพาะเมื่อทราบผลแลปหรือแพทย์ประเมินแล้ว'
+                        : 'Optional — Select only when lab/clinician Child-Pugh is known'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -455,6 +498,61 @@ class DosingParametersForm extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRequirementsBanner(
+    bool t,
+    RegimenInputRequirements reqs,
+  ) {
+    final isOptionalMode = reqs.canCalculateWithoutDemographics;
+    final bgColor =
+        isOptionalMode ? Colors.teal.shade50 : Colors.blueGrey.shade50;
+    final borderColor =
+        isOptionalMode ? Colors.teal.shade200 : Colors.blueGrey.shade200;
+    final fgColor =
+        isOptionalMode ? Colors.teal.shade900 : Colors.blueGrey.shade900;
+    final iconColor =
+        isOptionalMode ? Colors.teal.shade700 : Colors.blueGrey.shade700;
+
+    final message = isOptionalMode
+        ? (t
+            ? 'ขนาดยาผู้ใหญ่คงที่ — คำนวณได้ทันทีโดยไม่ต้องกรอก น้ำหนัก / ส่วนสูง / ค่าไต (กรอกเฉพาะเมื่อต้องการตรวจคัดกรองเพิ่มเติม)'
+            : 'Fixed Adult Dose — Calculate immediately without Weight / Height / SCr (enter only for additional screening)')
+        : (t
+            ? 'ข้อมูลที่ต้องใช้สำหรับสูตรนี้: ${reqs.requiredSummaryTh}'
+            : 'Required for this regimen: ${reqs.requiredSummaryEn}');
+
+    return Container(
+      key: const Key('calculator_input_requirements_banner'),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isOptionalMode ? Icons.check_circle_outline : Icons.info_outline,
+            size: 16,
+            color: iconColor,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: fgColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

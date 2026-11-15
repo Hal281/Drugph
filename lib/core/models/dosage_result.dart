@@ -15,6 +15,7 @@ import 'frequency.dart';
 import 'dosing_phase.dart';
 import 'provenance.dart';
 import 'renal_replacement_mode.dart';
+import 'oral_liquid_formulation.dart';
 
 /// The complete result of a dose calculation.
 ///
@@ -47,8 +48,32 @@ class DosageResult {
   /// Infusion result with rate, rateUnit, and pump rate (D2).
   final InfusionResult? infusionResult;
 
-  /// Volume to administer in milliliters (for IV/IM).
+  /// Volume to administer in milliliters (for IV/IM/oral liquid).
   final double? volumeMl;
+
+  /// Equivalent household teaspoons (5 mL per teaspoon) for oral liquids (R1).
+  final double? teaspoons;
+
+  /// Selected oral liquid concentration entity, if applicable (R1).
+  final OralLiquidConcentration? liquidConcentration;
+
+  /// Label of the selected oral liquid concentration (R1).
+  final String? liquidConcentrationLabel;
+
+  /// Reconstitution vial draw volume in milliliters (mL) (R2).
+  final double? vialDrawVolumeMl;
+
+  /// Active concentration after reconstitution in mg/mL (R2).
+  final double? reconstitutionConcentrationMgPerMl;
+
+  /// Diluent bag volume in milliliters (mL) (R2).
+  final double? diluentBagVolumeMl;
+
+  /// Total infusion volume (diluent bag + additive or min volume) in mL (R2).
+  final double? totalInfusionVolumeMl;
+
+  /// Number of vials required for the prescribed dose (R2).
+  final int? vialsNeeded;
 
   /// Infusion rate in mL/hr (for continuous IV infusion).
   final double? infusionRateMlPerHr;
@@ -149,6 +174,14 @@ class DosageResult {
     this.dailyDose,
     this.infusionResult,
     this.volumeMl,
+    this.teaspoons,
+    this.liquidConcentration,
+    this.liquidConcentrationLabel,
+    this.vialDrawVolumeMl,
+    this.reconstitutionConcentrationMgPerMl,
+    this.diluentBagVolumeMl,
+    this.totalInfusionVolumeMl,
+    this.vialsNeeded,
     this.infusionRateMlPerHr,
     this.infusionDurationMinutes,
     this.dripRateDropsPerMin,

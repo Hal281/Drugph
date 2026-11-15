@@ -260,8 +260,28 @@ final List<Drug> neurology = [
         indication: 'Seizures / Mania / Migraine Prophylaxis',
         dosingType: DosingType.weightBased,
         dosePerKg: 15.0, // Initial 10-15 mg/kg/day
+        doseBasis: DoseBasis.perDay,
         doseUnit: DoseUnit.mg,
         frequency: Frequency(minIntervalHours: 8, maxIntervalHours: 12, displayEn: 'Divided BID-TID', displayTh: 'แบ่งวันละ 2-3 ครั้ง'),
+        limits: DoseLimit(
+          maxDosePerKgPerDay: 60.0,
+        ),
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Seizures (Pediatric >= 2 years)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 24, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 15.0, // Initial 10-15 mg/kg/day
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency(
+          minIntervalHours: 8,
+          maxIntervalHours: 12,
+          displayEn: 'Divided BID-TID',
+          displayTh: 'แบ่งวันละ 2-3 ครั้ง',
+        ),
         limits: DoseLimit(
           maxDosePerKgPerDay: 60.0,
         ),

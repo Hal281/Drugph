@@ -212,27 +212,80 @@ class _ClinicalBreakdownSectionState extends State<ClinicalBreakdownSection> {
       return steps;
     }
 
+    final inputs = res.calculationInputs;
+    final renalEq = inputs['renalEquationUsed'] as String?;
+    final age = (inputs['ageYears'] as num?)?.toInt() ?? widget.state.ageYears;
+    final scr =
+        (inputs['serumCreatinineMgDl'] as num?)?.toDouble() ?? widget.state.scrMgDl;
+    final height =
+        (inputs['heightCm'] as num?)?.toDouble() ?? widget.state.heightCm;
+    final tbw =
+        (inputs['weightKg'] as num?)?.toDouble() ?? widget.state.weightKg;
+    final crclWt = (inputs['crclWeightUsedKg'] as num?)?.toDouble() ??
+        widget.state.dosingWeightValue;
+    final crclStrat = inputs['crclWeightStrategy'] as String? ?? 'Weight';
+    final effectiveAdjBw =
+        res.adjBwKg ?? (inputs['adjBwKg'] as num?)?.toDouble();
+
     // Step 1: Renal Function
     if (res.crclMlMin != null) {
-      final sexStr = widget.state.sex == Sex.female ? ' × 0.85' : '';
-      steps.add(_BreakdownStep(
-        title: t
-            ? 'การประเมินการทำงานของไต (Cockcroft-Gault CrCl)'
-            : 'Renal Function Evaluation (Cockcroft-Gault)',
-        detail:
-            'CrCl = [(140 - Age) × Weight] / (72 × SCr)$sexStr = ${res.crclMlMin!.toStringAsFixed(1)} mL/min',
-      ));
+      if (renalEq == 'Bedside Schwartz' && height != null && scr != null) {
+        final scrStr =
+            scr == scr.roundToDouble() ? scr.toStringAsFixed(1) : scr.toString();
+        steps.add(_BreakdownStep(
+          title: t
+              ? 'การประเมินการทำงานของไตเด็ก (Bedside Schwartz eGFR)'
+              : 'Renal Function Evaluation (Bedside Schwartz eGFR)',
+          detail:
+              'eGFR = (0.413 × ${height.toStringAsFixed(1)} cm) / $scrStr = ${res.crclMlMin!.toStringAsFixed(1)} mL/min/1.73m²',
+        ));
+      } else if (renalEq == 'RRT Protocol') {
+        steps.add(_BreakdownStep(
+          title: t
+              ? 'การประเมินการทำงานของไต (เกณฑ์ RRT)'
+              : 'Renal Function Evaluation (RRT Protocol)',
+          detail: t
+              ? 'ประเมินร่วมกับการบำบัดทดแทนไต (CrCl เทียบเท่า: ${res.crclMlMin!.toStringAsFixed(1)} mL/min)'
+              : 'Evaluated under active RRT (${res.crclMlMin!.toStringAsFixed(1)} mL/min equivalent)',
+        ));
+      } else if (renalEq == 'Manual CrCl') {
+        steps.add(_BreakdownStep(
+          title: t
+              ? 'การประเมินการทำงานของไต (Manual CrCl)'
+              : 'Renal Function Evaluation (Manual CrCl)',
+          detail: 'Manual CrCl = ${res.crclMlMin!.toStringAsFixed(1)} mL/min',
+        ));
+      } else {
+        final sexStr = widget.state.sex == Sex.female ? ' × 0.85' : '';
+        final detailStr = (age != null && crclWt != null && scr != null)
+            ? 'CrCl = [(140 - $age) × ${crclWt.toStringAsFixed(1)} kg ($crclStrat)] / (72 × ${scr == scr.roundToDouble() ? scr.toStringAsFixed(1) : scr.toString()})$sexStr = ${res.crclMlMin!.toStringAsFixed(1)} mL/min'
+            : 'CrCl = [(140 - Age) × Weight] / (72 × SCr)$sexStr = ${res.crclMlMin!.toStringAsFixed(1)} mL/min';
+        steps.add(_BreakdownStep(
+          title: t
+              ? 'การประเมินการทำงานของไต (Cockcroft-Gault CrCl)'
+              : 'Renal Function Evaluation (Cockcroft-Gault)',
+          detail: detailStr,
+        ));
+      }
     }
 
     // Step 2: Weight selection
     if (widget.state.dosingWeightLabel != null &&
         widget.state.dosingWeightValue != null) {
+      final metricsParts = <String>[
+        if (tbw != null) 'TBW: ${tbw.toStringAsFixed(1)} kg',
+        if (res.ibwKg != null) 'IBW: ${res.ibwKg!.toStringAsFixed(1)} kg',
+        if (effectiveAdjBw != null)
+          'AdjBW: ${effectiveAdjBw.toStringAsFixed(1)} kg',
+      ];
+      final metricsLine =
+          metricsParts.isNotEmpty ? '\n${metricsParts.join(' • ')}' : '';
       steps.add(_BreakdownStep(
         title: t
             ? 'เกณฑ์การเลือกน้ำหนัก (Dosing Weight)'
             : 'Dosing Weight Strategy',
         detail:
-            '${widget.state.dosingWeightLabel} = ${widget.state.dosingWeightValue!.toStringAsFixed(1)} kg (${widget.state.dosingWeightReason ?? ""})',
+            '${widget.state.dosingWeightLabel} = ${widget.state.dosingWeightValue!.toStringAsFixed(1)} kg (${widget.state.dosingWeightReason ?? ""})$metricsLine',
       ));
     }
 
@@ -261,6 +314,34 @@ class _ClinicalBreakdownSectionState extends State<ClinicalBreakdownSection> {
             : 'Formulary Rounding Discrepancy',
         detail:
             'เทียบขนาดยาในคลัง ➔ ปัดเป็น: ${res.roundedDose} ${res.doseUnit?.symbol ?? ""}',
+      ));
+    }
+
+    // Step 5: Oral Liquid Conversion or IV Reconstitution & Infusion (R1, R2)
+    if (res.teaspoons != null && res.volumeMl != null) {
+      steps.add(_BreakdownStep(
+        title: t
+            ? 'การแปลงขนาดยาน้ำรับประทาน (Oral Liquid & Household Volume)'
+            : 'Oral Liquid Formulation Conversion',
+        detail:
+            'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ความเข้มข้น (${res.liquidConcentrationLabel ?? ""}) ➔ ${res.volumeMl!.toStringAsFixed(1)} mL (เทียบเท่า ${res.teaspoons!.toStringAsFixed(1)} ช้อนชา)',
+      ));
+    } else if (res.vialDrawVolumeMl != null) {
+      steps.add(_BreakdownStep(
+        title: t
+            ? 'การละลายผงยาและดูดยาฉีด (Vial Reconstitution & Draw)'
+            : 'Vial Reconstitution & Draw',
+        detail:
+            'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ${res.reconstitutionConcentrationMgPerMl ?? ""} mg/mL ➔ ดูดยา ${res.vialDrawVolumeMl!.toStringAsFixed(1)} mL${res.vialsNeeded != null ? " (${res.vialsNeeded} ขวด)" : ""}',
+      ));
+    }
+    if (res.infusionRateMlPerHr != null && res.infusionResult == null) {
+      steps.add(_BreakdownStep(
+        title: t
+            ? 'อัตราเครื่องหยดยาเข้าหลอดเลือดดำ (IV Infusion Pump Rate)'
+            : 'IV Infusion Pump Rate',
+        detail:
+            'สารน้ำ ${res.totalInfusionVolumeMl?.toStringAsFixed(0) ?? res.volumeMl?.toStringAsFixed(0) ?? ""} mL ÷ ${res.infusionDurationMinutes?.toStringAsFixed(0) ?? "60"} นาที ➔ ตั้งเครื่อง ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr${res.dripRateDropsPerMin != null ? " (หยดน้ำเกลือ ${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min)" : ""}',
       ));
     }
 

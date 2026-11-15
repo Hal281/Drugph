@@ -166,8 +166,8 @@ void main() {
       }
       expect(acyclovirStart, isNotNull);
       expect(acyclovirEnd, isNotNull);
-      // id: 'acyclovir' is at line 1691 (Drug starts at 1690).
-      expect(acyclovirStart, equals(1691));
+      // id: 'acyclovir' line shifted after clinical dosing enhancements (reconstitution & oral liquids).
+      expect(acyclovirStart, equals(2618));
 
       // Check Emergency file
       final emLines = File('lib/data/drugs/emergency.dart').readAsLinesSync();

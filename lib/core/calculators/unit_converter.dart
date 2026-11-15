@@ -39,6 +39,44 @@ class UnitConverter {
   }
 
   // ------------------------------------------------------------------
+  // Household Teaspoon conversions (1 teaspoon = 5 mL)
+  // Standard clinical reference: Lexicomp, USP, AAP
+  // ------------------------------------------------------------------
+
+  /// Standard clinical definition of a household medicinal teaspoon in milliliters.
+  static const double mlPerTeaspoon = 5.0;
+
+  /// Converts volume in milliliters (mL) to household teaspoons (tsp).
+  ///
+  /// Formula: `teaspoons = volumeMl / 5.0`
+  static double mlToTeaspoons(double volumeMl) {
+    if (volumeMl < 0) {
+      throw ArgumentError.value(volumeMl, 'volumeMl', 'Must be >= 0');
+    }
+    return volumeMl / mlPerTeaspoon;
+  }
+
+  /// Converts household teaspoons (tsp) to volume in milliliters (mL).
+  ///
+  /// Formula: `volumeMl = teaspoons * 5.0`
+  static double teaspoonsToMl(double teaspoons) {
+    if (teaspoons < 0) {
+      throw ArgumentError.value(teaspoons, 'teaspoons', 'Must be >= 0');
+    }
+    return teaspoons * mlPerTeaspoon;
+  }
+
+  /// Formats teaspoon value cleanly for clinical UI (e.g. "1 tsp", "1.5 tsp", "0.5 tsp").
+  static String formatTeaspoons(double teaspoons, {bool isThai = false}) {
+    final formatted = (teaspoons % 1 == 0)
+        ? teaspoons.toInt().toString()
+        : (teaspoons < 0.1
+            ? teaspoons.toStringAsFixed(2)
+            : teaspoons.toStringAsFixed(1).replaceAll(RegExp(r'\.?0+$'), ''));
+    return isThai ? '$formatted ช้อนชา' : '$formatted tsp';
+  }
+
+  // ------------------------------------------------------------------
   // Time conversions (min ↔ hr ↔ day)
   // ------------------------------------------------------------------
 

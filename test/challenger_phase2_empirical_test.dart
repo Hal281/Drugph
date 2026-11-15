@@ -49,12 +49,12 @@ void main() {
   ];
 
   group('Dimension 1: SchemaValidator & KnowledgeBase vs DrugDatabase Audit', () {
-    test('1.1: DrugDatabase contains exactly 121 drugs across 16 categories', () {
+    test('1.1: DrugDatabase contains exactly 119 drugs across 16 categories', () {
       final totalDrugs = DrugDatabase.allDrugs.length;
       expect(
         totalDrugs,
-        equals(121),
-        reason: 'DrugDatabase.allDrugs must contain exactly 121 formulary drugs',
+        equals(119),
+        reason: 'DrugDatabase.allDrugs must contain exactly 119 curated formulary drugs',
       );
     });
 

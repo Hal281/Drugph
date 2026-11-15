@@ -29,10 +29,9 @@ import 'drugs/nephrology.dart';
 class DrugDatabase {
   const DrugDatabase._();
 
-  /// All drugs currently loaded in the system.
+  /// Active clinical formulary drugs shown in UI catalog and search.
   static final List<Drug> allDrugs = [
     ...antibiotics,
-    ...chemotherapy,
     ...cardiovascular,
     ...analgesics,
     ...gastrointestinal,
@@ -49,13 +48,23 @@ class DrugDatabase {
     ...nephrology,
   ];
 
-  /// Finds a drug by its unique [id].
+  /// Complex oncology and transplant immunosuppressant drugs archived from the
+  /// general ward UI catalog per pharmacist feedback, while retained for direct
+  /// ID lookup and engine verification.
+  static final List<Drug> archivedSpecialtyDrugs = [
+    ...chemotherapy,
+    ...immunosuppressants,
+  ];
+
+  /// Finds a drug by its unique [id], searching active and archived lists.
   static Drug? findById(String id) {
-    try {
-      return allDrugs.firstWhere((d) => d.id == id);
-    } catch (_) {
-      return null;
+    for (final drug in allDrugs) {
+      if (drug.id == id) return drug;
     }
+    for (final drug in archivedSpecialtyDrugs) {
+      if (drug.id == id) return drug;
+    }
+    return null;
   }
 
   /// Pre-computed multi-dimensional search engine instance over [allDrugs].

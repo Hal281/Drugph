@@ -162,12 +162,17 @@ final List<Drug> nephrology = [
       ),
     ],
   ),
+];
+
+/// Specialized transplant immunosuppressants archived from general ward presentation catalog.
+final List<Drug> immunosuppressants = [
   const Drug(
     id: 'tacrolimus',
     genericName: 'Tacrolimus',
     brandNames: ['Prograf', 'Advagraf'],
     nameTh: 'ทาโครลิมัส',
-    category: DrugCategory.nephrology,
+    category: DrugCategory.immunosuppressant,
+    drugClass: DrugClass.immunosuppressant,
     pregnancyCategory: 'C',
     isHighAlert: true,
     requiresRenalAdjustment: true,
@@ -207,7 +212,8 @@ final List<Drug> nephrology = [
     genericName: 'Mycophenolate Mofetil (MMF)',
     brandNames: ['CellCept'],
     nameTh: 'ไมโคฟีโนเลต',
-    category: DrugCategory.nephrology,
+    category: DrugCategory.immunosuppressant,
+    drugClass: DrugClass.immunosuppressant,
     pregnancyCategory: 'D', // Risk of fetal harm
     isHighAlert: true,
     contraindications: ['Pregnancy (must use effective contraception)'],

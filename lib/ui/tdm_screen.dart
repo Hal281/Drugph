@@ -113,6 +113,15 @@ class _TdmScreenState extends State<TdmScreen> {
     if (patient.serumCreatinineMgDl != null &&
         patient.serumCreatinineMgDl! > 0 &&
         patient.ageYears >= 18) {
+      if (patient.heightCm > 0) {
+        return RenalCalculator.cockcroftGaultAutoWeight(
+          ageYears: patient.ageYears,
+          weightKg: patient.weightKg,
+          heightCm: patient.heightCm,
+          sex: patient.sex,
+          serumCreatinineMgDl: patient.serumCreatinineMgDl!,
+        );
+      }
       return RenalCalculator.cockcroftGault(
         ageYears: patient.ageYears,
         weightKg: patient.weightKg,

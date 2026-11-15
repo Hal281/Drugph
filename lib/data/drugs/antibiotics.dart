@@ -151,6 +151,22 @@ final List<Drug> antibiotics = [
         ],
         maxInfusionRateMgPerMin:
             10.0, // max 10 mg/min or 60 min, whichever is longer
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: ReconstitutionInfo(
+          vialStrengthMg: 500.0,
+          diluentName: 'Sterile Water for Injection (SWFI)',
+          diluentVolumeMl: 10.0,
+          resultingConcentrationMgPerMl: 50.0,
+          instructionsEn:
+              'Reconstitute 500 mg vial with 10 mL SWFI (or 1 g vial with 20 mL SWFI) to yield 50 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 500 มก. ด้วยน้ำกลั่นสำหรับฉีดยา 10 มล. (หรือ 1 กรัม ด้วย 20 มล.) ได้ความเข้มข้น 50 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide to Antimicrobial Therapy 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 50.0,
+        standardDilutionBagMl: 250.0,
+        standardDilutionMgPerMl: 5.0,
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 50,
@@ -309,6 +325,10 @@ final List<Drug> antibiotics = [
         dosePerKg: 5.0, // 5-7 mg/kg
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitutionConcentrationMgPerMl: 40.0,
+        standardDilutionBagMl: 100.0,
+        infusionTimeMinutes: 60.0,
         limits: DoseLimit(maxSingleDose: 700.0),
         renalAdjustments: [
           RenalAdjustment(
@@ -474,6 +494,10 @@ final List<Drug> antibiotics = [
         dosePerKg: 15.0, // 15 mg/kg
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitutionConcentrationMgPerMl: 250.0,
+        standardDilutionBagMl: 100.0,
+        infusionTimeMinutes: 60.0,
         limits: DoseLimit(maxSingleDose: 1500.0),
         renalAdjustments: [
           RenalAdjustment(
@@ -623,6 +647,23 @@ final List<Drug> antibiotics = [
         fixedDose: 1000.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 20.0,
+          resultingConcentrationMgPerMl: 50.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 20 mL SWFI or NSS (or 500 mg vial with 10 mL) to yield 50 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 20 มล. (หรือ 500 มก. ด้วย 10 มล.) ได้ความเข้มข้น 50 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 50.0,
+        standardDilutionBagMl: 100.0,
+        standardDilutionMgPerMl: 10.0,
+        infusionTimeMinutes: 30.0,
         limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
         renalAdjustments: [
           // Reference: Merrem (meropenem) FDA Prescribing Information §2.2; Sanford Guide 2023.
@@ -704,6 +745,23 @@ final List<Drug> antibiotics = [
         fixedDose: 2000.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 20.0,
+          resultingConcentrationMgPerMl: 50.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 20 mL SWFI or NSS to yield 50 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 20 มล. ได้ความเข้มข้น 50 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 50.0,
+        standardDilutionBagMl: 100.0,
+        standardDilutionMgPerMl: 10.0,
+        infusionTimeMinutes: 30.0,
         limits: const DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
         renalAdjustments: [
           const RenalAdjustment(
@@ -840,25 +898,330 @@ final List<Drug> antibiotics = [
         fixedDose: 2000.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
-        limits: DoseLimit(maxDailyDose: 4000.0),
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 9.6,
+          displacedVolumeMl: 0.4,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 9.6 mL SWFI or NSS to yield 100 mg/mL (total volume 10 mL).',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 9.6 มล. ได้ความเข้มข้น 100 มก./มล. (ปริมาตรรวม 10 มล.)',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        standardDilutionMgPerMl: 10.0,
+        infusionTimeMinutes: 30.0,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Severe infections (bacteremia, pyelonephritis, endocarditis): 2,000 mg IV q24h.',
+        notesTh: 'การติดเชื้อรุนแรง (ผู้ใหญ่): 2,000 mg IV วันละ 1 ครั้ง (q24h)',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Standard Infection / CAP / UTI (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 1000.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 9.6,
+          displacedVolumeMl: 0.4,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 9.6 mL SWFI or NSS to yield 100 mg/mL (total volume 10 mL).',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 9.6 มล. ได้ความเข้มข้น 100 มก./มล. (ปริมาตรรวม 10 มล.)',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        standardDilutionMgPerMl: 10.0,
+        infusionTimeMinutes: 30.0,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Standard community-acquired pneumonia, UTI, or uncomplicated systemic infection: 1,000–2,000 mg IV q24h.',
+        notesTh: 'การติดเชื้อทั่วไป / ปอดอักเสบชุมชน / ทางเดินปัสสาวะ (ผู้ใหญ่): 1,000 mg IV วันละ 1 ครั้ง (q24h)',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Bacterial Meningitis (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 2000.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 9.6,
+          displacedVolumeMl: 0.4,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 9.6 mL SWFI or NSS to yield 100 mg/mL (total volume 10 mL).',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 9.6 มล. ได้ความเข้มข้น 100 มก./มล. (ปริมาตรรวม 10 มล.)',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        standardDilutionMgPerMl: 10.0,
+        infusionTimeMinutes: 30.0,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'CNS penetration regimen for bacterial meningitis: 2,000 mg IV q12h (4,000 mg/day).',
+        notesTh: 'เยื่อหุ้มสมองอักเสบ (ผู้ใหญ่): 2,000 mg IV ทุก 12 ชม. (วันละ 4,000 mg)',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Standard Infection (Pediatric)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 50.0,
+        minDosePerKg: 50.0,
+        maxDosePerKg: 75.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Standard pediatric non-CNS infections: 50–75 mg/kg/day IV q24h (max 2,000 mg/day). Avoid in hyperbilirubinemic neonates.',
+        notesTh: 'ติดเชื้อทั่วไป (เด็ก): 50–75 mg/kg/วัน IV วันละ 1 ครั้ง (สูงสุด 2,000 mg/วัน) ห้ามใช้ในทารกตัวเหลือง',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 2000.0, maxDosePerKgPerDay: 75.0),
       ),
       DosingRegimen(
         route: DoseRoute.ivInfusion,
         indication: 'Meningitis (Pediatric)',
         dosingType: DosingType.weightBased,
         dosePerKg: 100.0,
+        minDosePerKg: 80.0,
+        maxDosePerKg: 100.0,
+        doseBasis: DoseBasis.perDay,
         doseUnit: DoseUnit.mg,
-        frequency: Frequency.q24h, // Can also be divided q12h
-        limits: DoseLimit(maxDailyDose: 4000.0, maxDosePerKgPerDay: 100.0),
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric bacterial meningitis: 100 mg/kg/day IV divided q12h (50 mg/kg/dose; max 4,000 mg/day).',
+        notesTh: 'เยื่อหุ้มสมองอักเสบ (เด็ก): 100 mg/kg/วัน IV แบ่งให้ทุก 12 ชม. (ครั้งละ 50 mg/kg สูงสุด 4,000 mg/วัน)',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0, maxDosePerKgPerDay: 100.0),
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'amoxicillin',
+    genericName: 'Amoxicillin',
+    brandNames: ['Amoxil', 'Moxilin'],
+    nameTh: 'อะม็อกซี่ซิลลิน',
+    category: DrugCategory.antibiotic,
+    drugClass: DrugClass.betaLactamPenicillin,
+    requiresRenalAdjustment: true,
+    allergyClass: 'Penicillin / Beta-lactam',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024 / RDU Thailand',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp Pediatric & Neonatal Dosage Handbook 2024',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail:
+          'Aminopenicillins Monograph (Adult & Pediatric Weight-Based Regimens)',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Aminopenicillins - Amoxicillin (Adult & Pediatric)',
+      dosingGuideline:
+          '• ผู้ใหญ่ (Adult Standard): 500 mg PO ทุก 8 ชม. (หรือ 875 mg PO ทุก 12 ชม.) สูงสุดไม่เกิน 3,000 mg/วัน\n'
+          '• เด็ก ติดเชื้อทั่วไป (Pediatric Mild-to-Moderate): 25–50 mg/kg/วัน แบ่งให้ทุก 8–12 ชม. (ขนาดแนะนำ 45 mg/kg/วัน แบ่ง q8h = 15 mg/kg/ครั้ง)\n'
+          '• เด็ก หูชั้นกลางอักเสบ / ปอดอักเสบ / ไซนัสอักเสบ (Pediatric High-Dose AOM/CAP): 80–90 mg/kg/วัน แบ่งให้ทุก 12 ชม. (45 mg/kg/ครั้ง)',
+      renalGuideline:
+          '• CrCl ≥ 30 mL/min: ไม่ต้องปรับขนาดยา\n'
+          '• CrCl 10–29 mL/min: ผู้ใหญ่ 250–500 mg ทุก 12 ชม.; เด็ก 15 mg/kg/ครั้ง ทุก 12 ชม. (หลีกเลี่ยงสูตร High-dose)\n'
+          '• CrCl < 10 mL/min: ผู้ใหญ่ 250–500 mg ทุก 24 ชม.; เด็ก 15 mg/kg/ครั้ง ทุก 24 ชม.',
+      administrationGuideline:
+          '• รับประทานได้ทั้งก่อนและหลังอาหาร (การดูดซึมไม่ถูกรบกวนจากอาหาร)\n'
+          '• รูปแบบยาน้ำแขวนตะกอน (Suspension 125 mg/5 mL หรือ 250 mg/5 mL): เขย่าขวดก่อนรินยาทุกครั้ง เก็บหลังผสมที่อุณหภูมิห้องหรือตู้เย็นตามฉลากและใช้ให้หมดภายใน 7–14 วัน',
+      clinicalNotes:
+          '• ตรวจสอบประวัติการแพ้ยาในกลุ่ม Penicillins และ Aminocephalosporins (เช่น Cephalexin, Cefadroxil) ก่อนจ่ายยา\n'
+          '• ยาเดี่ยว Amoxicillin ครอบคลุมเชื้อแกรมบวก (Streptococcus pneumoniae, GABHS) ได้ดีโดยมีผลข้างเคียงต่อทางเดินอาหารน้อยกว่า Amoxicillin/Clavulanate',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
+    severeInteractions: [
+      'Methotrexate (decreases renal clearance and increases MTX toxicity)',
+      'Probenecid (increases amoxicillin serum levels)',
+      'Allopurinol (increases risk of maculopapular rash)',
+    ],
+    contraindications: [
+      'Hypersensitivity to penicillins or beta-lactam antibiotics',
+      'Infectious mononucleosis (high incidence of erythematous rash)',
+    ],
+    specialNotes:
+        'Pediatric dosing is specified as total mg/kg/day divided q8h (45 mg/kg/day standard) or q12h (80-90 mg/kg/day high-dose AOM).',
+    specialNotesTh:
+        'ขนาดยาเด็กคำนวณจาก mg/kg/วัน แล้วหารแบ่งมื้อ: ติดเชื้อทั่วไป 45 mg/kg/วัน แบ่ง q8h; หูชั้นกลางอักเสบ (AOM) 80–90 mg/kg/วัน แบ่ง q12h',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Standard Infection (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 500.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        notes: '500 mg PO q8h (up to 1,000 mg q8h for severe infections)',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 3000.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 10,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q12h,
+            notes: '500 mg PO q12h in CrCl 10-30 mL/min',
+            notesTh: 'ให้ 500 mg PO ทุก 12 ชม. เมื่อ CrCl 10–30 mL/min',
+          ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 10,
+            adjustmentFactor: 1.0,
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q24h,
+            notes: '500 mg PO q24h in CrCl < 10 mL/min',
+            notesTh: 'ให้ 500 mg PO ทุก 24 ชม. เมื่อ CrCl < 10 mL/min',
+          ),
+        ],
       ),
       DosingRegimen(
-        route: DoseRoute.ivInfusion,
+        route: DoseRoute.po,
         indication: 'Standard Infection (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
         dosingType: DosingType.weightBased,
-        dosePerKg: 50.0, // 50-75 mg/kg
+        dosePerKg: 45.0,
+        minDosePerKg: 25.0,
+        maxDosePerKg: 50.0,
+        doseBasis: DoseBasis.perDay,
         doseUnit: DoseUnit.mg,
-        frequency: Frequency.q24h,
-        limits: DoseLimit(maxDailyDose: 2000.0),
+        frequency: Frequency.q8h,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: [
+          OralLiquidConcentration(
+            label: '125 mg / 5 mL (25 mg/mL)',
+            amountMg: 125.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Dry Syrup / Suspension',
+            citation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+          ),
+          OralLiquidConcentration(
+            label: '250 mg / 5 mL (50 mg/mL)',
+            amountMg: 250.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Forte Suspension',
+            citation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+            isDefault: true,
+          ),
+        ],
+        notes:
+            '45 mg/kg/day divided q8h (15 mg/kg/dose; usual range 25-50 mg/kg/day)',
+        notesTh:
+            'ขนาดยารวม 45 mg/kg/วัน แบ่งให้ทุก 8 ชม. (15 mg/kg/ครั้ง; ช่วงแนะนำ 25–50 mg/kg/วัน)',
+        limits: DoseLimit(
+          maxSingleDose: 500.0,
+          maxDailyDose: 1500.0,
+          maxDosePerKgPerDay: 50.0,
+        ),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 10,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            adjustedFrequency: Frequency.q12h,
+            notes: '15 mg/kg/dose PO q12h in CrCl 10-30 mL/min',
+            notesTh: 'ให้ 15 mg/kg/ครั้ง PO ทุก 12 ชม. เมื่อ eGFR/CrCl 10–30',
+          ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 10,
+            adjustmentFactor: 1.0,
+            adjustedFrequency: Frequency.q24h,
+            notes: '15 mg/kg/dose PO q24h in CrCl < 10 mL/min',
+            notesTh: 'ให้ 15 mg/kg/ครั้ง PO ทุก 24 ชม. เมื่อ eGFR/CrCl < 10',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Acute Otitis Media / High-Dose (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 90.0,
+        minDosePerKg: 80.0,
+        maxDosePerKg: 90.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: [
+          OralLiquidConcentration(
+            label: '250 mg / 5 mL (50 mg/mL)',
+            amountMg: 250.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Forte Suspension',
+            citation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+            isDefault: true,
+          ),
+          OralLiquidConcentration(
+            label: '125 mg / 5 mL (25 mg/mL)',
+            amountMg: 125.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Dry Syrup / Suspension',
+            citation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+          ),
+        ],
+        notes:
+            '80-90 mg/kg/day divided q12h (45 mg/kg/dose) for Acute Otitis Media or resistant S. pneumoniae',
+        notesTh:
+            'ขนาดยาสูง 80–90 mg/kg/วัน แบ่งให้ทุก 12 ชม. (45 mg/kg/ครั้ง) สำหรับหูชั้นกลางอักเสบเฉียบพลัน (AOM) หรือปอดอักเสบ',
+        limits: DoseLimit(
+          maxSingleDose: 1000.0,
+          maxDailyDose: 3000.0,
+          maxDosePerKgPerDay: 90.0,
+        ),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 10,
+            crclMax: 30,
+            adjustmentFactor: 0.33,
+            adjustedFrequency: Frequency.q12h,
+            notes:
+                'Avoid high-dose in renal impairment; reduce to ~15 mg/kg/dose PO q12h',
+            notesTh:
+                'หลีกเลี่ยงสูตร High-dose ในผู้ป่วยไตเสื่อม ลดขนาดยาเหลือ ~15 mg/kg/ครั้ง ทุก 12 ชม.',
+          ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 10,
+            adjustmentFactor: 0.33,
+            adjustedFrequency: Frequency.q24h,
+            notes:
+                'Avoid high-dose in severe renal impairment; reduce to ~15 mg/kg/dose PO q24h',
+            notesTh:
+                'หลีกเลี่ยงสูตร High-dose ในผู้ป่วยไตเสื่อมรุนแรง ลดขนาดยาเหลือ ~15 mg/kg/ครั้ง ทุก 24 ชม.',
+          ),
+        ],
       ),
     ],
   ),
@@ -868,9 +1231,41 @@ final List<Drug> antibiotics = [
     brandNames: ['Augmentin', 'Curam', 'Amoksiklav'],
     nameTh: 'ออม็อกซิลลิน/คลาวูลานิก แอซิด',
     category: DrugCategory.antibiotic,
+    drugClass: DrugClass.betaLactamPenicillin,
     requiresRenalAdjustment: true,
     requiresHepaticCaution: true,
     allergyClass: 'Penicillin / Beta-lactam',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp Pediatric & Neonatal Dosage Handbook 2024',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Amoxicillin/Clavulanate Monograph (Standard & High-Dose)',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Beta-Lactam / Beta-Lactamase Inhibitors',
+      dosingGuideline:
+          '• ผู้ใหญ่: 875/125 mg (1,000 mg) PO ทุก 12 ชม. หรือ 500/125 mg PO ทุก 8–12 ชม.\n'
+          '• เด็ก ติดเชื้อทั่วไป (Standard): 25–45 mg/kg/วัน (อ้างอิงส่วน Amoxicillin) แบ่งทุก 12 ชม. (22.5 mg/kg/ครั้ง)\n'
+          '• เด็ก หูชั้นกลางอักเสบ / ไซนัส / ปอดอักเสบ (High-Dose ES/14:1): 80–90 mg/kg/วัน แบ่งทุก 12 ชม. (45 mg/kg/ครั้ง)',
+      renalGuideline:
+          '• CrCl < 30 mL/min: ห้ามใช้เม็ดขนาด 875/125 mg (1,000 mg) และหลีกเลี่ยงสูตร High-dose\n'
+          '• CrCl 10–30 mL/min: ผู้ใหญ่ 500/125 mg ทุก 12 ชม.; เด็ก 15 mg/kg/ครั้ง ทุก 12 ชม.\n'
+          '• CrCl < 10 mL/min: ผู้ใหญ่ 500/125 mg ทุก 24 ชม.; เด็ก 15 mg/kg/ครั้ง ทุก 24 ชม.',
+      administrationGuideline:
+          '• รับประทานพร้อมอาหารหรือเริ่มมื้ออาหารทันที เพื่อเพิ่มการดูดซึมและลดอาการคลื่นไส้/ท้องเสีย\n'
+          '• เลือกอัตราส่วนผสม (เช่น 7:1 หรือ 14:1) ให้เหมาะสมในเด็กเพื่อไม่ให้ได้รับ Clavulanate เกินขนาด (> 10 mg/kg/วัน ทำให้ถ่ายเหลว)',
+      clinicalNotes:
+          '• การคำนวณทั้งหมดอ้างอิงจากตัวยา Amoxicillin component เป็นหลัก\n'
+          '• ระวังภาวะ Cholestatic jaundice หรือตับอักเสบจาก Clavulanate ในผู้สูงอายุหรือผู้ที่มีประวัติตับผิดปกติจากยานี้มาก่อน',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
     severeInteractions: [
       'Methotrexate (increases toxicity)',
       'Probenecid',
@@ -879,8 +1274,10 @@ final List<Drug> antibiotics = [
     contraindications: [
       'History of penicillin-associated jaundice/hepatic dysfunction',
     ],
-    specialNotes: 'Dosing is based on the Amoxicillin component. High doses of clavulanate can cause diarrhea.',
-    specialNotesTh: 'คำนวณโดสจาก Amoxicillin เป็นหลัก ระวังท้องเสียจาก Clavulanate ที่สูงเกินไป',
+    specialNotes:
+        'Dosing is based on the Amoxicillin component. High doses of clavulanate can cause diarrhea.',
+    specialNotesTh:
+        'คำนวณโดสจาก Amoxicillin เป็นหลัก ระวังท้องเสียจาก Clavulanate ที่สูงเกินไป',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -912,12 +1309,40 @@ final List<Drug> antibiotics = [
       DosingRegimen(
         route: DoseRoute.po,
         indication: 'Standard Infection (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
         dosingType: DosingType.weightBased,
-        dosePerKg: 22.5, // 45 mg/kg/day divided q12h = 22.5 mg/kg/dose
+        dosePerKg: 45.0,
+        minDosePerKg: 25.0,
+        maxDosePerKg: 45.0,
+        doseBasis: DoseBasis.perDay,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q12h,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: [
+          OralLiquidConcentration(
+            label: '200/28.5 mg / 5 mL (40 mg/mL Amox)',
+            amountMg: 200.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Oral Suspension (7:1)',
+            citation: 'The Sanford Guide 2024 / Lexicomp 2024',
+            isDefault: true,
+          ),
+          OralLiquidConcentration(
+            label: '400/57 mg / 5 mL (80 mg/mL Amox)',
+            amountMg: 400.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Oral Suspension (7:1)',
+            citation: 'The Sanford Guide 2024 / Lexicomp 2024',
+          ),
+        ],
         notes: '45 mg/kg/day divided q12h (22.5 mg/kg/dose)',
-        limits: DoseLimit(maxDailyDose: 4000.0), // Amoxicillin component
+        notesTh: 'ขนาดยารวม 45 mg/kg/วัน แบ่งให้ทุก 12 ชม. (22.5 mg/kg/ครั้ง)',
+        limits: DoseLimit(
+          maxSingleDose: 875.0,
+          maxDailyDose: 1750.0,
+          maxDosePerKgPerDay: 45.0,
+        ),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 10,
@@ -925,6 +1350,7 @@ final List<Drug> antibiotics = [
             adjustmentFactor: 0.67,
             adjustedFrequency: Frequency.q12h,
             notes: '15 mg/kg q12h in CrCl 10-30 mL/min',
+            notesTh: 'ให้ 15 mg/kg/ครั้ง PO ทุก 12 ชม. เมื่อ eGFR/CrCl 10–30',
           ),
           RenalAdjustment(
             crclMin: 0,
@@ -932,6 +1358,69 @@ final List<Drug> antibiotics = [
             adjustmentFactor: 0.67,
             adjustedFrequency: Frequency.q24h,
             notes: '15 mg/kg q24h in CrCl < 10 mL/min',
+            notesTh: 'ให้ 15 mg/kg/ครั้ง PO ทุก 24 ชม. เมื่อ eGFR/CrCl < 10',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Acute Otitis Media / High-Dose (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 90.0,
+        minDosePerKg: 80.0,
+        maxDosePerKg: 90.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: [
+          OralLiquidConcentration(
+            label: '600/42.9 mg / 5 mL (120 mg/mL Amox)',
+            amountMg: 600.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Augmentin ES-600 (14:1)',
+            citation: 'The Sanford Guide 2024 / Lexicomp 2024',
+            isDefault: true,
+          ),
+          OralLiquidConcentration(
+            label: '400/57 mg / 5 mL (80 mg/mL Amox)',
+            amountMg: 400.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Oral Suspension (7:1)',
+            citation: 'The Sanford Guide 2024 / Lexicomp 2024',
+          ),
+        ],
+        notes:
+            '90 mg/kg/day (amoxicillin component, 14:1 ratio) divided q12h (45 mg/kg/dose) for AOM / Sinusitis / CAP',
+        notesTh:
+            'ขนาดยาสูง 90 mg/kg/วัน (สัดส่วน 14:1) แบ่งให้ทุก 12 ชม. (45 mg/kg/ครั้ง) สำหรับหูชั้นกลางอักเสบ (AOM) หรือปอดอักเสบ',
+        limits: DoseLimit(
+          maxSingleDose: 2000.0,
+          maxDailyDose: 4000.0,
+          maxDosePerKgPerDay: 90.0,
+        ),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 10,
+            crclMax: 30,
+            adjustmentFactor: 0.33,
+            adjustedFrequency: Frequency.q12h,
+            notes:
+                'Avoid high-dose in renal impairment; reduce to 15 mg/kg q12h',
+            notesTh:
+                'หลีกเลี่ยงสูตร High-dose ในผู้ป่วยไตเสื่อม ลดขนาดยาเหลือ 15 mg/kg/ครั้ง ทุก 12 ชม.',
+          ),
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 10,
+            adjustmentFactor: 0.33,
+            adjustedFrequency: Frequency.q24h,
+            notes:
+                'Avoid high-dose in severe renal impairment; reduce to 15 mg/kg q24h',
+            notesTh:
+                'หลีกเลี่ยงสูตร High-dose ในผู้ป่วยไตเสื่อมรุนแรง ลดขนาดยาเหลือ 15 mg/kg/ครั้ง ทุก 24 ชม.',
           ),
         ],
       ),
@@ -943,14 +1432,44 @@ final List<Drug> antibiotics = [
     brandNames: ['Zithromax'],
     nameTh: 'อะซิโธรมัยซิน',
     category: DrugCategory.antibiotic,
+    drugClass: DrugClass.macrolide,
     requiresHepaticCaution: true,
     allergyClass: 'Macrolide',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp Pediatric & Neonatal Dosage Handbook 2024',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Macrolides Monograph (Adult & Pediatric Regimens)',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Macrolides - Azithromycin',
+      dosingGuideline:
+          '• ผู้ใหญ่ (CAP / Respiratory): วันแรก 500 mg PO ครั้งเดียว จากนั้น 250 mg PO วันละครั้ง วันที่ 2–5 (หรือ 500 mg/วัน นาน 3 วัน)\n'
+          '• เด็ก (Otitis Media / CAP): วันแรก 10 mg/kg/ครั้ง (สูงสุด 500 mg) จากนั้น 5 mg/kg/ครั้ง วันละครั้ง วันที่ 2–5 (สูงสุด 250 mg)',
+      renalGuideline:
+          '• ไม่ต้องปรับขนาดยาในผู้ป่วยไตเสื่อม (ขับออกทางน้ำดี/อุจจาระเป็นหลัก)',
+      administrationGuideline:
+          '• ยาน้ำแขวนตะกอนและยาเม็ด: รับประทานก่อนหรือหลังอาหารก็ได้ (แคปซูลบางสูตรให้ก่อนอาหาร 1 ชม. หรือหลังอาหาร 2 ชม.)\n'
+          '• หลีกเลี่ยงการรับประทานพร้อมยาลดกรดที่มี Aluminium/Magnesium พร้อมกันทันที (ให้ห่างกันอย่างน้อย 2 ชม.)',
+      clinicalNotes:
+          '• เฝ้าระวังคลื่นไฟฟ้าหัวใจผิดปกติ (QT prolongation / Torsades de Pointes) โดยเฉพาะเมื่อใช้ร่วมกับ Amiodarone หรือ Fluoroquinolones\n'
+          '• ไม่ยับยั้ง CYP3A4 รุนแรงเท่า Erythromycin/Clarithromycin แต่ยังควรติดตาม INR เมื่อใช้ร่วมกับ Warfarin',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
     severeInteractions: [
       'Amiodarone (QT prolongation)',
       'Statins (increased myopathy risk)',
       'Warfarin',
     ],
-    specialNotes: 'Risk of QT prolongation. Take on an empty stomach for some formulations.',
+    specialNotes:
+        'Risk of QT prolongation. Take on an empty stomach for some formulations.',
     specialNotesTh: 'ระวังคลื่นไฟฟ้าหัวใจผิดปกติ (QT prolongation)',
     regimens: [
       DosingRegimen(
@@ -966,11 +1485,14 @@ final List<Drug> antibiotics = [
       DosingRegimen(
         route: DoseRoute.po,
         indication: 'Otitis Media / Pneumonia (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
         dosingType: DosingType.weightBased,
         dosePerKg: 10.0, // 10 mg/kg day 1, then 5 mg/kg day 2-5
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q24h,
-        notes: 'Day 1: 10 mg/kg (max 500 mg), then 5 mg/kg q24h on Days 2-5 (max 250 mg)',
+        notes:
+            'Day 1: 10 mg/kg (max 500 mg), then 5 mg/kg q24h on Days 2-5 (max 250 mg)',
         limits: DoseLimit(maxSingleDose: 500.0),
       ),
     ],
@@ -981,31 +1503,114 @@ final List<Drug> antibiotics = [
     brandNames: ['Ciproxyl', 'Ciprobay'],
     nameTh: 'ซิโปรฟลอกซาซิน',
     category: DrugCategory.antibiotic,
+    drugClass: DrugClass.fluoroquinolone,
     requiresRenalAdjustment: true,
     allergyClass: 'Fluoroquinolone',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024 / US FDA Cipro SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide 2024 / Lexicomp Drug Information / US FDA Cipro Label',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Fluoroquinolones - Ciprofloxacin Multi-Indication Dosing',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Fluoroquinolones - Ciprofloxacin',
+      dosingGuideline:
+          '• กระเพาะปัสสาวะอักเสบไม่ซับซ้อน (Uncomplicated Cystitis): 250 mg PO ทุก 12 ชม. นาน 3 วัน\n'
+          '• ติดเชื้อทางเดินปัสสาวะ / ทั่วไป (Complicated UTI / Moderate Systemic): 500 mg PO ทุก 12 ชม. (หรือ 400 mg IV ทุก 12 ชม.)\n'
+          '• ติดเชื้อรุนแรง / กระดูกและข้อ / Pseudomonas aeruginosa: 750 mg PO ทุก 12 ชม. (หรือ 400 mg IV ทุก 8–12 ชม.)',
+      renalGuideline:
+          '• CrCl > 50 mL/min: ไม่ต้องปรับขนาดยา\n'
+          '• CrCl 30–50 mL/min: 250–500 mg PO ทุก 12 ชม. (หลีกเลี่ยง 750 mg PO q12h); IV 400 mg ทุก 12 ชม.\n'
+          '• CrCl < 30 mL/min: 250–500 mg PO ทุก 18–24 ชม. หรือ 400 mg IV ทุก 24 ชม.',
+      administrationGuideline:
+          '• ยารับประทาน: ห้ามรับประทานพร้อมนม ผลิตภัณฑ์จากนม แคลเซียม ธาตุเหล็ก สังกะสี หรือยาลดกรด (Aluminum/Magnesium hydroxide) เนื่องจากเกิด Chelation ลดการดูดซึมยา — เว้นห่างอย่างน้อย 2 ชม. ก่อน หรือ 4–6 ชม. หลังแร่ธาตุเหล่านี้\n'
+          '• ยาฉีด IV: ให้แบบ IV Infusion นาน 60 นาที ผ่านหลอดเลือดดำขนาดใหญ่ เพื่อลดอาการระคายเคืองหลอดเลือด',
+      clinicalNotes:
+          '• FDA Black Box Warning: เสี่ยงเอ็นร้อยหวายอักเสบหรือฉีกขาด (Tendinitis/Tendon rupture), เส้นประสาทส่วนปลายอักเสบ, อาการทางระบบประสาทส่วนกลาง และ QT prolongation\n'
+          '• หลีกเลี่ยงการใช้ในเด็กและวัยรุ่น (< 18 ปี) และหญิงตั้งครรภ์ เนื่องจากเสี่ยงพิษต่อกระดูกอ่อนข้อต่อ (Arthropathy) ยกเว้นกรณีจำเป็นตามข้อบ่งชี้เฉพาะ',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
     severeInteractions: [
       'Tizanidine (Contraindicated - severe hypotension)',
       'Theophylline (Increases toxicity)',
       'Antacids / Calcium / Iron (Decreases absorption)',
     ],
     contraindications: ['Concurrent administration with tizanidine'],
-    specialNotes: 'Risk of tendon rupture and QT prolongation. Avoid in children (unless cystic fibrosis) due to cartilage toxicity.',
-    specialNotesTh: 'เสี่ยงเอ็นร้อยหวายอักเสบ/ฉีกขาด และ QT ยาวขึ้น ไม่แนะนำในเด็กเนื่องจากผลต่อกระดูกอ่อน ห้ามกินพร้อมนมหรือยาลดกรด',
+    specialNotes:
+        'Risk of tendon rupture and QT prolongation. Avoid in children (unless specific severe indications) due to cartilage toxicity.',
+    specialNotesTh:
+        'เสี่ยงเอ็นร้อยหวายอักเสบ/ฉีกขาด และ QT ยาวขึ้น ไม่แนะนำในเด็กเนื่องจากผลต่อกระดูกอ่อน ห้ามกินพร้อมนมหรือยาลดกรด',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
         indication: 'UTI / Systemic Infection (Adult)',
         dosingType: DosingType.fixed,
-        fixedDose: 500.0, // 250 - 750 mg
+        fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q12h,
-        limits: DoseLimit(maxDailyDose: 1500.0),
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Standard complicated UTI, prostatitis, or moderate systemic infection: 500 mg PO q12h.',
+        notesTh: 'ติดเชื้อทางเดินปัสสาวะซับซ้อน / ติดเชื้อทั่วไป (ผู้ใหญ่): 500 mg PO ทุก 12 ชม.',
+        limits: DoseLimit(maxSingleDose: 750.0, maxDailyDose: 1500.0),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 0,
             crclMax: 30,
             adjustmentFactor: 0.5,
-            notes: 'Max 500 mg q18-24h',
+            notes: 'Max 500 mg q18-24h (250 mg PO q12h or 500 mg PO q24h)',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Uncomplicated Cystitis / UTI (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 250.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Uncomplicated acute cystitis: 250 mg PO q12h for 3 days.',
+        notesTh: 'กระเพาะปัสสาวะอักเสบไม่ซับซ้อน (ผู้ใหญ่): 250 mg PO ทุก 12 ชม. นาน 3 วัน',
+        limits: DoseLimit(maxSingleDose: 750.0, maxDailyDose: 1500.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            adjustedFrequency: Frequency.q24h,
+            notes: '250 mg PO q24h in CrCl < 30 mL/min',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Severe Pseudomonas / Bone & Joint Infection (Adult PO)',
+        dosingType: DosingType.fixed,
+        fixedDose: 750.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'High-dose oral therapy for severe Pseudomonas, osteomyelitis, or diabetic foot infections: 750 mg PO q12h.',
+        notesTh: 'ติดเชื้อ Pseudomonas รุนแรง / กระดูกและข้อ (ผู้ใหญ่ PO): 750 mg PO ทุก 12 ชม.',
+        limits: DoseLimit(maxSingleDose: 750.0, maxDailyDose: 1500.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q24h,
+            notes: 'CrCl < 30 mL/min: Reduce to 500 mg PO q18–24h (avoid 750 mg q12h)',
           ),
         ],
       ),
@@ -1016,7 +1621,11 @@ final List<Drug> antibiotics = [
         fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q12h,
-        limits: DoseLimit(maxDailyDose: 1200.0),
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Intravenous systemic therapy (may increase to 400 mg IV q8h for severe Pseudomonas/nosocomial pneumonia). Infuse over 60 min.',
+        notesTh: 'ติดเชื้อรุนแรงแบบฉีดเข้าหลอดเลือดดำ (ผู้ใหญ่ IV): 400 mg IV ทุก 12 ชม. หยดนาน 60 นาที',
+        limits: DoseLimit(maxSingleDose: 400.0, maxDailyDose: 1200.0),
         renalAdjustments: [
           RenalAdjustment(
             crclMin: 0,
@@ -1112,8 +1721,40 @@ final List<Drug> antibiotics = [
     brandNames: ['Flagyl', 'Robaz'],
     nameTh: 'เมโทรนิดาโซล',
     category: DrugCategory.antibiotic,
+    drugClass: DrugClass.nitroimidazole,
     requiresHepaticCaution: true,
     allergyClass: 'Nitroimidazole',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024 / US FDA Flagyl SPL',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide 2024 / Lexicomp Pediatric & Adult Drug Information',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail:
+          'Nitroimidazoles - Metronidazole Multi-Indication & Pediatric Dosing',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Nitroimidazoles - Metronidazole (Adult & Pediatric)',
+      dosingGuideline:
+          '• การติดเชื้อแบคทีเรียที่ไม่ใช้ออกซิเจน (ผู้ใหญ่ PO): 400–500 mg ทุก 8 ชม. (สูงสุด 4,000 mg/วัน)\n'
+          '• การติดเชื้อรุนแรง (ผู้ใหญ่ IV): 500 mg IV ทุก 8 ชม. หยดนาน 30–60 นาที\n'
+          '• เด็ก ติดเชื้อแบคทีเรียที่ไม่ใช้ออกซิเจน (Pediatric Anaerobic Infections): 30 mg/kg/วัน PO หรือ IV แบ่งให้ทุก 6–8 ชม. (สูงสุด 4,000 mg/วัน)',
+      renalGuideline:
+          '• CrCl ≥ 10 mL/min: ไม่ต้องปรับขนาดยา\n'
+          '• CrCl < 10 mL/min / Anuria: ลดขนาดยาลง 50% หรือให้ทุก 12 ชม. เนื่องจากเมแทบอไลต์อาจสะสม',
+      administrationGuideline:
+          '• ยารับประทาน: รับประทานพร้อมหรือหลังอาหารเพื่อลดอาการคลื่นไส้ระคายเคืองกระเพาะ\n'
+          '• ยาฉีด IV: ให้แบบ IV Infusion นาน 30–60 นาที ห้ามฉีดแบบ IV Push และห้ามแช่เย็นหลังเปิดขวด',
+      clinicalNotes:
+          '• ห้ามดื่มแอลกอฮอล์เด็ดขาดระหว่างใช้ยาและหลังหยุดยาอย่างน้อย 3 วัน (Disulfiram-like reaction)\n'
+          '• ผู้ป่วยตับเสื่อมรุนแรง (Child-Pugh C): ลดขนาดยาลง 50% หรือยืดระยะห่างเป็นทุก 12 ชม.',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
     severeInteractions: [
       'Alcohol (Disulfiram-like reaction: severe vomiting, flushing)',
       'Warfarin (Increases bleeding risk)',
@@ -1121,17 +1762,23 @@ final List<Drug> antibiotics = [
     contraindications: [
       'First trimester of pregnancy (controversial, but often avoided)',
     ],
-    specialNotes: 'Strictly AVOID alcohol during therapy and for 3 days after. May cause metallic taste.',
-    specialNotesTh: 'ห้ามดื่มแอลกอฮอล์เด็ดขาดระหว่างกินยาและหลังยาหมด 3 วัน (จะทำให้คลื่นไส้อาเจียนรุนแรง) อาจมีรสเฝื่อนในปาก',
+    specialNotes:
+        'Strictly AVOID alcohol during therapy and for 3 days after. Reduce dose by 50% in severe hepatic impairment (Child-Pugh C). Pediatric anaerobic dosing is 30 mg/kg/day divided q6–8h.',
+    specialNotesTh:
+        'ห้ามดื่มแอลกอฮอล์เด็ดขาดระหว่างกินยาและหลังยาหมด 3 วัน ในผู้ป่วยโรคตับรุนแรง (Child-Pugh C) ลดขนาดยาลง 50% ขนาดยาเด็ก 30 mg/kg/วัน แบ่ง q6–8h',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
         indication: 'Anaerobic Infection / Trichomoniasis (Adult)',
         dosingType: DosingType.fixed,
-        fixedDose: 400.0, // or 500mg depending on country/formulation
+        fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8h,
-        limits: DoseLimit(maxDailyDose: 4000.0),
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Oral anaerobic infections / amoebiasis / trichomoniasis: 400–500 mg PO q8h.',
+        notesTh: 'ติดเชื้อแบคทีเรียที่ไม่ใช้ออกซิเจน / พยาธิช่องคลอด (ผู้ใหญ่ PO): 400 mg PO ทุก 8 ชม.',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 4000.0),
       ),
       DosingRegimen(
         route: DoseRoute.ivInfusion,
@@ -1140,7 +1787,56 @@ final List<Drug> antibiotics = [
         fixedDose: 500.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8h,
-        limits: DoseLimit(maxDailyDose: 4000.0),
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Severe systemic anaerobic infection or CNS abscess: 500 mg IV q8h over 30–60 min.',
+        notesTh: 'ติดเชื้อไม่ใช้ออกซิเจนรุนแรง (ผู้ใหญ่ IV): 500 mg IV ทุก 8 ชม. หยดนาน 30–60 นาที',
+        limits: DoseLimit(maxSingleDose: 1500.0, maxDailyDose: 4000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Clostridioides difficile Colitis (Adult PO)',
+        dosingType: DosingType.fixed,
+        fixedDose: 500.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Alternative non-severe C. difficile regimen when vancomycin/fidaxomicin are unavailable: 500 mg PO q8h for 10 days.',
+        notesTh: 'ลำไส้อักเสบ C. difficile (ทางเลือก ผู้ใหญ่ PO): 500 mg PO ทุก 8 ชม. นาน 10 วัน',
+        limits: DoseLimit(maxSingleDose: 500.0, maxDailyDose: 4000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Anaerobic Bacterial Infection (Pediatric PO)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 30.0,
+        minDosePerKg: 20.0,
+        maxDosePerKg: 40.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric oral anaerobic infections: 30 mg/kg/day PO divided q8h (10 mg/kg/dose; max 500 mg/dose, 2,000 mg/day).',
+        notesTh: 'ติดเชื้อแบคทีเรียที่ไม่ใช้ออกซิเจน (เด็ก PO): 30 mg/kg/วัน แบ่งทุก 8 ชม. (10 mg/kg/ครั้ง สูงสุด 500 mg/ครั้ง)',
+        limits: DoseLimit(maxSingleDose: 500.0, maxDailyDose: 2000.0, maxDosePerKgPerDay: 50.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Anaerobic Bacterial Infection (Pediatric IV)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 30.0,
+        minDosePerKg: 20.0,
+        maxDosePerKg: 40.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q6h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric IV anaerobic infections: 30 mg/kg/day IV divided q6h (7.5 mg/kg/dose; max 500 mg/dose, 4,000 mg/day).',
+        notesTh: 'ติดเชื้อแบคทีเรียที่ไม่ใช้ออกซิเจน (เด็ก IV): 30 mg/kg/วัน IV แบ่งทุก 6 ชม. (7.5 mg/kg/ครั้ง สูงสุด 500 mg/ครั้ง)',
+        limits: DoseLimit(maxSingleDose: 500.0, maxDailyDose: 4000.0, maxDosePerKgPerDay: 50.0),
       ),
     ],
   ),
@@ -1173,6 +1869,22 @@ final List<Drug> antibiotics = [
         fixedDose: 2000.0, // 2g for adults > 60kg
         doseUnit: DoseUnit.mg,
         frequency: Frequency.stat,
+        formulation: DrugFormulation.ivInjection,
+        reconstitution: ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'Sterile Water for Injection (SWFI)',
+          diluentVolumeMl: 10.0,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 10 mL SWFI to yield 100 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นสำหรับฉีดยา 10 มล. ได้ความเข้มข้น 100 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        infusionTimeMinutes: 30.0,
         limits: DoseLimit(
           maxSingleDose: 3000.0, // 3g for patients >120kg
         ),
@@ -1192,6 +1904,22 @@ final List<Drug> antibiotics = [
         fixedDose: 1000.0, // 1g q8h
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q8h,
+        formulation: DrugFormulation.ivInjection,
+        reconstitution: ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'Sterile Water for Injection (SWFI)',
+          diluentVolumeMl: 10.0,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 10 mL SWFI to yield 100 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นสำหรับฉีดยา 10 มล. ได้ความเข้มข้น 100 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        infusionTimeMinutes: 30.0,
         limits: DoseLimit(maxDailyDose: 6000.0),
         renalAdjustments: [
           // Reference: Cefazolin FDA Prescribing Information §2.2 (Ancef); Sanford Guide 2023.
@@ -1259,6 +1987,173 @@ final List<Drug> antibiotics = [
               reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
               reviewedAt: '2024-10-29',
             ),
+          ),
+        ],
+      ),
+    ],
+  ),
+  const Drug(
+    id: 'cephalexin',
+    genericName: 'Cephalexin',
+    brandNames: ['Keflex', 'Ibilex', 'Sporidex'],
+    nameTh: 'เซฟาเล็กซิน',
+    category: DrugCategory.antibiotic,
+    drugClass: DrugClass.betaLactamCephalosporin,
+    requiresRenalAdjustment: true,
+    allergyClass: 'Cephalosporin (1st Gen)',
+    sourceCitation:
+        'The Sanford Guide to Antimicrobial Therapy 2024 / Lexicomp 2024 / US FDA Keflex SPL / RDU Thailand',
+    lastReviewedDate: '2024-10-29',
+    provenance: Provenance(
+      source:
+          'The Sanford Guide 2024 / Lexicomp Pediatric & Adult Drug Information / US FDA Keflex Label',
+      reviewedBy:
+          'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-29',
+      sourceDetail:
+          'First-Generation Cephalosporins - Cephalexin Adult & Pediatric Multi-Indication Dosing',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'The Sanford Guide to Antimicrobial Therapy & Lexicomp',
+      editionYear: '54th Edition, 2024',
+      sectionOrTable: 'Cephalosporins (First Generation) - Cephalexin',
+      dosingGuideline:
+          '• ผู้ใหญ่ ติดเชื้อทั่วไป (Strep Pharyngitis / Skin & Soft Tissue / Uncomplicated Cystitis): 500 mg PO ทุก 12 ชม. หรือ 250 mg PO ทุก 6 ชม. นาน 7–14 วัน\n'
+          '• ผู้ใหญ่ ติดเชื้อรุนแรง (Severe / Deep SSTI / Complicated UTI): 500 mg PO ทุก 6 ชม. (สูงสุดไม่เกิน 4,000 mg/วัน)\n'
+          '• เด็ก ติดเชื้อทั่วไป (Pediatric Mild-to-Moderate): 25–50 mg/kg/วัน PO แบ่งทุก 6–12 ชม. (ขนาดมาตรฐาน 50 mg/kg/วัน แบ่ง q12h)\n'
+          '• เด็ก หูชั้นกลางอักเสบ / ติดเชื้อรุนแรง (Pediatric Otitis Media / Severe): 75–100 mg/kg/วัน PO แบ่งทุก 6 ชม. (สูงสุด 4,000 mg/วัน)',
+      renalGuideline:
+          '• CrCl ≥ 30 mL/min: ไม่ต้องปรับขนาดยาตามปกติ\n'
+          '• CrCl 15–29 mL/min: ผู้ใหญ่ 250–500 mg PO ทุก 8–12 ชม.\n'
+          '• CrCl < 15 mL/min: ผู้ใหญ่ 250 mg PO ทุก 12–24 ชม. เด็ก ลดขนาดรวมต่อวันลง 50% และยืดระยะห่างเป็นทุก 12–24 ชม.',
+      administrationGuideline:
+          '• รับประทานได้ทั้งก่อนและหลังอาหาร (อาหารอาจชะลอเวลาดูดซึมเล็กน้อยแต่ไม่ลดปริมาณการดูดซึมรวม; หากคลื่นไส้แนะนำทานพร้อมอาหาร)\n'
+          '• ยาน้ำแขวนตะกอน (125 mg/5 mL, 250 mg/5 mL): เขย่าขวดก่อนรินยาทุกครั้ง หลังผสมควรแช่ตู้เย็น (2–8°C) และใช้ให้หมดภายใน 14 วัน',
+      clinicalNotes:
+          '• ยา Cephalosporin รุ่นที่ 1 มีฤทธิ์ครอบคลุมเชื้อแกรมบวก (MSSA, Streptococci) ได้ดีเยี่ยม แต่ไม่ครอบคลุม MRSA หรือ Enterococci\n'
+          '• ระวัง Cross-sensitivity ในผู้ที่มีประวัติแพ้ Penicillin แบบรุนแรง (Anaphylaxis / Stevens-Johnson)',
+      externalUrl: 'https://www.sanfordguide.com',
+    ),
+    severeInteractions: [
+      'Metformin (Increases metformin serum concentration by ~24–34%; monitor blood glucose)',
+      'Probenecid (Inhibits renal tubular secretion and increases cephalexin levels)',
+      'Warfarin (May enhance anticoagulant effect / monitor INR)',
+    ],
+    contraindications: [
+      'Known hypersensitivity to cephalosporins or severe IgE-mediated beta-lactam allergy',
+    ],
+    specialNotes:
+        'First-generation oral cephalosporin for skin/soft tissue, streptococcal pharyngitis, uncomplicated cystitis, and pediatric otitis media (75-100 mg/kg/day). Adjust dose if CrCl < 30 mL/min.',
+    specialNotesTh:
+        'ยาปฏิชีวนะกลุ่ม Cephalosporin รุ่นที่ 1 แบบรับประทาน สำหรับติดเชื้อผิวหนัง คออักเสบ ทางเดินปัสสาวะ และหูชั้นกลางอักเสบในเด็ก (75–100 mg/kg/วัน) ต้องปรับขนาดยาเมื่อ CrCl < 30 mL/min',
+    regimens: [
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Standard Infection / Skin / Cystitis (Adult PO)',
+        dosingType: DosingType.fixed,
+        fixedDose: 500.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Mild-to-moderate SSTI, streptococcal pharyngitis, or uncomplicated cystitis: 500 mg PO q12h (or 250 mg PO q6h) for 7–14 days.',
+        notesTh: 'ติดเชื้อทั่วไป / ผิวหนัง / คออักเสบ / กระเพาะปัสสาวะอักเสบ (ผู้ใหญ่ PO): 500 mg PO ทุก 12 ชม. (หรือ 250 mg ทุก 6 ชม.)',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 4000.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 15,
+            adjustmentFactor: 1.0,
+            absoluteDose: 250.0,
+            adjustedFrequency: Frequency.q12h,
+            notes: 'CrCl < 15 mL/min: 250 mg PO q12–24h',
+          ),
+          RenalAdjustment(
+            crclMin: 15,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            absoluteDose: 250.0,
+            adjustedFrequency: Frequency.q8h,
+            notes: 'CrCl 15–29 mL/min: 250–500 mg PO q8–12h',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Severe / Deep Infection / Cellulitis (Adult PO)',
+        dosingType: DosingType.fixed,
+        fixedDose: 500.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q6h,
+        population: PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'More severe infections or less susceptible organisms: 500 mg PO q6h (up to 1,000 mg PO q6h; max 4,000 mg/day).',
+        notesTh: 'ติดเชื้อรุนแรง / เซลล์เนื้อเยื่ออักเสบ (ผู้ใหญ่ PO): 500 mg PO ทุก 6 ชม. (สูงสุด 4,000 mg/วัน)',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 4000.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 15,
+            adjustmentFactor: 1.0,
+            absoluteDose: 250.0,
+            adjustedFrequency: Frequency.q12h,
+            notes: 'CrCl < 15 mL/min: 250 mg PO q12h',
+          ),
+          RenalAdjustment(
+            crclMin: 15,
+            crclMax: 30,
+            adjustmentFactor: 1.0,
+            absoluteDose: 500.0,
+            adjustedFrequency: Frequency.q12h,
+            notes: 'CrCl 15–29 mL/min: 500 mg PO q12h',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Mild-to-Moderate Infection (Pediatric PO)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 50.0,
+        minDosePerKg: 25.0,
+        maxDosePerKg: 50.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric mild-to-moderate infections (SSTI, pharyngitis, UTI): 25–50 mg/kg/day PO divided q6–12h (default 50 mg/kg/day divided q12h).',
+        notesTh: 'ติดเชื้อทั่วไปในเด็ก (เด็ก PO): 25–50 mg/kg/วัน แบ่งทุก 6–12 ชม. (ค่ามาตรฐาน 50 mg/kg/วัน แบ่ง q12h)',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 4000.0, maxDosePerKgPerDay: 100.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            adjustmentFactor: 0.5,
+            notes: 'CrCl < 30 mL/min: Reduce total daily dose by 50% and extend interval',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Otitis Media / Severe Infection (Pediatric PO)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 75.0,
+        minDosePerKg: 75.0,
+        maxDosePerKg: 100.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q6h,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric acute otitis media or severe osteomyelitis/SSTI: 75–100 mg/kg/day PO divided q6h (max 4,000 mg/day).',
+        notesTh: 'หูชั้นกลางอักเสบ / ติดเชื้อรุนแรง (เด็ก PO): 75–100 mg/kg/วัน แบ่งทุก 6 ชม. (สูงสุด 4,000 mg/วัน)',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 4000.0, maxDosePerKgPerDay: 100.0),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            adjustmentFactor: 0.5,
+            notes: 'CrCl < 30 mL/min: Avoid high-dose AOM regimen or reduce daily dose by 50%',
           ),
         ],
       ),
@@ -1351,6 +2246,22 @@ final List<Drug> antibiotics = [
         doseUnit: DoseUnit.g,
         frequency: Frequency.q6h,
         infusionTimeMinutes: 30,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: const ReconstitutionInfo(
+          vialStrengthMg: 4500.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 20.0,
+          displacedVolumeMl: 3.0,
+          resultingConcentrationMgPerMl: 200.0,
+          instructionsEn:
+              'Reconstitute 4.5 g vial with 20 mL SWFI or NSS (displaces ~3 mL to yield ~23 mL total at ~200 mg/mL piperacillin).',
+          instructionsTh:
+              'ละลายผงยา 4.5 กรัม ด้วยน้ำกลั่นหรือ NSS 20 มล. (ผงยาเพิ่มปริมาตร ~3 มล. รวมเป็น ~23 มล. ได้ความเข้มข้น ~200 มก./มล.)',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 200.0,
+        standardDilutionBagMl: 100.0,
         notes: 'Standard infusion is 4.5g q6h over 30 min. Extended infusion is 3.375g or 4.5g q8h over 4 hours.',
         limits: DoseLimit(maxDailyDose: 18),
         renalAdjustments: [
@@ -1437,12 +2348,28 @@ final List<Drug> antibiotics = [
         'ระวังอาการชักหรือพิษต่อระบบประสาทหากไม่ปรับโดสในผู้ป่วยโรคไต',
     regimens: [
       DosingRegimen(
-        route: DoseRoute.iv,
+        route: DoseRoute.ivInfusion,
         indication: 'Pseudomonas / Febrile neutropenia',
         dosingType: DosingType.fixed,
         fixedDose: 2,
         doseUnit: DoseUnit.g,
         frequency: Frequency.q8h,
+        formulation: DrugFormulation.ivInfusion,
+        reconstitution: ReconstitutionInfo(
+          vialStrengthMg: 1000.0,
+          diluentName: 'SWFI or 0.9% NSS',
+          diluentVolumeMl: 10.0,
+          resultingConcentrationMgPerMl: 100.0,
+          instructionsEn:
+              'Reconstitute 1 g vial with 10 mL SWFI or NSS to yield 100 mg/mL.',
+          instructionsTh:
+              'ละลายผงยา 1 กรัม ด้วยน้ำกลั่นหรือ NSS 10 มล. ได้ความเข้มข้น 100 มก./มล.',
+          sourceCitation:
+              'Drug Information Handbook (Lexicomp) 2024 / The Sanford Guide 2024',
+        ),
+        reconstitutionConcentrationMgPerMl: 100.0,
+        standardDilutionBagMl: 100.0,
+        infusionTimeMinutes: 30.0,
         limits: DoseLimit(maxDailyDose: 6),
         renalAdjustments: [
           RenalAdjustment(

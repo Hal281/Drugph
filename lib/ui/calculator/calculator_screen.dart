@@ -185,7 +185,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     RegimenSelectorSection(
                       drug: widget.drug,
                       selectedRegimen: state.selectedRegimen,
+                      selectedLiquidConcentration: state.selectedLiquidConcentration,
                       onRegimenChanged: _controller.selectRegimen,
+                      onLiquidConcentrationChanged:
+                          _controller.selectLiquidConcentration,
                       isThai: t,
                       categoryColor: widget.categoryColor,
                     ),
@@ -215,6 +218,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       onSexChanged: _controller.setSex,
                       isThai: t,
                       categoryColor: widget.categoryColor,
+                      inputRequirements: state.inputRequirements,
                     ),
                   ],
                 ),
@@ -312,7 +316,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               RegimenSelectorSection(
                 drug: widget.drug,
                 selectedRegimen: state.selectedRegimen,
+                selectedLiquidConcentration: state.selectedLiquidConcentration,
                 onRegimenChanged: _controller.selectRegimen,
+                onLiquidConcentrationChanged:
+                    _controller.selectLiquidConcentration,
                 isThai: t,
                 categoryColor: widget.categoryColor,
               ),
@@ -342,6 +349,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 onSexChanged: _controller.setSex,
                 isThai: t,
                 categoryColor: widget.categoryColor,
+                inputRequirements: state.inputRequirements,
               ),
               const SizedBox(height: 16),
               if (state.status == CalculatorUiStatus.loading)

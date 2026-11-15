@@ -20,11 +20,15 @@ import 'renal_replacement_protocol.dart';
 import 'drug_class.dart';
 import 'interaction.dart';
 import 'formulation.dart';
+import 'oral_liquid_formulation.dart';
+import 'reconstitution_info.dart';
 import 'provenance.dart';
 import 'iv_diluent.dart';
 import 'dose_rule.dart';
 import 'drug_ontology.dart';
 
+export 'oral_liquid_formulation.dart';
+export 'reconstitution_info.dart';
 export 'renal_adjustment.dart';
 export 'renal_replacement_mode.dart';
 export 'renal_replacement_protocol.dart';
@@ -165,6 +169,9 @@ class DosingRegimen {
   /// Pharmaceutical formulation for this regimen (D10).
   final DrugFormulation? formulation;
 
+  /// Commercial oral liquid concentrations for pediatric regimens (R1).
+  final List<OralLiquidConcentration>? liquidConcentrations;
+
   /// Clinical provenance / citation (D11).
   final Provenance? provenance;
 
@@ -178,8 +185,17 @@ class DosingRegimen {
 
   // ---- IV preparation info ----
 
+  /// Reconstitution parameters for dry powder injectables (R2).
+  final ReconstitutionInfo? reconstitution;
+
   /// Concentration after reconstitution in mg/mL.
+  final double? reconstitutionConcentrationMgPerMl;
+
+  /// Concentration after reconstitution in mg/mL (legacy alias).
   final double? reconcentrationMgPerMl;
+
+  /// Standard diluent bag volume in mL (e.g. 50, 100, 250, 500 mL) (R2).
+  final double? standardDilutionBagMl;
 
   /// Standard dilution concentration for infusion in mg/mL.
   final double? standardDilutionMgPerMl;
@@ -255,10 +271,14 @@ class DosingRegimen {
     this.phases,
     this.population,
     this.formulation,
+    this.liquidConcentrations,
     this.provenance,
     this.monograph,
     this.limits,
+    this.reconstitution,
+    this.reconstitutionConcentrationMgPerMl,
     this.reconcentrationMgPerMl,
+    this.standardDilutionBagMl,
     this.standardDilution,
     this.standardDilutionMgPerMl,
     this.infusionTimeMinutes,
@@ -296,6 +316,27 @@ class DosingRegimen {
   /// Effective standard dilution concentration in base unit per mL equivalent.
   double? get effectiveStandardDilutionMgPerMl =>
       standardDilution?.toBaseUnitPerMl() ?? standardDilutionMgPerMl;
+
+  /// Resolves the default commercial liquid concentration, if any.
+  OralLiquidConcentration? get defaultLiquidConcentration {
+    if (liquidConcentrations == null || liquidConcentrations!.isEmpty) {
+      return null;
+    }
+    for (final conc in liquidConcentrations!) {
+      if (conc.isDefault) return conc;
+    }
+    return liquidConcentrations!.first;
+  }
+
+  /// Whether this regimen has commercial oral liquid concentrations available.
+  bool get hasLiquidConcentrations =>
+      liquidConcentrations != null && liquidConcentrations!.isNotEmpty;
+
+  /// Effective reconstitution concentration in mg/mL.
+  double? get effectiveReconstitutionMgPerMl =>
+      reconstitution?.resultingConcentrationMgPerMl ??
+      reconstitutionConcentrationMgPerMl ??
+      reconcentrationMgPerMl;
 
   /// Who this regimen is written for.
   ///
@@ -338,6 +379,60 @@ enum RenalDataPolicy {
 
   /// Renal adjustment is not clinically required.
   notNeeded,
+}
+
+/// Describes which patient demographic/laboratory inputs are clinically
+/// required vs optional for a specific [Drug] and [DosingRegimen].
+class RegimenInputRequirements {
+  final bool isWeightRequired;
+  final bool isHeightRequired;
+  final bool isAgeRequired;
+  final bool isScrRequired;
+  final bool requiresRenalEvaluation;
+  final bool requiresHepaticEvaluation;
+  final bool isPediatricRegimen;
+
+  const RegimenInputRequirements({
+    required this.isWeightRequired,
+    required this.isHeightRequired,
+    required this.isAgeRequired,
+    required this.isScrRequired,
+    required this.requiresRenalEvaluation,
+    required this.requiresHepaticEvaluation,
+    required this.isPediatricRegimen,
+  });
+
+  /// True if none of Weight, Height, Age, or SCr is strictly required to calculate.
+  bool get canCalculateWithoutDemographics =>
+      !isWeightRequired && !isHeightRequired && !isAgeRequired && !isScrRequired;
+
+  /// Concise English summary of required fields.
+  String get requiredSummaryEn {
+    final parts = <String>[
+      if (isWeightRequired) 'Weight',
+      if (isHeightRequired) 'Height',
+      if (isAgeRequired) 'Age',
+      if (isScrRequired) 'SCr',
+    ];
+    if (parts.isEmpty) {
+      return 'None (Fixed Adult Dose — Weight, Height & SCr optional)';
+    }
+    return parts.join(', ');
+  }
+
+  /// Concise Thai summary of required fields.
+  String get requiredSummaryTh {
+    final parts = <String>[
+      if (isWeightRequired) 'น้ำหนัก',
+      if (isHeightRequired) 'ส่วนสูง',
+      if (isAgeRequired) 'อายุ',
+      if (isScrRequired) 'ค่าไต (SCr)',
+    ];
+    if (parts.isEmpty) {
+      return 'ไม่ต้องระบุข้อมูลบังคับ (ขนาดยาผู้ใหญ่คงที่ — น้ำหนัก/ส่วนสูง/ค่าไต ไม่บังคับ)';
+    }
+    return parts.join(', ');
+  }
 }
 
 /// Complete drug definition with all dosing information.
@@ -547,6 +642,85 @@ class Drug {
   /// Effective pharmacological drug class, falling back to DrugOntology if not explicitly specified.
   DrugClass? get effectiveDrugClass =>
       drugClass ?? DrugOntology.resolveDrugClass(id, genericName, allergyClass);
+
+  /// Determines which demographic and lab inputs are required vs optional for
+  /// [selectedRegimen] under the current [rrtMode].
+  RegimenInputRequirements inputRequirementsFor([
+    DosingRegimen? selectedRegimen,
+    RenalReplacementMode rrtMode = RenalReplacementMode.none,
+  ]) {
+    final reg =
+        selectedRegimen ?? (regimens.isNotEmpty ? regimens.first : null);
+    final isPediatric = reg?.effectiveAudience == RegimenAudience.pediatric;
+    final requiresRenal = requiresRenalAdjustment ||
+        reg?.dosingType == DosingType.gfrBased ||
+        reg?.dosingType == DosingType.renalAdjusted ||
+        (reg?.renalAdjustments != null && reg!.renalAdjustments!.isNotEmpty) ||
+        (reg?.renalReplacementProtocols != null &&
+            reg!.renalReplacementProtocols!.isNotEmpty);
+    final requiresHepatic = requiresHepaticCaution ||
+        reg?.population?.maxHepaticImpairment != null ||
+        contraindications.any(
+          (c) =>
+              c.toLowerCase().contains('hepatic') ||
+              c.toLowerCase().contains('child-pugh') ||
+              c.contains('ตับ'),
+        );
+
+    var isTitratedWeightBased = false;
+    if (reg?.dosingType == DosingType.titrated) {
+      if (reg!.rateUnit != null) {
+        isTitratedWeightBased = reg.rateUnit == RateUnit.mcgKgMin ||
+            reg.rateUnit == RateUnit.mcgKgHr ||
+            reg.rateUnit == RateUnit.mgKgHr ||
+            reg.rateUnit == RateUnit.mgKgMin ||
+            reg.rateUnit == RateUnit.uKgHr;
+      } else {
+        isTitratedWeightBased =
+            (reg.continuousRateUnit ?? 'mcg/kg/min').toLowerCase().contains('/kg');
+      }
+    }
+
+    final isWeightRequired = reg == null ||
+        isPediatric ||
+        requiresRenal ||
+        reg.dosingType == DosingType.weightBased ||
+        reg.dosingType == DosingType.bsaBased ||
+        (reg.dosingType == DosingType.renalAdjusted && reg.dosePerKg != null) ||
+        isTitratedWeightBased ||
+        doseRules.isNotEmpty ||
+        reg.population?.minWeightKg != null ||
+        reg.population?.maxWeightKg != null ||
+        reg.limits?.maxDosePerKgPerDay != null;
+
+    final isHeightRequired = reg == null ||
+        reg.dosingType == DosingType.bsaBased ||
+        reg.dosingWeightStrategy == DosingWeightStrategy.ideal ||
+        reg.dosingWeightStrategy == DosingWeightStrategy.adjustedIfObese ||
+        requiresRenal;
+
+    final isAgeRequired = reg == null ||
+        isPediatric ||
+        requiresRenal ||
+        doseRules.isNotEmpty ||
+        reg.population?.minAgeMonths != null ||
+        reg.population?.maxAgeMonths != null;
+
+    final isScrRequired = !rrtMode.isRrt &&
+        (reg?.dosingType == DosingType.gfrBased ||
+            (requiresRenalAdjustment &&
+                renalDataPolicy == RenalDataPolicy.block));
+
+    return RegimenInputRequirements(
+      isWeightRequired: isWeightRequired,
+      isHeightRequired: isHeightRequired,
+      isAgeRequired: isAgeRequired,
+      isScrRequired: isScrRequired,
+      requiresRenalEvaluation: requiresRenal,
+      requiresHepaticEvaluation: requiresHepatic,
+      isPediatricRegimen: isPediatric,
+    );
+  }
 
   @override
   String toString() => 'Drug($genericName [${category.nameEn}])';

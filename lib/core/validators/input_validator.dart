@@ -72,6 +72,10 @@ class InputValidator {
     int? ageMonths,
     double? serumCreatinineMgDl,
     bool allowNeonatalLowWeight = false,
+    bool requireWeight = true,
+    bool requireHeight = true,
+    bool requireAge = true,
+    bool requireScr = false,
   }) {
     final errorsEn = <String, String>{};
     final errorsTh = <String, String>{};
@@ -80,8 +84,10 @@ class InputValidator {
 
     // Weight
     if (weightKg == null) {
-      errorsEn['weightKg'] = 'Weight is required';
-      errorsTh['weightKg'] = 'กรุณาระบุน้ำหนัก';
+      if (requireWeight) {
+        errorsEn['weightKg'] = 'Weight is required';
+        errorsTh['weightKg'] = 'กรุณาระบุน้ำหนัก';
+      }
     } else if (!weightKg.isFinite || weightKg <= 0) {
       errorsEn['weightKg'] = 'Weight must be greater than 0';
       errorsTh['weightKg'] = 'น้ำหนักต้องมากกว่า 0';
@@ -100,8 +106,10 @@ class InputValidator {
 
     // Height
     if (heightCm == null) {
-      errorsEn['heightCm'] = 'Height is required';
-      errorsTh['heightCm'] = 'กรุณาระบุส่วนสูง';
+      if (requireHeight) {
+        errorsEn['heightCm'] = 'Height is required';
+        errorsTh['heightCm'] = 'กรุณาระบุส่วนสูง';
+      }
     } else if (!heightCm.isFinite || heightCm <= 0) {
       errorsEn['heightCm'] = 'Height must be greater than 0';
       errorsTh['heightCm'] = 'ส่วนสูงต้องมากกว่า 0';
@@ -134,8 +142,10 @@ class InputValidator {
 
     // Age
     if (ageYears == null) {
-      errorsEn['ageYears'] = 'Age is required';
-      errorsTh['ageYears'] = 'กรุณาระบุอายุ';
+      if (requireAge) {
+        errorsEn['ageYears'] = 'Age is required';
+        errorsTh['ageYears'] = 'กรุณาระบุอายุ';
+      }
     } else if (ageYears < 0) {
       errorsEn['ageYears'] = 'Age cannot be negative';
       errorsTh['ageYears'] = 'อายุไม่สามารถเป็นค่าลบ';
@@ -150,8 +160,15 @@ class InputValidator {
       errorsTh['ageMonths'] = 'เดือนต้องอยู่ระหว่าง 0–11';
     }
 
-    // Serum creatinine (optional but validated if provided)
-    if (serumCreatinineMgDl != null) {
+    // Serum creatinine (optional unless requireScr is true; validated if provided)
+    if (serumCreatinineMgDl == null) {
+      if (requireScr) {
+        errorsEn['serumCreatinineMgDl'] =
+            'Serum creatinine is required for this regimen';
+        errorsTh['serumCreatinineMgDl'] =
+            'กรุณาระบุค่าครีเอตินิน (SCr) สำหรับสูตรยานี้';
+      }
+    } else {
       if (!serumCreatinineMgDl.isFinite || serumCreatinineMgDl <= 0) {
         errorsEn['serumCreatinineMgDl'] =
             'Serum creatinine must be greater than 0';

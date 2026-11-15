@@ -388,10 +388,34 @@ final List<Drug> emergency = [
     genericName: 'Naloxone',
     brandNames: ['Narcan'],
     nameTh: 'นาลอกโซน',
-    category: DrugCategory.analgesic, // antidote
+    category: DrugCategory.antidote,
     isHighAlert: true,
-    specialNotes: 'Opioid reversal agent. Short duration (30-90 min); re-sedation may occur. Titrate to respiratory effort.',
-    specialNotesTh: 'ยาแก้พิษฝิ่น (Opioid) ออกฤทธิ์สั้น (30-90 นาที) คนไข้อาจซึมกลับมาอีก ต้อง Titrate ตามอัตราการหายใจ',
+    sourceCitation: 'Lexicomp Drug Information 2024 / AHA ACLS Opioid-Associated Emergency Guidelines',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'Lexicomp Drug Information 2024 / AHA ACLS Opioid-Associated Emergency Guidelines',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Naloxone Monograph: Opioid Overdose Reversal & Titration Protocol',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'Lexicomp Drug Information / AHA ACLS Guidelines',
+      editionYear: '2024 Edition',
+      sectionOrTable: 'Opioid Antagonist / Antidote Dosing & Respiratory Reversal',
+      dosingGuideline:
+          '• ผู้ใหญ่ (Opioid Overdose / Reversal): เริ่มต้น 0.04–0.4 mg IV/IM/SC หรือพ่นจมูก (Intranasal 4 mg) สามารถให้ซ้ำทุก 2–3 นาทีจนการหายใจกลับมาเพียงพอ (ขนาดยาสูงสุดสะสมก่อนทบทวนสาเหตุอื่น: 2–10 mg)\n'
+          '• เด็ก (Pediatric Opioid Reversal): 0.01 mg/kg IV/IO/IM (หากยังไม่ตอบสนองสามารถพิจารณา 0.1 mg/kg ในกรณีหัวใจหยุดเต้นหรือกดการหายใจรุนแรง สูงสุดไม่เกิน 2 mg/dose)',
+      renalGuideline:
+          '• ถูกเมแทบอลิซึมที่ตับเป็นหลัก (Hepatic glucuronidation) ไม่จำเป็นต้องปรับขนาดยาในผู้ป่วยไตเสื่อม',
+      administrationGuideline:
+          '• การฉีดทางหลอดเลือดดำ (IV Push): ค่อยๆ Titrate ทีละน้อย (เช่น เจือจาง 0.4 mg ใน NSS 10 mL เป็น 0.04 mg/mL แล้วฉีดทีละ 1–2 mL ทุก 2–3 นาที) เพื่อฟื้นฟูการหายใจโดยไม่กระตุ้น Acute Opioid Withdrawal Syndrome รุนแรง',
+      clinicalNotes:
+          '• ยาต้านพิษจำเพาะต่อ Opioid (Competitive Mu-Opioid Receptor Antagonist) — ไม่ใช่ยาแก้ปวด\n'
+          '• ค่าครึ่งชีวิตสั้น (30–90 นาที) สั้นกว่า Opioid หลายชนิด (เช่น Morphine, Methadone, Fentanyl) จึงต้องเฝ้าระวังภาวะ Re-sedation หรือกดการหายใจซ้ำหลังหมดฤทธิ์ยาอย่างน้อย 2–4 ชม.',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=naloxone',
+    ),
+    specialNotes: 'Opioid reversal agent (Antidote). Short duration (30-90 min); re-sedation may occur. Titrate to respiratory effort.',
+    specialNotesTh: 'ยาต้านพิษกลุ่ม Opioid (Antidote) ออกฤทธิ์สั้น (30-90 นาที) ผู้ป่วยอาจกลับมากดการหายใจซ้ำ ต้อง Titrate ตามอัตราการหายใจ',
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivPush,

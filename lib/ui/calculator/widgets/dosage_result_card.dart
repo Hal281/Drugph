@@ -252,57 +252,14 @@ class DosageResultCard extends StatelessWidget {
               _buildMultiPhaseAntidoteSection(context, res, t),
             ],
 
-            // Volume to Administer Badge (High Visibility for Resuscitation / Bedside Nurses)
-            if (res.volumeMl != null) ...[
-              const SizedBox(height: 10),
-              Container(
-                key: const Key('dosage_result_volume_badge'),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade300, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blue.withValues(alpha: 0.08),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.vaccines,
-                      color: Colors.blue.shade800,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        t
-                            ? 'ปริมาตรยาที่ต้องบริหาร: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL'
-                            : 'Volume to Administer: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade900,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            // Clinical Dosing Badges (Oral Liquid R1, IV Reconstitution & Pump Rate R2)
+            _buildClinicalDosingBadges(context, res, t),
 
             // CrCl Badge
             if (res.crclMlMin != null) ...[
               const SizedBox(height: 12),
               Container(
+                key: const Key('dosage_result_crcl_badge'),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 6,
@@ -313,7 +270,8 @@ class DosageResultCard extends StatelessWidget {
                   border: Border.all(color: Colors.green.shade200),
                 ),
                 child: Text(
-                  'CrCl: ${res.crclMlMin!.toStringAsFixed(1)} mL/min',
+                  _formatCrClBadgeText(res),
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
@@ -509,6 +467,337 @@ class DosageResultCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildClinicalDosingBadges(
+    BuildContext context,
+    DosageResult res,
+    bool t,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Backward-compatible Volume Badge
+        if (res.volumeMl != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            key: const Key('dosage_result_volume_badge'),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.blue.shade300, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.vaccines,
+                  color: Colors.blue.shade800,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    t
+                        ? 'ปริมาตรยาที่ต้องบริหาร: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL'
+                        : 'Volume to Administer: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // Pediatric Oral Liquid Dosing Badge (R1)
+        if (res.teaspoons != null || res.liquidConcentration != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            key: const Key('dosage_result_liquid_badge'),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.deepPurple.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.deepPurple.shade300, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.deepPurple.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.medication_liquid_rounded,
+                      color: Colors.deepPurple.shade800,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        t
+                            ? 'ขนาดยาน้ำรับประทาน (Pediatric Oral Liquid)'
+                            : 'Pediatric Oral Liquid Dosing',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (res.volumeMl != null)
+                      Text(
+                        t
+                            ? 'ปริมาตร: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL'
+                            : 'Volume: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple.shade900,
+                        ),
+                      ),
+                    if (res.teaspoons != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          t
+                              ? 'เทียบเท่า: ${UnitConverter.formatTeaspoons(res.teaspoons!, isThai: true)}'
+                              : 'Household: ${UnitConverter.formatTeaspoons(res.teaspoons!, isThai: false)}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple.shade900,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                if (res.liquidConcentrationLabel != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    t
+                        ? 'สูตรยาในคลัง: ${res.liquidConcentrationLabel}'
+                        : 'Commercial Formulation: ${res.liquidConcentrationLabel}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.deepPurple.shade800,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  t
+                      ? 'คำแนะนำ: 1 ช้อนชา (tsp) = 5 mL | แนะนำใช้กระบอกฉีดยา (oral syringe) เพื่อความแม่นยำ'
+                      : 'Guideline: 1 tsp = 5 mL | Recommend oral syringe or calibrated measuring spoon for accuracy',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.deepPurple.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
+        // Hospital IV Reconstitution Vial Draw Badge (R2)
+        if (res.vialDrawVolumeMl != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            key: const Key('dosage_result_vial_draw_badge'),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.indigo.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.indigo.shade300, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.indigo.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.vaccines,
+                      color: Colors.indigo.shade800,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        t
+                            ? 'การเตรียมยาฉีด & ปริมาตรดูดยา (Vial Reconstitution & Draw)'
+                            : 'IV Reconstitution & Draw',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.indigo.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  t
+                      ? 'ปริมาตรดูดยาจากขวด: ${res.vialDrawVolumeMl! < 1.0 ? res.vialDrawVolumeMl!.toStringAsFixed(2) : res.vialDrawVolumeMl!.toStringAsFixed(1)} mL'
+                      : 'Vial Draw Volume: ${res.vialDrawVolumeMl! < 1.0 ? res.vialDrawVolumeMl!.toStringAsFixed(2) : res.vialDrawVolumeMl!.toStringAsFixed(1)} mL',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo.shade900,
+                  ),
+                ),
+                if (res.reconstitutionConcentrationMgPerMl != null ||
+                    res.vialsNeeded != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    [
+                      if (res.reconstitutionConcentrationMgPerMl != null)
+                        t
+                            ? 'ความเข้มข้นหลังละลาย: ${res.reconstitutionConcentrationMgPerMl!.toStringAsFixed(1)} mg/mL'
+                            : 'Reconstituted Conc: ${res.reconstitutionConcentrationMgPerMl!.toStringAsFixed(1)} mg/mL',
+                      if (res.vialsNeeded != null)
+                        t
+                            ? 'จำนวนขวดที่ใช้: ${res.vialsNeeded} ขวด'
+                            : 'Vials Needed: ${res.vialsNeeded}',
+                    ].join(' | '),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.indigo.shade800,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+
+        // IV Infusion Pump Rate Badge (R2)
+        if (res.infusionRateMlPerHr != null && res.infusionResult == null) ...[
+          const SizedBox(height: 10),
+          Container(
+            key: const Key('dosage_result_pump_rate_badge'),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.teal.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.teal.shade400, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.teal.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.speed,
+                      color: Colors.teal.shade800,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        t
+                            ? 'อัตราเครื่องหยดยา & สารน้ำ (Infusion Rate & Dilution)'
+                            : 'Infusion Pump Rate & Bag',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  t
+                      ? 'อัตราเครื่องหยดยา: ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr'
+                      : 'Infusion Pump Rate: ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal.shade900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  [
+                    if (res.totalInfusionVolumeMl != null)
+                      t
+                          ? 'ปริมาตรสารน้ำรวม: ${res.totalInfusionVolumeMl!.toStringAsFixed(0)} mL'
+                          : 'Total Bag Volume: ${res.totalInfusionVolumeMl!.toStringAsFixed(0)} mL',
+                    if (res.infusionDurationMinutes != null)
+                      t
+                          ? 'ระยะเวลา: ${res.infusionDurationMinutes!.toStringAsFixed(0)} นาที'
+                          : 'Duration: ${res.infusionDurationMinutes!.toStringAsFixed(0)} min',
+                    if (res.dripRateDropsPerMin != null)
+                      t
+                          ? 'หยดน้ำเกลือ: ${res.dripRateDropsPerMin!.toStringAsFixed(0)} drops/min'
+                          : 'Gravity Drip: ${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min',
+                  ].join(' | '),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.teal.shade800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -1568,6 +1857,21 @@ class DosageResultCard extends StatelessWidget {
     );
     final formatted = parts.length > 1 ? '$intPart.${parts[1]}' : intPart;
     return '$formatted $unit';
+  }
+
+  String _formatCrClBadgeText(DosageResult res) {
+    final crclStr = res.crclMlMin!.toStringAsFixed(1);
+    final eq = res.calculationInputs['renalEquationUsed'] as String?;
+    final strat = res.calculationInputs['crclWeightStrategy'] as String?;
+    final wt = (res.calculationInputs['crclWeightUsedKg'] as num?)?.toDouble();
+
+    if (eq == 'Bedside Schwartz') {
+      return 'CrCl: $crclStr mL/min/1.73m² (Schwartz)';
+    }
+    if (eq == 'Cockcroft-Gault' && strat != null && wt != null) {
+      return 'CrCl: $crclStr mL/min (CG • $strat ${wt.toStringAsFixed(1)} kg)';
+    }
+    return 'CrCl: $crclStr mL/min';
   }
 }
 

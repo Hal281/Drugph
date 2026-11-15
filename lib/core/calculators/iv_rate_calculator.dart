@@ -167,6 +167,36 @@ class IvRateCalculator {
     return desiredDoseMg / concentrationMgPerMl;
   }
 
+  /// Calculates the volume in milliliters (mL) to draw from a reconstituted vial or ampoule (R2).
+  ///
+  /// Formula: `volumeMl = doseMg / concentrationMgPerMl`
+  static double vialDrawVolume({
+    required double desiredDoseMg,
+    required double concentrationMgPerMl,
+  }) =>
+      volumeForDose(
+        desiredDoseMg: desiredDoseMg,
+        concentrationMgPerMl: concentrationMgPerMl,
+      );
+
+  /// Calculates the number of whole vials needed to fulfill the prescribed dose (R2).
+  ///
+  /// Formula: `(doseMg / vialStrengthMg).ceil()`
+  static int vialsCount({
+    required double doseMg,
+    required double vialStrengthMg,
+  }) {
+    if (!doseMg.isFinite || doseMg <= 0) return 0;
+    if (!vialStrengthMg.isFinite || vialStrengthMg <= 0) {
+      throw ArgumentError.value(
+        vialStrengthMg,
+        'vialStrengthMg',
+        'Must be > 0',
+      );
+    }
+    return (doseMg / vialStrengthMg).ceil();
+  }
+
   // ------------------------------------------------------------------
   // Dose rate from concentration & pump rate
   //

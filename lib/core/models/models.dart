@@ -14,6 +14,8 @@ export 'drug_class.dart';
 export 'interaction.dart';
 export 'allergy.dart';
 export 'formulation.dart';
+export 'oral_liquid_formulation.dart';
+export 'reconstitution_info.dart';
 export 'provenance.dart';
 export 'iv_diluent.dart';
 export 'drug.dart';

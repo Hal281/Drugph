@@ -73,6 +73,14 @@ class ClinicalOrderFormatter {
       final unitStr = result.doseUnit?.symbol ?? regimen.doseUnit.symbol;
       buffer.write(' $doseStr $unitStr');
 
+      // Oral liquid volume and teaspoons (R1)
+      if (result.teaspoons != null && result.volumeMl != null) {
+        final tspStr = (result.teaspoons! % 1 == 0)
+            ? result.teaspoons!.toInt().toString()
+            : result.teaspoons!.toStringAsFixed(1);
+        buffer.write(' (${result.volumeMl!.toStringAsFixed(1)} mL / $tspStr tsp)');
+      }
+
       // Route
       final routeStr = _formatRoute(regimen.route, isContinuous: false);
       buffer.write(' $routeStr');
@@ -82,6 +90,11 @@ class ClinicalOrderFormatter {
           result.infusionDurationMinutes ?? regimen.infusionTimeMinutes;
       if (duration != null) {
         buffer.write(' (infuse over ${_formatNumber(duration)} min)');
+      }
+
+      // Infusion pump rate for intermittent IV infusion (R2)
+      if (result.infusionRateMlPerHr != null) {
+        buffer.write(' (Pump rate: ${result.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr)');
       }
 
       // Frequency

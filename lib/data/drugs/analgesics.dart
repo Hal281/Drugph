@@ -60,6 +60,24 @@ final List<Drug> analgesics = [
         dosePerKg: 10.0, // 10-15 mg/kg/dose
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q4_6hPrn,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: const [
+          OralLiquidConcentration(
+            label: '120 mg / 5 mL (24 mg/mL)',
+            amountMg: 120.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Syrup / Suspension',
+            citation: 'Drug Information Handbook (Lexicomp) 2024 / RDU Thailand',
+            isDefault: true,
+          ),
+          OralLiquidConcentration(
+            label: '250 mg / 5 mL (50 mg/mL)',
+            amountMg: 250.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Forte Suspension',
+            citation: 'Drug Information Handbook (Lexicomp) 2024 / RDU Thailand',
+          ),
+        ],
         limits: DoseLimit(
           maxSingleDose: 750.0,
           softMaxSingleDose: 500.0,
@@ -145,6 +163,34 @@ final List<Drug> analgesics = [
         fixedDose: 400.0,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q6_8hPrn,
+        population: const PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Mild-to-moderate pain, fever, or dysmenorrhea: 400 mg PO q6–8h PRN after meals (max 2,400–3,200 mg/day).',
+        notesTh: 'ลดไข้ / ปวดเล็กน้อยถึงปานกลาง (ผู้ใหญ่): 400 mg PO ทุก 6–8 ชม. หลังอาหารทันที เมื่อมีอาการ',
+        limits: const DoseLimit(
+          maxSingleDose: 800.0,
+          maxDailyDose: 3200.0,
+        ),
+        renalAdjustments: [
+          const RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            action: RenalAction.avoid,
+            notes: 'Avoid in CrCl < 30 mL/min; risk of AKI and severe fluid retention',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Osteoarthritis / Rheumatoid Arthritis / Inflammatory (Adult)',
+        dosingType: DosingType.fixed,
+        fixedDose: 600.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        population: const PopulationCriteria(minAgeMonths: 216),
+        audience: RegimenAudience.adult,
+        notes: 'Anti-inflammatory regimen for osteoarthritis or rheumatoid arthritis: 600 mg PO q8h (up to 800 mg q6–8h; max 3,200 mg/day).',
+        notesTh: 'ต้านการอักเสบ / ข้อเสื่อม / ข้ออักเสบรูมาตอยด์ (ผู้ใหญ่): 600 mg PO ทุก 8 ชม. หลังอาหาร (สูงสุด 3,200 mg/วัน)',
         limits: const DoseLimit(
           maxSingleDose: 800.0,
           maxDailyDose: 3200.0,
@@ -162,13 +208,59 @@ final List<Drug> analgesics = [
         route: DoseRoute.po,
         indication: 'Fever/Pain (Pediatric >6 months)',
         dosingType: DosingType.weightBased,
-        dosePerKg: 10.0, // 5-10 mg/kg/dose
+        dosePerKg: 10.0,
+        minDosePerKg: 5.0,
+        maxDosePerKg: 10.0,
+        doseBasis: DoseBasis.perDose,
         doseUnit: DoseUnit.mg,
         frequency: Frequency.q6_8hPrn,
+        formulation: DrugFormulation.oralLiquid,
+        liquidConcentrations: const [
+          OralLiquidConcentration(
+            label: '100 mg / 5 mL (20 mg/mL)',
+            amountMg: 100.0,
+            perVolumeMl: 5.0,
+            brandOrForm: 'Oral Suspension',
+            citation: 'Drug Information Handbook (Lexicomp) 2024 / Pediatric & Neonatal Dosage Handbook',
+            isDefault: true,
+          ),
+        ],
+        population: const PopulationCriteria(minAgeMonths: 6, maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Pediatric fever or acute pain (>6 months): 5–10 mg/kg/dose PO q6–8h PRN (max 400 mg/dose, max 40 mg/kg/day or 2,400 mg/day).',
+        notesTh: 'ลดไข้ / แก้ปวดในเด็ก (> 6 เดือน): 5–10 mg/kg/ครั้ง ทุก 6–8 ชม. เมื่อมีอาการ (สูงสุด 400 mg/ครั้ง หรือ 40 mg/kg/วัน)',
         limits: const DoseLimit(
           maxSingleDose: 400.0,
           maxDailyDose: 2400.0,
           maxDosePerKgPerDay: 40.0,
+        ),
+        renalAdjustments: [
+          const RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            action: RenalAction.avoid,
+            notes: 'Avoid in CrCl < 30 mL/min; risk of AKI and severe fluid retention',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Juvenile Idiopathic Arthritis / Inflammatory (Pediatric >6 months)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 35.0,
+        minDosePerKg: 30.0,
+        maxDosePerKg: 40.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        population: const PopulationCriteria(minAgeMonths: 6, maxAgeMonths: 215),
+        audience: RegimenAudience.pediatric,
+        notes: 'Juvenile idiopathic arthritis (JIA): 30–40 mg/kg/day PO divided q8h (up to 50 mg/kg/day under specialist care; max 2,400 mg/day).',
+        notesTh: 'ข้ออักเสบในเด็ก JIA (> 6 เดือน): 30–40 mg/kg/วัน แบ่งทุก 8 ชม. หลังอาหาร (สูงสุด 2,400 mg/วัน)',
+        limits: const DoseLimit(
+          maxSingleDose: 800.0,
+          maxDailyDose: 2400.0,
+          maxDosePerKgPerDay: 50.0,
         ),
         renalAdjustments: [
           const RenalAdjustment(
@@ -190,12 +282,41 @@ final List<Drug> analgesics = [
     requiresRenalAdjustment: true,
     allergyClass: 'NSAID / Aspirin',
     drugClass: DrugClass.nsaid,
+    sourceCitation: 'Lexicomp Drug Information 2024 / แนวทางการใช้ยาอย่างสมเหตุผล (RDU Thailand)',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'Lexicomp Drug Information 2024 / RDU NSAID Guidelines',
+      reviewedBy: 'รอการลงนามรับรองโดยเภสัชกรคลินิก (Pending Pharmacist Review)',
+      reviewedAt: '2024-10-12',
+      sourceDetail: 'Naproxen Monograph: Adult/Pediatric Dosing & Renal/GI Safety',
+    ),
+    monograph: ClinicalMonograph(
+      textbookName: 'Lexicomp Drug Information / RDU Thailand',
+      editionYear: '2024 Edition',
+      sectionOrTable: 'Naproxen Dosing, Contraindications & Renal Safety Guidance',
+      dosingGuideline:
+          '• ผู้ใหญ่ (Pain / Osteoarthritis / Inflammation): 250–500 mg รับประทานทุก 12 ชม. (ขนาดยาสูงสุดไม่เกิน 1,250 mg/วัน ในวันแรก และไม่เกิน 1,000 mg/วัน สำหรับการให้ต่อเนื่อง)\n'
+          '• โรคเกาต์เฉียบพลัน (Acute Gout): เริ่มต้น 750 mg ครั้งเดียว ตามด้วย 250 mg ทุก 8 ชม. จนอาการสงบ\n'
+          '• เด็ก (> 2 ปี, Pain / Juvenile Idiopathic Arthritis): 5–7 mg/kg/dose รับประทานทุก 12 ชม. (10–15 mg/kg/day แบ่งให้วันละ 2 ครั้ง, สูงสุด 1,000 mg/day)',
+      renalGuideline:
+          '• CrCl >= 30 mL/min: ไม่จำเป็นต้องปรับขนาดยา แต่ควรใช้ขนาดต่ำสุดในระยะเวลาสั้นที่สุด\n'
+          '• CrCl < 30 mL/min: หลีกเลี่ยงการใช้โดยเด็ดขาด เนื่องจากลด Renal blood flow (ยับยั้ง PGI2/PGE2) เสี่ยงไตวายเฉียบพลัน (AKI) และคั่งของสารน้ำ/โพแทสเซียม',
+      administrationGuideline:
+          '• รับประทานพร้อมอาหารหรือหลังอาหารทันที เพื่อลดการระคายเคืองและลดความเสี่ยงแผลในกระเพาะอาหาร',
+      clinicalNotes:
+          '• ข้อห้ามใช้เด็ดขาด: ผู้ป่วยที่สงสัยไข้เลือดออก (Dengue), มีแผลหรือเลือดออกในทางเดินอาหาร, ไตเสื่อมรุนแรง (CrCl < 30 mL/min), หรือหลังผ่าตัดบายพาสหลอดเลือดหัวใจ (CABG)\n'
+          '• ห้ามใช้ซ้ำซ้อนกับ NSAID ตัวอื่น (Dual NSAIDs Contraindication)\n'
+          '• ระมัดระวังอันตรกิริยารุนแรงกับ Warfarin, Lithium, Methotrexate และ ACEi/ARB',
+      externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=naproxen',
+    ),
     severeInteractions: ['Warfarin', 'ACE inhibitors', 'Lithium', 'Methotrexate'],
-    contraindications: ['Active GI bleeding', 'Severe renal impairment'],
+    contraindications: ['Active GI bleeding', 'Severe renal impairment (CrCl < 30 mL/min)', 'Dengue fever (suspected)', 'CABG surgery'],
+    specialNotes: 'Take with food to reduce GI irritation. Avoid in CrCl < 30 mL/min, suspected Dengue fever, and active GI bleeding. Do not combine with other NSAIDs.',
+    specialNotesTh: 'รับประทานหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะ หลีกเลี่ยงในผู้ป่วย CrCl < 30 mL/min, สงสัยไข้เลือดออก หรือมีเลือดออกในทางเดินอาหาร ห้ามใช้ร่วมกับ NSAIDs ตัวอื่น',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
-        indication: 'Pain / Inflammation',
+        indication: 'Pain / Inflammation (Adult)',
         dosingType: DosingType.fixed,
         fixedDose: 250.0,
         doseUnit: DoseUnit.mg,
@@ -203,6 +324,28 @@ final List<Drug> analgesics = [
         limits: DoseLimit(
           maxSingleDose: 500.0,
           maxDailyDose: 1250.0,
+        ),
+        renalAdjustments: [
+          RenalAdjustment(
+            crclMin: 0,
+            crclMax: 30,
+            action: RenalAction.avoid,
+            notes: 'Avoid in CrCl < 30 mL/min; risk of AKI and severe fluid retention',
+          ),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.po,
+        indication: 'Pain / Juvenile Idiopathic Arthritis (Pediatric >2 yrs)',
+        dosingType: DosingType.weightBased,
+        dosePerKg: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q12h,
+        population: PopulationCriteria(minAgeMonths: 24, maxAgeMonths: 215),
+        limits: DoseLimit(
+          maxSingleDose: 500.0,
+          maxDailyDose: 1000.0,
+          maxDosePerKgPerDay: 15.0,
         ),
         renalAdjustments: [
           RenalAdjustment(
