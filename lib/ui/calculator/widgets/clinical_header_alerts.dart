@@ -18,6 +18,11 @@ class ClinicalHeaderAlerts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = isThai;
+    final sideEffects = t
+        ? (drug.sideEffectsTh.isNotEmpty
+            ? drug.sideEffectsTh
+            : drug.sideEffects)
+        : drug.sideEffects;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -32,6 +37,19 @@ class ClinicalHeaderAlerts extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+
+        _buildListAlertCard(
+          Icons.health_and_safety_outlined,
+          Colors.deepOrange,
+          t ? 'ผลข้างเคียงสำคัญ (Side Effects)' : 'Important Side Effects',
+          sideEffects.isNotEmpty
+              ? sideEffects
+              : [
+                  t
+                      ? 'ยังไม่มีข้อมูลที่ยืนยันในฐานข้อมูล'
+                      : 'No verified side-effect data in the database.',
+                ],
+        ),
 
         // Pre-calculate Warnings
         if (drug.pregnancyCategory != null)
@@ -75,9 +93,10 @@ class ClinicalHeaderAlerts extends StatelessWidget {
           _buildAlertCard(
             Icons.info_outline,
             Colors.blue,
-            t ? (drug.specialNotesTh ?? drug.specialNotes!) : drug.specialNotes!,
+            t
+                ? (drug.specialNotesTh ?? drug.specialNotes!)
+                : drug.specialNotes!,
           ),
-
       ],
     );
   }

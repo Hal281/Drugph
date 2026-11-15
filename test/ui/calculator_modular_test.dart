@@ -147,7 +147,8 @@ void main() {
         expect(find.textContaining('Severe Infection (IV Inf)'), findsWidgets);
 
         // Tap dropdown to switch regimen
-        await tester.tap(find.textContaining('Severe Infection (IV Inf)').first);
+        await tester
+            .tap(find.textContaining('Severe Infection (IV Inf)').first);
         await tester.pumpAndSettle();
 
         // Select Meningitis (IV Inf)
@@ -182,6 +183,11 @@ void main() {
         final rrtSelector = find.byKey(const Key('calculator_rrt_selector'));
         final rrtSize = tester.getSize(rrtSelector);
         expect(rrtSize.height, greaterThanOrEqualTo(48.0));
+
+        await tester.tap(
+          find.byKey(const Key('calculator_hepatic_options')),
+        );
+        await tester.pumpAndSettle();
 
         // Child-Pugh selector
         final cpSelector =
@@ -289,8 +295,7 @@ void main() {
         );
 
         // Verify MDCalc Step-by-Step Math Accordion
-        final accordion =
-            find.byKey(const Key('clinical_breakdown_accordion'));
+        final accordion = find.byKey(const Key('clinical_breakdown_accordion'));
         expect(accordion, findsOneWidget);
         await tester.ensureVisible(accordion);
         await tester.tap(accordion);
@@ -539,22 +544,6 @@ void main() {
         await tester.pumpWidget(createTestApp(drug: meropenem));
         await tester.pumpAndSettle();
 
-        await tester.enterText(
-          find.byKey(const Key('calculator_weight_field')),
-          '70',
-        );
-        await tester.enterText(
-          find.byKey(const Key('calculator_height_field')),
-          '170',
-        );
-        await tester.enterText(
-          find.byKey(const Key('calculator_age_field')),
-          '50',
-        );
-        await tester.enterText(
-          find.byKey(const Key('calculator_scr_field')),
-          '1.0',
-        );
         await tester.tap(find.byKey(const Key('calculator_calculate_button')));
         await tester.pumpAndSettle();
 

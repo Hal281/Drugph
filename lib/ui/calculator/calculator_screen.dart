@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/core.dart';
 import '../../data/prescription_cart.dart';
+import '../../data/patient_session.dart';
 import '../widgets/clinical_evidence_sheet.dart';
 import 'controllers/calculator_controller.dart';
 import 'models/calculator_ui_state.dart';
@@ -164,6 +165,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   /// Widescreen Desktop / Tablet Dual-Pane Split View (> 800px).
   Widget _buildWideLayout(CalculatorUiState state) {
     final t = widget.isThai;
+    final showDemographicInputs =
+        PatientSession.instance.currentPatient.value == null;
 
     return Stack(
       children: [
@@ -178,32 +181,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ClinicalHeaderAlerts(
-                      drug: widget.drug,
-                      isThai: t,
-                      categoryColor: widget.categoryColor,
-                    ),
-                    const SizedBox(height: 16),
                     PatientClinicalHeader(
                       state: state,
                       isThai: t,
                       categoryColor: widget.categoryColor,
                     ),
-                    RegimenSelectorSection(
-                      drug: widget.drug,
-                      selectedRegimen: state.selectedRegimen,
-                      onRegimenChanged: _controller.selectRegimen,
-                      isThai: t,
-                      categoryColor: widget.categoryColor,
-                    ),
-                    if (state.shouldShowIvDiluentCard) ...[
-                      const SizedBox(height: 16),
-                      IvDiluentCompatibilityCard(
-                        drug: widget.drug,
-                        selectedRegimen: state.selectedRegimen!,
-                        isThai: t,
-                      ),
-                    ],
                     const SizedBox(height: 16),
                     DosingParametersForm(
                       weightCtrl: _controller.weightCtrl,
@@ -222,6 +204,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       onSexChanged: _controller.setSex,
                       isThai: t,
                       categoryColor: widget.categoryColor,
+                      showDemographicInputs: showDemographicInputs,
                     ),
                   ],
                 ),
@@ -237,6 +220,22 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    RegimenSelectorSection(
+                      drug: widget.drug,
+                      selectedRegimen: state.selectedRegimen,
+                      onRegimenChanged: _controller.selectRegimen,
+                      isThai: t,
+                      categoryColor: widget.categoryColor,
+                    ),
+                    if (state.shouldShowIvDiluentCard) ...[
+                      const SizedBox(height: 16),
+                      IvDiluentCompatibilityCard(
+                        drug: widget.drug,
+                        selectedRegimen: state.selectedRegimen!,
+                        isThai: t,
+                      ),
+                    ],
+                    const SizedBox(height: 16),
                     if (state.status == CalculatorUiStatus.loading)
                       _buildLoadingSkeleton()
                     else if (state.hasCalculatedResult) ...[
@@ -275,6 +274,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                         initiallyExpanded: false,
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    ClinicalHeaderAlerts(
+                      drug: widget.drug,
+                      isThai: t,
+                      categoryColor: widget.categoryColor,
+                    ),
                   ],
                 ),
               ),
@@ -296,6 +301,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   /// Compact Mobile Layout (<= 800px) with Sticky Bottom Calculate Bar.
   Widget _buildMobileLayout(CalculatorUiState state) {
     final t = widget.isThai;
+    final showDemographicInputs =
+        PatientSession.instance.currentPatient.value == null;
 
     return Stack(
       children: [
@@ -304,17 +311,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ClinicalHeaderAlerts(
-                drug: widget.drug,
-                isThai: t,
-                categoryColor: widget.categoryColor,
-              ),
-              const SizedBox(height: 16),
               PatientClinicalHeader(
                 state: state,
                 isThai: t,
                 categoryColor: widget.categoryColor,
               ),
+              const SizedBox(height: 16),
               RegimenSelectorSection(
                 drug: widget.drug,
                 selectedRegimen: state.selectedRegimen,
@@ -348,6 +350,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 onSexChanged: _controller.setSex,
                 isThai: t,
                 categoryColor: widget.categoryColor,
+                showDemographicInputs: showDemographicInputs,
               ),
               const SizedBox(height: 16),
               if (state.status == CalculatorUiStatus.loading)
@@ -387,6 +390,12 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   initiallyExpanded: false,
                 ),
               ],
+              const SizedBox(height: 16),
+              ClinicalHeaderAlerts(
+                drug: widget.drug,
+                isThai: t,
+                categoryColor: widget.categoryColor,
+              ),
             ],
           ),
         ),
@@ -435,8 +444,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             const SizedBox(height: 6),
             Text(
               t
-                  ? 'ระบุน้ำหนัก ส่วนสูง อายุ และค่าไต แล้วกดปุ่ม "คำนวณโดสยา" ด้านล่าง'
-                  : 'Specify weight, height, age, and SCr then tap "Calculate Dose" below.',
+                  ? 'เลือกข้อบ่งใช้และจัดการข้อมูลผู้ป่วยในแถบข้อมูลผู้ป่วย แล้วกดปุ่ม "คำนวณโดสยา" ด้านล่าง'
+                  : 'Select an indication and manage demographics in the patient profile, then tap "Calculate Dose" below.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.5,

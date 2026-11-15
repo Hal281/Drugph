@@ -176,6 +176,7 @@ void main() {
             tester.platformDispatcher.clearTextScaleFactorTestValue();
           });
 
+          PatientSession.instance.clearPatient();
           await tester.pumpWidget(
             buildApp(child: CalculatorScreen(drug: meropenem, isThai: true)),
           );

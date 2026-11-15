@@ -126,6 +126,7 @@ void main() {
       });
 
       for (final isThai in [false, true]) {
+        PatientSession.instance.clearPatient();
         await tester.pumpWidget(createEnoxaparinWidget(isThai: isThai));
         await tester.pumpAndSettle();
 

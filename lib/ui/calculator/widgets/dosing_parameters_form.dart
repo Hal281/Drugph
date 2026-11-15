@@ -26,6 +26,7 @@ class DosingParametersForm extends StatelessWidget {
   final ValueChanged<Sex> onSexChanged;
   final bool isThai;
   final Color categoryColor;
+  final bool showDemographicInputs;
 
   const DosingParametersForm({
     super.key,
@@ -44,6 +45,7 @@ class DosingParametersForm extends StatelessWidget {
     required this.onSexChanged,
     required this.isThai,
     this.categoryColor = Colors.teal,
+    this.showDemographicInputs = true,
   });
 
   @override
@@ -68,7 +70,11 @@ class DosingParametersForm extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    t ? 'ข้อมูลผู้ป่วย' : 'Patient Data',
+                    showDemographicInputs
+                        ? (t ? 'ข้อมูลผู้ป่วย' : 'Patient Data')
+                        : (t
+                            ? 'ตัวเลือกปรับขนาดยา'
+                            : 'Dose Adjustment Options'),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -79,98 +85,99 @@ class DosingParametersForm extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final screenWidth = MediaQuery.sizeOf(context).width;
-                final textScale = MediaQuery.textScalerOf(context).scale(1.0);
-                final shouldStack = screenWidth < 340 ||
-                    constraints.maxWidth < 280 ||
-                    textScale > 1.25;
+            if (showDemographicInputs) ...[
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenWidth = MediaQuery.sizeOf(context).width;
+                  final textScale = MediaQuery.textScalerOf(context).scale(1.0);
+                  final shouldStack = screenWidth < 340 ||
+                      constraints.maxWidth < 280 ||
+                      textScale > 1.25;
 
-                final weightField = _buildTextField(
-                  weightCtrl,
-                  t ? 'น้ำหนัก (kg)' : 'Weight (kg)',
-                  Icons.monitor_weight_outlined,
-                  key: const Key('calculator_weight_field'),
-                );
+                  final weightField = _buildTextField(
+                    weightCtrl,
+                    t ? 'น้ำหนัก (kg)' : 'Weight (kg)',
+                    Icons.monitor_weight_outlined,
+                    key: const Key('calculator_weight_field'),
+                  );
 
-                final heightField = _buildTextField(
-                  heightCtrl,
-                  t ? 'ส่วนสูง (cm)' : 'Height (cm)',
-                  Icons.height,
-                  key: const Key('calculator_height_field'),
-                );
+                  final heightField = _buildTextField(
+                    heightCtrl,
+                    t ? 'ส่วนสูง (cm)' : 'Height (cm)',
+                    Icons.height,
+                    key: const Key('calculator_height_field'),
+                  );
 
-                final ageField = _buildTextField(
-                  ageCtrl,
-                  t ? 'อายุ (ปี)' : 'Age (years)',
-                  Icons.cake_outlined,
-                  key: const Key('calculator_age_field'),
-                  isInteger: true,
-                );
+                  final ageField = _buildTextField(
+                    ageCtrl,
+                    t ? 'อายุ (ปี)' : 'Age (years)',
+                    Icons.cake_outlined,
+                    key: const Key('calculator_age_field'),
+                    isInteger: true,
+                  );
 
-                final scrField = _buildTextField(
-                  scrCtrl,
-                  t ? 'Cr (mg/dL)' : 'SCr (mg/dL)',
-                  Icons.water_drop_outlined,
-                  key: const Key('calculator_scr_field'),
-                );
+                  final scrField = _buildTextField(
+                    scrCtrl,
+                    t ? 'Cr (mg/dL)' : 'SCr (mg/dL)',
+                    Icons.water_drop_outlined,
+                    key: const Key('calculator_scr_field'),
+                  );
 
-                if (shouldStack) {
+                  if (shouldStack) {
+                    return Column(
+                      children: [
+                        weightField,
+                        const SizedBox(height: 12),
+                        heightField,
+                        const SizedBox(height: 12),
+                        ageField,
+                        const SizedBox(height: 12),
+                        scrField,
+                      ],
+                    );
+                  }
+
                   return Column(
                     children: [
-                      weightField,
-                      const SizedBox(height: 12),
-                      heightField,
-                      const SizedBox(height: 12),
-                      ageField,
-                      const SizedBox(height: 12),
-                      scrField,
+                      Row(
+                        children: [
+                          Expanded(child: weightField),
+                          const SizedBox(width: 16),
+                          Expanded(child: heightField),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(child: ageField),
+                          const SizedBox(width: 16),
+                          Expanded(child: scrField),
+                        ],
+                      ),
                     ],
                   );
-                }
-
-                return Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(child: weightField),
-                        const SizedBox(width: 16),
-                        Expanded(child: heightField),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(child: ageField),
-                        const SizedBox(width: 16),
-                        Expanded(child: scrField),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(
-                t
-                    ? 'ค่า SCr คงที่ (Stable / ไม่ใช่ AKI)'
-                    : 'SCr is stable (No AKI)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color:
-                      isScrStable ? Colors.grey.shade800 : Colors.red,
-                  fontWeight:
-                      isScrStable ? FontWeight.normal : FontWeight.bold,
-                ),
+                },
               ),
-              value: isScrStable,
-              onChanged: (val) => onScrStableChanged(val ?? true),
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(
+                  t
+                      ? 'ค่า SCr คงที่ (Stable / ไม่ใช่ AKI)'
+                      : 'SCr is stable (No AKI)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isScrStable ? Colors.grey.shade800 : Colors.red,
+                    fontWeight:
+                        isScrStable ? FontWeight.normal : FontWeight.bold,
+                  ),
+                ),
+                value: isScrStable,
+                onChanged: (val) => onScrStableChanged(val ?? true),
+              ),
+              const SizedBox(height: 12),
+            ],
             // Renal Replacement Therapy (RRT) Selector
             Align(
               alignment: Alignment.centerLeft,
@@ -247,8 +254,7 @@ class DosingParametersForm extends StatelessWidget {
                   ),
                 ],
                 selected: {renalReplacementMode},
-                onSelectionChanged:
-                    (Set<RenalReplacementMode> newSelection) {
+                onSelectionChanged: (Set<RenalReplacementMode> newSelection) {
                   onRrtChanged(newSelection.first);
                 },
                 style: ButtonStyle(
@@ -256,192 +262,6 @@ class DosingParametersForm extends StatelessWidget {
                   padding: WidgetStateProperty.all(
                     const EdgeInsets.symmetric(horizontal: 2),
                   ),
-                  backgroundColor:
-                      WidgetStateProperty.resolveWith<Color>((
-                    Set<WidgetState> states,
-                  ) {
-                    if (states.contains(WidgetState.selected)) {
-                      return categoryColor.withValues(alpha: 0.2);
-                    }
-                    return Colors.white;
-                  }),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Child-Pugh Hepatic Function Selector + Interactive Calculator Button
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              alignment: WrapAlignment.spaceBetween,
-              children: [
-                Text(
-                  t
-                      ? 'การทำงานของตับ (Child-Pugh):'
-                      : 'Hepatic Function (Child-Pugh):',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    minHeight: 48,
-                    minWidth: 48,
-                  ),
-                  child: TextButton.icon(
-                    key: const Key('calculator_open_child_pugh_sheet_button'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: categoryColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                    ),
-                    onPressed: () async {
-                      final res = await ChildPughCalculatorSheet.show(
-                        context,
-                        isThai: t,
-                        accentColor: categoryColor,
-                      );
-                      if (res != null) {
-                        onHepaticChanged(res.classification, res.totalScore);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.calculate_outlined,
-                      size: 18,
-                    ),
-                    label: Text(
-                      lastChildPughScore != null
-                          ? (t
-                              ? 'คำนวณ Child-Pugh ($lastChildPughScore/15)'
-                              : 'Child-Pugh Calc ($lastChildPughScore/15)')
-                          : (t
-                              ? 'คำนวณคะแนน Child-Pugh'
-                              : 'Calculate Score'),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: SegmentedButton<ChildPughClass>(
-                key: const Key('calculator_child_pugh_selector'),
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment<ChildPughClass>(
-                    value: ChildPughClass.none,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        t ? 'ปกติ' : 'Normal',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const ButtonSegment<ChildPughClass>(
-                    value: ChildPughClass.classA,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Class A',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const ButtonSegment<ChildPughClass>(
-                    value: ChildPughClass.classB,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Class B',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const ButtonSegment<ChildPughClass>(
-                    value: ChildPughClass.classC,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Class C',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                selected: {hepaticImpairment},
-                onSelectionChanged: (Set<ChildPughClass> newSelection) {
-                  onHepaticChanged(newSelection.first, null);
-                },
-                style: ButtonStyle(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 2),
-                  ),
-                  backgroundColor:
-                      WidgetStateProperty.resolveWith<Color>((
-                    Set<WidgetState> states,
-                  ) {
-                    if (states.contains(WidgetState.selected)) {
-                      return categoryColor.withValues(alpha: 0.2);
-                    }
-                    return Colors.white;
-                  }),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Sex Selector
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: SegmentedButton<Sex>(
-                segments: [
-                  ButtonSegment(
-                    value: Sex.male,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(t ? 'ชาย' : 'Male'),
-                    ),
-                    icon: const Icon(Icons.male),
-                  ),
-                  ButtonSegment(
-                    value: Sex.female,
-                    label: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(t ? 'หญิง' : 'Female'),
-                    ),
-                    icon: const Icon(Icons.female),
-                  ),
-                ],
-                selected: {sex},
-                onSelectionChanged: (Set<Sex> newSelection) {
-                  onSexChanged(newSelection.first);
-                },
-                style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.resolveWith<Color>((
                     Set<WidgetState> states,
                   ) {
@@ -453,6 +273,194 @@ class DosingParametersForm extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+            ExpansionTile(
+              key: const Key('calculator_hepatic_options'),
+              initiallyExpanded: hepaticImpairment != ChildPughClass.none ||
+                  lastChildPughScore != null,
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              title: Text(
+                t
+                    ? 'ตัวเลือกเสริม: การทำงานของตับ (Child-Pugh)'
+                    : 'Optional: Hepatic Function (Child-Pugh)',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: 48,
+                      minWidth: 48,
+                    ),
+                    child: TextButton.icon(
+                      key: const Key(
+                        'calculator_open_child_pugh_sheet_button',
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: categoryColor,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                      ),
+                      onPressed: () async {
+                        final res = await ChildPughCalculatorSheet.show(
+                          context,
+                          isThai: t,
+                          accentColor: categoryColor,
+                        );
+                        if (res != null) {
+                          onHepaticChanged(
+                            res.classification,
+                            res.totalScore,
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.calculate_outlined, size: 18),
+                      label: Text(
+                        lastChildPughScore != null
+                            ? (t
+                                ? 'คำนวณ Child-Pugh ($lastChildPughScore/15)'
+                                : 'Child-Pugh Calc ($lastChildPughScore/15)')
+                            : (t ? 'คำนวณคะแนน Child-Pugh' : 'Calculate Score'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: SegmentedButton<ChildPughClass>(
+                    key: const Key('calculator_child_pugh_selector'),
+                    showSelectedIcon: false,
+                    segments: [
+                      ButtonSegment<ChildPughClass>(
+                        value: ChildPughClass.none,
+                        label: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            t ? 'ปกติ' : 'Normal',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const ButtonSegment<ChildPughClass>(
+                        value: ChildPughClass.classA,
+                        label: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Class A',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const ButtonSegment<ChildPughClass>(
+                        value: ChildPughClass.classB,
+                        label: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Class B',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const ButtonSegment<ChildPughClass>(
+                        value: ChildPughClass.classC,
+                        label: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Class C',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    selected: {hepaticImpairment},
+                    onSelectionChanged: (Set<ChildPughClass> newSelection) {
+                      onHepaticChanged(newSelection.first, null);
+                    },
+                    style: ButtonStyle(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 2),
+                      ),
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                        Set<WidgetState> states,
+                      ) {
+                        if (states.contains(WidgetState.selected)) {
+                          return categoryColor.withValues(alpha: 0.2);
+                        }
+                        return Colors.white;
+                      }),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Sex Selector
+            if (showDemographicInputs)
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: SegmentedButton<Sex>(
+                  segments: [
+                    ButtonSegment(
+                      value: Sex.male,
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(t ? 'ชาย' : 'Male'),
+                      ),
+                      icon: const Icon(Icons.male),
+                    ),
+                    ButtonSegment(
+                      value: Sex.female,
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(t ? 'หญิง' : 'Female'),
+                      ),
+                      icon: const Icon(Icons.female),
+                    ),
+                  ],
+                  selected: {sex},
+                  onSelectionChanged: (Set<Sex> newSelection) {
+                    onSexChanged(newSelection.first);
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                      Set<WidgetState> states,
+                    ) {
+                      if (states.contains(WidgetState.selected)) {
+                        return categoryColor.withValues(alpha: 0.2);
+                      }
+                      return Colors.white;
+                    }),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

@@ -50,6 +50,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        final hepaticOptions = find.byKey(
+          const Key('calculator_hepatic_options'),
+        );
+        await tester.ensureVisible(hepaticOptions);
+        await tester.tap(hepaticOptions);
+        await tester.pumpAndSettle();
+
         final openSheetBtn = find.byKey(
           const Key('calculator_open_child_pugh_sheet_button'),
         );
@@ -77,7 +84,8 @@ void main() {
         await tester.tap(mildAscitesText);
         await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('child_pugh_result_badge')), findsOneWidget);
+        expect(
+            find.byKey(const Key('child_pugh_result_badge')), findsOneWidget);
         expect(find.textContaining('Score 9/15'), findsOneWidget);
 
         final applyBtn = find.byKey(const Key('child_pugh_apply_button'));
@@ -109,6 +117,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        final hepaticOptions = find.byKey(
+          const Key('calculator_hepatic_options'),
+        );
+        await tester.ensureVisible(hepaticOptions);
+        await tester.tap(hepaticOptions);
+        await tester.pumpAndSettle();
+
         // Select Class B directly
         final classBBtn = find.text('Class B');
         await tester.ensureVisible(classBBtn);
@@ -135,7 +150,9 @@ void main() {
     );
   });
 
-  group('Phase 3 UI — IV Diluent Compatibility Card & Interactive Precipitation Banner', () {
+  group(
+      'Phase 3 UI — IV Diluent Compatibility Card & Interactive Precipitation Banner',
+      () {
     testWidgets(
       'CalculatorScreen displays IV diluent compatibility card on Phenytoin IV with 0 overflow on 320x480, and hides it on PO regimen',
       (tester) async {
@@ -214,7 +231,8 @@ void main() {
           find.byKey(const Key('iv_titration_incompatibility_banner')),
           findsOneWidget,
         );
-        expect(find.textContaining('INCOMPATIBLE DILUENT (LRS)'), findsOneWidget);
+        expect(
+            find.textContaining('INCOMPATIBLE DILUENT (LRS)'), findsOneWidget);
         expect(find.text('150.0'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
