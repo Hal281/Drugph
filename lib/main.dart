@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'ui/login_screen.dart';
+import 'ui/home_screen.dart';
 
 void main() {
   runApp(const DrugDosageApp());
@@ -43,7 +43,7 @@ class _DrugDosageAppState extends State<DrugDosageApp> {
         Locale('en', 'US'),
         Locale('th', 'TH'),
       ],
-      home: LoginScreen(
+      home: HomeScreen(
         currentLocale: _locale,
         onLocaleChange: setLocale,
       ),
