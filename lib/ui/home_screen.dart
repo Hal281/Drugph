@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(2, 0),
                             )
@@ -277,8 +277,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.shopping_cart),
                     tooltip: isThai
-                        ? 'ตะกร้ายา (เช็กยาตีกัน)'
-                        : 'Prescription Cart (DDI)',
+                        ? ''
+                        : '',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -296,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
-                          color: Colors.red,
+                          color: Color.fromARGB(255, 158, 124, 122),
                           shape: BoxShape.circle,
                         ),
                         child: Text(
