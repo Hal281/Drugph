@@ -505,7 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: filteredResults.isEmpty
                 ? Center(
                     child: Text(
-                      isThai ? 'ไม่พบข้อมูลยา' : 'No drugs found',
+                      isThai ? '' : 'No drugs found',
                       style:
                           TextStyle(color: Colors.grey.shade500, fontSize: 16),
                     ),
