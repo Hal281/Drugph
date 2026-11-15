@@ -208,7 +208,7 @@ class SafetyCheckEngine {
       throw InvalidPatientInputException(
         field: 'dosesPerDay',
         message:
-            'จำนวนมื้อยาต่อวัน (dosesPerDay) ต้องมากกว่า 0 (ได้รับค่า: $dosesPerDay)',
+            'จำนวนครั้งที่ให้ยาต่อวัน (dosesPerDay) ต้องมากกว่า 0 (ได้รับค่า: $dosesPerDay)',
       );
     }
 

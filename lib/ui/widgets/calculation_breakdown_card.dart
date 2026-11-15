@@ -50,9 +50,9 @@ class CalculationBreakdownCard extends StatelessWidget {
             ),
           ),
           title: const Text(
-            'แสดงวิธีคิดและแทนค่าในสมการทีละบรรทัด (Step-by-Step Breakdown)',
+            'วิธีคำนวณทีละขั้นตอน',
             style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               fontSize: 15,
               color: Color(0xFF1E3A8A),
             ),
@@ -74,7 +74,7 @@ class CalculationBreakdownCard extends StatelessWidget {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Text(
-                'ข้อมูลผู้ป่วยตั้งต้น (Input Summary): ${result.inputSummary.toFormattedString()}',
+                'ข้อมูลผู้ป่วยที่ใช้คำนวณ: ${result.inputSummary.toFormattedString()}',
                 style: const TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
@@ -138,22 +138,22 @@ class CalculationBreakdownCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'ตารางเปรียบเทียบความแม่นยำเชิงปริมาตร (Exact vs Practical Syringe Volume):',
+                    'เปรียบเทียบปริมาตรคำนวณจริงกับปริมาตรตวงยา:',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontSize: 13,
                       color: Color(0xFF166534),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '• โดสตามน้ำหนักจริง (Raw Single Dose): ${result.rawCalculatedSingleDoseMg.toStringAsFixed(2)} mg/ครั้ง '
-                    '| โดสแนะนำหลังเทียบเพดาน (Final Dose): ${result.finalRecommendedSingleDoseMg.toStringAsFixed(2)} mg/ครั้ง',
+                    '• ขนาดยาตามน้ำหนักจริง: ${result.rawCalculatedSingleDoseMg.toStringAsFixed(2)} mg/ครั้ง '
+                    '| ขนาดยาแนะนำ (หลังเทียบเพดานสูงสุด): ${result.finalRecommendedSingleDoseMg.toStringAsFixed(2)} mg/ครั้ง',
                     style: const TextStyle(fontSize: 12.5),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '• ปริมาตรตามสมการเป๊ะ (Exact Volume): ${result.exactVolumeMl.toStringAsFixed(4)} mL '
+                    '• ปริมาตรตามสมการ: ${result.exactVolumeMl.toStringAsFixed(4)} mL '
                     '| ปริมาตรตวงจริง (${result.roundingRuleUsed}, $volDec ตำแหน่ง): ${result.practicalVolumeMl.toStringAsFixed(volDec)} mL',
                     style: const TextStyle(fontSize: 12.5),
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ui/home_screen.dart';
+import 'ui/theme/app_theme.dart';
 
 void main() {
   runApp(const DrugDosageApp());
@@ -25,14 +26,9 @@ class _DrugDosageAppState extends State<DrugDosageApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SaMD Dosage Calculator',
+      title: 'Drugph Clinical Calculator',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-        fontFamily: 'ThaiFont',
-        fontFamilyFallback: const ['ThaiFont', 'Sarabun', 'sans-serif'],
-      ),
+      theme: AppTheme.light,
       locale: _locale,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

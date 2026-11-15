@@ -115,13 +115,13 @@ class PrescriptionCart {
 
         if (d1ContraindicatesD2 || d2ContraindicatesD1) {
           final msg = isThai
-              ? '❌ ข้อห้ามใช้ร้ายแรง: ${d1.genericName} ห้ามใช้ร่วมกับ ${d2.genericName}'
-              : '❌ CONTRAINDICATED: ${d1.genericName} and ${d2.genericName}';
+              ? 'ข้อห้ามใช้ร่วมกัน: ${d1.genericName} และ ${d2.genericName}'
+              : 'Contraindicated combination: ${d1.genericName} and ${d2.genericName}';
           if (!warnings.contains(msg)) warnings.add(msg);
         } else if (d1WarnsAboutD2 || d2WarnsAboutD1) {
           final msg = isThai
-              ? '⚠️ ระวังการตีกันของยา: ${d1.genericName} และ ${d2.genericName}'
-              : '⚠️ INTERACTION: ${d1.genericName} and ${d2.genericName}';
+              ? 'ปฏิกิริยาระหว่างยา: ${d1.genericName} และ ${d2.genericName}'
+              : 'Drug interaction: ${d1.genericName} and ${d2.genericName}';
           if (!warnings.contains(msg)) warnings.add(msg);
         }
       }

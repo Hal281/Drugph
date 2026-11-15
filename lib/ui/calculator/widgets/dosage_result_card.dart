@@ -1456,7 +1456,9 @@ class DosageResultCard extends StatelessWidget {
     double? dilutionMgPerMl,
   ) {
     if (dilutionMgPerMl == null || dilutionMgPerMl <= 0) {
-      return 'ไม่พบข้อมูลความเข้มข้นสารน้ำมาตรฐาน (No standard dilution)';
+      return isThai
+          ? 'ไม่พบข้อมูลความเข้มข้นสารน้ำมาตรฐาน'
+          : 'No standard dilution data';
     }
 
     final rateUnit = reg?.rateUnit ??

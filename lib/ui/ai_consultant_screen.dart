@@ -90,9 +90,9 @@ COMMUNICATION STYLE & MANDATORY DISCLAIMER:
     setState(() {
       _messages.add({
         'isBot': true,
-        'text': widget.isThai 
-          ? 'สวัสดีครับ ผมคือผู้ช่วยเภสัชกร AI ยินดีให้คำปรึกษาเรื่องยา (ไม่รับคำนวณขนาดยานะครับ กรุณาใช้เครื่องคิดเลขหลักของแอป)' 
-          : 'Hello! I am your Clinical Pharmacist AI Assistant. How can I help you with drug information today?'
+        'text': widget.isThai
+            ? 'สอบถามข้อมูลยา กลไก หรือข้อควรระวังได้ที่นี่ (สำหรับการคำนวณขนาดยา ให้ใช้หน้าคำนวณหลักของแอป)'
+            : 'Ask about drug mechanisms, interactions, or clinical precautions. Use the main calculator for dosing.'
       });
     });
   }

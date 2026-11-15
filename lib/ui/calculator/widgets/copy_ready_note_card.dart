@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/core.dart';
+import '../../theme/app_theme.dart';
 import '../models/calculator_ui_state.dart';
 
 /// Pre-formatted monospaced clinical pharmacist note card with 1-click clipboard copy.
@@ -62,10 +63,8 @@ class CopyReadyNoteCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          t
-                              ? 'ข้อความพร้อมคัดลอก (Copy-ready Note)'
-                              : 'Copy-ready Note',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          t ? 'บันทึกพร้อมคัดลอก' : 'Copy-ready Note',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -91,8 +90,7 @@ class CopyReadyNoteCard extends StatelessWidget {
             const Divider(),
             SelectableText(
               noteText,
-              style: const TextStyle(
-                fontFamily: 'Courier',
+              style: AppTheme.monoStyle(
                 fontSize: 13,
                 color: Colors.black87,
               ),

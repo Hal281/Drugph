@@ -71,10 +71,10 @@ class TextbookEvidenceModal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'หลักฐานอ้างอิงจากตำราแพทย์ (Textbook Evidence)',
+                      'ข้อมูลอ้างอิงจากตำรา',
                       style: TextStyle(
                         fontSize: 17,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: Color(0xFF1E3A8A),
                       ),
                     ),
@@ -132,8 +132,8 @@ class TextbookEvidenceModal extends StatelessWidget {
                         Expanded(
                           child: Text(
                             isVerified
-                                ? 'สถานะ: ตรวจเทียบหน้าหนังสือจริงโดย ${meta.verifiedBy} เมื่อ ${meta.verifiedDate} (source_verified: true)'
-                                : 'สถานะ: รอเภสัชกร/อาจารย์เปิดตำราเทียบเลขหน้าจริงและลงนามรับรอง (source_verified: ${meta.sourceVerified} | ${meta.verifiedStatus})',
+                                ? 'ตรวจเทียบตำราโดย ${meta.verifiedBy} เมื่อ ${meta.verifiedDate}'
+                                : 'รอเภสัชกรหรืออาจารย์แพทย์ตรวจสอบเทียบตำราและลงนามรับรอง (${meta.verifiedStatus})',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,

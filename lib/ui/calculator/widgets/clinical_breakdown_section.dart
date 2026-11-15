@@ -292,28 +292,28 @@ class _ClinicalBreakdownSectionState extends State<ClinicalBreakdownSection> {
     // Step 3: Calculation equation
     if (res.calculatedDose != null) {
       steps.add(_BreakdownStep(
-        title: t
-            ? 'การแทนค่าในสมการหลัก (Primary Calculation)'
-            : 'Primary Equation Substitution',
-        detail:
-            '${res.formulaUsed} ➔ ขนาดยาดิบ: ${res.calculatedDose} ${res.doseUnit?.symbol ?? ""}',
+        title: t ? 'การคำนวณขนาดยาหลัก' : 'Primary Equation Substitution',
+        detail: t
+            ? '${res.formulaUsed} ➔ ขนาดยาที่คำนวณได้: ${res.calculatedDose} ${res.doseUnit?.symbol ?? ""}'
+            : '${res.formulaUsed} ➔ Calculated dose: ${res.calculatedDose} ${res.doseUnit?.symbol ?? ""}',
       ));
     }
 
     // Step 4: Infusion or Formulary Rounding
     if (res.infusionResult != null) {
       steps.add(_BreakdownStep(
-        title: t ? 'อัตราการหยดยา (Infusion Titration)' : 'Infusion Titration',
+        title: t ? 'อัตราการหยดยา' : 'Infusion Titration',
         detail:
             '${res.infusionResult!.rate} ${res.infusionResult!.rateUnit.symbol}${res.infusionResult!.rateMlPerHr != null ? " (Pump Rate: ${res.infusionResult!.rateMlPerHr!.toStringAsFixed(1)} mL/hr)" : ""}',
       ));
     } else if (res.roundedDose != null) {
       steps.add(_BreakdownStep(
         title: t
-            ? 'การปัดเศษยาตามขนาดเม็ด/หลอดจริง (Formulary Rounding)'
-            : 'Formulary Rounding Discrepancy',
-        detail:
-            'เทียบขนาดยาในคลัง ➔ ปัดเป็น: ${res.roundedDose} ${res.doseUnit?.symbol ?? ""}',
+            ? 'การปัดเศษตามขนาดยาที่มีในคลัง'
+            : 'Formulary Rounding',
+        detail: t
+            ? 'เทียบขนาดยาที่มีในคลัง ➔ ปัดเป็น: ${res.roundedDose} ${res.doseUnit?.symbol ?? ""}'
+            : 'Matched to formulary strength ➔ Rounded to: ${res.roundedDose} ${res.doseUnit?.symbol ?? ""}',
       ));
     }
 
@@ -321,27 +321,30 @@ class _ClinicalBreakdownSectionState extends State<ClinicalBreakdownSection> {
     if (res.teaspoons != null && res.volumeMl != null) {
       steps.add(_BreakdownStep(
         title: t
-            ? 'การแปลงขนาดยาน้ำรับประทาน (Oral Liquid & Household Volume)'
-            : 'Oral Liquid Formulation Conversion',
-        detail:
-            'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ความเข้มข้น (${res.liquidConcentrationLabel ?? ""}) ➔ ${res.volumeMl!.toStringAsFixed(1)} mL (เทียบเท่า ${res.teaspoons!.toStringAsFixed(1)} ช้อนชา)',
+            ? 'การคำนวณปริมาตรยาน้ำรับประทาน'
+            : 'Oral Liquid Volume Conversion',
+        detail: t
+            ? 'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ความเข้มข้น (${res.liquidConcentrationLabel ?? ""}) ➔ ${res.volumeMl!.toStringAsFixed(1)} mL (${res.teaspoons!.toStringAsFixed(1)} ช้อนชา)'
+            : 'Dose ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ Conc. (${res.liquidConcentrationLabel ?? ""}) ➔ ${res.volumeMl!.toStringAsFixed(1)} mL (${res.teaspoons!.toStringAsFixed(1)} tsp)',
       ));
     } else if (res.vialDrawVolumeMl != null) {
       steps.add(_BreakdownStep(
         title: t
-            ? 'การละลายผงยาและดูดยาฉีด (Vial Reconstitution & Draw)'
+            ? 'การเตรียมและดูดยาฉีด'
             : 'Vial Reconstitution & Draw',
-        detail:
-            'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ${res.reconstitutionConcentrationMgPerMl ?? ""} mg/mL ➔ ดูดยา ${res.vialDrawVolumeMl!.toStringAsFixed(1)} mL${res.vialsNeeded != null ? " (${res.vialsNeeded} ขวด)" : ""}',
+        detail: t
+            ? 'ขนาดยา ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ${res.reconstitutionConcentrationMgPerMl ?? ""} mg/mL ➔ ดูดยา ${res.vialDrawVolumeMl!.toStringAsFixed(1)} mL${res.vialsNeeded != null ? " (${res.vialsNeeded} ขวด)" : ""}'
+            : 'Dose ${res.calculatedDose} ${res.doseUnit?.symbol ?? "mg"} ÷ ${res.reconstitutionConcentrationMgPerMl ?? ""} mg/mL ➔ Draw ${res.vialDrawVolumeMl!.toStringAsFixed(1)} mL${res.vialsNeeded != null ? " (${res.vialsNeeded} vials)" : ""}',
       ));
     }
     if (res.infusionRateMlPerHr != null && res.infusionResult == null) {
       steps.add(_BreakdownStep(
         title: t
-            ? 'อัตราเครื่องหยดยาเข้าหลอดเลือดดำ (IV Infusion Pump Rate)'
+            ? 'อัตราการให้ยาทางหลอดเลือดดำ'
             : 'IV Infusion Pump Rate',
-        detail:
-            'สารน้ำ ${res.totalInfusionVolumeMl?.toStringAsFixed(0) ?? res.volumeMl?.toStringAsFixed(0) ?? ""} mL ÷ ${res.infusionDurationMinutes?.toStringAsFixed(0) ?? "60"} นาที ➔ ตั้งเครื่อง ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr${res.dripRateDropsPerMin != null ? " (หยดน้ำเกลือ ${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min)" : ""}',
+        detail: t
+            ? 'สารน้ำ ${res.totalInfusionVolumeMl?.toStringAsFixed(0) ?? res.volumeMl?.toStringAsFixed(0) ?? ""} mL ÷ ${res.infusionDurationMinutes?.toStringAsFixed(0) ?? "60"} นาที ➔ ตั้งเครื่อง ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr${res.dripRateDropsPerMin != null ? " (อัตราหยดสารน้ำ ${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min)" : ""}'
+            : 'Fluid ${res.totalInfusionVolumeMl?.toStringAsFixed(0) ?? res.volumeMl?.toStringAsFixed(0) ?? ""} mL ÷ ${res.infusionDurationMinutes?.toStringAsFixed(0) ?? "60"} min ➔ Pump ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr${res.dripRateDropsPerMin != null ? " (${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min)" : ""}',
       ));
     }
 

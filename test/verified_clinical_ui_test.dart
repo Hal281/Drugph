@@ -90,7 +90,7 @@ void main() {
         expect(find.text('41.7 mL/ครั้ง'), findsOneWidget);
         expect(find.text('1200.0 mg/ครั้ง (50.0 mL)'), findsOneWidget);
         expect(
-          find.textContaining('4 มื้อ/วัน = 4000.0 mg/วัน'),
+          find.textContaining('4 ครั้ง/วัน = 4000.0 mg/วัน'),
           findsOneWidget,
         );
 
@@ -197,7 +197,10 @@ void main() {
           find.byKey(const Key('source_verification_status_banner')),
           findsOneWidget,
         );
-        expect(find.textContaining('source_verified: false'), findsOneWidget);
+        expect(
+          find.textContaining('รอเภสัชกรหรืออาจารย์แพทย์ตรวจสอบเทียบตำราและลงนามรับรอง'),
+          findsOneWidget,
+        );
         expect(
           find.byKey(const Key('simulated_textbook_evidence_card')),
           findsOneWidget,

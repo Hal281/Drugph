@@ -11,8 +11,7 @@ class PrescriptionCartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            isThai ? 'ตรวจสอบยา (Prescription Cart)' : 'Prescription Cart'),
+        title: Text(isThai ? 'ตรวจสอบรายการยา' : 'Prescription Cart'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
@@ -46,12 +45,12 @@ class PrescriptionCartScreen extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             isThai
-                                ? 'พบการตีกันของยา!'
-                                : 'Drug Interactions Detected!',
+                                ? 'พบปฏิกิริยาระหว่างยาหรือข้อห้ามใช้'
+                                : 'Drug interactions or contraindications found',
                             style: const TextStyle(
                               color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15.5,
                             ),
                           ),
                         ],
@@ -76,10 +75,10 @@ class PrescriptionCartScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         isThai
-                            ? 'ไม่พบการตีกันของยาที่รุนแรง'
-                            : 'No severe interactions detected.',
+                            ? 'ไม่พบปฏิกิริยาระหว่างยาที่รุนแรง'
+                            : 'No severe drug interactions found.',
                         style: const TextStyle(
-                            color: Colors.green, fontWeight: FontWeight.bold),
+                            color: Colors.green, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -129,10 +128,10 @@ class PrescriptionCartScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(
-                        isThai ? 'ล้างตะกร้ายาเรียบร้อย' : 'Cart cleared')),
+                        isThai ? 'ล้างรายการยาแล้ว' : 'Cart cleared')),
               );
             },
-            child: Text(isThai ? 'ล้างตะกร้า (Clear Cart)' : 'Clear Cart'),
+            child: Text(isThai ? 'ล้างรายการทั้งหมด' : 'Clear Cart'),
           ),
         ),
       ),

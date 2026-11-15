@@ -131,18 +131,19 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
               controller: _nameCtrl,
               decoration: InputDecoration(
                 labelText:
-                    widget.isThai ? 'ชื่อ (ตัวเลือก)' : 'Name (Optional)',
+                    widget.isThai ? 'ชื่อผู้ป่วย (ถ้ามี)' : 'Name (Optional)',
               ),
             ),
             TextField(
               controller: _hnCtrl,
-              decoration: const InputDecoration(labelText: 'HN (Optional)'),
+              decoration: InputDecoration(
+                labelText: widget.isThai ? 'HN (ถ้ามี)' : 'HN (Optional)',
+              ),
             ),
             DropdownButtonFormField<Sex>(
               initialValue: _sex,
               decoration: InputDecoration(
-                labelText:
-                    widget.isThai ? 'เพศกำเนิด (Sex) *' : 'Biological Sex *',
+                labelText: widget.isThai ? 'เพศกำเนิด *' : 'Biological Sex *',
               ),
               items: Sex.values
                   .map((s) => DropdownMenuItem(
@@ -157,12 +158,16 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
             TextField(
               controller: _weightCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Weight (kg) *'),
+              decoration: InputDecoration(
+                labelText: widget.isThai ? 'น้ำหนัก (kg) *' : 'Weight (kg) *',
+              ),
             ),
             TextField(
               controller: _heightCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Height (cm) *'),
+              decoration: InputDecoration(
+                labelText: widget.isThai ? 'ส่วนสูง (cm) *' : 'Height (cm) *',
+              ),
             ),
             Row(
               children: [
@@ -194,8 +199,10 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
             TextField(
               controller: _scrCtrl,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Serum Creatinine (mg/dL)',
+              decoration: InputDecoration(
+                labelText: widget.isThai
+                    ? 'ค่าการทำงานของไต SCr (mg/dL)'
+                    : 'Serum Creatinine (mg/dL)',
               ),
             ),
             const SizedBox(height: 16),
@@ -205,7 +212,8 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
                 labelText: widget.isThai
                     ? 'ประวัติแพ้ยา (คั่นด้วยลูกน้ำ ,)'
                     : 'Allergies (comma separated)',
-                hintText: 'ex: Penicillin, Sulfa',
+                hintText:
+                    widget.isThai ? 'เช่น Penicillin, Sulfa' : 'e.g. Penicillin, Sulfa',
                 prefixIcon: const Icon(Icons.warning_amber, color: Colors.red),
               ),
             ),

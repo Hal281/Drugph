@@ -103,16 +103,25 @@ void main() {
           reason: 'ThaiFont.ttf should be a complete font file (~900KB)');
     });
 
-    test('4. lib/main.dart configures ThaiFont and Sarabun fallbacks in ThemeData', () {
+    test('4. AppTheme configures bundled Thai fonts and fallbacks in ThemeData', () {
       final mainFile = File('lib/main.dart');
+      final themeFile = File('lib/ui/theme/app_theme.dart');
       expect(mainFile.existsSync(), isTrue);
+      expect(themeFile.existsSync(), isTrue);
 
-      final content = mainFile.readAsStringSync();
+      final mainContent = mainFile.readAsStringSync();
+      final themeContent = themeFile.readAsStringSync();
 
-      expect(content, contains("fontFamily: 'ThaiFont'"),
-          reason: 'ThemeData must set primary fontFamily to ThaiFont');
-      expect(content, contains("'ThaiFont', 'Sarabun', 'sans-serif'"),
-          reason: 'ThemeData must configure fontFamilyFallback with ThaiFont, Sarabun, and sans-serif');
+      expect(mainContent, contains('AppTheme.light'),
+          reason: 'MaterialApp must wire AppTheme.light');
+      expect(themeContent, contains("primaryFontFamily = 'IBMPlexSansThai'"),
+          reason: 'AppTheme must configure bundled IBMPlexSansThai');
+      expect(themeContent, contains("'ThaiFont'"),
+          reason: 'AppTheme must include ThaiFont fallback');
+      expect(themeContent, contains("'Sarabun'"),
+          reason: 'AppTheme must include Sarabun fallback');
+      expect(themeContent, contains("'sans-serif'"),
+          reason: 'AppTheme must include sans-serif fallback');
     });
 
     test('5. .github/workflows/flutter_web.yml enforces security gates and zero secret exposure', () {

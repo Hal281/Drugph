@@ -107,7 +107,9 @@ class PatientBanner extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      'แพ้ยา: ${patient.allergies.join(", ")}',
+                                      isThai
+                                          ? 'แพ้ยา: ${patient.allergies.join(", ")}'
+                                          : 'Allergies: ${patient.allergies.join(", ")}',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.redAccent,

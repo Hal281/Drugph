@@ -693,7 +693,7 @@ class _VerifiedClinicalCalculatorScreenState
                   value:
                       '${res.finalRecommendedSingleDoseMg.toStringAsFixed(1)} mg/ครั้ง',
                   subtext:
-                      'ความถี่: ${res.recommendedFrequency} (${res.dosesPerDay} มื้อ/วัน = ${res.finalRecommendedDailyDoseMg.toStringAsFixed(1)} mg/วัน)',
+                      'ความถี่: ${res.recommendedFrequency} (${res.dosesPerDay} ครั้ง/วัน = ${res.finalRecommendedDailyDoseMg.toStringAsFixed(1)} mg/วัน)',
                   highlightColor: const Color(0xFF1E3A8A),
                 ),
                 _buildMetricTile(
