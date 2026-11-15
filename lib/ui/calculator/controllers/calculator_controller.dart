@@ -60,6 +60,8 @@ class CalculatorController extends ChangeNotifier {
     if (best != null && best != _state.selectedRegimen) {
       _state = _state.copyWith(
         selectedRegimen: best,
+        selectedLiquidConcentration: best.defaultLiquidConcentration,
+        clearLiquidConcentration: best.defaultLiquidConcentration == null,
         clearResult: true,
         status: CalculatorUiStatus.empty,
       );
@@ -70,53 +72,102 @@ class CalculatorController extends ChangeNotifier {
   void _syncFromSession() {
     if (_isDisposed || _isSyncingToSession) return;
     final p = PatientSession.instance.currentPatient.value;
-    if (p != null) {
+    if (p == null) {
+      if (weightCtrl.text.isEmpty &&
+          heightCtrl.text.isEmpty &&
+          ageCtrl.text.isEmpty &&
+          scrCtrl.text.isEmpty &&
+          _state.result == null) {
+        return;
+      }
+
       _isSyncingFromSession = true;
       try {
-        final currentWeight = double.tryParse(weightCtrl.text);
-        if (currentWeight != p.weightKg) {
-          weightCtrl.text = p.weightKg.toString();
-        }
-
-        final currentHeight = double.tryParse(heightCtrl.text);
-        if (currentHeight != p.heightCm) {
-          heightCtrl.text = p.heightCm.toString();
-        }
-
-        final currentAge = int.tryParse(ageCtrl.text);
-        if (currentAge != p.ageYears) {
-          ageCtrl.text = p.ageYears.toString();
-        }
-
-        final currentScr = double.tryParse(scrCtrl.text);
-        if (currentScr != p.serumCreatinineMgDl) {
-          scrCtrl.text = p.serumCreatinineMgDl?.toString() ?? '';
-        }
+        weightCtrl.clear();
+        heightCtrl.clear();
+        ageCtrl.clear();
+        scrCtrl.clear();
       } finally {
         _isSyncingFromSession = false;
       }
-
-      final autoRegimen = _hasManuallySelectedRegimen
-          ? _state.selectedRegimen
-          : CalculatorUiState.selectBestRegimenForPatient(
-              _state.drug,
-              ageYears: p.ageYears,
-              weightKg: p.weightKg,
-              current: _state.selectedRegimen,
-            );
-
-      _state = _state.copyWith(
-        selectedRegimen: autoRegimen,
-        weightKg: p.weightKg,
-        heightCm: p.heightCm,
-        ageYears: p.ageYears,
-        scrMgDl: p.serumCreatinineMgDl,
-        sex: p.sex,
-        renalReplacementMode: p.renalReplacementMode,
-        hepaticImpairment: p.hepaticImpairment ?? ChildPughClass.none,
+      _state = CalculatorUiState.initial(_state.drug).copyWith(
+        selectedRegimen: _state.selectedRegimen,
+        selectedLiquidConcentration: _state.selectedLiquidConcentration,
       );
       notifyListeners();
+      return;
     }
+
+    final autoRegimen = _hasManuallySelectedRegimen
+        ? _state.selectedRegimen
+        : CalculatorUiState.selectBestRegimenForPatient(
+            _state.drug,
+            ageYears: p.ageYears,
+            weightKg: p.weightKg,
+            current: _state.selectedRegimen,
+          );
+    final regimenChanged = autoRegimen != _state.selectedRegimen;
+
+    final profileChanged = (_state.lastEvaluatedPatient != null &&
+            _state.lastEvaluatedPatient!.id != p.id) ||
+        _state.weightKg != p.weightKg ||
+        _state.heightCm != p.heightCm ||
+        _state.ageYears != p.ageYears ||
+        _state.scrMgDl != p.serumCreatinineMgDl ||
+        _state.sex != p.sex ||
+        _state.isScrStable != p.isScrStable ||
+        _state.renalReplacementMode != p.renalReplacementMode ||
+        _state.hepaticImpairment !=
+            (p.hepaticImpairment ?? ChildPughClass.none);
+
+    _isSyncingFromSession = true;
+    try {
+      final currentWeight = double.tryParse(weightCtrl.text);
+      if (currentWeight != p.weightKg) {
+        weightCtrl.text = p.weightKg.toString();
+      }
+
+      final currentHeight = double.tryParse(heightCtrl.text);
+      if (currentHeight != p.heightCm) {
+        heightCtrl.text = p.heightCm.toString();
+      }
+
+      final currentAge = int.tryParse(ageCtrl.text);
+      if (currentAge != p.ageYears) {
+        ageCtrl.text = p.ageYears.toString();
+      }
+
+      final currentScr = double.tryParse(scrCtrl.text);
+      if (currentScr != p.serumCreatinineMgDl) {
+        scrCtrl.text = p.serumCreatinineMgDl?.toString() ?? '';
+      }
+    } finally {
+      _isSyncingFromSession = false;
+    }
+
+    _state = _state.copyWith(
+      selectedRegimen: autoRegimen,
+      selectedLiquidConcentration: regimenChanged
+          ? autoRegimen?.defaultLiquidConcentration
+          : _state.selectedLiquidConcentration,
+      clearLiquidConcentration:
+          regimenChanged && autoRegimen?.defaultLiquidConcentration == null,
+      weightKg: p.weightKg,
+      heightCm: p.heightCm,
+      ageYears: p.ageYears,
+      scrMgDl: p.serumCreatinineMgDl,
+      sex: p.sex,
+      isScrStable: p.isScrStable,
+      renalReplacementMode: p.renalReplacementMode,
+      hepaticImpairment: p.hepaticImpairment ?? ChildPughClass.none,
+      usedDefaultDemographics: false,
+      clearResult: profileChanged || regimenChanged,
+      clearDosingWeight: profileChanged || regimenChanged,
+      status: (profileChanged || regimenChanged)
+          ? CalculatorUiStatus.empty
+          : null,
+    );
+    notifyListeners();
   }
 
   /// Outbound sync: CalculatorController -> PatientSession

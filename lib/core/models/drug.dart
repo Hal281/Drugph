@@ -476,6 +476,12 @@ class Drug {
   /// Known contraindications (English).
   final List<String> contraindications;
 
+  /// Important adverse effects documented for this drug.
+  final List<String> sideEffects;
+
+  /// Important adverse effects documented for this drug (Thai).
+  final List<String> sideEffectsTh;
+
   /// Available vial sizes or tablet strengths (e.g., [250, 500, 1000]).
   final List<double>? availableStrengths;
 
@@ -560,6 +566,8 @@ class Drug {
     this.renalExemptionReason,
     this.formulation,
     this.contraindications = const [],
+    this.sideEffects = const [],
+    this.sideEffectsTh = const [],
     this.availableStrengths,
     this.requiresRenalAdjustment = false,
     this.renalDataPolicy = RenalDataPolicy.warn,

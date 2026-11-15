@@ -55,6 +55,8 @@ final List<Drug> gastrointestinal = [
     brandNames: ['Plasil'],
     nameTh: 'เมโทโคลพราไมด์',
     category: DrugCategory.antiemetic,
+    sideEffects: ['Extrapyramidal symptoms (EPS)', 'Tardive dyskinesia'],
+    sideEffectsTh: ['อาการผิดปกติของการเคลื่อนไหว (EPS)', 'Tardive dyskinesia'],
     requiresRenalAdjustment: true,
     allergyClass: 'Benzamide',
     severeInteractions: [
@@ -227,6 +229,13 @@ final List<Drug> gastrointestinal = [
     brandNames: ['Buscopan'],
     nameTh: 'ไฮออสซีน / บัสโคพาน',
     category: DrugCategory.gastrointestinal,
+    sideEffects: [
+      'Dry mouth',
+      'Blurred vision',
+      'Tachycardia',
+      'Urinary retention',
+    ],
+    sideEffectsTh: ['ปากแห้ง', 'ตามัว', 'หัวใจเต้นเร็ว', 'ปัสสาวะคั่ง'],
     allergyClass: 'Anticholinergic',
     severeInteractions: [
       'Other anticholinergics (additive effects)',

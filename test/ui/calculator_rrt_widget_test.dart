@@ -125,6 +125,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
 
         for (final isThai in [false, true]) {
+          PatientSession.instance.clearPatient();
           await tester.pumpWidget(createWidgetUnderTest(isThai: isThai));
           await tester.pumpAndSettle();
 

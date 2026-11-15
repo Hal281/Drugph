@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/calculators/renal_calculator.dart';
 import '../../core/models/patient.dart';
+import '../../core/models/renal_replacement_mode.dart';
 import '../../core/models/unit.dart';
 import '../../data/patient_session.dart';
 
@@ -40,7 +41,8 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
     _weightCtrl = TextEditingController(text: p?.weightKg.toString() ?? '');
     _heightCtrl = TextEditingController(text: p?.heightCm.toString() ?? '');
     _ageCtrl = TextEditingController(text: p?.ageYears.toString() ?? '');
-    _ageMonthsCtrl = TextEditingController(text: p?.ageMonths?.toString() ?? '');
+    _ageMonthsCtrl =
+        TextEditingController(text: p?.ageMonths?.toString() ?? '');
     _scrCtrl = TextEditingController(
       text: p?.serumCreatinineMgDl?.toString() ?? '',
     );
@@ -92,8 +94,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
         .toList();
 
     final newPatient = Patient(
-      id:
-          widget.initialPatient?.id ??
+      id: widget.initialPatient?.id ??
           DateTime.now().millisecondsSinceEpoch.toString(),
       patientName: _nameCtrl.text.isNotEmpty ? _nameCtrl.text : null,
       hospitalNumber: _hnCtrl.text.isNotEmpty ? _hnCtrl.text : null,
@@ -104,7 +105,12 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       sex: _sex,
       serumCreatinineMgDl: scr,
       creatinineClearanceMlMin: crcl,
+      eGfrMlMinPer173m2: widget.initialPatient?.eGfrMlMinPer173m2,
       isScrStable: _isScrStable,
+      isPregnant: widget.initialPatient?.isPregnant ?? false,
+      hepaticImpairment: widget.initialPatient?.hepaticImpairment,
+      renalReplacementMode: widget.initialPatient?.renalReplacementMode ??
+          RenalReplacementMode.none,
       activeDrugIds: widget.initialPatient?.activeDrugIds ?? const [],
       allergies: allergies,
     );
@@ -124,9 +130,8 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
             TextField(
               controller: _nameCtrl,
               decoration: InputDecoration(
-                labelText: widget.isThai
-                    ? 'ชื่อ (ตัวเลือก)'
-                    : 'Name (Optional)',
+                labelText:
+                    widget.isThai ? 'ชื่อ (ตัวเลือก)' : 'Name (Optional)',
               ),
             ),
             TextField(
@@ -136,12 +141,15 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
             DropdownButtonFormField<Sex>(
               initialValue: _sex,
               decoration: InputDecoration(
-                labelText: widget.isThai ? 'เพศกำเนิด (Sex) *' : 'Biological Sex *',
+                labelText:
+                    widget.isThai ? 'เพศกำเนิด (Sex) *' : 'Biological Sex *',
               ),
-              items: Sex.values.map((s) => DropdownMenuItem(
-                value: s,
-                child: Text(widget.isThai ? s.nameTh : s.nameEn),
-              )).toList(),
+              items: Sex.values
+                  .map((s) => DropdownMenuItem(
+                        value: s,
+                        child: Text(widget.isThai ? s.nameTh : s.nameEn),
+                      ))
+                  .toList(),
               onChanged: (val) {
                 if (val != null) setState(() => _sex = val);
               },
@@ -163,7 +171,8 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
                     controller: _ageCtrl,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: widget.isThai ? 'อายุ (ปี) *' : 'Age (years) *',
+                      labelText:
+                          widget.isThai ? 'อายุ (ปี) *' : 'Age (years) *',
                     ),
                   ),
                 ),
@@ -173,7 +182,9 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
                     controller: _ageMonthsCtrl,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: widget.isThai ? 'เดือน (เด็กเล็ก)' : 'Months (pediatric)',
+                      labelText: widget.isThai
+                          ? 'เดือน (เด็กเล็ก)'
+                          : 'Months (pediatric)',
                       hintText: '0-11',
                     ),
                   ),
@@ -191,7 +202,9 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
             TextField(
               controller: _allergiesCtrl,
               decoration: InputDecoration(
-                labelText: widget.isThai ? 'ประวัติแพ้ยา (คั่นด้วยลูกน้ำ ,)' : 'Allergies (comma separated)',
+                labelText: widget.isThai
+                    ? 'ประวัติแพ้ยา (คั่นด้วยลูกน้ำ ,)'
+                    : 'Allergies (comma separated)',
                 hintText: 'ex: Penicillin, Sulfa',
                 prefixIcon: const Icon(Icons.warning_amber, color: Colors.red),
               ),

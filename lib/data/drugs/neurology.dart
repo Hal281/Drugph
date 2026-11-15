@@ -79,13 +79,13 @@ final List<Drug> neurology = [
       preferredDiluent: IvDiluent.nss,
       incompatibleDiluents: [IvDiluent.d5w, IvDiluent.d5nss, IvDiluent.lrs],
       incompatibilityReasonEn:
-          'CRITICAL PRECIPITATION HAZARD: Phenytoin sodium (pH ~12) immediately precipitates into microcrystals in dextrose (D5W/D5NSS) or Lactated Ringer\'s (LRS). Dilute ONLY in 0.9% NaCl (NSS).',
+          'D5W, D5NSS, and LRS may cause precipitation; dilute in NSS only.',
       incompatibilityReasonTh:
-          'ห้ามผสมใน D5W, D5NSS หรือ LRS เด็ดขาด: Phenytoin (pH ~12) จะตกตะกอนเป็นผลึกทันทีในสารละลายน้ำตาลหรือกรดอ่อน ต้องผสมใน 0.9% NaCl (NSS) เท่านั้น',
+          'D5W, D5NSS และ LRS เสี่ยงตกตะกอน; เจือจางใน NSS เท่านั้น',
       stabilityNoteEn:
-          'Dilute in NSS to <= 10 mg/mL, administer via 0.22-micron inline filter at <= 50 mg/min (<= 25 mg/min in elderly/cardiac disease), and complete within 1 hour of preparation.',
+          'NSS concentration <=10 mg/mL; use a 0.22-micron filter. Max rate: 50 mg/min (25 mg/min in elderly/cardiac disease); use within 1 h.',
       stabilityNoteTh:
-          'เจือจางใน NSS ความเข้มข้น <= 10 mg/mL ให้ผ่านตัวกรอง 0.22-micron inline filter อัตราไม่เกิน 50 mg/min (ผู้สูงอายุ/โรคหัวใจ <= 25 mg/min) และใช้ให้หมดภายใน 1 ชม. หลังผสม',
+          'เจือจางใน NSS <=10 mg/mL ผ่านตัวกรอง 0.22 micron; อัตราสูงสุด 50 mg/min (ผู้สูงอายุ/โรคหัวใจ 25 mg/min); ใช้ภายใน 1 ชม.',
       sourceCitation:
           'US FDA Phenytoin Sodium Injection SPL / Trissel\'s Handbook on Injectable Drugs / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -455,13 +455,13 @@ final List<Drug> neurology = [
       preferredDiluent: IvDiluent.d5w,
       incompatibleDiluents: [IvDiluent.nss, IvDiluent.lrs],
       incompatibilityReasonEn:
-          'Emulsion breakdown / cracking hazard with electrolyte solutions. Administer undiluted neat emulsion.',
+          'Emulsion breakdown with NSS/LRS; administer undiluted.',
       incompatibilityReasonTh:
-          'ห้ามผสมใน NSS หรือ LRS เนื่องจากอิเล็กโทรไลต์จะทำให้อิมัลชันไขมันแตกตัว (Cracking) ควรให้ยา Neat โดยไม่เจือจาง',
+          'อิเล็กโทรไลต์ใน NSS/LRS ทำให้อิมัลชันแตกตัว; ให้ยาโดยไม่เจือจาง',
       stabilityNoteEn:
-          '10 mg/mL (1%) neat lipid emulsion. Change tubing and bottle every 12 hours.',
+          '10 mg/mL (1%) emulsion; change tubing and bottle every 12 h.',
       stabilityNoteTh:
-          '10 มก./มล. (1%) อิมัลชันไขมัน เปลี่ยนสายและขวดยาทุก 12 ชั่วโมง',
+          'อิมัลชัน 10 mg/mL (1%); เปลี่ยนสายและขวดยาทุก 12 ชม.',
       sourceCitation: 'US FDA Diprivan SPL §2.4 / Lexicomp 2024',
     ),
     regimens: [
@@ -501,6 +501,8 @@ final List<Drug> neurology = [
     brandNames: ['Precedex'],
     nameTh: 'เดกซ์เมดีโทมิดีน',
     category: DrugCategory.sedative,
+    sideEffects: ['Bradycardia', 'Hypotension'],
+    sideEffectsTh: ['หัวใจเต้นช้า', 'ความดันโลหิตต่ำ'],
     isHighAlert: true,
     sourceCitation:
         'PADIS Guidelines 2018 / Lexicomp 2024 / US FDA Precedex SPL',
