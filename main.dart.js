@@ -57392,7 +57392,7 @@ p=B.ai(k,B.ar(B.b([A.alK,A.bh,B.aM(B.r(l.a.c.gcp()==="th"?"\u26a0\ufe0f \u0e0b\u
 o=B.ai(k,new B.Dy(l.d,l.gaxC(),new B.aIM(l),l.e,new B.aIN(l),new B.aIO(l),l.a.c.gcp()==="th",k),A.J,A.eY,k,k,k,k,k,k,A.ahL,k,k,k)
 n=B.cU(B.ar(B.b([B.dU(k,k,B.bX(A.ajr,A.eK,k,32),k,k,new B.aIP(l),k,k,k,k),B.aM(B.Wc(l.w,new B.aIF(l,q),q.length+1,A.ahY,A.c6),1),B.dU(k,k,B.bX(A.EN,A.eK,k,32),k,k,new B.aIG(l),k,k,k,k)],m),A.S,A.C,A.I,0,k,k),95,k)
 i=i.length
-if(i===0){j=l.a.c.gcp()==="th"?"\u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e22\u0e32":"No drugs found"
+if(i===0){j=l.a.c.gcp()==="th"?"":"No drugs found"
 j=B.ee(B.r(j,k,k,k,k,B.a8(k,k,A.jG,k,k,k,k,k,k,k,k,16,k,k,k,k,k,!0,k,k,k,k,k,k,k,k),k,k),k,k)}else j=B.Wc(k,new B.aIH(j,l,a),i,A.m7,A.b8)
 return B.ih(r,A.fJ,B.as(B.b([p,o,n,B.aM(j,1)],m),A.S,A.C,A.I),k,k)}}
 B.aIS.prototype={
