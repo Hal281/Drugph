@@ -72,15 +72,6 @@ class ClinicalHeaderAlerts extends StatelessWidget {
                 : 'Hepatic dose adjustment / caution required',
           ),
 
-        if (drug.allergyClass != null)
-          _buildAlertCard(
-            Icons.medical_information,
-            Colors.purple,
-            t
-                ? 'ตรวจสอบประวัติแพ้ยากลุ่ม: ${drug.allergyClass}'
-                : 'Check patient allergy to: ${drug.allergyClass}',
-          ),
-
         if (drug.contraindications.isNotEmpty)
           _buildListAlertCard(
             Icons.do_not_disturb_alt,

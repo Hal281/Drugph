@@ -8,7 +8,9 @@ import 'package:drug_dosage_calculator/ui/calculator_screen.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Challenger M1-Iter2 Adversarial Stress Suite: Mobile Viewports & Rule 5 Overdose', () {
+  group(
+      'Challenger M1-Iter2 Adversarial Stress Suite: Mobile Viewports & Rule 5 Overdose',
+      () {
     late Drug enoxaparin;
     late Drug vancomycin;
     late Drug meropenem;
@@ -78,7 +80,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 1: CRRT Mode with Extreme Patient (250 kg) across 360x640 and 320x480
     // -------------------------------------------------------------------------
-    testWidgets('1. CRRT with extreme weight (250 kg) exhibits zero RenderFlex overflow and strictly preserves Rule 5', (WidgetTester tester) async {
+    testWidgets(
+        '1. CRRT with extreme weight (250 kg) exhibits zero RenderFlex overflow and strictly preserves Rule 5',
+        (WidgetTester tester) async {
       for (final vp in testViewports) {
         for (final isThai in [false, true]) {
           tester.view.physicalSize = vp;
@@ -88,7 +92,9 @@ void main() {
             tester.view.resetDevicePixelRatio();
           });
 
-          await tester.pumpWidget(buildTestApp(drug: enoxaparin, isThai: isThai));
+          PatientSession.instance.clearPatient();
+          await tester
+              .pumpWidget(buildTestApp(drug: enoxaparin, isThai: isThai));
           await tester.pumpAndSettle();
 
           await enterInputsAndCalculate(
@@ -104,11 +110,13 @@ void main() {
           expect(
             tester.takeException(),
             isNull,
-            reason: 'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under CRRT',
+            reason:
+                'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under CRRT',
           );
 
           // Rule 5: Overdose Banner MUST be present
-          final overdoseBanner = find.byKey(const Key('calculator_overdose_banner'));
+          final overdoseBanner =
+              find.byKey(const Key('calculator_overdose_banner'));
           await tester.ensureVisible(overdoseBanner);
           expect(overdoseBanner, findsOneWidget);
 
@@ -127,10 +135,12 @@ void main() {
           expect(copyHisBtn, findsOneWidget);
           expect(tester.getSize(copyHisBtn).height, greaterThanOrEqualTo(48.0));
 
-          final copyNoteBtn = find.byKey(const Key('copy_pharmacist_note_button'));
+          final copyNoteBtn =
+              find.byKey(const Key('copy_pharmacist_note_button'));
           await tester.ensureVisible(copyNoteBtn);
           expect(copyNoteBtn, findsOneWidget);
-          expect(tester.getSize(copyNoteBtn).height, greaterThanOrEqualTo(48.0));
+          expect(
+              tester.getSize(copyNoteBtn).height, greaterThanOrEqualTo(48.0));
         }
       }
     });
@@ -138,7 +148,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 2: IHD Mode with Extreme Patient (250 kg) across 360x640 and 320x480
     // -------------------------------------------------------------------------
-    testWidgets('2. IHD with extreme weight (250 kg) Vancomycin exhibits zero RenderFlex overflow and renders Post-HD badge', (WidgetTester tester) async {
+    testWidgets(
+        '2. IHD with extreme weight (250 kg) Vancomycin exhibits zero RenderFlex overflow and renders Post-HD badge',
+        (WidgetTester tester) async {
       for (final vp in testViewports) {
         for (final isThai in [false, true]) {
           tester.view.physicalSize = vp;
@@ -148,7 +160,9 @@ void main() {
             tester.view.resetDevicePixelRatio();
           });
 
-          await tester.pumpWidget(buildTestApp(drug: vancomycin, isThai: isThai));
+          PatientSession.instance.clearPatient();
+          await tester
+              .pumpWidget(buildTestApp(drug: vancomycin, isThai: isThai));
           await tester.pumpAndSettle();
 
           await enterInputsAndCalculate(
@@ -164,11 +178,13 @@ void main() {
           expect(
             tester.takeException(),
             isNull,
-            reason: 'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under IHD',
+            reason:
+                'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under IHD',
           );
 
           // Rule 5: Overdose Banner MUST be present
-          final overdoseBanner = find.byKey(const Key('calculator_overdose_banner'));
+          final overdoseBanner =
+              find.byKey(const Key('calculator_overdose_banner'));
           await tester.ensureVisible(overdoseBanner);
           expect(overdoseBanner, findsOneWidget);
 
@@ -186,7 +202,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 3: CAPD Mode across 360x640 and 320x480
     // -------------------------------------------------------------------------
-    testWidgets('3. CAPD mode Meropenem exhibits zero RenderFlex overflow and renders CAPD badge', (WidgetTester tester) async {
+    testWidgets(
+        '3. CAPD mode Meropenem exhibits zero RenderFlex overflow and renders CAPD badge',
+        (WidgetTester tester) async {
       for (final vp in testViewports) {
         for (final isThai in [false, true]) {
           tester.view.physicalSize = vp;
@@ -196,7 +214,9 @@ void main() {
             tester.view.resetDevicePixelRatio();
           });
 
-          await tester.pumpWidget(buildTestApp(drug: meropenem, isThai: isThai));
+          PatientSession.instance.clearPatient();
+          await tester
+              .pumpWidget(buildTestApp(drug: meropenem, isThai: isThai));
           await tester.pumpAndSettle();
 
           await enterInputsAndCalculate(
@@ -212,7 +232,8 @@ void main() {
           expect(
             tester.takeException(),
             isNull,
-            reason: 'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under CAPD',
+            reason:
+                'RenderFlex overflow detected on ${vp.width}x${vp.height} (isThai=$isThai) under CAPD',
           );
 
           // CAPD Badge must be present
@@ -229,7 +250,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 4: Dynamic RRT Switching under 320x480 without state contamination
     // -------------------------------------------------------------------------
-    testWidgets('4. Dynamic switching (CRRT -> IHD -> CAPD -> None) on 320x480 executes cleanly without overflow', (WidgetTester tester) async {
+    testWidgets(
+        '4. Dynamic switching (CRRT -> IHD -> CAPD -> None) on 320x480 executes cleanly without overflow',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(320, 480);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -313,7 +336,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 5: Unmapped RRT Drug Fallback Warning on Mobile Viewports (360x640 & 320x480)
     // -------------------------------------------------------------------------
-    testWidgets('5. Unmapped RRT Drug (Acyclovir) fallback warnings on 320x480 & 360x640 exhibit zero RenderFlex overflow', (WidgetTester tester) async {
+    testWidgets(
+        '5. Unmapped RRT Drug (Acyclovir) fallback warnings on 320x480 & 360x640 exhibit zero RenderFlex overflow',
+        (WidgetTester tester) async {
       final acyclovir = DrugDatabase.findById('acyclovir')!;
 
       for (final vp in testViewports) {
@@ -325,7 +350,9 @@ void main() {
             tester.view.resetDevicePixelRatio();
           });
 
-          await tester.pumpWidget(buildTestApp(drug: acyclovir, isThai: isThai));
+          PatientSession.instance.clearPatient();
+          await tester
+              .pumpWidget(buildTestApp(drug: acyclovir, isThai: isThai));
           await tester.pumpAndSettle();
 
           await enterInputsAndCalculate(
@@ -340,11 +367,13 @@ void main() {
           expect(
             tester.takeException(),
             isNull,
-            reason: 'Unmapped RRT drug must not overflow on ${vp.width}x${vp.height} (isThai=$isThai)',
+            reason:
+                'Unmapped RRT drug must not overflow on ${vp.width}x${vp.height} (isThai=$isThai)',
           );
 
           // Verify CRRT badge and fallback advisory warning are rendered
-          expect(find.byKey(const Key('calculator_crrt_badge')), findsOneWidget);
+          expect(
+              find.byKey(const Key('calculator_crrt_badge')), findsOneWidget);
         }
       }
     });
@@ -352,7 +381,9 @@ void main() {
     // -------------------------------------------------------------------------
     // Test 6: Extreme SCr (25.0 mg/dL) & Low Weight (35 kg) on 320x480
     // -------------------------------------------------------------------------
-    testWidgets('6. Extreme SCr (25.0 mg/dL) & Low Weight (35 kg) on 320x480 exhibits zero RenderFlex overflow', (WidgetTester tester) async {
+    testWidgets(
+        '6. Extreme SCr (25.0 mg/dL) & Low Weight (35 kg) on 320x480 exhibits zero RenderFlex overflow',
+        (WidgetTester tester) async {
       tester.view.physicalSize = const Size(320, 480);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

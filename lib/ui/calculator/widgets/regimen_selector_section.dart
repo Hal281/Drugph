@@ -51,6 +51,37 @@ class RegimenSelectorSection extends StatelessWidget {
                 ),
               ],
             ),
+            if (drug.availableIndications.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                key: const Key('calculator_available_indications'),
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: categoryColor.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      t ? 'ข้อบ่งใช้หลัก' : 'Indications',
+                      style: TextStyle(
+                        color: categoryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ...drug.availableIndications.map(
+                      (indication) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('• $indication'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -90,17 +121,23 @@ class RegimenSelectorSection extends StatelessWidget {
                 runSpacing: 4,
                 children: [
                   _buildRegimenPill(
-                    t ? selectedRegimen!.route.nameTh : selectedRegimen!.route.nameEn,
+                    t
+                        ? selectedRegimen!.route.nameTh
+                        : selectedRegimen!.route.nameEn,
                     Colors.blueGrey.shade700,
                     Colors.blueGrey.shade50,
                   ),
                   _buildRegimenPill(
-                    t ? selectedRegimen!.dosingType.nameTh : selectedRegimen!.dosingType.nameEn,
+                    t
+                        ? selectedRegimen!.dosingType.nameTh
+                        : selectedRegimen!.dosingType.nameEn,
                     Colors.teal.shade800,
                     Colors.teal.shade50,
                   ),
                   _buildRegimenPill(
-                    t ? selectedRegimen!.frequency.displayTh : selectedRegimen!.frequency.displayEn,
+                    t
+                        ? selectedRegimen!.frequency.displayTh
+                        : selectedRegimen!.frequency.displayEn,
                     Colors.indigo.shade800,
                     Colors.indigo.shade50,
                   ),

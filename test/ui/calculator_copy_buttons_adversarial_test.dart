@@ -28,7 +28,8 @@ void main() {
     setUp(() {
       clipboardLog = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, (MethodCall call) async {
+          .setMockMethodCallHandler(SystemChannels.platform,
+              (MethodCall call) async {
         if (call.method == 'Clipboard.setData') {
           clipboardLog.add(call);
         }
@@ -136,6 +137,7 @@ void main() {
           tester.view.physicalSize = vp;
           tester.view.devicePixelRatio = 1.0;
 
+          PatientSession.instance.clearPatient();
           await tester.pumpWidget(
             const MaterialApp(
               home: CalculatorScreen(
@@ -147,12 +149,17 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          await tester.enterText(find.byKey(const Key('calculator_weight_field')), '70');
-          await tester.enterText(find.byKey(const Key('calculator_height_field')), '170');
-          await tester.enterText(find.byKey(const Key('calculator_age_field')), '30');
-          await tester.enterText(find.byKey(const Key('calculator_scr_field')), '0.9');
+          await tester.enterText(
+              find.byKey(const Key('calculator_weight_field')), '70');
+          await tester.enterText(
+              find.byKey(const Key('calculator_height_field')), '170');
+          await tester.enterText(
+              find.byKey(const Key('calculator_age_field')), '30');
+          await tester.enterText(
+              find.byKey(const Key('calculator_scr_field')), '0.9');
 
-          await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+          await tester
+              .tap(find.byKey(const Key('calculator_calculate_button')));
           await tester.pumpAndSettle();
 
           final hisBtn = find.byKey(const Key('copy_his_order_button'));
@@ -165,9 +172,11 @@ void main() {
           final noteHeight = tester.getSize(noteBtn).height;
 
           expect(hisHeight, greaterThanOrEqualTo(48.0),
-              reason: 'HIS Order button height must be >= 48dp on ${vp.width}x${vp.height}');
+              reason:
+                  'HIS Order button height must be >= 48dp on ${vp.width}x${vp.height}');
           expect(noteHeight, greaterThanOrEqualTo(48.0),
-              reason: 'Pharmacist Note button height must be >= 48dp on ${vp.width}x${vp.height}');
+              reason:
+                  'Pharmacist Note button height must be >= 48dp on ${vp.width}x${vp.height}');
         }
 
         tester.view.resetPhysicalSize();
@@ -197,17 +206,23 @@ void main() {
         await tester.pumpAndSettle();
 
         // 70 kg * 15 mg/kg = 1050 mg (> 1000 mg maxSingleDose)
-        await tester.enterText(find.byKey(const Key('calculator_weight_field')), '70');
-        await tester.enterText(find.byKey(const Key('calculator_height_field')), '170');
-        await tester.enterText(find.byKey(const Key('calculator_age_field')), '30');
-        await tester.enterText(find.byKey(const Key('calculator_scr_field')), '0.9');
+        await tester.enterText(
+            find.byKey(const Key('calculator_weight_field')), '70');
+        await tester.enterText(
+            find.byKey(const Key('calculator_height_field')), '170');
+        await tester.enterText(
+            find.byKey(const Key('calculator_age_field')), '30');
+        await tester.enterText(
+            find.byKey(const Key('calculator_scr_field')), '0.9');
 
         await tester.tap(find.byKey(const Key('calculator_calculate_button')));
         await tester.pumpAndSettle();
 
         // 1. Verify overdose banner is present AND distinct from critical safety banner
-        expect(find.byKey(const Key('calculator_overdose_banner')), findsOneWidget);
-        expect(find.byKey(const Key('calculator_critical_safety_banner')), findsNothing);
+        expect(find.byKey(const Key('calculator_overdose_banner')),
+            findsOneWidget);
+        expect(find.byKey(const Key('calculator_critical_safety_banner')),
+            findsNothing);
 
         // 2. Verify doses are NOT hidden or removed
         // Rounded dose: 1000.00 mg
@@ -216,21 +231,28 @@ void main() {
         expect(find.textContaining('1050.00 mg'), findsOneWidget);
 
         // 3. Verify copy buttons are NOT disabled and remain fully interactive
-        final hisBtn = tester.widget<ElevatedButton>(find.byKey(const Key('copy_his_order_button')));
-        final noteBtn = tester.widget<OutlinedButton>(find.byKey(const Key('copy_pharmacist_note_button')));
-        expect(hisBtn.onPressed, isNotNull, reason: 'HIS Order button must never be disabled during overdose');
-        expect(noteBtn.onPressed, isNotNull, reason: 'Pharmacist Note button must never be disabled during overdose');
+        final hisBtn = tester.widget<ElevatedButton>(
+            find.byKey(const Key('copy_his_order_button')));
+        final noteBtn = tester.widget<OutlinedButton>(
+            find.byKey(const Key('copy_pharmacist_note_button')));
+        expect(hisBtn.onPressed, isNotNull,
+            reason: 'HIS Order button must never be disabled during overdose');
+        expect(noteBtn.onPressed, isNotNull,
+            reason:
+                'Pharmacist Note button must never be disabled during overdose');
 
         // 4. Tap copy HIS Order and assert clipboard receives payload with warning
         clipboardLog.clear();
-        await tester.ensureVisible(find.byKey(const Key('copy_his_order_button')));
+        await tester
+            .ensureVisible(find.byKey(const Key('copy_his_order_button')));
         await tester.tap(find.byKey(const Key('copy_his_order_button')));
         await tester.pump();
 
         expect(clipboardLog.length, equals(1));
         final hisText = clipboardLog.first.arguments['text'] as String;
         expect(hisText, contains('1000 mg'));
-        expect(hisText, contains('[⚠️ OVERDOSE WARNING: Dose exceeds recommended limits]'));
+        expect(hisText,
+            contains('[⚠️ OVERDOSE WARNING: Dose exceeds recommended limits]'));
       },
     );
 
@@ -255,31 +277,39 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byKey(const Key('calculator_weight_field')), '80');
-        await tester.enterText(find.byKey(const Key('calculator_height_field')), '175');
-        await tester.enterText(find.byKey(const Key('calculator_age_field')), '30');
-        await tester.enterText(find.byKey(const Key('calculator_scr_field')), '0.9');
+        await tester.enterText(
+            find.byKey(const Key('calculator_weight_field')), '80');
+        await tester.enterText(
+            find.byKey(const Key('calculator_height_field')), '175');
+        await tester.enterText(
+            find.byKey(const Key('calculator_age_field')), '30');
+        await tester.enterText(
+            find.byKey(const Key('calculator_scr_field')), '0.9');
 
         await tester.tap(find.byKey(const Key('calculator_calculate_button')));
         await tester.pumpAndSettle();
 
         // Overdose banner present
-        expect(find.byKey(const Key('calculator_overdose_banner')), findsOneWidget);
-        expect(find.byKey(const Key('calculator_critical_safety_banner')), findsNothing);
+        expect(find.byKey(const Key('calculator_overdose_banner')),
+            findsOneWidget);
+        expect(find.byKey(const Key('calculator_critical_safety_banner')),
+            findsNothing);
 
         // Since availableStrengths is empty, roundedDose is null; calculatedDose (1600.00 mg) must be visible directly
         expect(find.textContaining('1600.00 mg'), findsOneWidget);
 
         // Copy button still works
         clipboardLog.clear();
-        await tester.ensureVisible(find.byKey(const Key('copy_his_order_button')));
+        await tester
+            .ensureVisible(find.byKey(const Key('copy_his_order_button')));
         await tester.tap(find.byKey(const Key('copy_his_order_button')));
         await tester.pump();
 
         expect(clipboardLog.length, equals(1));
         final hisText = clipboardLog.first.arguments['text'] as String;
         expect(hisText, contains('1600 mg'));
-        expect(hisText, contains('[⚠️ OVERDOSE WARNING: Dose exceeds recommended limits]'));
+        expect(hisText,
+            contains('[⚠️ OVERDOSE WARNING: Dose exceeds recommended limits]'));
       },
     );
 
@@ -304,17 +334,23 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byKey(const Key('calculator_weight_field')), '60');
-        await tester.enterText(find.byKey(const Key('calculator_height_field')), '165');
-        await tester.enterText(find.byKey(const Key('calculator_age_field')), '25');
-        await tester.enterText(find.byKey(const Key('calculator_scr_field')), '0.8');
+        await tester.enterText(
+            find.byKey(const Key('calculator_weight_field')), '60');
+        await tester.enterText(
+            find.byKey(const Key('calculator_height_field')), '165');
+        await tester.enterText(
+            find.byKey(const Key('calculator_age_field')), '25');
+        await tester.enterText(
+            find.byKey(const Key('calculator_scr_field')), '0.8');
 
         await tester.tap(find.byKey(const Key('calculator_calculate_button')));
         await tester.pumpAndSettle();
 
         // Neither banner rendered on safe calculation
-        expect(find.byKey(const Key('calculator_overdose_banner')), findsNothing);
-        expect(find.byKey(const Key('calculator_critical_safety_banner')), findsNothing);
+        expect(
+            find.byKey(const Key('calculator_overdose_banner')), findsNothing);
+        expect(find.byKey(const Key('calculator_critical_safety_banner')),
+            findsNothing);
 
         // Dose is 500.00 mg (verify headline exists)
         expect(find.text('500.00 mg'), findsOneWidget);
@@ -336,6 +372,7 @@ void main() {
           tester.view.physicalSize = const Size(800, 600);
           tester.view.devicePixelRatio = 1.0;
 
+          PatientSession.instance.clearPatient();
           await tester.pumpWidget(
             MaterialApp(
               home: CalculatorScreen(
@@ -348,17 +385,24 @@ void main() {
           await tester.pumpAndSettle();
 
           // 80 kg * 15 mg/kg = 1200 mg > 1000 mg limit (triggers critical/overdose alert)
-          await tester.enterText(find.byKey(const Key('calculator_weight_field')), '80');
-          await tester.enterText(find.byKey(const Key('calculator_height_field')), '170');
-          await tester.enterText(find.byKey(const Key('calculator_age_field')), '30');
-          await tester.enterText(find.byKey(const Key('calculator_scr_field')), '1.0');
+          await tester.enterText(
+              find.byKey(const Key('calculator_weight_field')), '80');
+          await tester.enterText(
+              find.byKey(const Key('calculator_height_field')), '170');
+          await tester.enterText(
+              find.byKey(const Key('calculator_age_field')), '30');
+          await tester.enterText(
+              find.byKey(const Key('calculator_scr_field')), '1.0');
 
-          await tester.tap(find.byKey(const Key('calculator_calculate_button')));
+          await tester
+              .tap(find.byKey(const Key('calculator_calculate_button')));
           await tester.pumpAndSettle();
 
           expect(tester.takeException(), isNull,
-              reason: 'Zero RenderFlex overflow must occur on narrow viewport in locale isThai=$isThai');
-          expect(find.byKey(const Key('calculator_overdose_banner')), findsOneWidget);
+              reason:
+                  'Zero RenderFlex overflow must occur on narrow viewport in locale isThai=$isThai');
+          expect(find.byKey(const Key('calculator_overdose_banner')),
+              findsOneWidget);
         }
 
         tester.view.resetPhysicalSize();
@@ -367,4 +411,3 @@ void main() {
     );
   });
 }
-

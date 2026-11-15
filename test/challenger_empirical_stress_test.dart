@@ -23,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:drug_dosage_calculator/core/core.dart';
 import 'package:drug_dosage_calculator/data/drug_database.dart';
 import 'package:drug_dosage_calculator/data/drug_search_engine.dart';
+import 'package:drug_dosage_calculator/data/patient_session.dart';
 import 'package:drug_dosage_calculator/ui/calculator/calculator_screen.dart';
 import 'package:drug_dosage_calculator/ui/calculator/controllers/calculator_controller.dart';
 import 'package:drug_dosage_calculator/ui/calculator/models/calculator_ui_state.dart';
@@ -76,7 +77,9 @@ void main() {
     // ------------------------------------------------------------
     // 1. Extreme String Lengths
     // ------------------------------------------------------------
-    test('1.1 Handles extreme query lengths (100, 500, 2000 chars) without crashing', () {
+    test(
+        '1.1 Handles extreme query lengths (100, 500, 2000 chars) without crashing',
+        () {
       // Warm up search engine first to eliminate initial static init / classloading jitter
       DrugDatabase.searchDetailed('warmup');
 
@@ -109,7 +112,8 @@ void main() {
     // ------------------------------------------------------------
     // 1.2 Regex Metacharacters and Format Injection
     // ------------------------------------------------------------
-    test('1.2 Survives complex regex metacharacters and SQL/format symbols', () {
+    test('1.2 Survives complex regex metacharacters and SQL/format symbols',
+        () {
       final adversarialQueries = [
         r'.*',
         r'[a-z]+',
@@ -137,7 +141,9 @@ void main() {
     // ------------------------------------------------------------
     // 1.3 Unicode, Diacritics, RTL, Emojis, Zero-Width Spaces
     // ------------------------------------------------------------
-    test('1.3 Handles unicode diacritics, RTL, emojis, and null bytes gracefully', () {
+    test(
+        '1.3 Handles unicode diacritics, RTL, emojis, and null bytes gracefully',
+        () {
       final unicodeQueries = [
         '💊 paracetamol',
         'céftriaxone', // decomposed e + combining acute
@@ -223,30 +229,109 @@ void main() {
     // ------------------------------------------------------------
     // 1.6 Benchmark: 100 Diverse Searches Latency Verification (< 16ms)
     // ------------------------------------------------------------
-    test('1.6 Benchmark 100 diverse search queries: average latency < 16ms', () {
+    test('1.6 Benchmark 100 diverse search queries: average latency < 16ms',
+        () {
       // Warm up search engine and JIT compilation before starting benchmark stopwatch
       DrugDatabase.searchDetailed('paracetamol');
 
       final searchQueries = [
-        'paracetamol', 'ceftriaxone', 'meropenem', 'vancomycin', 'ciprofloxacin',
-        'amoxicillin', 'ampicillin', 'gentamicin', 'amikacin', 'levofloxacin',
-        'colistin', 'piperacillin', 'doxycycline', 'azithromycin', 'clarithromycin',
-        'tylenol', 'rocephin', 'meronem', 'vancocin', 'augmentin',
-        'sepsis', 'cap', 'uti', 'meningitis', 'pneumonia', 'shock',
-        'พาราเซตามอล', 'ยาฆ่าเชื้อ', 'ยาแก้ปวด', 'ยาลดความดัน', 'เซฟไตร',
-        'paracetamul', 'ceftriaxon', 'meropenen', 'vankomycin', 'amoxicilin',
-        'a', 'ab', 'abc', 'antibiotic', 'analgesic', 'cardiovascular',
-        '1000mg', 'po', 'iv', 'renal', 'crcl', 'dialysis', 'overdose',
-        'cef', 'pen', 'micin', 'mycin', 'cillin', 'floxacin', 'prazole',
-        'paracetamol 500', 'ceftriaxone 1g', 'meropenem 1g iv',
-        '', '   ', '!!!', '***', '???', '12345', 'xyz999',
+        'paracetamol',
+        'ceftriaxone',
+        'meropenem',
+        'vancomycin',
+        'ciprofloxacin',
+        'amoxicillin',
+        'ampicillin',
+        'gentamicin',
+        'amikacin',
+        'levofloxacin',
+        'colistin',
+        'piperacillin',
+        'doxycycline',
+        'azithromycin',
+        'clarithromycin',
+        'tylenol',
+        'rocephin',
+        'meronem',
+        'vancocin',
+        'augmentin',
+        'sepsis',
+        'cap',
+        'uti',
+        'meningitis',
+        'pneumonia',
+        'shock',
+        'พาราเซตามอล',
+        'ยาฆ่าเชื้อ',
+        'ยาแก้ปวด',
+        'ยาลดความดัน',
+        'เซฟไตร',
+        'paracetamul',
+        'ceftriaxon',
+        'meropenen',
+        'vankomycin',
+        'amoxicilin',
+        'a',
+        'ab',
+        'abc',
+        'antibiotic',
+        'analgesic',
+        'cardiovascular',
+        '1000mg',
+        'po',
+        'iv',
+        'renal',
+        'crcl',
+        'dialysis',
+        'overdose',
+        'cef',
+        'pen',
+        'micin',
+        'mycin',
+        'cillin',
+        'floxacin',
+        'prazole',
+        'paracetamol 500',
+        'ceftriaxone 1g',
+        'meropenem 1g iv',
+        '',
+        '   ',
+        '!!!',
+        '***',
+        '???',
+        '12345',
+        'xyz999',
         'very long medical query string that does not match anything in database',
-        'norepinephrine', 'epinephrine', 'dopamine', 'dobutamine', 'furosemide',
-        'spironolactone', 'enalapril', 'losartan', 'amlodipine', 'atenolol',
-        'metoprolol', 'propranolol', 'digoxin', 'amiodarone', 'warfarin',
-        'aspirin', 'clopidogrel', 'heparin', 'enoxaparin', 'fondaparinux',
-        'insulin', 'metformin', 'glipizide', 'omeprazole', 'pantoprazole',
-        'ondansetron', 'metoclopramide', 'morphine', 'fentanyl', 'tramadol',
+        'norepinephrine',
+        'epinephrine',
+        'dopamine',
+        'dobutamine',
+        'furosemide',
+        'spironolactone',
+        'enalapril',
+        'losartan',
+        'amlodipine',
+        'atenolol',
+        'metoprolol',
+        'propranolol',
+        'digoxin',
+        'amiodarone',
+        'warfarin',
+        'aspirin',
+        'clopidogrel',
+        'heparin',
+        'enoxaparin',
+        'fondaparinux',
+        'insulin',
+        'metformin',
+        'glipizide',
+        'omeprazole',
+        'pantoprazole',
+        'ondansetron',
+        'metoclopramide',
+        'morphine',
+        'fentanyl',
+        'tramadol',
       ];
 
       expect(searchQueries.length, greaterThanOrEqualTo(80));
@@ -280,14 +365,17 @@ void main() {
       // ignore: avoid_print
       print('Total elapsed time for 100 searches: ${totalMs}ms');
       // ignore: avoid_print
-      print('Average search latency: ${avgMs.toStringAsFixed(3)}ms (target: < 16ms)');
+      print(
+          'Average search latency: ${avgMs.toStringAsFixed(3)}ms (target: < 16ms)');
       // ignore: avoid_print
       print('p95 search latency: ${p95Ms.toStringAsFixed(3)}ms');
       // ignore: avoid_print
       print('Max search latency: ${maxMs.toStringAsFixed(3)}ms');
 
-      expect(avgMs, lessThan(16.0), reason: 'Average latency must be < 16ms (60 FPS gate)');
-      expect(maxMs, lessThan(50.0), reason: 'Max latency should not exceed 50ms');
+      expect(avgMs, lessThan(16.0),
+          reason: 'Average latency must be < 16ms (60 FPS gate)');
+      expect(maxMs, lessThan(50.0),
+          reason: 'Max latency should not exceed 50ms');
     });
   });
 
@@ -295,7 +383,9 @@ void main() {
     // ------------------------------------------------------------
     // 2.1 Extreme Clinical Inputs (300kg, 25 mg/dL SCr)
     // ------------------------------------------------------------
-    test('2.1 Controller handles extreme inputs (300kg weight, 25 SCr) deterministically', () {
+    test(
+        '2.1 Controller handles extreme inputs (300kg weight, 25 SCr) deterministically',
+        () {
       final controller = CalculatorController(drug: testOverdoseDrug);
       addTearDown(() => controller.dispose());
 
@@ -341,7 +431,8 @@ void main() {
     // ------------------------------------------------------------
     // 2.2 Unselected Regimen State Handling & Bug Discovery
     // ------------------------------------------------------------
-    test('2.2 Unselected regimen initial state does not throw on calculate', () {
+    test('2.2 Unselected regimen initial state does not throw on calculate',
+        () {
       final controller = CalculatorController(drug: testDrugNoRegimens);
       addTearDown(() => controller.dispose());
 
@@ -359,7 +450,9 @@ void main() {
       expect(controller.state.status, CalculatorUiStatus.empty);
     });
 
-    test('2.2.1 selectRegimen(null) properly clears selectedRegimen in CalculatorController', () {
+    test(
+        '2.2.1 selectRegimen(null) properly clears selectedRegimen in CalculatorController',
+        () {
       final controller = CalculatorController(drug: testOverdoseDrug);
       addTearDown(() => controller.dispose());
 
@@ -372,14 +465,17 @@ void main() {
       expect(
         controller.state.selectedRegimen,
         isNull,
-        reason: 'controller.selectRegimen(null) must clear regimen via clearRegimen: true in copyWith',
+        reason:
+            'controller.selectRegimen(null) must clear regimen via clearRegimen: true in copyWith',
       );
     });
 
     // ------------------------------------------------------------
     // 2.3 Rapid Toggling of Regimens and RRT Modes
     // ------------------------------------------------------------
-    test('2.3 Rapid cycling of RRT modes and regimens preserves controller state', () {
+    test(
+        '2.3 Rapid cycling of RRT modes and regimens preserves controller state',
+        () {
       final meropenem = DrugDatabase.findById('meropenem')!;
       final controller = CalculatorController(drug: meropenem);
       addTearDown(() => controller.dispose());
@@ -424,6 +520,7 @@ void main() {
           tester.view.resetDevicePixelRatio();
         });
 
+        PatientSession.instance.clearPatient();
         await tester.pumpWidget(const MaterialApp(
           home: CalculatorScreen(
             drug: testOverdoseDrug,
@@ -456,7 +553,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // 1. Verify overdose banner is present
-        expect(find.byKey(const Key('calculator_overdose_banner')), findsOneWidget);
+        expect(find.byKey(const Key('calculator_overdose_banner')),
+            findsOneWidget);
 
         // 2. Verify calculatedDose (4500.00 mg) is displayed on screen
         // In DosageResultCard, it appears both in the rounded display and the strikethrough raw formula
@@ -485,6 +583,7 @@ void main() {
         });
 
         // Test Thai locale (typically longer text)
+        PatientSession.instance.clearPatient();
         await tester.pumpWidget(const MaterialApp(
           home: CalculatorScreen(
             drug: testOverdoseDrug,
@@ -519,7 +618,8 @@ void main() {
         expect(tester.takeException(), isNull);
 
         // Verify sticky calculate bar is still accessible
-        expect(find.byKey(const Key('calculator_calculate_button')), findsOneWidget);
+        expect(find.byKey(const Key('calculator_calculate_button')),
+            findsOneWidget);
 
         // Verify dose result is rendered
         expect(find.textContaining('mg'), findsWidgets);
