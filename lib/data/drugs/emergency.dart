@@ -54,9 +54,9 @@ final List<Drug> emergency = [
       compatibleDiluents: [IvDiluent.d5w, IvDiluent.nss, IvDiluent.d5nss],
       preferredDiluent: IvDiluent.d5w,
       stabilityNoteEn:
-          'Continuous IV infusion: dilute in D5W or NSS (e.g., 4 mg in 250 mL = 16 mcg/mL). Protect from light; discard if pinkish or brown. NEVER mix with sodium bicarbonate (alkaline inactivation).',
+          'Infusion: 4 mg/250 mL (16 mcg/mL) in D5W or NSS. Protect from light; discard if pink/brown. Do not mix with sodium bicarbonate.',
       stabilityNoteTh:
-          'สำหรับการหยดต่อเนื่อง: ผสมใน D5W หรือ NSS (เช่น 4 mg ใน 250 mL = 16 mcg/mL) เก็บพ้นแสง ห้ามใช้หากเปลี่ยนเป็นสีชมพูหรือน้ำตาล และห้ามผสมร่วมกับ Sodium Bicarbonate',
+          'หยดต่อเนื่อง: 4 mg/250 mL (16 mcg/mL) ใน D5W หรือ NSS; เก็บพ้นแสง งดใช้หากสีชมพู/น้ำตาล และห้ามผสม Sodium Bicarbonate',
       sourceCitation:
           'US FDA Adrenalin (epinephrine) SPL / AHA ACLS Guidelines 2020 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี',
     ),
@@ -222,9 +222,9 @@ final List<Drug> emergency = [
       compatibleDiluents: [IvDiluent.d5w, IvDiluent.nss],
       preferredDiluent: IvDiluent.d5w,
       stabilityNoteEn:
-          'Dilute 50% MgSO4 solution to <= 20% (<= 200 mg/mL) prior to IV infusion (standard maintenance: 20 g in 500 mL NSS or D5W = 40 mg/mL) via infusion pump.',
+          'Dilute 50% MgSO4 to <=20% (<=200 mg/mL). Standard: 20 g/500 mL (40 mg/mL); use an infusion pump.',
       stabilityNoteTh:
-          'ต้องเจือจาง 50% MgSO4 ให้มีความเข้มข้น <= 20% ก่อนหยดเข้าหลอดเลือดดำ (ผสมมาตรฐาน: 20 g ใน NSS หรือ D5W 500 mL = 40 mg/mL) ผ่าน Infusion Pump เสมอ',
+          'เจือจาง MgSO4 50% ให้เหลือ <=20% (<=200 mg/mL). มาตรฐาน 20 g/500 mL (40 mg/mL); ใช้ Infusion Pump',
       sourceCitation:
           'US FDA Magnesium Sulfate Injection SPL / ACOG Practice Bulletin No. 222 / คู่มือยาฉีดรามาธิบดี',
     ),
@@ -463,9 +463,9 @@ final List<Drug> emergency = [
       ],
       preferredDiluent: IvDiluent.d5w,
       stabilityNoteEn:
-          'Standard: 250 mg in 250 mL D5W or NSS (1.0 mg/mL = 1,000 mcg/mL); use within 24 hours. Slight pink discoloration over time reflects mild oxidation without significant potency loss. Incompatible with alkaline sodium bicarbonate.',
+          'Standard: 250 mg/250 mL (1 mg/mL) in D5W or NSS; use within 24 h. Slight pink color may occur. Do not mix with sodium bicarbonate.',
       stabilityNoteTh:
-          'ผสมมาตรฐาน 250 mg ใน D5W หรือ NSS 250 mL (1.0 mg/mL) ใช้ภายใน 24 ชม. ห้ามผสมร่วมกับ Sodium Bicarbonate หรือสารละลายด่าง',
+          'ผสม 250 mg/250 mL (1 mg/mL) ใน D5W หรือ NSS; ใช้ภายใน 24 ชม. สีชมพูเล็กน้อยอาจเกิดได้; ห้ามผสม Sodium Bicarbonate',
       sourceCitation:
           'US FDA Dobutrex (dobutamine) SPL / Ramathibodi High-Alert IV Infusion Guide 2024',
     ),
