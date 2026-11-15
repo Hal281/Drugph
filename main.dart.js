@@ -57388,8 +57388,7 @@ n=l.a.c.gcp()==="th"?"\u0e1b\u0e23\u0e30\u0e27\u0e31\u0e15\u0e34":"History"
 n=B.dU(k,k,A.am2,k,k,new B.aIJ(l),k,k,n,k)
 m=t.n
 r=B.ja(B.b([new B.fZ(p.a,new B.aIK(l),k,k,t.oe),o,n,B.Ak(B.r(l.a.c.gcp()==="th"?"EN":"TH",k,k,k,k,A.a1z,k,k),k,k,new B.aIL(l),k,k)],m),!0,A.eY,k,0,k,A.F,k,k,r)
-l.a.c.gcp()
-p=B.ai(k,B.ar(B.b([A.alK,A.bh,B.aM(B.r("",k,k,k,k,A.bDG,k,k),1)],m),A.S,A.C,A.I,0,k,k),A.J,A.a8c,k,k,k,k,k,k,A.oP,k,k,k)
+p=B.ai(k,B.ar(B.b([A.alK,A.bh,B.aM(B.r(l.a.c.gcp()==="th"?"\u26a0\ufe0f \u0e0b\u0e2d\u0e1f\u0e15\u0e4c\u0e41\u0e27\u0e23\u0e4c\u0e15\u0e49\u0e19\u0e41\u0e1a\u0e1a\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e01\u0e32\u0e23\u0e28\u0e36\u0e01\u0e29\u0e32 (Educational Prototype) \u2014 \u0e44\u0e21\u0e48\u0e43\u0e0a\u0e48\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e1e\u0e17\u0e22\u0e4c \u0e2b\u0e49\u0e32\u0e21\u0e43\u0e0a\u0e49\u0e01\u0e31\u0e1a\u0e1c\u0e39\u0e49\u0e1b\u0e48\u0e27\u0e22\u0e08\u0e23\u0e34\u0e07":"\u26a0\ufe0f Educational SaMD Prototype \u2014 Not a certified medical device. Never for real patient use.",k,k,k,k,A.bDG,k,k),1)],m),A.S,A.C,A.I,0,k,k),A.J,A.a8c,k,k,k,k,k,k,A.oP,k,k,k)
 o=B.ai(k,new B.Dy(l.d,l.gaxC(),new B.aIM(l),l.e,new B.aIN(l),new B.aIO(l),l.a.c.gcp()==="th",k),A.J,A.eY,k,k,k,k,k,k,A.ahL,k,k,k)
 n=B.cU(B.ar(B.b([B.dU(k,k,B.bX(A.ajr,A.eK,k,32),k,k,new B.aIP(l),k,k,k,k),B.aM(B.Wc(l.w,new B.aIF(l,q),q.length+1,A.ahY,A.c6),1),B.dU(k,k,B.bX(A.EN,A.eK,k,32),k,k,new B.aIG(l),k,k,k,k)],m),A.S,A.C,A.I,0,k,k),95,k)
 i=i.length
