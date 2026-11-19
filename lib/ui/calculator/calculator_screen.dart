@@ -379,6 +379,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildTierBanner(t),
+                    _buildVerificationBanner(state, t),
                     if (isReferenceOnly) ...[
                       _buildReferenceOnlyCard(state, t),
                       const SizedBox(height: 16),
@@ -428,6 +429,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             children: isReferenceOnly
                 ? [
                     _buildTierBanner(t),
+                    _buildVerificationBanner(state, t),
                     _buildReferenceOnlyCard(state, t),
                     const SizedBox(height: 16),
                     ClinicalHeaderAlerts(
@@ -439,6 +441,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   ]
                 : [
                     _buildTierBanner(t),
+                    _buildVerificationBanner(state, t),
                     PatientClinicalHeader(
                       state: state,
                       isThai: t,
@@ -465,6 +468,84 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             categoryColor: AppTheme.primaryTeal,
           ),
       ],
+    );
+  }
+
+  Widget _buildVerificationBanner(CalculatorUiState state, bool t) {
+    final summary = VerificationLedgerService.evaluateDrug(widget.drug);
+    final isVerified = summary.isFullyVerified;
+    final bgColor = isVerified ? const Color(0xFFF0FDF4) : AppTheme.statusWarningBg;
+    final borderColor =
+        isVerified ? const Color(0xFF86EFAC) : AppTheme.statusWarningBorder;
+    final fgColor = isVerified ? const Color(0xFF15803D) : const Color(0xFF92400E);
+    final iconColor = isVerified ? const Color(0xFF16A34A) : const Color(0xFFD97706);
+
+    final String message;
+    if (isVerified) {
+      final licenses = summary.reviewerLicenses.join(', ');
+      final dateStr =
+          summary.latestVerifiedDate != null ? ' • ${summary.latestVerifiedDate}' : '';
+      message = t
+          ? 'ตรวจรับรองทางคลินิกแล้ว ($licenses$dateStr)'
+          : 'Pharmacist verified ($licenses$dateStr)';
+    } else if (summary.status == DrugLedgerStatus.partiallyVerified) {
+      message = t
+          ? 'รอเภสัชกรตรวจสอบรับรอง (Not yet verified by a pharmacist) — ตรวจแล้ว ${summary.verifiedRegimenCount}/${summary.totalRegimenCount} สูตร'
+          : 'Not yet verified by a pharmacist (${summary.verifiedRegimenCount}/${summary.totalRegimenCount} regimens verified).';
+    } else {
+      message = t
+          ? 'รอเภสัชกรตรวจสอบรับรอง (Not yet verified by a pharmacist)'
+          : 'Not yet verified by a pharmacist — verify dosing against clinical monograph.';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: bgColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: borderColor),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: Key(
+            isVerified
+                ? 'calculator_verified_pharmacist_banner'
+                : 'calculator_unverified_pharmacist_banner',
+          ),
+          onTap: () => ClinicalEvidenceSheet.show(
+            context,
+            drug: widget.drug,
+            regimen: state.selectedRegimen,
+            isThai: t,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  isVerified ? Icons.verified_rounded : Icons.pending_actions_rounded,
+                  size: 18,
+                  color: iconColor,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: fgColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(Icons.chevron_right, size: 18, color: fgColor),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 

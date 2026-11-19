@@ -3,6 +3,7 @@ import '../data/drug_database.dart';
 import '../data/drug_search_engine.dart';
 import '../core/domain/drug_tier_registry.dart';
 import '../core/domain/high_alert_registry.dart';
+import '../core/domain/verification_ledger_service.dart';
 import '../core/models/models.dart';
 import 'calculator_screen.dart';
 import 'history_screen.dart';
@@ -825,6 +826,45 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         _selectedTier ==
                                                             _DrugTierFilter.all)
                                                       _buildTierPill(drug),
+                                                    if (VerificationLedgerService
+                                                        .evaluateDrug(drug)
+                                                        .isFullyVerified)
+                                                      Container(
+                                                        key: Key(
+                                                          'drug_verified_badge_${drug.id}',
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 1.5,
+                                                        ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color(
+                                                              0xFFF0FDF4),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(4),
+                                                          border: Border.all(
+                                                            color: const Color(
+                                                                0xFF86EFAC),
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          isThai
+                                                              ? 'รับรองแล้ว ✓'
+                                                              : 'Verified ✓',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: Color(
+                                                                0xFF15803D),
+                                                          ),
+                                                        ),
+                                                      ),
                                                   ],
                                                 ),
                                               ),

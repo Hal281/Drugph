@@ -110,6 +110,9 @@ enum DosingWeightStrategy {
 /// A drug may have multiple regimens for different routes, indications,
 /// or patient populations.
 class DosingRegimen {
+  /// Optional explicit identifier matching `assets/data/verification_ledger.json` (WP-13).
+  final String? id;
+
   /// Route of administration.
   final DoseRoute route;
 
@@ -252,6 +255,7 @@ class DosingRegimen {
   final IvDiluentCompatibility? ivDiluentCompatibility;
 
   const DosingRegimen({
+    this.id,
     required this.route,
     this.indication,
     required this.dosingType,
@@ -359,6 +363,28 @@ class DosingRegimen {
       return RegimenAudience.pediatric;
     }
     return RegimenAudience.adult;
+  }
+
+  /// Canonical deterministic identifier for this regimen (WP-13 verification ledger).
+  ///
+  /// Uses explicit [id] if supplied; otherwise synthesizes
+  /// `<route>_<slug(indication|dosingType)>`. Note that [Drug.regimenIdAt]
+  /// additionally disambiguates duplicate base slugs within the same [Drug].
+  String get canonicalRegimenId {
+    if (id != null && id!.trim().isNotEmpty) {
+      return id!.trim().toLowerCase();
+    }
+    final rawLabel = (indication != null && indication!.trim().isNotEmpty)
+        ? indication!
+        : dosingType.name;
+    var slug = rawLabel
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'^_+|_+$'), '');
+    if (slug.isEmpty) {
+      slug = dosingType.name.toLowerCase();
+    }
+    return '${route.name.toLowerCase()}__$slug';
   }
 
   @override
@@ -743,6 +769,30 @@ class Drug {
       requiresHepaticEvaluation: requiresHepatic,
       isPediatricRegimen: isPediatric,
     );
+  }
+
+  /// Deterministic unique identifier for the regimen at [index] within this [Drug] (WP-13).
+  String regimenIdAt(int index) {
+    final targetBase = regimens[index].canonicalRegimenId;
+    var seenBefore = 0;
+    for (var i = 0; i < index; i++) {
+      if (regimens[i].canonicalRegimenId == targetBase) {
+        seenBefore++;
+      }
+    }
+    return seenBefore == 0 ? targetBase : '${targetBase}_${seenBefore + 1}';
+  }
+
+  /// Deterministic unique identifier for [regimen] within this [Drug] (WP-13).
+  String regimenIdFor(DosingRegimen regimen) {
+    for (var i = 0; i < regimens.length; i++) {
+      if (identical(regimens[i], regimen)) {
+        return regimenIdAt(i);
+      }
+    }
+    final idx = regimens.indexOf(regimen);
+    if (idx >= 0) return regimenIdAt(idx);
+    return regimen.canonicalRegimenId;
   }
 
   @override

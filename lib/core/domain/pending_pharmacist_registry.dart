@@ -672,4 +672,23 @@ class PendingPharmacistRegistry {
         .where((d) => d.affectedDrugIds.map((e) => e.toLowerCase()).contains(needle))
         .toList();
   }
+
+  /// Whether [drugId] currently has an open pending decision policy.
+  static bool hasPendingDecision(String drugId) =>
+      getByDrugId(drugId).isNotEmpty;
+
+  /// Collects unique pending decisions affecting any drug in [drugIds].
+  static List<PendingClinicalDecision> getForDrugIds(Iterable<String> drugIds) {
+    final needles = drugIds.map((e) => e.trim().toLowerCase()).toSet();
+    final matched = <PendingClinicalDecision>[];
+    final seenIds = <String>{};
+    for (final decision in allDecisions) {
+      final hits = decision.affectedDrugIds
+          .any((id) => needles.contains(id.toLowerCase()));
+      if (hits && seenIds.add(decision.id)) {
+        matched.add(decision);
+      }
+    }
+    return matched;
+  }
 }

@@ -24,3 +24,4 @@ export 'dosage_result.dart';
 export 'dose_rule.dart';
 export 'drug_ontology.dart';
 export 'therapeutic_duplication.dart';
+export 'verification_ledger.dart';

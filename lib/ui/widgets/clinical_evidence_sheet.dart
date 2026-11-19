@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/formatters/clinical_citation_formatter.dart';
-import '../../core/models/models.dart';
+import '../../core/core.dart';
 import '../theme/app_theme.dart';
 
 /// Interactive modal bottom sheet / dialog that displays the clinical textbook
@@ -121,9 +120,12 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
         (drug.lastReviewedDate.isNotEmpty ? drug.lastReviewedDate : 'Current Version');
     final section = mono?.sectionOrTable;
 
-    final isVerified = (drug.provenance?.reviewerLicense != null &&
-            drug.provenance!.reviewerLicense!.trim().isNotEmpty) ||
-        (regimen?.verificationStatus == VerificationStatus.verified);
+    final ledgerSummary = VerificationLedgerService.evaluateDrug(drug);
+    final hasSignedProvenance = drug.provenance?.reviewerLicense != null &&
+        SchemaValidator.isValidThaiMedicalLicense(drug.provenance!.reviewerLicense) &&
+        drug.regimens.isNotEmpty &&
+        drug.regimens.every((r) => r.verificationStatus == VerificationStatus.verified);
+    final isVerified = ledgerSummary.isFullyVerified || hasSignedProvenance;
 
     final showRenalSection = widget.initialSection == 'renal' ||
         (regimen?.renalAdjustments != null && regimen!.renalAdjustments!.isNotEmpty) ||
@@ -488,7 +490,7 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
             ],
 
             // Clinical Review Stamp (ตรายางรับรองโดยเภสัชกร)
-            _buildReviewerStampCard(isVerified),
+            _buildReviewerStampCard(isVerified, ledgerSummary),
           ],
         ),
       ),
@@ -738,9 +740,33 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
     );
   }
 
-  Widget _buildReviewerStampCard(bool isVerified) {
+  Widget _buildReviewerStampCard(
+    bool isVerified,
+    DrugVerificationSummary ledgerSummary,
+  ) {
     final prov = drug.provenance;
+    final String detailText;
+    if (ledgerSummary.isFullyVerified) {
+      final reviewers = ledgerSummary.verifiedByNames.join(', ');
+      final licenses = ledgerSummary.reviewerLicenses.join(', ');
+      final date = ledgerSummary.latestVerifiedDate ?? '';
+      detailText =
+          '${isThai ? "ผู้ตรวจ:" : "Reviewer:"} $reviewers ($licenses) • $date (${ledgerSummary.verifiedRegimenCount}/${ledgerSummary.totalRegimenCount})';
+    } else if (isVerified && prov != null) {
+      detailText =
+          '${isThai ? "ผู้ตรวจ:" : "Reviewer:"} ${prov.reviewedBy} ${prov.reviewerLicense != null ? "(${prov.reviewerLicense})" : ""} • ${prov.reviewedAt}';
+    } else {
+      detailText = isThai
+          ? 'รอเภสัชกรตรวจสอบรับรอง (รับรองแล้ว ${ledgerSummary.verifiedRegimenCount}/${ledgerSummary.totalRegimenCount} สูตร) — อยู่ในชุด Clinical Dossier'
+          : 'Not yet verified by a pharmacist (${ledgerSummary.verifiedRegimenCount}/${ledgerSummary.totalRegimenCount} regimens signed in ledger).';
+    }
+
     return Container(
+      key: Key(
+        isVerified
+            ? 'clinical_evidence_verified_stamp'
+            : 'clinical_evidence_pending_stamp',
+      ),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isVerified ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB),
@@ -774,11 +800,7 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isVerified && prov != null
-                      ? '${isThai ? "ผู้ตรวจ:" : "Reviewer:"} ${prov.reviewedBy} ${prov.reviewerLicense != null ? "(${prov.reviewerLicense})" : ""} • ${prov.reviewedAt}'
-                      : (isThai
-                          ? 'ข้อมูลอยู่ในชุดตรวจสอบ Clinical Dossier เพื่อให้อาจารย์และเภสัชกรตรวจเซ็นรับรอง'
-                          : 'Monograph included in Clinical Dossier awaiting formal verification.'),
+                  detailText,
                   style: TextStyle(
                     fontSize: 12,
                     color: isVerified ? const Color(0xFF166534) : const Color(0xFF92400E),

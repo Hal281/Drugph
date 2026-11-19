@@ -1,3 +1,5 @@
+import '../models/drug.dart';
+import '../models/verification_ledger.dart';
 import '../models/verified_drug_schema.dart';
 
 /// Result of validating a [VerifiedDrugKnowledgeBase] against Pillar 1 rules.
@@ -386,5 +388,152 @@ class SchemaValidator {
     }
 
     return errors;
+  }
+
+  // ===========================================================================
+  // WP-13: Verification Ledger Validation (Strict Human Sign-Off Enforcement)
+  // ===========================================================================
+
+  static final RegExp _thaiLicenseRegex = RegExp(r'^(?:ภก\.|ภ\.|ว\.)\s*\d{4,6}$');
+
+  static const Set<String> _placeholderReviewerTokens = {
+    'pending',
+    'tbd',
+    'todo',
+    'test',
+    'fake',
+    'dummy',
+    'mock',
+    'n/a',
+    'na',
+    'none',
+    'unknown',
+    'รอการลงนาม',
+    'รอยืนยัน',
+  };
+
+  /// Validates Thai pharmacist (`ภก.XXXXX`, `ภ. XXXXX`) or physician (`ว.XXXXX`) licenses.
+  static bool isValidThaiMedicalLicense(String? value) {
+    if (value == null) return false;
+    final trimmed = value.trim();
+    return _thaiLicenseRegex.hasMatch(trimmed);
+  }
+
+  /// Validates an ISO `YYYY-MM-DD` date string with strict calendar round-trip check
+  /// (rejects invalid calendar dates like `2026-02-30` or `2026-13-01`).
+  static bool isValidIsoDate(String? value) {
+    if (value == null) return false;
+    final trimmed = value.trim();
+    final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(trimmed);
+    if (match == null) return false;
+    final year = int.tryParse(match.group(1)!);
+    final month = int.tryParse(match.group(2)!);
+    final day = int.tryParse(match.group(3)!);
+    if (year == null || month == null || day == null) return false;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return false;
+    final parsed = DateTime(year, month, day);
+    return parsed.year == year && parsed.month == month && parsed.day == day;
+  }
+
+  /// Returns `true` when [value] is missing or uses known placeholder text.
+  static bool isPlaceholderReviewer(String? value) {
+    if (value == null) return true;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return true;
+    final lower = trimmed.toLowerCase();
+    for (final token in _placeholderReviewerTokens) {
+      if (lower == token ||
+          lower.contains('pending') ||
+          lower.contains('รอการลงนาม') ||
+          lower.contains('รอยืนยัน')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Validates a single [VerificationLedgerEntry] against strict sign-off rules.
+  static List<String> validateLedgerEntry(VerificationLedgerEntry entry) {
+    final errors = <String>[];
+    final prefix =
+        '[${entry.drugId.isNotEmpty ? entry.drugId : "unknown"}:${entry.regimenId.isNotEmpty ? entry.regimenId : "unknown"}]';
+
+    if (entry.drugId.trim().isEmpty) {
+      errors.add('$prefix drug_id must not be empty.');
+    }
+    if (entry.regimenId.trim().isEmpty) {
+      errors.add('$prefix regimen_id must not be empty.');
+    }
+    if (entry.sourceChecked.trim().isEmpty) {
+      errors.add('$prefix source_checked must not be empty.');
+    }
+
+    if (entry.verified) {
+      if (isPlaceholderReviewer(entry.verifiedBy)) {
+        errors.add(
+          '$prefix verified=true requires non-placeholder human reviewer name in verified_by.',
+        );
+      }
+      if (!isValidThaiMedicalLicense(entry.licenseNo)) {
+        errors.add(
+          '$prefix verified=true requires valid Thai license format (e.g. ภก.12345, ภ. 12345, or ว.12345) in license_no.',
+        );
+      }
+      if (!isValidIsoDate(entry.verifiedDate)) {
+        errors.add(
+          '$prefix verified=true requires valid calendar ISO YYYY-MM-DD date in verified_date.',
+        );
+      }
+      if (entry.sourceChecked.toLowerCase().contains('(pending)')) {
+        errors.add(
+          '$prefix verified=true cannot leave "(Pending)" marker in source_checked.',
+        );
+      }
+    }
+
+    return errors;
+  }
+
+  /// Validates an entire [VerificationLedger], checking uniqueness of `(drug_id, regimen_id)`
+  /// and optional full coverage of all active regimens in [expectedDrugs].
+  static SchemaValidationReport validateVerificationLedger(
+    VerificationLedger ledger, {
+    Iterable<Drug>? expectedDrugs,
+  }) {
+    final errors = <String>[];
+
+    if (!RegExp(r'^\d+\.\d+\.\d+$').hasMatch(ledger.schemaVersion.trim())) {
+      errors.add(
+        'Invalid or missing schema_version "${ledger.schemaVersion}" in verification ledger (expected semver like 1.0.0).',
+      );
+    }
+
+    final seenPairs = <String>{};
+    for (final entry in ledger.entries) {
+      final pairKey =
+          '${entry.drugId.trim().toLowerCase()}::${entry.regimenId.trim().toLowerCase()}';
+      if (!seenPairs.add(pairKey)) {
+        errors.add('Duplicate verification ledger entry for "$pairKey".');
+      }
+      errors.addAll(validateLedgerEntry(entry));
+    }
+
+    if (expectedDrugs != null) {
+      for (final drug in expectedDrugs) {
+        for (var i = 0; i < drug.regimens.length; i++) {
+          final regId = drug.regimenIdAt(i);
+          if (ledger.entryFor(drug.id, regId) == null) {
+            errors.add(
+              'Missing verification ledger entry for expected regimen "${drug.id}::$regId".',
+            );
+          }
+        }
+      }
+    }
+
+    return SchemaValidationReport(
+      isValid: errors.isEmpty,
+      errors: List.unmodifiable(errors),
+    );
   }
 }

@@ -18,4 +18,5 @@ export 'validators/safety_check_engine.dart';
 export 'domain/drug_tier_registry.dart';
 export 'domain/high_alert_registry.dart';
 export 'domain/pending_pharmacist_registry.dart';
+export 'domain/verification_ledger_service.dart';
 export 'audit/calculation_log.dart';

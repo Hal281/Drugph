@@ -476,6 +476,7 @@ class VerificationMetadata {
   final String verifiedStatus;
   final bool sourceVerified;
   final String? verifiedBy;
+  final String? licenseNo;
   final String? verifiedDate;
   final String sourceName;
   final String editionAndPage;
@@ -488,6 +489,7 @@ class VerificationMetadata {
     required this.verifiedStatus,
     this.sourceVerified = false,
     this.verifiedBy,
+    this.licenseNo,
     this.verifiedDate,
     required this.sourceName,
     required this.editionAndPage,
@@ -512,6 +514,7 @@ class VerificationMetadata {
       verifiedStatus: (json['verified_status'] as String?) ?? '',
       sourceVerified: (json['source_verified'] as bool?) ?? false,
       verifiedBy: json['verified_by'] as String?,
+      licenseNo: json['license_no'] as String?,
       verifiedDate: json['verified_date'] as String?,
       sourceName: (json['source_name'] as String?) ?? '',
       editionAndPage: (json['edition_and_page'] as String?) ?? '',
@@ -526,6 +529,7 @@ class VerificationMetadata {
         'verified_status': verifiedStatus,
         'source_verified': sourceVerified,
         'verified_by': verifiedBy,
+        if (licenseNo != null) 'license_no': licenseNo,
         'verified_date': verifiedDate,
         'source_name': sourceName,
         'edition_and_page': editionAndPage,

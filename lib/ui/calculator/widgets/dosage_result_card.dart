@@ -72,7 +72,7 @@ class DosageResultCard extends StatelessWidget {
             ? (t ? 'ผลการคำนวณ (มีข้อควรระวัง)' : 'Calculated with Warnings')
             : (t
                 ? 'ผลการคำนวณผ่านเกณฑ์ความปลอดภัย'
-                : 'Calculated Result (Verified)'));
+                : 'Calculated Result (Within Safety Limits)'));
 
     return Card(
       color: Colors.white,

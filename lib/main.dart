@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'data/verification_ledger_loader.dart';
 import 'ui/home_screen.dart';
 import 'ui/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await VerificationLedgerLoader.ensureLoaded();
   runApp(const DrugDosageApp());
 }
 

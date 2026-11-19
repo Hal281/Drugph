@@ -1,12 +1,93 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, unnecessary_string_interpolations
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:drug_dosage_calculator/core/core.dart';
 import 'package:drug_dosage_calculator/data/drug_database.dart';
 
-void main() async {
+void main(List<String> args) async {
+  if (args.isEmpty) {
+    await _generateFullDossierPdf();
+    return;
+  }
+
+  final parsed = _parseCliArgs(args);
+  if (parsed.showHelp) {
+    _printHelp();
+    return;
+  }
+  if (parsed.errorMessage != null) {
+    stderr.writeln('Error: ${parsed.errorMessage}');
+    _printHelp();
+    exitCode = 64;
+    return;
+  }
+
+  if (parsed.syncLedger) {
+    _syncLedgerFile(parsed.ledgerPath);
+    return;
+  }
+
+  final tierDrugs = _resolveTierDrugs(parsed.tier);
+  final totalBatches = tierDrugs.isEmpty
+      ? 1
+      : (tierDrugs.length / parsed.batchSize).ceil();
+  final ledger = _loadLedgerOrEmpty(parsed.ledgerPath);
+
+  pw.Font? thaiFont;
+  final fontFile = File('assets/fonts/ThaiFont.ttf');
+  if (fontFile.existsSync()) {
+    thaiFont = pw.Font.ttf(fontFile.readAsBytesSync().buffer.asByteData());
+  }
+  final theme = thaiFont != null
+      ? pw.ThemeData.withFont(
+          base: thaiFont,
+          bold: thaiFont,
+          italic: thaiFont,
+          boldItalic: thaiFont,
+        )
+      : pw.ThemeData.base();
+
+  if (parsed.allBatches) {
+    for (var b = 1; b <= totalBatches; b++) {
+      await _generateBatchDossierPdf(
+        tierName: parsed.tier,
+        tierDrugs: tierDrugs,
+        batchNumber: b,
+        batchSize: parsed.batchSize,
+        totalBatches: totalBatches,
+        ledger: ledger,
+        theme: theme,
+        explicitOutPath: null,
+      );
+    }
+    return;
+  }
+
+  final batchNumber = parsed.batchNumber ?? 1;
+  if (batchNumber < 1 || batchNumber > totalBatches) {
+    stderr.writeln(
+      'Error: --batch $batchNumber is out of range (1..$totalBatches for tier "${parsed.tier}" at batch-size ${parsed.batchSize}).',
+    );
+    exitCode = 64;
+    return;
+  }
+
+  await _generateBatchDossierPdf(
+    tierName: parsed.tier,
+    tierDrugs: tierDrugs,
+    batchNumber: batchNumber,
+    batchSize: parsed.batchSize,
+    totalBatches: totalBatches,
+    ledger: ledger,
+    theme: theme,
+    explicitOutPath: parsed.outPath,
+  );
+}
+
+Future<void> _generateFullDossierPdf() async {
   print('====================================================');
   print('Generating Clinical Pharmacist Dossier PDF...');
   print('====================================================');
@@ -1341,6 +1422,514 @@ pw.Widget _buildTableCell(String text, {bool isHeader = false, int flex = 1}) {
         fontWeight: isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
         color: isHeader ? PdfColors.teal900 : PdfColors.black,
       ),
+    ),
+  );
+}
+
+// =============================================================================
+// WP-13 CLI Argument Parsing, Verification Ledger Sync & 5-Drug Batch Dossiers
+// =============================================================================
+
+class _CliOptions {
+  final bool showHelp;
+  final bool syncLedger;
+  final String tier;
+  final int? batchNumber;
+  final bool allBatches;
+  final int batchSize;
+  final String? outPath;
+  final String ledgerPath;
+  final String? errorMessage;
+
+  const _CliOptions({
+    this.showHelp = false,
+    this.syncLedger = false,
+    this.tier = 'core',
+    this.batchNumber,
+    this.allBatches = false,
+    this.batchSize = 5,
+    this.outPath,
+    this.ledgerPath = 'assets/data/verification_ledger.json',
+    this.errorMessage,
+  });
+}
+
+_CliOptions _parseCliArgs(List<String> args) {
+  var showHelp = false;
+  var syncLedger = false;
+  var tier = 'core';
+  int? batchNumber;
+  var allBatches = false;
+  var batchSize = 5;
+  String? outPath;
+  var ledgerPath = 'assets/data/verification_ledger.json';
+
+  for (var i = 0; i < args.length; i++) {
+    final arg = args[i];
+    if (arg == '--help' || arg == '-h') {
+      showHelp = true;
+    } else if (arg == '--sync-ledger') {
+      syncLedger = true;
+    } else if (arg == '--tier' || arg.startsWith('--tier=')) {
+      final val = arg.contains('=')
+          ? arg.split('=')[1]
+          : (i + 1 < args.length ? args[++i] : '');
+      final norm = val.trim().toLowerCase();
+      if (!const {'core', 'extended', 'all'}.contains(norm)) {
+        return _CliOptions(
+          errorMessage: 'Invalid --tier "$val". Expected core, extended, or all.',
+        );
+      }
+      tier = norm;
+    } else if (arg == '--batch' || arg.startsWith('--batch=')) {
+      final val = arg.contains('=')
+          ? arg.split('=')[1]
+          : (i + 1 < args.length ? args[++i] : '');
+      final norm = val.trim().toLowerCase();
+      if (norm == 'all') {
+        allBatches = true;
+      } else {
+        final parsed = int.tryParse(norm);
+        if (parsed == null || parsed < 1) {
+          return _CliOptions(
+            errorMessage: 'Invalid --batch "$val". Expected positive integer or "all".',
+          );
+        }
+        batchNumber = parsed;
+      }
+    } else if (arg == '--batch-size' || arg.startsWith('--batch-size=')) {
+      final val = arg.contains('=')
+          ? arg.split('=')[1]
+          : (i + 1 < args.length ? args[++i] : '');
+      final parsed = int.tryParse(val.trim());
+      if (parsed == null || parsed < 1 || parsed > 20) {
+        return _CliOptions(
+          errorMessage: 'Invalid --batch-size "$val". Expected 1..20.',
+        );
+      }
+      batchSize = parsed;
+    } else if (arg == '--out' || arg.startsWith('--out=')) {
+      final val = arg.contains('=')
+          ? arg.split('=')[1]
+          : (i + 1 < args.length ? args[++i] : '');
+      if (val.trim().isEmpty) {
+        return const _CliOptions(errorMessage: '--out requires a file path.');
+      }
+      outPath = val.trim();
+    } else if (arg == '--ledger' || arg.startsWith('--ledger=')) {
+      final val = arg.contains('=')
+          ? arg.split('=')[1]
+          : (i + 1 < args.length ? args[++i] : '');
+      if (val.trim().isEmpty) {
+        return const _CliOptions(errorMessage: '--ledger requires a file path.');
+      }
+      ledgerPath = val.trim();
+    } else {
+      return _CliOptions(errorMessage: 'Unknown argument: $arg');
+    }
+  }
+
+  return _CliOptions(
+    showHelp: showHelp,
+    syncLedger: syncLedger,
+    tier: tier,
+    batchNumber: batchNumber,
+    allBatches: allBatches,
+    batchSize: batchSize,
+    outPath: outPath,
+    ledgerPath: ledgerPath,
+  );
+}
+
+void _printHelp() {
+  print('''
+Drugph Clinical Pharmacist Verification Dossier Generator (WP-13)
+
+Usage:
+  dart run tool/generate_pharmacist_dossier_pdf.dart
+      Generate full 48-page formulary verification dossier -> review/Clinical_Verification_Dossier.pdf
+
+  dart run tool/generate_pharmacist_dossier_pdf.dart --tier core --batch 1 --batch-size 5
+      Generate a focused 5-drug Clinical Advisor review dossier (30-min batch)
+
+Options:
+  --help, -h             Show this usage guide and exit
+  --tier <tier>          Select formulary tier: core (default in batch mode), extended, all
+  --batch <n|all>        1-indexed batch number or "all" batches
+  --batch-size <n>       Drugs per batch PDF (1..20, default: 5)
+  --out <path>           Custom PDF output path (batch mode)
+  --ledger <path>        Verification ledger JSON (default: assets/data/verification_ledger.json)
+  --sync-ledger          Generate/append unverified skeleton entries for Core regimens
+''');
+}
+
+List<Drug> _resolveTierDrugs(String tier) {
+  switch (tier) {
+    case 'extended':
+      return DrugDatabase.extendedDrugs;
+    case 'all':
+      return DrugDatabase.allDrugs;
+    case 'core':
+    default:
+      return DrugDatabase.coreDrugs;
+  }
+}
+
+VerificationLedger _loadLedgerOrEmpty(String path) {
+  final file = File(path);
+  if (!file.existsSync()) return VerificationLedger.empty;
+  try {
+    return VerificationLedger.parseJsonString(file.readAsStringSync());
+  } catch (e) {
+    stderr.writeln('Warning: Could not parse ledger at $path ($e). Using empty ledger.');
+    return VerificationLedger.empty;
+  }
+}
+
+void _syncLedgerFile(String ledgerPath) {
+  final existing = _loadLedgerOrEmpty(ledgerPath);
+  final existingMap = <String, VerificationLedgerEntry>{
+    for (final e in existing.entries) '${e.drugId}::${e.regimenId}': e,
+  };
+
+  final syncedEntries = <VerificationLedgerEntry>[];
+  var added = 0;
+
+  for (final drug in DrugDatabase.coreDrugs) {
+    for (var i = 0; i < drug.regimens.length; i++) {
+      final reg = drug.regimens[i];
+      final regId = drug.regimenIdAt(i);
+      final key = '${drug.id.toLowerCase()}::${regId.toLowerCase()}';
+      final prev = existingMap[key];
+      if (prev != null) {
+        syncedEntries.add(prev);
+      } else {
+        final citation = ClinicalCitationFormatter.formatPrimaryCitation(
+          drug,
+          regimen: reg,
+          isThai: false,
+        );
+        syncedEntries.add(
+          VerificationLedgerEntry(
+            drugId: drug.id.toLowerCase(),
+            regimenId: regId.toLowerCase(),
+            verified: false,
+            verifiedBy: null,
+            licenseNo: null,
+            verifiedDate: null,
+            sourceChecked: '$citation (Pending)',
+          ),
+        );
+        added++;
+      }
+    }
+  }
+
+  final outputLedger = VerificationLedger(
+    schemaVersion: existing.schemaVersion.isNotEmpty
+        ? existing.schemaVersion
+        : '1.0.0',
+    entries: syncedEntries,
+  );
+
+  final file = File(ledgerPath);
+  file.parent.createSync(recursive: true);
+  final encoded = const JsonEncoder.withIndent('  ').convert(outputLedger.toJson());
+  file.writeAsStringSync('$encoded\n');
+  print(
+    'Synced verification ledger: ${syncedEntries.length} total Core regimens ($added newly added) -> $ledgerPath',
+  );
+}
+
+Future<void> _generateBatchDossierPdf({
+  required String tierName,
+  required List<Drug> tierDrugs,
+  required int batchNumber,
+  required int batchSize,
+  required int totalBatches,
+  required VerificationLedger ledger,
+  required pw.ThemeData theme,
+  required String? explicitOutPath,
+}) async {
+  final start = (batchNumber - 1) * batchSize;
+  final end = (start + batchSize) > tierDrugs.length
+      ? tierDrugs.length
+      : (start + batchSize);
+  final batchDrugs = tierDrugs.sublist(start, end);
+  final batchPadded = batchNumber.toString().padLeft(2, '0');
+  final outPath = explicitOutPath ??
+      'review/batches/Clinical_Verification_Batch_${batchPadded}_$tierName.pdf';
+
+  final pilotGate = VerificationLedgerService.evaluatePilotReleaseGate(
+    coreDrugs: DrugDatabase.coreDrugs,
+    ledger: ledger,
+  );
+  final batchPendingDecisions = PendingPharmacistRegistry.getForDrugIds(
+    batchDrugs.map((d) => d.id),
+  );
+
+  final doc = pw.Document();
+  doc.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      theme: theme,
+      margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+      header: (ctx) => pw.Column(
+        children: [
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                'DRUGPH CLINICAL ADVISOR BATCH REVIEW — TIER: ${tierName.toUpperCase()} | BATCH $batchNumber/$totalBatches',
+                style: pw.TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.teal800,
+                ),
+              ),
+              pw.Text(
+                'Page ${ctx.pageNumber} of ${ctx.pagesCount}',
+                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+              ),
+            ],
+          ),
+          pw.Divider(color: PdfColors.teal700, thickness: 0.8),
+          pw.SizedBox(height: 4),
+        ],
+      ),
+      build: (ctx) => [
+        pw.Container(
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            color: PdfColor.fromHex('#E0F2F1'),
+            borderRadius: pw.BorderRadius.circular(6),
+            border: pw.Border.all(color: PdfColors.teal600),
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'ชุดเอกสารตรวจรับรองยาสำหรับที่ปรึกษาทางคลินิก — Batch $batchNumber / $totalBatches (${batchDrugs.length} ตัวยา)',
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.teal900,
+                ),
+              ),
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'รายการยาในชุดนี้: ${batchDrugs.map((d) => "${d.genericName} (${d.id})").join("  |  ")}',
+                style: const pw.TextStyle(fontSize: 8.5, color: PdfColors.grey900),
+              ),
+              pw.SizedBox(height: 4),
+              pw.Text(
+                'Pilot Release Gate (>= 80% Core Verified): ${pilotGate.verifiedCoreDrugCount}/${pilotGate.coreDrugCount} Core drugs verified '
+                '(${pilotGate.coveragePercent.toStringAsFixed(1)}%) — ${pilotGate.isPilotReady ? "PASSED" : "BLOCKED PENDING SIGN-OFF"}',
+                style: pw.TextStyle(
+                  fontSize: 8.2,
+                  fontWeight: pw.FontWeight.bold,
+                  color: pilotGate.isPilotReady ? PdfColors.green800 : PdfColors.orange900,
+                ),
+              ),
+              pw.SizedBox(height: 3),
+              pw.Text(
+                'แนวทางตรวจสอบ (30 นาที/ชุด): ยึดตาม AGENTS.md กฎข้อ 1-5 และ docs/VERIFICATION_PROTOCOL.md '
+                'โปรดตรวจสอบ DoseBasis (/dose vs /day), เพดานยาสูงสุด, เกณฑ์ไต (CrCl), IV Diluent, และลงนามรายตัวยาเพื่อนำไปบันทึกใน assets/data/verification_ledger.json',
+                style: const pw.TextStyle(fontSize: 7.5, color: PdfColors.grey800),
+              ),
+            ],
+          ),
+        ),
+        pw.SizedBox(height: 10),
+        ...batchDrugs.map((drug) => _buildBatchDrugCard(drug, ledger)),
+        if (batchPendingDecisions.isNotEmpty) ...[
+          pw.SizedBox(height: 8),
+          pw.Text(
+            'ภาคผนวกเฉพาะ Batch: ประเด็นนโยบายทางคลินิกที่รอมติลงนาม (${batchPendingDecisions.length} รายการ)',
+            style: pw.TextStyle(
+              fontSize: 10,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColor.fromHex('#E65100'),
+            ),
+          ),
+          pw.SizedBox(height: 4),
+          ...batchPendingDecisions.map(_buildPendingDecisionCard),
+        ],
+        pw.SizedBox(height: 10),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.teal700),
+            borderRadius: pw.BorderRadius.circular(6),
+            color: PdfColors.grey50,
+          ),
+          child: pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'การรับรองประจำชุด Batch $batchNumber/$totalBatches (Batch Sign-Off Certification)',
+                style: pw.TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.teal900,
+                ),
+              ),
+              pw.SizedBox(height: 6),
+              pw.Text(
+                'เภสัชกรคลินิกผู้ตรวจสอบ (Clinical Pharmacist): ______________________________  '
+                'เลขที่ ภก./ภ.: _______________  วันที่ (YYYY-MM-DD): ______________',
+                style: const pw.TextStyle(fontSize: 8),
+              ),
+              pw.SizedBox(height: 6),
+              pw.Text(
+                'กุมารแพทย์ / แพทย์ผู้ทรงคุณวุฒิ (Pediatrician / MD): _________________________  '
+                'เลขที่ ว.: ___________________  วันที่ (YYYY-MM-DD): ______________',
+                style: const pw.TextStyle(fontSize: 8),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  final outFile = File(outPath);
+  outFile.parent.createSync(recursive: true);
+  await outFile.writeAsBytes(await doc.save());
+  print(
+    'Generated Batch $batchNumber/$totalBatches (${batchDrugs.length} drugs) -> ${outFile.path} (${(outFile.lengthSync() / 1024).toStringAsFixed(1)} KB)',
+  );
+}
+
+pw.Widget _buildBatchDrugCard(Drug drug, VerificationLedger ledger) {
+  final summary = VerificationLedgerService.evaluateDrug(drug, ledger: ledger);
+  final citation = ClinicalCitationFormatter.formatPrimaryCitation(
+    drug,
+    isThai: false,
+  );
+  final isHad = HighAlertRegistry.isDrugHighAlertInCatalog(drug);
+  final isNti = HighAlertRegistry.isNarrowTherapeuticIndex(drug);
+
+  final badges = <String>[
+    drug.tier.name.toUpperCase(),
+    if (isHad) 'ISMP-HAD',
+    if (isNti) 'NTI/TDM',
+    if (drug.requiresRenalAdjustment) 'RENAL',
+    if (drug.requiresHepaticCaution) 'HEPATIC',
+  ];
+
+  final statusLabel = summary.isFullyVerified
+      ? 'VERIFIED (${summary.verifiedRegimenCount}/${summary.totalRegimenCount})'
+      : 'PENDING (${summary.verifiedRegimenCount}/${summary.totalRegimenCount})';
+
+  return pw.Container(
+    margin: const pw.EdgeInsets.only(bottom: 10),
+    padding: const pw.EdgeInsets.all(8),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(
+        color: summary.isFullyVerified ? PdfColors.green700 : PdfColors.grey400,
+      ),
+      borderRadius: pw.BorderRadius.circular(6),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Expanded(
+              child: pw.Text(
+                '${drug.genericName}${drug.nameTh != null ? " (${drug.nameTh})" : ""}  [id: ${drug.id}]',
+                style: pw.TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.teal900,
+                ),
+              ),
+            ),
+            pw.Text(
+              '${badges.join(" | ")}  •  $statusLabel',
+              style: pw.TextStyle(
+                fontSize: 7,
+                fontWeight: pw.FontWeight.bold,
+                color: summary.isFullyVerified ? PdfColors.green800 : PdfColors.orange800,
+              ),
+            ),
+          ],
+        ),
+        pw.SizedBox(height: 2),
+        pw.Text(
+          'Primary Reference: $citation',
+          style: const pw.TextStyle(fontSize: 7.2, color: PdfColors.blueGrey800),
+        ),
+        if (drug.sideEffects.isNotEmpty || drug.seriousSideEffects.isNotEmpty) ...[
+          pw.SizedBox(height: 2),
+          pw.Text(
+            'Side Effects — Common: ${drug.sideEffects.take(3).join("; ")} | Serious: ${drug.seriousSideEffects.take(3).join("; ")}',
+            style: const pw.TextStyle(fontSize: 6.8, color: PdfColors.grey800),
+          ),
+        ],
+        if (drug.ivDiluentCompatibility != null) ...[
+          pw.SizedBox(height: 2),
+          pw.Text(
+            'IV Compatibility — Safe: ${drug.ivDiluentCompatibility!.compatibleDiluents.map((d) => d.code).join(", ")}'
+            '${drug.ivDiluentCompatibility!.incompatibleDiluents.isNotEmpty ? " | Avoid: ${drug.ivDiluentCompatibility!.incompatibleDiluents.map((d) => d.code).join(", ")}" : ""}',
+            style: const pw.TextStyle(fontSize: 6.8, color: PdfColors.red800),
+          ),
+        ],
+        pw.SizedBox(height: 4),
+        pw.Table(
+          border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+          children: [
+            pw.TableRow(
+              decoration: const pw.BoxDecoration(color: PdfColors.grey100),
+              children: [
+                _buildTableCell('regimen_id / ข้อบ่งใช้', isHeader: true),
+                _buildTableCell('สูตร (Basis)', isHeader: true),
+                _buildTableCell('เพดานยา', isHeader: true),
+                _buildTableCell('เกณฑ์ไต / Ledger', isHeader: true),
+              ],
+            ),
+            ...List.generate(drug.regimens.length, (i) {
+              final r = drug.regimens[i];
+              final regId = drug.regimenIdAt(i);
+              final entry = ledger.entryFor(drug.id, regId);
+              final entryOk = entry != null &&
+                  entry.verified &&
+                  SchemaValidator.validateLedgerEntry(entry).isEmpty;
+              final formula = r.fixedDose != null
+                  ? '${r.fixedDose} ${r.doseUnit.symbol} ${r.frequency.displayEn}'
+                  : (r.dosePerKg != null
+                      ? '${r.dosePerKg} ${r.doseUnit.symbol}/kg (${r.doseBasis.name}) ${r.frequency.displayEn}'
+                      : (r.continuousRateMin != null
+                          ? '${r.continuousRateMin}-${r.continuousRateMax} ${r.continuousRateUnit}'
+                          : r.dosingType.nameEn));
+              final cap = r.limits?.maxSingleDose != null
+                  ? 'Max1: ${r.limits!.maxSingleDose} ${r.doseUnit.symbol}'
+                  : (r.limits?.maxDailyDose != null
+                      ? 'MaxDay: ${r.limits!.maxDailyDose} ${r.doseUnit.symbol}'
+                      : '-');
+              final renal = r.renalAdjustments != null && r.renalAdjustments!.isNotEmpty
+                  ? '${r.renalAdjustments!.length} tiers'
+                  : (drug.requiresRenalAdjustment ? 'Caution' : 'None');
+              return pw.TableRow(
+                children: [
+                  _buildTableCell('$regId\n${r.indication ?? "-"} [${r.route.abbreviation}]'),
+                  _buildTableCell(formula),
+                  _buildTableCell(cap),
+                  _buildTableCell('$renal\n${entryOk ? "[VERIFIED ${entry.licenseNo}]" : "[ ] Pending"}'),
+                ],
+              );
+            }),
+          ],
+        ),
+        pw.SizedBox(height: 5),
+        pw.Text(
+          'Sign-off (${drug.id}):  [  ] Approved   [  ] Needs Revision: _______________________   '
+          'Reviewer / License (ภก./ว.): ______________________   Date: ____-__-__',
+          style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey800),
+        ),
+      ],
     ),
   );
 }
