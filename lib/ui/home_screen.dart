@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/drug_database.dart';
 import '../data/drug_search_engine.dart';
+import '../core/domain/drug_tier_registry.dart';
 import '../core/domain/high_alert_registry.dart';
 import '../core/models/models.dart';
 import 'calculator_screen.dart';
@@ -26,10 +27,14 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+enum _DrugTierFilter { core, extended, all }
+
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   final List<String> _recentSearches = [];
   DrugCategory? _selectedCategory;
+  _DrugTierFilter _selectedTier = _DrugTierFilter.core;
+  bool _tierExplicitlyLocked = false;
   Drug? _selectedDrugForDesktop; // Track selected drug for desktop view
   final ScrollController _categoryScrollController = ScrollController();
 
@@ -93,6 +98,82 @@ class _HomeScreenState extends State<HomeScreen> {
       default:
         return Icons.medication_outlined;
     }
+  }
+
+  Widget _buildTierChip({
+    required Key key,
+    required _DrugTierFilter tierFilter,
+    required String label,
+  }) {
+    final isSelected = _selectedTier == tierFilter;
+    return ChoiceChip(
+      key: key,
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          color: isSelected ? AppTheme.primaryTealDark : AppTheme.inkSecondary,
+        ),
+      ),
+      selected: isSelected,
+      showCheckmark: false,
+      selectedColor: AppTheme.primaryTealSoft,
+      backgroundColor: AppTheme.surfaceSubtle,
+      side: BorderSide(
+        color: isSelected ? AppTheme.primaryTeal : AppTheme.borderDefault,
+      ),
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      onSelected: (_) {
+        setState(() {
+          _selectedTier = tierFilter;
+          _tierExplicitlyLocked = true;
+        });
+      },
+    );
+  }
+
+  Widget _buildTierPill(Drug drug) {
+    final tier = drug.tier;
+    final Color fg;
+    final Color bg;
+    final Color border;
+    final String text;
+    switch (tier) {
+      case DrugTier.core:
+        fg = AppTheme.primaryTealDark;
+        bg = AppTheme.primaryTealSoft;
+        border = AppTheme.primaryTealBorder;
+        text = 'Core';
+      case DrugTier.extended:
+        fg = const Color(0xFF92400E);
+        bg = AppTheme.statusWarningBg;
+        border = AppTheme.statusWarningBorder;
+        text = 'Extended';
+      case DrugTier.referenceOnly:
+        fg = const Color(0xFF475569);
+        bg = AppTheme.surfaceSubtle;
+        border = AppTheme.borderStrong;
+        text = 'Reference Only';
+    }
+    return Container(
+      key: Key('drug_tier_badge_${drug.id}'),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: border),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: fg,
+        ),
+      ),
+    );
   }
 
   String _getDrugClassLabel(Drug drug) {
@@ -239,9 +320,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // The actual Drug List UI (reused in both Mobile and Left Panel of Desktop)
   Widget _buildDrugList(bool isDesktop) {
+    final trimmedQuery = _searchQuery.trim();
+    final isSearching = trimmedQuery.isNotEmpty;
+    final expandCategoryAllTiers =
+        !isSearching && _selectedCategory != null && !_tierExplicitlyLocked;
+
     final List<DrugSearchResult> searchResults =
-        DrugDatabase.searchDetailed(_searchQuery);
+        (isSearching || _selectedTier == _DrugTierFilter.all)
+            ? DrugDatabase.searchAllCatalogDetailed(_searchQuery)
+            : DrugDatabase.searchDetailed(_searchQuery);
+
     var filteredResults = searchResults;
+    if (!isSearching && !expandCategoryAllTiers) {
+      if (_selectedTier == _DrugTierFilter.core) {
+        filteredResults =
+            filteredResults.where((r) => r.drug.tier == DrugTier.core).toList();
+      } else if (_selectedTier == _DrugTierFilter.extended) {
+        filteredResults = filteredResults
+            .where((r) => r.drug.tier == DrugTier.extended)
+            .toList();
+      }
+    }
+
     if (_selectedCategory != null) {
       filteredResults = filteredResults.where((r) {
         if (_selectedCategory == DrugCategory.analgesic) {
@@ -252,9 +352,25 @@ class _HomeScreenState extends State<HomeScreen> {
         return r.drug.category == _selectedCategory;
       }).toList();
     }
-    if (_searchQuery.trim().isEmpty) {
+
+    if (isSearching) {
+      // Rank Core -> Extended -> ReferenceOnly while preserving SearchEngine order within each tier
+      final indexed = filteredResults.asMap().entries.toList()
+        ..sort((a, b) {
+          final tierCmp = DrugTierRegistry.sortRank(a.value.drug.tier)
+              .compareTo(DrugTierRegistry.sortRank(b.value.drug.tier));
+          if (tierCmp != 0) return tierCmp;
+          return a.key.compareTo(b.key);
+        });
+      filteredResults = indexed.map((e) => e.value).toList();
+    } else {
       filteredResults = List.of(filteredResults)
-        ..sort((a, b) => a.drug.genericName.compareTo(b.drug.genericName));
+        ..sort((a, b) {
+          final tierCmp = DrugTierRegistry.sortRank(a.drug.tier)
+              .compareTo(DrugTierRegistry.sortRank(b.drug.tier));
+          if (tierCmp != 0) return tierCmp;
+          return a.drug.genericName.compareTo(b.drug.genericName);
+        });
     }
 
     final categories = DrugCategory.values.where((c) {
@@ -408,6 +524,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   _recentSearches.clear();
                 });
               },
+            ),
+          ),
+
+          // Formulary Tier Filter Row (WP-08 / FB-21)
+          Container(
+            width: double.infinity,
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildTierChip(
+                    key: const Key('home_tier_chip_core'),
+                    tierFilter: _DrugTierFilter.core,
+                    label: isThai
+                        ? 'Core (ยาเด็ก & ยาฉีด)'
+                        : 'Core (Pediatric & IV)',
+                  ),
+                  const SizedBox(width: 8),
+                  _buildTierChip(
+                    key: const Key('home_tier_chip_extended'),
+                    tierFilter: _DrugTierFilter.extended,
+                    label: isThai ? 'Extended (ทั่วไป)' : 'Extended',
+                  ),
+                  const SizedBox(width: 8),
+                  _buildTierChip(
+                    key: const Key('home_tier_chip_all'),
+                    tierFilter: _DrugTierFilter.all,
+                    label: isThai ? 'ทุก Tier (รวมอ้างอิง)' : 'All Tiers',
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -670,6 +819,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             .inkSecondary,
                                                       ),
                                                     ),
+                                                    if (drug.tier !=
+                                                            DrugTier.core ||
+                                                        isSearching ||
+                                                        _selectedTier ==
+                                                            _DrugTierFilter.all)
+                                                      _buildTierPill(drug),
                                                   ],
                                                 ),
                                               ),

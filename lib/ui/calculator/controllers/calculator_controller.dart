@@ -587,6 +587,7 @@ class CalculatorController extends ChangeNotifier {
       drug: _state.drug,
       regimen: _state.selectedRegimen!,
       liquidConcentration: _state.selectedLiquidConcentration,
+      enforceReferenceOnlyGate: true,
     );
 
     final weightStrategy =

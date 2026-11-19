@@ -8,6 +8,7 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import '../core/domain/drug_tier_registry.dart';
 import '../core/models/models.dart';
 import 'drug_search_engine.dart';
 import 'drugs/antibiotics.dart';
@@ -56,6 +57,25 @@ class DrugDatabase {
     ...immunosuppressants,
   ];
 
+  /// Complete catalog spanning active formulary ([allDrugs]) and archived
+  /// specialty drugs ([archivedSpecialtyDrugs]) — delete nothing policy (Q2).
+  static final List<Drug> allCatalogDrugs = [
+    ...allDrugs,
+    ...archivedSpecialtyDrugs,
+  ];
+
+  /// Tier 1: Core Formulary drugs (Pediatric & Hospital Injectables).
+  static List<Drug> get coreDrugs =>
+      allCatalogDrugs.where((d) => d.tier == DrugTier.core).toList();
+
+  /// Tier 2: Extended Formulary drugs (Adult/General catalog incl. Heparin).
+  static List<Drug> get extendedDrugs =>
+      allCatalogDrugs.where((d) => d.tier == DrugTier.extended).toList();
+
+  /// Tier 3: Reference-only specialist oncology & transplant drugs.
+  static List<Drug> get referenceOnlyDrugs =>
+      allCatalogDrugs.where((d) => d.tier == DrugTier.referenceOnly).toList();
+
   /// Finds a drug by its unique [id], searching active and archived lists.
   static Drug? findById(String id) {
     for (final drug in allDrugs) {
@@ -70,8 +90,15 @@ class DrugDatabase {
   /// Pre-computed multi-dimensional search engine instance over [allDrugs].
   static final DrugSearchEngine _searchEngine = DrugSearchEngine(allDrugs);
 
+  /// Search engine covering all 123 catalog drugs (including ReferenceOnly).
+  static final DrugSearchEngine _catalogSearchEngine =
+      DrugSearchEngine(allCatalogDrugs);
+
   /// Pre-warms the search index and JIT cache to prevent cold-start latency jitter.
-  static void warmUp() => _searchEngine.warmUp();
+  static void warmUp() {
+    _searchEngine.warmUp();
+    _catalogSearchEngine.warmUp();
+  }
 
   /// Searches drugs using the 10-tier multi-dimensional relevance scoring engine.
   ///
@@ -92,6 +119,20 @@ class DrugDatabase {
     int? limit,
   }) {
     return _searchEngine.search(query, categoryFilter: category, limit: limit);
+  }
+
+  /// Searches across all 123 catalog drugs (Core + Extended + ReferenceOnly),
+  /// ranking matches by tier when scores tie or query is non-empty.
+  static List<DrugSearchResult> searchAllCatalogDetailed(
+    String query, {
+    DrugCategory? category,
+    int? limit,
+  }) {
+    return _catalogSearchEngine.search(
+      query,
+      categoryFilter: category,
+      limit: limit,
+    );
   }
 
   /// Gets all drugs in a specific category.

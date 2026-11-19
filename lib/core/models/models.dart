@@ -11,6 +11,7 @@ export 'renal_adjustment.dart';
 export 'renal_replacement_mode.dart';
 export 'renal_replacement_protocol.dart';
 export 'drug_class.dart';
+export 'drug_tier.dart';
 export 'interaction.dart';
 export 'allergy.dart';
 export 'formulation.dart';

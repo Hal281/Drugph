@@ -116,6 +116,9 @@ enum DoseWarningCode {
   /// Hepatic function has not yet been assessed (Child-Pugh notAssessed) on a hepatic-caution drug (WP-02 / FB-12).
   hepaticNotAssessed,
 
+  /// High-complexity oncology/transplant drug restricted to specialist monograph reference (WP-08 / FB-21).
+  referenceOnlyDrug,
+
   calculationError,
   generalAlert,
 }

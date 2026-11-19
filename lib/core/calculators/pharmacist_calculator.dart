@@ -7,6 +7,7 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import '../domain/drug_tier_registry.dart';
 import '../domain/high_alert_registry.dart';
 import '../formatters/clinical_terms.dart';
 import '../models/models.dart';
@@ -28,9 +29,32 @@ class PharmacistCalculator {
     Drug? Function(String id)? drugLookup,
     List<Drug>? activeDrugs,
     double dripFactor = 20.0,
+    bool enforceReferenceOnlyGate = false,
   }) {
     try {
       final warnings = <DoseWarning>[];
+
+      // --- -1. Reference-Only Specialist Gate (WP-08 / FB-21) ---
+      if (enforceReferenceOnlyGate && drug.tier == DrugTier.referenceOnly) {
+        const msgEn =
+            'Reference Only: Automated bedside dosing is disabled for complex oncology/transplant agents. Consult the textbook monograph and institutional specialist protocol.';
+        const msgTh =
+            'Reference Only (อ้างอิงเฉพาะทาง): ปิดการคำนวณอัตโนมัติสำหรับยามะเร็ง/ยากดภูมิคุ้มกัน โปรดเปิดดูข้อมูลจากตำราอ้างอิงและโปรโตคอลเฉพาะทางของโรงพยาบาล';
+        return DosageResult.failure(
+          reasonEn: msgEn,
+          reasonTh: msgTh,
+          formulaUsed: 'Drug Tier Reference-Only Gate',
+          renalReplacementMode: patient.renalReplacementMode,
+          warnings: const [
+            DoseWarning(
+              severity: LimitSeverity.hard,
+              code: DoseWarningCode.referenceOnlyDrug,
+              messageEn: msgEn,
+              messageTh: msgTh,
+            ),
+          ],
+        );
+      }
 
       // --- 0. Input Validation (A12) ---
       final isNeonateOrInfant =

@@ -330,6 +330,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final t = widget.isThai;
     final showDemographicInputs =
         PatientSession.instance.currentPatient.value == null;
+    final isReferenceOnly = widget.drug.tier == DrugTier.referenceOnly;
 
     return Stack(
       children: [
@@ -344,12 +345,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    _buildTierBanner(t),
                     PatientClinicalHeader(
                       state: state,
                       isThai: t,
                       categoryColor: AppTheme.primaryTeal,
                     ),
-                    _buildParametersForm(state, t, showDemographicInputs),
+                    if (!isReferenceOnly)
+                      _buildParametersForm(state, t, showDemographicInputs),
                   ],
                 ),
               ),
@@ -362,23 +365,38 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildRegimenSelector(state, t),
-                    const SizedBox(height: 16),
-                    ..._buildOutcomeAndGuidanceSection(state, t, isWide: true),
-                  ],
+                  children: isReferenceOnly
+                      ? [
+                          _buildReferenceOnlyCard(state, t),
+                          const SizedBox(height: 16),
+                          ClinicalHeaderAlerts(
+                            drug: widget.drug,
+                            isThai: t,
+                            categoryColor: AppTheme.primaryTeal,
+                          ),
+                        ]
+                      : [
+                          _buildRegimenSelector(state, t),
+                          const SizedBox(height: 16),
+                          ..._buildOutcomeAndGuidanceSection(
+                            state,
+                            t,
+                            isWide: true,
+                          ),
+                        ],
                 ),
               ),
             ),
           ],
         ),
-        StickyCalculateBar(
-          drug: widget.drug,
-          selectedRegimen: state.selectedRegimen,
-          onCalculate: _handleCalculate,
-          isThai: t,
-          categoryColor: AppTheme.primaryTeal,
-        ),
+        if (!isReferenceOnly)
+          StickyCalculateBar(
+            drug: widget.drug,
+            selectedRegimen: state.selectedRegimen,
+            onCalculate: _handleCalculate,
+            isThai: t,
+            categoryColor: AppTheme.primaryTeal,
+          ),
       ],
     );
   }
@@ -388,6 +406,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final t = widget.isThai;
     final showDemographicInputs =
         PatientSession.instance.currentPatient.value == null;
+    final isReferenceOnly = widget.drug.tier == DrugTier.referenceOnly;
 
     return Stack(
       children: [
@@ -395,28 +414,156 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              PatientClinicalHeader(
-                state: state,
-                isThai: t,
-                categoryColor: AppTheme.primaryTeal,
-              ),
-              _buildRegimenSelector(state, t),
-              const SizedBox(height: 16),
-              _buildParametersForm(state, t, showDemographicInputs),
-              const SizedBox(height: 16),
-              ..._buildOutcomeAndGuidanceSection(state, t, isWide: false),
-            ],
+            children: isReferenceOnly
+                ? [
+                    _buildTierBanner(t),
+                    _buildReferenceOnlyCard(state, t),
+                    const SizedBox(height: 16),
+                    ClinicalHeaderAlerts(
+                      drug: widget.drug,
+                      isThai: t,
+                      categoryColor: AppTheme.primaryTeal,
+                    ),
+                  ]
+                : [
+                    _buildTierBanner(t),
+                    PatientClinicalHeader(
+                      state: state,
+                      isThai: t,
+                      categoryColor: AppTheme.primaryTeal,
+                    ),
+                    _buildRegimenSelector(state, t),
+                    const SizedBox(height: 16),
+                    _buildParametersForm(state, t, showDemographicInputs),
+                    const SizedBox(height: 16),
+                    ..._buildOutcomeAndGuidanceSection(
+                      state,
+                      t,
+                      isWide: false,
+                    ),
+                  ],
           ),
         ),
-        StickyCalculateBar(
-          drug: widget.drug,
-          selectedRegimen: state.selectedRegimen,
-          onCalculate: _handleCalculate,
-          isThai: t,
-          categoryColor: AppTheme.primaryTeal,
-        ),
+        if (!isReferenceOnly)
+          StickyCalculateBar(
+            drug: widget.drug,
+            selectedRegimen: state.selectedRegimen,
+            onCalculate: _handleCalculate,
+            isThai: t,
+            categoryColor: AppTheme.primaryTeal,
+          ),
       ],
+    );
+  }
+
+  Widget _buildTierBanner(bool t) {
+    final tier = widget.drug.tier;
+    if (tier == DrugTier.core) {
+      return const SizedBox.shrink();
+    }
+    if (tier == DrugTier.extended) {
+      return Container(
+        key: const Key('calculator_extended_tier_notice'),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppTheme.statusWarningBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppTheme.statusWarningBorder),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.layers_outlined,
+              size: 18,
+              color: Color(0xFF92400E),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                t
+                    ? 'Extended Formulary — ยานอกรายการหลัก Core (ยังไม่ผ่านการตรวจสอบระดับ Core โปรดตรวจซ้ำกับตำรา)'
+                    : 'Extended Formulary — Not yet verified at Core Pediatric/IV level; verify against reference monograph.',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF92400E),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildReferenceOnlyCard(CalculatorUiState state, bool t) {
+    return Container(
+      key: const Key('calculator_reference_only_card'),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.statusCriticalBorder, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.menu_book_rounded,
+                color: AppTheme.statusCritical,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  t
+                      ? 'Reference Only — ยาเฉพาะทาง (ปิดการคำนวณอัตโนมัติ)'
+                      : 'Reference Only — Specialist Oncology / Transplant Protocol',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.statusCritical,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            t
+                ? 'ยานี้จัดอยู่ในกลุ่มยาเฉพาะทางที่มีความซับซ้อนสูง ระบบปิดการคำนวณขนาดยาอัตโนมัติเพื่อความปลอดภัย กรุณาเปิดดูตำราอ้างอิงและอิงตามโปรโตคอลเฉพาะทางของโรงพยาบาล'
+                : 'Automated bedside dose calculation is disabled for high-complexity oncology/transplant agents. Consult the textbook monograph and institutional specialist protocol.',
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppTheme.inkPrimary,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            key: const Key('calculator_reference_only_monograph_btn'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryTeal,
+              foregroundColor: Colors.white,
+              minimumSize: const Size.fromHeight(48),
+            ),
+            onPressed: () => ClinicalEvidenceSheet.show(
+              context,
+              drug: widget.drug,
+              regimen: state.selectedRegimen,
+              isThai: t,
+            ),
+            icon: const Icon(Icons.menu_book_outlined),
+            label: Text(
+              t ? 'เปิดดูตำราอ้างอิง (Monograph)' : 'Open Textbook Monograph',
+            ),
+          ),
+        ],
+      ),
     );
   }
 
