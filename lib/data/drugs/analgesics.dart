@@ -40,6 +40,16 @@ final List<Drug> analgesics = [
     ),
     specialNotes: 'Max daily dose 4g in adults to prevent hepatotoxicity. Reduce to 2g/day in severe hepatic impairment or chronic alcoholism.',
     specialNotesTh: 'ขนาดยาสูงสุด 4 กรัม/วัน ในผู้ใหญ่เพื่อป้องกันตับอักเสบ ลดเหลือ 2 กรัม/วัน ในผู้ป่วยโรคตับรุนแรงหรือติดสุราเรื้อรัง',
+    sideEffects: const [
+      'Hepatotoxicity / elevated serum transaminases (overdose or >4 g/day)',
+      'Nausea and vomiting',
+      'Rash or hypersensitivity (rare; Stevens-Johnson syndrome / TEN very rare)',
+    ],
+    sideEffectsTh: const [
+      'พิษต่อตับ / เอนไซม์ตับ AST, ALT สูงขึ้น (เมื่อได้รับยาเกินขนาดหรือ > 4 กรัม/วัน)',
+      'คลื่นไส้ อาเจียน',
+      'ผื่นแพ้ยา (พบน้อย; กลุ่มอาการรุนแรง SJS/TEN พบได้น้อยมาก)',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -152,9 +162,26 @@ final List<Drug> analgesics = [
       ),
     ],
     severeInteractions: ['Warfarin (bleeding risk)', 'ACE inhibitors (renal failure)', 'Lithium'],
-    contraindications: ['Active GI bleeding', 'Severe renal impairment', 'Dengue fever (suspected)'],
-    specialNotes: 'Avoid in suspected Dengue fever. Take with food to reduce GI irritation.',
-    specialNotesTh: 'หลีกเลี่ยงในผู้ป่วยที่สงสัยไข้เลือดออก ทานพร้อมอาหารเพื่อลดการระคายเคืองกระเพาะ',
+    contraindications: [
+      'Active GI bleeding or peptic ulcer disease',
+      'Severe renal impairment (CrCl < 30 mL/min)',
+      'Suspected or confirmed Dengue hemorrhagic fever (thrombocytopenia/bleeding risk)',
+      'Third trimester of pregnancy (premature closure of ductus arteriosus)',
+    ],
+    specialNotes: 'Take with food or milk immediately after meals to reduce GI irritation. Do not combine with other NSAIDs.',
+    specialNotesTh: 'รับประทานพร้อมอาหารหรือหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะอาหาร ห้ามใช้ซ้ำซ้อนกับยากลุ่ม NSAIDs ตัวอื่น',
+    sideEffects: const [
+      'Dyspepsia, heartburn, nausea, abdominal pain, GI ulceration/bleeding',
+      'Acute kidney injury (AKI), fluid retention, edema, hypertension',
+      'Dizziness, headache, tinnitus',
+      'Increased risk of cardiovascular thrombotic events',
+    ],
+    sideEffectsTh: const [
+      'ระคายเคืองกระเพาะอาหาร แสบท้อง คลื่นไส้ แผลหรือเลือดออกในทางเดินอาหาร',
+      'ไตวายเฉียบพลัน (AKI) บวมน้ำ ความดันโลหิตสูง',
+      'เวียนศีรษะ ปวดศีรษะ หูอื้อ',
+      'เพิ่มความเสี่ยงภาวะหลอดเลือดหัวใจและสมองอุดตันเมื่อใช้ต่อเนื่อง',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -310,9 +337,24 @@ final List<Drug> analgesics = [
       externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=naproxen',
     ),
     severeInteractions: ['Warfarin', 'ACE inhibitors', 'Lithium', 'Methotrexate'],
-    contraindications: ['Active GI bleeding', 'Severe renal impairment (CrCl < 30 mL/min)', 'Dengue fever (suspected)', 'CABG surgery'],
-    specialNotes: 'Take with food to reduce GI irritation. Avoid in CrCl < 30 mL/min, suspected Dengue fever, and active GI bleeding. Do not combine with other NSAIDs.',
-    specialNotesTh: 'รับประทานหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะ หลีกเลี่ยงในผู้ป่วย CrCl < 30 mL/min, สงสัยไข้เลือดออก หรือมีเลือดออกในทางเดินอาหาร ห้ามใช้ร่วมกับ NSAIDs ตัวอื่น',
+    contraindications: [
+      'Active GI bleeding or peptic ulcer disease',
+      'Severe renal impairment (CrCl < 30 mL/min)',
+      'Suspected or confirmed Dengue hemorrhagic fever (thrombocytopenia/bleeding risk)',
+      'Perioperative pain in CABG surgery',
+    ],
+    specialNotes: 'Take with food or milk immediately after meals to reduce GI irritation. Do not combine with other NSAIDs.',
+    specialNotesTh: 'รับประทานพร้อมอาหารหรือหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะอาหาร ห้ามใช้ซ้ำซ้อนกับยากลุ่ม NSAIDs ตัวอื่น',
+    sideEffects: [
+      'Dyspepsia, epigastric pain, nausea, peptic ulcer/GI bleeding',
+      'Renal impairment (AKI), peripheral edema, hypertension',
+      'Dizziness, drowsiness, headache',
+    ],
+    sideEffectsTh: [
+      'ระคายเคืองกระเพาะอาหาร ปวดจุกแน่นท้อง แผลหรือเลือดออกในทางเดินอาหาร',
+      'การทำงานของไตลดลง (AKI) บวมน้ำ ความดันโลหิตสูง',
+      'เวียนศีรษะ ง่วงซึม ปวดศีรษะ',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,

@@ -166,8 +166,8 @@ void main() {
       }
       expect(acyclovirStart, isNotNull);
       expect(acyclovirEnd, isNotNull);
-      // id: 'acyclovir' line shifted after clinical dosing enhancements (reconstitution & oral liquids).
-      expect(acyclovirStart, equals(2618));
+      // id: 'acyclovir' line shifted after adding Amoxicillin & Cephalexin sideEffects.
+      expect(acyclovirStart, equals(2642));
 
       // Check Emergency file
       final emLines = File('lib/data/drugs/emergency.dart').readAsLinesSync();

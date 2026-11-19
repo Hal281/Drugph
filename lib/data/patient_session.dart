@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../core/calculators/renal_calculator.dart';
 import '../core/models/patient.dart';
 import '../core/models/population_criteria.dart';
 import '../core/models/renal_replacement_mode.dart';
@@ -62,38 +63,79 @@ class PatientSession {
     final existing = currentPatient.value;
     final Patient updated;
 
+    final effWeight = weightKg ?? existing?.weightKg ?? 70.0;
+    final effHeight = heightCm ?? existing?.heightCm ?? 170.0;
+    final effAge = ageYears ?? existing?.ageYears ?? 35;
+    final effSex = sex ?? existing?.sex ?? Sex.male;
+    final effScr = serumCreatinineMgDl ?? existing?.serumCreatinineMgDl;
+
+    double? effectiveCrCl;
+    if (effAge >= 18) {
+      if (creatinineClearanceMlMin != null) {
+        effectiveCrCl = creatinineClearanceMlMin;
+      } else if (effScr != null && effScr > 0 && effWeight > 0 && effHeight > 0) {
+        effectiveCrCl = RenalCalculator.cockcroftGaultAutoWeight(
+          ageYears: effAge,
+          weightKg: effWeight,
+          heightCm: effHeight,
+          sex: effSex,
+          serumCreatinineMgDl: effScr,
+        );
+      } else if (serumCreatinineMgDl == null &&
+          existing != null &&
+          existing.ageYears >= 18) {
+        effectiveCrCl = existing.creatinineClearanceMlMin;
+      }
+    }
+
+    double? effectiveEgfr;
+    if (effAge < 18) {
+      if (eGfrMlMinPer173m2 != null) {
+        effectiveEgfr = eGfrMlMinPer173m2;
+      } else if (effScr != null && effScr > 0 && effAge >= 1 && effHeight > 0) {
+        effectiveEgfr = RenalCalculator.bedsideSchwartz(
+          heightCm: effHeight,
+          serumCreatinineMgDl: effScr,
+        );
+      } else if (serumCreatinineMgDl == null &&
+          existing != null &&
+          existing.ageYears < 18) {
+        effectiveEgfr = existing.eGfrMlMinPer173m2;
+      }
+    }
+
     if (existing != null) {
       updated = existing.copyWith(
         weightKg: weightKg,
         heightCm: heightCm,
         ageYears: ageYears,
-        ageMonths: ageMonths,
+        ageMonths: ageMonths ?? existing.ageMonths,
         sex: sex,
-        serumCreatinineMgDl: serumCreatinineMgDl,
-        creatinineClearanceMlMin: creatinineClearanceMlMin,
-        eGfrMlMinPer173m2: eGfrMlMinPer173m2,
+        serumCreatinineMgDl: effScr,
+        creatinineClearanceMlMin: effectiveCrCl,
+        eGfrMlMinPer173m2: effectiveEgfr,
         isScrStable: isScrStable,
         renalReplacementMode: renalReplacementMode,
         hepaticImpairment: hepaticImpairment,
         activeDrugIds: activeDrugIds,
         allergies: allergies,
         isPregnant: isPregnant,
-        patientName: patientName,
-        hospitalNumber: hospitalNumber,
+        patientName: patientName ?? existing.patientName,
+        hospitalNumber: hospitalNumber ?? existing.hospitalNumber,
       );
     } else {
       updated = Patient(
         id: 'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
         patientName: patientName,
         hospitalNumber: hospitalNumber,
-        weightKg: weightKg ?? 70.0,
-        heightCm: heightCm ?? 170.0,
-        ageYears: ageYears ?? 35,
+        weightKg: effWeight,
+        heightCm: effHeight,
+        ageYears: effAge,
         ageMonths: ageMonths,
-        sex: sex ?? Sex.male,
-        serumCreatinineMgDl: serumCreatinineMgDl,
-        creatinineClearanceMlMin: creatinineClearanceMlMin,
-        eGfrMlMinPer173m2: eGfrMlMinPer173m2,
+        sex: effSex,
+        serumCreatinineMgDl: effScr,
+        creatinineClearanceMlMin: effectiveCrCl,
+        eGfrMlMinPer173m2: effectiveEgfr,
         isScrStable: isScrStable ?? true,
         renalReplacementMode: renalReplacementMode ?? RenalReplacementMode.none,
         hepaticImpairment: hepaticImpairment,

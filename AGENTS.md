@@ -48,6 +48,10 @@
 
 ## 3. เอกสารอ้างอิงเพิ่มเติมในโปรเจกต์
 หากมีข้อสงสัยหรือต้องการตรวจสอบรายละเอียดเชิงลึก ให้ศึกษาเอกสารในโฟลเดอร์ `docs/`:
+* [`docs/feedback/PHARMACIST_FEEDBACK.md`](file:///c:/Users/turbo/drugforPh/docs/feedback/PHARMACIST_FEEDBACK.md) (และสำเนาใน [`review/PHARMACIST_FEEDBACK.md`](file:///c:/Users/turbo/drugforPh/review/PHARMACIST_FEEDBACK.md)) — **Feedback จากเภสัชกร (ฉบับสมบูรณ์ พร้อมไฟล์ภาพแชต 4 ภาพ และไฟล์เสียงรีวิว 2 ไฟล์ใน [`docs/feedback/`](file:///c:/Users/turbo/drugforPh/docs/feedback))**
+* [`docs/prompts/feedback-v2/00_MASTER_CONTEXT.md`](file:///c:/Users/turbo/drugforPh/docs/prompts/feedback-v2/00_MASTER_CONTEXT.md) — **แผนพัฒนา Drugph v2 และชุด Prompt แยกตาม Work Package (`WP-00` ถึง `WP-15`) สำหรับให้ AI ทำงานต่อ**
+* [`docs/feedback/FEEDBACK_TRACEABILITY.md`](file:///c:/Users/turbo/drugforPh/docs/feedback/FEEDBACK_TRACEABILITY.md) — ตารางติดตามผลการแก้ไข Feedback เภสัชกร (`FB-01`–`FB-23`)
+* [`docs/06-presentation/QA_PREP.md`](file:///c:/Users/turbo/drugforPh/docs/06-presentation/QA_PREP.md) — คู่มือตอบคำถามกรรมการ/อาจารย์, จุดต่างจาก Medscape, และแผนสู่ Startup
 * [`docs/PROJECT_GUIDELINES.md`](file:///c:/Users/turbo/drugforPh/docs/PROJECT_GUIDELINES.md) — คู่มือแนวทางระบบเชิงละเอียด (Clinical & Engineering Charter)
 * [`docs/VERIFICATION_PROTOCOL.md`](file:///c:/Users/turbo/drugforPh/docs/VERIFICATION_PROTOCOL.md) — ระเบียบปฏิบัติการตรวจรับรองข้อมูลและสูตรคำนวณยาทางคลินิก
 * [`docs/01-charter/charter.md`](file:///c:/Users/turbo/drugforPh/docs/01-charter/charter.md) — ปัญหาจริงและ Root Cause Analysis

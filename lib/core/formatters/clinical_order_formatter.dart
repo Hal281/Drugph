@@ -185,15 +185,16 @@ class ClinicalOrderFormatter {
 
     final wtBuf = StringBuffer('TBW: ${_formatNumber(patient.weightKg)} kg');
     if (result.ibwKg != null) {
-      wtBuf.write(' | IBW: ${_formatNumber(result.ibwKg!)} kg');
+      wtBuf.write(' | IBW: ${result.ibwKg!.toStringAsFixed(1)} kg');
     }
     if (result.adjBwKg != null) {
-      wtBuf.write(' | AdjBW: ${_formatNumber(result.adjBwKg!)} kg');
+      wtBuf.write(' | AdjBW: ${result.adjBwKg!.toStringAsFixed(1)} kg');
     }
     final dosingWt = result.calculationInputs['dosingWeightUsedKg'] as num?;
     final wtStrat = result.calculationInputs['weightStrategy'] as String?;
     if (dosingWt != null && wtStrat != null && wtStrat != 'TBW') {
-      wtBuf.write(' | Dosing Weight: ${_formatNumber(dosingWt.toDouble())} kg ($wtStrat)');
+      wtBuf.write(
+          ' | Dosing Weight: ${dosingWt.toDouble().toStringAsFixed(1)} kg ($wtStrat)');
     }
     buf.writeln('  • Weight: $wtBuf');
     buf.writeln('  • Height: ${_formatNumber(patient.heightCm)} cm');
@@ -207,11 +208,19 @@ class ClinicalOrderFormatter {
         ? '${patient.serumCreatinineMgDl!.toStringAsFixed(2)} mg/dL'
         : 'Not documented';
     final scrStability = patient.isScrStable ? 'Stable' : 'Unstable / AKI';
-    final crcl = result.crclMlMin ?? patient.creatinineClearanceMlMin;
+    final isPediatric = patient.ageYears < 18;
+    final crcl = result.crclMlMin ??
+        (isPediatric
+            ? patient.eGfrMlMinPer173m2
+            : patient.creatinineClearanceMlMin);
+    final renalLabel = isPediatric ? 'eGFR' : 'CrCl';
     final crclStr = crcl != null
-        ? '${crcl.toStringAsFixed(1)} mL/min (Cockcroft-Gault)'
+        ? (isPediatric
+            ? '${crcl.toStringAsFixed(1)} mL/min/1.73 m² (Bedside Schwartz)'
+            : '${crcl.toStringAsFixed(1)} mL/min (Cockcroft-Gault)')
         : 'Not available';
-    buf.writeln('  • Renal Function: SCr $scrStr ($scrStability) | CrCl: $crclStr');
+    buf.writeln(
+        '  • Renal Function: SCr $scrStr ($scrStability) | $renalLabel: $crclStr');
 
     final rrtMode = result.renalReplacementMode != RenalReplacementMode.none
         ? result.renalReplacementMode
@@ -233,11 +242,16 @@ class ClinicalOrderFormatter {
     buf.writeln('  • Allergies: $allergyStr');
 
     // Pregnancy / Hepatic status
-    final pregStr = patient.isPregnant ? 'Pregnant' : 'Non-pregnant';
     final hepStr = patient.hepaticImpairment != null
         ? 'Child-Pugh Class ${patient.hepaticImpairment!.name.toUpperCase()}'
         : 'Normal / Not assessed';
-    buf.writeln('  • Clinical Status: $pregStr | Hepatic: $hepStr');
+    if (patient.isPregnant) {
+      buf.writeln('  • Clinical Status: Pregnant | Hepatic: $hepStr');
+    } else if (patient.sex == Sex.female && patient.ageYears >= 10) {
+      buf.writeln('  • Clinical Status: Non-pregnant | Hepatic: $hepStr');
+    } else {
+      buf.writeln('  • Clinical Status: Hepatic: $hepStr');
+    }
     buf.writeln();
 
     // 3. Medication & Regimen

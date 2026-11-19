@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../core/models/models.dart';
+import '../theme/app_theme.dart';
 
 /// Interactive modal bottom sheet / dialog that displays the clinical textbook
 /// monograph and evidence for the selected drug and regimen.
-class ClinicalEvidenceSheet extends StatelessWidget {
+class ClinicalEvidenceSheet extends StatefulWidget {
   final Drug drug;
   final DosingRegimen? regimen;
   final bool isThai;
+  final String? initialSection;
 
   const ClinicalEvidenceSheet({
     super.key,
     required this.drug,
     this.regimen,
     this.isThai = true,
+    this.initialSection,
   });
 
   /// Displays the monograph as a responsive modal bottom sheet or dialog.
@@ -21,18 +24,24 @@ class ClinicalEvidenceSheet extends StatelessWidget {
     required Drug drug,
     DosingRegimen? regimen,
     bool isThai = true,
+    String? initialSection,
   }) {
     final isDesktop = MediaQuery.of(context).size.width > 700;
     if (isDesktop) {
       return showDialog(
         context: context,
         builder: (_) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680, maxHeight: 750),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: ClinicalEvidenceSheet(drug: drug, regimen: regimen, isThai: isThai),
+              borderRadius: BorderRadius.circular(14),
+              child: ClinicalEvidenceSheet(
+                drug: drug,
+                regimen: regimen,
+                isThai: isThai,
+                initialSection: initialSection,
+              ),
             ),
           ),
         ),
@@ -50,14 +59,15 @@ class ClinicalEvidenceSheet extends StatelessWidget {
         builder: (_, scrollController) => Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: ClinicalEvidenceSheet(
               drug: drug,
               regimen: regimen,
               isThai: isThai,
+              initialSection: initialSection,
             ),
           ),
         ),
@@ -66,33 +76,77 @@ class ClinicalEvidenceSheet extends StatelessWidget {
   }
 
   @override
+  State<ClinicalEvidenceSheet> createState() => _ClinicalEvidenceSheetState();
+}
+
+class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
+  final GlobalKey _renalSectionKey = GlobalKey();
+  final GlobalKey _hepaticSectionKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialSection != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final targetKey = widget.initialSection == 'renal'
+            ? _renalSectionKey
+            : (widget.initialSection == 'hepatic' ? _hepaticSectionKey : null);
+        final ctx = targetKey?.currentContext;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            duration: const Duration(milliseconds: 250),
+            alignment: 0.1,
+          );
+        }
+      });
+    }
+  }
+
+  Drug get drug => widget.drug;
+  DosingRegimen? get regimen => widget.regimen;
+  bool get isThai => widget.isThai;
+
+  @override
   Widget build(BuildContext context) {
     final mono = regimen?.monograph ?? drug.monograph;
     final textbookName = mono?.textbookName ??
         (drug.sourceCitation.isNotEmpty
             ? drug.sourceCitation
             : (isThai ? 'รอยืนยันแหล่งอ้างอิง (UNVERIFIED)' : 'Unverified Citation'));
-    final edition = mono?.editionYear ?? (drug.lastReviewedDate.isNotEmpty ? drug.lastReviewedDate : 'Current Version');
+    final edition = mono?.editionYear ??
+        (drug.lastReviewedDate.isNotEmpty ? drug.lastReviewedDate : 'Current Version');
     final section = mono?.sectionOrTable;
 
     final isVerified = (drug.provenance?.reviewerLicense != null &&
             drug.provenance!.reviewerLicense!.trim().isNotEmpty) ||
         (regimen?.verificationStatus == VerificationStatus.verified);
 
+    final showRenalSection = widget.initialSection == 'renal' ||
+        (regimen?.renalAdjustments != null && regimen!.renalAdjustments!.isNotEmpty) ||
+        mono?.renalGuideline != null ||
+        drug.requiresRenalAdjustment;
+
+    final maxHepatic = regimen?.population?.maxHepaticImpairment;
+    final showHepaticSection = widget.initialSection == 'hepatic' ||
+        drug.requiresHepaticCaution ||
+        maxHepatic != null;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.surfaceBackground,
       appBar: AppBar(
-        backgroundColor: Colors.teal.shade700,
+        backgroundColor: AppTheme.primaryTeal,
         foregroundColor: Colors.white,
         elevation: 0,
         title: Row(
           children: [
-            const Icon(Icons.menu_book_rounded, size: 22),
+            const Icon(Icons.menu_book_rounded, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 isThai ? 'ข้อมูลอ้างอิงจากตำราแพทย์' : 'Textbook Monograph & Evidence',
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 16.5, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -117,15 +171,19 @@ class ClinicalEvidenceSheet extends StatelessWidget {
             // Standard Dosing Monograph
             _buildSectionCard(
               title: isThai ? 'ขนาดยาและการบริหารยาตามตำรา' : 'Official Dosing & Administration',
-              icon: Icons.medication_liquid_rounded,
-              color: Colors.teal,
+              icon: Icons.medication_liquid_outlined,
+              color: AppTheme.primaryTeal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (mono?.dosingGuideline != null)
                     Text(
                       mono!.dosingGuideline,
-                      style: const TextStyle(fontSize: 14, height: 1.5, color: Color(0xFF1E293B)),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: AppTheme.inkPrimary,
+                      ),
                     )
                   else if (regimen != null) ...[
                     _buildKeyValue(
@@ -151,7 +209,7 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                       isThai
                           ? 'ยา ${drug.genericName} (${drug.nameTh ?? ''}) สำหรับใช้รักษาตามข้อบ่งใช้ที่ระบุในคู่มือ'
                           : '${drug.genericName} therapeutic dosing guidelines.',
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF334155)),
+                      style: const TextStyle(fontSize: 14, color: AppTheme.inkSecondary),
                     ),
                 ],
               ),
@@ -159,23 +217,127 @@ class ClinicalEvidenceSheet extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Renal Adjustment Tiers (ตารางการปรับยาตามไตจากตำรา)
-            if (regimen?.renalAdjustments != null && regimen!.renalAdjustments!.isNotEmpty) ...[
-              _buildSectionCard(
-                title: isThai ? 'เกณฑ์การปรับขนาดยาตามระดับไต (Renal Tiers)' : 'Renal Impairment Adjustments',
-                icon: Icons.water_drop_rounded,
-                color: Colors.blue.shade700,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (mono?.renalGuideline != null) ...[
-                      Text(
-                        mono!.renalGuideline!,
-                        style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF1E293B)),
-                      ),
-                      const SizedBox(height: 12),
+            if (showRenalSection) ...[
+              Container(
+                key: _renalSectionKey,
+                child: _buildSectionCard(
+                  title: isThai
+                      ? 'เกณฑ์การปรับขนาดยาตามระดับไต (Renal Tiers)'
+                      : 'Renal Impairment Adjustments',
+                  icon: Icons.water_drop_outlined,
+                  color: AppTheme.statusInfo,
+                  highlightBorder: widget.initialSection == 'renal'
+                      ? AppTheme.primaryTeal
+                      : null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (mono?.renalGuideline != null) ...[
+                        Text(
+                          mono!.renalGuideline!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            height: 1.45,
+                            color: AppTheme.inkPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      if (regimen?.renalAdjustments != null &&
+                          regimen!.renalAdjustments!.isNotEmpty)
+                        _buildRenalTable(regimen!.renalAdjustments!)
+                      else if (mono?.renalGuideline == null)
+                        Text(
+                          isThai
+                              ? 'ไม่ต้องปรับขนาดยาตามการทำงานของไต หรือดูหมายเหตุทางคลินิกประกอบ'
+                              : 'No specific renal dose adjustment table for this regimen; check clinical notes.',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            height: 1.45,
+                            color: AppTheme.inkSecondary,
+                          ),
+                        ),
                     ],
-                    _buildRenalTable(regimen!.renalAdjustments!),
-                  ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Hepatic Impairment & Child-Pugh Guidance
+            if (showHepaticSection) ...[
+              Container(
+                key: _hepaticSectionKey,
+                child: _buildSectionCard(
+                  title: isThai
+                      ? 'แนวทางการปรับขนาดยาในผู้ป่วยโรคตับ (Hepatic & Child-Pugh)'
+                      : 'Hepatic Impairment & Child-Pugh Guidance',
+                  icon: Icons.local_hospital_outlined,
+                  color: AppTheme.statusWarning,
+                  highlightBorder: widget.initialSection == 'hepatic'
+                      ? AppTheme.statusWarning
+                      : null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (maxHepatic != null)
+                        _buildKeyValue(
+                          isThai ? 'ระดับที่อนุญาตสูงสุด' : 'Max Permitted Child-Pugh',
+                          isThai ? maxHepatic.labelTh : maxHepatic.labelEn,
+                        ),
+                      if (drug.requiresHepaticCaution)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            isThai
+                                ? '• ยานี้ต้องการความระมัดระวังหรือการปรับลดขนาดยาในผู้ป่วยโรคตับ (Child-Pugh B/C)'
+                                : '• Caution or dose reduction required in hepatic impairment (Child-Pugh B/C).',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.inkPrimary,
+                            ),
+                          ),
+                        ),
+                      if (mono?.clinicalNotes != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            mono!.clinicalNotes!,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 1.45,
+                              color: AppTheme.inkSecondary,
+                            ),
+                          ),
+                        ),
+                      if (drug.specialNotesTh != null || drug.specialNotes != null)
+                        Text(
+                          isThai
+                              ? (drug.specialNotesTh ?? drug.specialNotes!)
+                              : (drug.specialNotes ?? ''),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            height: 1.45,
+                            color: AppTheme.inkSecondary,
+                          ),
+                        ),
+                      if (!drug.requiresHepaticCaution &&
+                          maxHepatic == null &&
+                          mono?.clinicalNotes == null &&
+                          drug.specialNotesTh == null &&
+                          drug.specialNotes == null)
+                        Text(
+                          isThai
+                              ? 'ไม่มีข้อจำกัดเฉพาะสำหรับโรคตับในสูตรนี้ โปรดประเมินทางคลินิกร่วมด้วย'
+                              : 'No specific hepatic impairment restriction recorded for this regimen.',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppTheme.inkSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -188,16 +350,22 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                 regimen?.standardDilution != null ||
                 mono?.administrationGuideline != null) ...[
               _buildSectionCard(
-                title: isThai ? 'คำแนะนำการบริหารยาทางหลอดเลือดดำ (IV Preparation)' : 'IV Dilution & Infusion',
-                icon: Icons.science_rounded,
-                color: Colors.indigo.shade600,
+                title: isThai
+                    ? 'คำแนะนำการบริหารยาทางหลอดเลือดดำ (IV Preparation)'
+                    : 'IV Dilution & Infusion',
+                icon: Icons.science_outlined,
+                color: AppTheme.primaryTealDark,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (mono?.administrationGuideline != null)
                       Text(
                         mono!.administrationGuideline!,
-                        style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF1E293B)),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          height: 1.45,
+                          color: AppTheme.inkPrimary,
+                        ),
                       ),
                     if (regimen?.reconstitution != null) ...[
                       const SizedBox(height: 8),
@@ -210,7 +378,11 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 2.0),
                           child: Text(
                             'อ้างอิง: ${regimen!.reconstitution!.sourceCitation}',
-                            style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Color(0xFF64748B)),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                              color: AppTheme.inkMuted,
+                            ),
                           ),
                         ),
                     ],
@@ -250,37 +422,60 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                 drug.specialNotes != null ||
                 drug.specialNotesTh != null) ...[
               _buildSectionCard(
-                title: isThai ? 'ข้อควรระวังและข้อห้ามใช้ทางคลินิก' : 'Precautions & Contraindications',
+                title: isThai
+                    ? 'ข้อควรระวังและข้อห้ามใช้ทางคลินิก'
+                    : 'Precautions & Contraindications',
                 icon: Icons.warning_amber_rounded,
-                color: Colors.amber.shade800,
+                color: AppTheme.statusWarning,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (mono?.clinicalNotes != null) ...[
                       Text(
                         mono!.clinicalNotes!,
-                        style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF9A3412)),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          height: 1.45,
+                          color: Color(0xFF9A3412),
+                        ),
                       ),
                       const SizedBox(height: 8),
                     ],
                     if (drug.specialNotesTh != null || drug.specialNotes != null) ...[
                       Text(
-                        isThai ? (drug.specialNotesTh ?? drug.specialNotes!) : (drug.specialNotes ?? ''),
-                        style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+                        isThai
+                            ? (drug.specialNotesTh ?? drug.specialNotes!)
+                            : (drug.specialNotes ?? ''),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.inkPrimary,
+                        ),
                       ),
                       const SizedBox(height: 8),
                     ],
                     if (drug.contraindications.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        isThai ? 'ข้อห้ามใช้เด็ดขาด (Contraindications):' : 'Contraindications:',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.red),
+                        isThai
+                            ? 'ข้อห้ามใช้เด็ดขาด (Contraindications):'
+                            : 'Contraindications:',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: AppTheme.statusCritical,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       ...drug.contraindications.map(
                         (c) => Padding(
                           padding: const EdgeInsets.only(left: 8, bottom: 2),
-                          child: Text('• $c', style: const TextStyle(fontSize: 13, color: Color(0xFFDC2626))),
+                          child: Text(
+                            '• $c',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.statusCritical,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -298,20 +493,14 @@ class ClinicalEvidenceSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildCitationHeader(String textbook, String edition, String? section, bool isVerified) {
+  Widget _buildCitationHeader(
+      String textbook, String edition, String? section, bool isVerified) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppTheme.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,10 +511,15 @@ class ClinicalEvidenceSheet extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.teal.shade50,
+                  color: AppTheme.primaryTealSoft,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.primaryTealBorder),
                 ),
-                child: Icon(Icons.auto_stories_rounded, color: Colors.teal.shade700, size: 28),
+                child: const Icon(
+                  Icons.auto_stories_outlined,
+                  color: AppTheme.primaryTeal,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -335,46 +529,61 @@ class ClinicalEvidenceSheet extends StatelessWidget {
                     Text(
                       drug.genericName,
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.inkPrimary,
                       ),
                     ),
                     if (drug.nameTh != null)
                       Text(
                         drug.nameTh!,
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.inkSecondary,
+                        ),
                       ),
                     const SizedBox(height: 4),
                     Text(
-                      isThai ? 'หมวด: ${drug.category.nameTh}' : 'Category: ${drug.category.nameEn}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                      isThai
+                          ? 'หมวด: ${drug.category.nameTh}'
+                          : 'Category: ${drug.category.nameEn}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.inkMuted,
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const Divider(height: 24, thickness: 1),
+          const Divider(height: 20, thickness: 1),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.bookmark_added_rounded, size: 16, color: Colors.teal),
+              const Icon(
+                Icons.bookmark_added_outlined,
+                size: 16,
+                color: AppTheme.primaryTeal,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: RichText(
                   text: TextSpan(
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppTheme.inkPrimary,
+                    ),
                     children: [
                       TextSpan(
                         text: isThai ? 'ตำราอ้างอิง: ' : 'Textbook: ',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       TextSpan(
                         text: textbook,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.teal.shade800,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryTealDark,
                         ),
                       ),
                       TextSpan(text: ' ($edition)'),
@@ -395,13 +604,17 @@ class ClinicalEvidenceSheet extends StatelessWidget {
     required IconData icon,
     required Color color,
     required Widget child,
+    Color? highlightBorder,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(
+          color: highlightBorder ?? AppTheme.borderDefault,
+          width: highlightBorder != null ? 1.5 : 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +626,11 @@ class ClinicalEvidenceSheet extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
               ),
             ],

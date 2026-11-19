@@ -5,6 +5,7 @@ import '../../../data/patient_session.dart';
 import '../../iv_titration_screen.dart';
 import '../../pkpd/pkpd_simulation_sheet.dart';
 import '../../tdm_screen.dart';
+import '../../theme/app_theme.dart';
 import '../../widgets/clinical_evidence_sheet.dart';
 import '../models/calculator_ui_state.dart';
 import 'clinical_action_bar.dart';
@@ -13,11 +14,11 @@ import 'safety_alert_banner.dart';
 /// Primary Clinical Dosage Result Card.
 ///
 /// Encapsulates:
-/// - Semantic alert coloring (Green verified, Amber warnings, Red critical)
+/// - Semantic alert border & compact status banner (Green verified, Amber warning, Red critical)
 /// - Non-blocking overdose banner and critical contraindication banners
-/// - Dosing display (rounded formulary dose with raw strikethrough, or titrated infusion rate)
+/// - Dosing display (rounded formulary dose with raw dose reference, or titrated infusion rate)
 /// - CrCl clearance badge & bedside RRT modality badges
-/// - Monograph drawer and TDM calculator triggers
+/// - Monograph drawer, PK-PD modeling, and TDM calculator triggers (>= 48dp)
 /// - Dual copy action bar (HIS Order & Pharmacist Note >= 48dp)
 /// - Warning details list
 class DosageResultCard extends StatelessWidget {
@@ -47,18 +48,22 @@ class DosageResultCard extends StatelessWidget {
     final hasSoftWarnings =
         state.warnings.any((w) => w.severity == LimitSeverity.soft);
 
-    final cardBgColor = hasHardWarnings
-        ? Colors.red.shade50
-        : (hasSoftWarnings ? Colors.amber.shade50 : Colors.green.shade50);
+    final headerBgColor = hasHardWarnings
+        ? AppTheme.statusCriticalBg
+        : (hasSoftWarnings ? AppTheme.statusWarningBg : AppTheme.statusSafeBg);
     final cardBorderColor = hasHardWarnings
-        ? Colors.red.shade700
-        : (hasSoftWarnings ? Colors.amber.shade800 : Colors.green);
+        ? AppTheme.statusCritical
+        : (hasSoftWarnings
+            ? AppTheme.statusWarning
+            : AppTheme.statusSafeBorder);
     final headerIcon = hasHardWarnings
-        ? Icons.error
-        : (hasSoftWarnings ? Icons.warning_amber_rounded : Icons.check_circle);
+        ? Icons.error_outline
+        : (hasSoftWarnings
+            ? Icons.warning_amber_rounded
+            : Icons.check_circle_outline);
     final headerIconColor = hasHardWarnings
-        ? Colors.red.shade700
-        : (hasSoftWarnings ? Colors.amber.shade900 : Colors.green);
+        ? AppTheme.statusCritical
+        : (hasSoftWarnings ? AppTheme.statusWarning : AppTheme.statusSafe);
     final headerTitle = hasHardWarnings
         ? (t
             ? 'คำเตือน: พบความเสี่ยงระดับวิกฤต (Critical Alert)'
@@ -70,35 +75,54 @@ class DosageResultCard extends StatelessWidget {
                 : 'Calculated Result (Verified)'));
 
     return Card(
-      color: cardBgColor,
+      color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: cardBorderColor, width: 2),
+        side: BorderSide(color: cardBorderColor, width: 1.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(headerIcon, color: headerIconColor),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    headerTitle,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: headerIconColor,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: headerBgColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: hasHardWarnings
+                      ? AppTheme.statusCriticalBorder
+                      : (hasSoftWarnings
+                          ? AppTheme.statusWarningBorder
+                          : AppTheme.statusSafeBorder),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(headerIcon, color: headerIconColor, size: 20),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      headerTitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: hasHardWarnings
+                            ? AppTheme.statusCritical
+                            : (hasSoftWarnings
+                                ? const Color(0xFF92400E)
+                                : AppTheme.statusSafe),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Safety alert banner (Rule 5: Non-blocking overdose policy)
             SafetyAlertBanner(
@@ -123,12 +147,12 @@ class DosageResultCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isOverdose
                       ? const Color(0xFFFEE2E2)
-                      : const Color(0xFFDCFCE7),
-                  borderRadius: BorderRadius.circular(8),
+                      : AppTheme.statusSafeBg,
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(
                     color: isOverdose
-                        ? const Color(0xFFEF4444)
-                        : const Color(0xFF86EFAC),
+                        ? AppTheme.statusCriticalBorder
+                        : AppTheme.statusSafeBorder,
                     width: 1,
                   ),
                 ),
@@ -142,32 +166,36 @@ class DosageResultCard extends StatelessWidget {
                           : 'Recommended Dose (Rounded)'),
                   style: TextStyle(
                     color: isOverdose
-                        ? const Color(0xFF7F1D1D)
-                        : const Color(0xFF14532D),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                        ? const Color(0xFF991B1B)
+                        : const Color(0xFF065F46),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12.5,
                   ),
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   '${res.roundedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  style: AppTheme.monoStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.inkPrimary,
+                    height: 1.15,
                   ),
                 ),
               ),
               if (res.frequency != null && res.frequency!.isNotEmpty)
-                Text(
-                  res.frequency!,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey.shade800,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    res.frequency!,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: AppTheme.inkSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               if (res.calculatedDose != null) ...[
@@ -180,18 +208,16 @@ class DosageResultCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: AppTheme.surfaceSubtle,
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: Colors.black.withValues(alpha: 0.12),
-                      ),
+                      border: Border.all(color: AppTheme.borderDefault),
                     ),
                     child: Text(
                       t
                           ? 'ขนาดยาคำนวณจริงก่อนปัดเศษ: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}'
                           : 'Raw Calculated Dose: ${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey.shade900,
                       ),
@@ -199,17 +225,17 @@ class DosageResultCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ] else ...[
+            ] else if (res.calculatedDose != null) ...[
               if (isOverdose)
                 Container(
                   key: const Key('dosage_result_status_label'),
-                  margin: const EdgeInsets.only(bottom: 6),
+                  margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFEE2E2),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: const Color(0xFFEF4444),
+                      color: AppTheme.statusCriticalBorder,
                       width: 1,
                     ),
                   ),
@@ -218,37 +244,63 @@ class DosageResultCard extends StatelessWidget {
                         ? 'ขนาดยาจากการคำนวณ (เกินเกณฑ์แนะนำ)'
                         : 'Calculated Dose (Exceeds Limit)',
                     style: const TextStyle(
-                      color: Color(0xFF7F1D1D),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
+                      color: Color(0xFF991B1B),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
                     ),
                   ),
                 ),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  '${res.calculatedDose?.toStringAsFixed(2)} ${res.doseUnit?.symbol}',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  '${res.calculatedDose!.toStringAsFixed(2)} ${res.doseUnit?.symbol ?? ''}',
+                  style: AppTheme.monoStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.inkPrimary,
+                    height: 1.15,
                   ),
                 ),
               ),
               if (res.frequency != null)
-                Text(
-                  res.frequency!,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.w500,
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    res.frequency!,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      color: AppTheme.inkSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
+            ] else if (res.activePhases == null || res.activePhases!.isEmpty) ...[
+              Container(
+                key: const Key('dosage_result_blocked_badge'),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppTheme.statusCriticalBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.statusCriticalBorder),
+                ),
+                child: Text(
+                  t
+                      ? 'ระงับการคำนวณขนาดยา — สูตรยาไม่ตรงกับกลุ่มอายุหรือเกณฑ์ความปลอดภัยของผู้ป่วย'
+                      : 'Calculation Blocked — Regimen does not match patient age/safety criteria',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.statusCritical,
+                  ),
+                ),
+              ),
             ],
 
             // Multi-Phase Regimen / Antidote Protocol (e.g. N-Acetylcysteine 3-Bag Regimen)
             if (res.activePhases != null && res.activePhases!.isNotEmpty) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               _buildMultiPhaseAntidoteSection(context, res, t),
             ],
 
@@ -265,16 +317,18 @@ class DosageResultCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.shade200),
+                  color: AppTheme.surfaceSubtle,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.borderDefault),
                 ),
                 child: Text(
                   _formatCrClBadgeText(res),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                  style: AppTheme.monoStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primaryTealDark,
+                    height: 1.35,
                   ),
                 ),
               ),
@@ -282,69 +336,75 @@ class DosageResultCard extends StatelessWidget {
 
             // RRT Result Badges
             _buildRrtResultBadges(res, t),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
             // Monograph Button
-            OutlinedButton.icon(
-              key: const Key('calculator_view_monograph_btn'),
-              icon: const Icon(Icons.menu_book, size: 18),
-              label: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  t
-                      ? 'เปิดดูข้อมูลยาในตำราอ้างอิง'
-                      : 'View Textbook Monograph',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                key: const Key('calculator_view_monograph_btn'),
+                icon: const Icon(Icons.menu_book_outlined, size: 18),
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    t
+                        ? 'เปิดดูข้อมูลยาในตำราอ้างอิง'
+                        : 'View Textbook Monograph',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
+                    ),
                   ),
                 ),
-              ),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(0, 48), // WCAG AAA >= 48dp touch target
-                foregroundColor: Colors.teal.shade800,
-                side: BorderSide(color: Colors.teal.shade300, width: 1.2),
-                backgroundColor: Colors.white.withValues(alpha: 0.8),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(48, 48),
+                  foregroundColor: AppTheme.primaryTealDark,
+                  side: const BorderSide(color: AppTheme.borderStrong),
+                  backgroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-              ),
-              onPressed: () => ClinicalEvidenceSheet.show(
-                context,
-                drug: state.drug,
-                regimen: state.selectedRegimen,
-                isThai: t,
+                onPressed: () => ClinicalEvidenceSheet.show(
+                  context,
+                  drug: state.drug,
+                  regimen: state.selectedRegimen,
+                  isThai: t,
+                ),
               ),
             ),
 
             // Dynamic NTI & Continuous Infusion PK-PD Modeling Action Button
             if (isNtiOrSimulationCandidate(state.drug, state.selectedRegimen, res)) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   key: const Key('calculator_open_pkpd_btn'),
-                  icon: const Icon(Icons.show_chart_rounded, size: 22),
+                  icon: const Icon(Icons.show_chart_rounded, size: 20),
                   label: Text(
                     t
-                        ? '📈 เปิดแบบจำลอง PK-PD & กราฟทำนายระดับยา'
-                        : '📈 PK-PD Simulation & Predictive Curve',
+                        ? 'เปิดแบบจำลอง PK-PD & กราฟทำนายระดับยา'
+                        : 'PK-PD Simulation & Predictive Curve',
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6D28D9), // Vibrant Violet
+                    backgroundColor: AppTheme.clinicalNavy,
                     foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 48), // WCAG AAA >= 48dp touch target
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    minimumSize: const Size(48, 48),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
-                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
                   ),
                   onPressed: () {
                     final patient = state.lastEvaluatedPatient ?? onBuildPatient();
@@ -367,55 +427,66 @@ class DosageResultCard extends StatelessWidget {
                 state.drug.genericName
                     .toLowerCase()
                     .contains('vancomycin')) ...[
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                key: const Key('calculator_open_tdm_btn'),
-                icon: const Icon(Icons.bar_chart),
-                label: Text(t ? 'เครื่องมือคำนวณ TDM' : 'TDM Calculator'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple.shade600,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-                onPressed: () {
-                  final activePt =
-                      PatientSession.instance.currentPatient.value;
-                  final p = onBuildPatient();
-                  final tdmPatient = Patient(
-                    id: p.id,
-                    patientName: p.patientName,
-                    hospitalNumber: p.hospitalNumber,
-                    weightKg: p.weightKg,
-                    heightCm: p.heightCm,
-                    ageYears: p.ageYears,
-                    sex: p.sex,
-                    serumCreatinineMgDl: p.serumCreatinineMgDl,
-                    isScrStable: p.isScrStable,
-                    renalReplacementMode: p.renalReplacementMode,
-                    creatinineClearanceMlMin:
-                        res.crclMlMin ?? activePt?.creatinineClearanceMlMin,
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => TdmScreen(
-                        patient: tdmPatient,
-                        drug: state.drug,
-                        isThai: t,
-                      ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  key: const Key('calculator_open_tdm_btn'),
+                  icon: const Icon(Icons.analytics_outlined, size: 19),
+                  label: Text(
+                    t ? 'เครื่องมือคำนวณ TDM' : 'TDM Calculator',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13.5,
                     ),
-                  );
-                },
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.primaryTealDark,
+                    backgroundColor: AppTheme.primaryTealSoft,
+                    side: const BorderSide(color: AppTheme.primaryTealBorder),
+                    minimumSize: const Size(48, 48),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    final activePt =
+                        PatientSession.instance.currentPatient.value;
+                    final p = onBuildPatient();
+                    final tdmPatient = Patient(
+                      id: p.id,
+                      patientName: p.patientName,
+                      hospitalNumber: p.hospitalNumber,
+                      weightKg: p.weightKg,
+                      heightCm: p.heightCm,
+                      ageYears: p.ageYears,
+                      sex: p.sex,
+                      serumCreatinineMgDl: p.serumCreatinineMgDl,
+                      isScrStable: p.isScrStable,
+                      renalReplacementMode: p.renalReplacementMode,
+                      creatinineClearanceMlMin:
+                          res.crclMlMin ?? activePt?.creatinineClearanceMlMin,
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TdmScreen(
+                          patient: tdmPatient,
+                          drug: state.drug,
+                          isThai: t,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Side-by-side Dual Copy Action Bar
             ClinicalActionBar(
@@ -426,20 +497,20 @@ class DosageResultCard extends StatelessWidget {
 
             // Warning Details List
             if (state.warnings.isNotEmpty) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               ...state.warnings.map(
                 (w) => Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: w.severity == LimitSeverity.hard
-                        ? Colors.red.shade100
-                        : Colors.orange.shade100,
+                        ? AppTheme.statusCriticalBg
+                        : AppTheme.statusWarningBg,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: w.severity == LimitSeverity.hard
-                          ? Colors.red
-                          : Colors.orange,
+                          ? AppTheme.statusCriticalBorder
+                          : AppTheme.statusWarningBorder,
                     ),
                   ),
                   child: Row(
@@ -447,15 +518,19 @@ class DosageResultCard extends StatelessWidget {
                     children: [
                       Text(
                         w.severity.icon,
-                        style: const TextStyle(fontSize: 18),
+                        style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           t ? w.messageTh : w.messageEn,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            height: 1.3,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            height: 1.35,
+                            color: w.severity == LimitSeverity.hard
+                                ? const Color(0xFF991B1B)
+                                : const Color(0xFF92400E),
                           ),
                         ),
                       ),
@@ -484,28 +559,21 @@ class DosageResultCard extends StatelessWidget {
           Container(
             key: const Key('dosage_result_volume_badge'),
             padding: const EdgeInsets.symmetric(
-              horizontal: 14,
+              horizontal: 12,
               vertical: 8,
             ),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.blue.shade300, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppTheme.statusInfoBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.statusInfoBorder),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.vaccines,
-                  color: Colors.blue.shade800,
-                  size: 20,
+                const Icon(
+                  Icons.vaccines_outlined,
+                  color: AppTheme.statusInfo,
+                  size: 18,
                 ),
                 const SizedBox(width: 8),
                 Flexible(
@@ -513,10 +581,10 @@ class DosageResultCard extends StatelessWidget {
                     t
                         ? 'ปริมาตรยาที่ต้องบริหาร: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL'
                         : 'Volume to Administer: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade900,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.inkPrimary,
                     ),
                   ),
                 ),
@@ -531,28 +599,21 @@ class DosageResultCard extends StatelessWidget {
           Container(
             key: const Key('dosage_result_liquid_badge'),
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.deepPurple.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.deepPurple.shade300, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.deepPurple.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppTheme.primaryTealSoft,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.primaryTealBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.medication_liquid_rounded,
-                      color: Colors.deepPurple.shade800,
-                      size: 20,
+                    const Icon(
+                      Icons.medication_liquid_outlined,
+                      color: AppTheme.primaryTealDark,
+                      size: 19,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -560,10 +621,10 @@ class DosageResultCard extends StatelessWidget {
                         t
                             ? 'ขนาดยาน้ำรับประทาน (Pediatric Oral Liquid)'
                             : 'Pediatric Oral Liquid Dosing',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple.shade900,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryTealDark,
                         ),
                       ),
                     ),
@@ -580,10 +641,10 @@ class DosageResultCard extends StatelessWidget {
                         t
                             ? 'ปริมาตร: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL'
                             : 'Volume: ${res.volumeMl! < 1.0 ? res.volumeMl!.toStringAsFixed(2) : res.volumeMl!.toStringAsFixed(1)} mL',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple.shade900,
+                        style: const TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.inkPrimary,
                         ),
                       ),
                     if (res.teaspoons != null)
@@ -593,17 +654,18 @@ class DosageResultCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.shade100,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppTheme.primaryTealBorder),
                         ),
                         child: Text(
                           t
                               ? 'เทียบเท่า: ${UnitConverter.formatTeaspoons(res.teaspoons!, isThai: true)}'
                               : 'Household: ${UnitConverter.formatTeaspoons(res.teaspoons!, isThai: false)}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple.shade900,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primaryTealDark,
                           ),
                         ),
                       ),
@@ -615,9 +677,9 @@ class DosageResultCard extends StatelessWidget {
                     t
                         ? 'สูตรยาในคลัง: ${res.liquidConcentrationLabel}'
                         : 'Commercial Formulation: ${res.liquidConcentrationLabel}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.deepPurple.shade800,
+                      color: AppTheme.inkSecondary,
                     ),
                   ),
                 ],
@@ -626,10 +688,10 @@ class DosageResultCard extends StatelessWidget {
                   t
                       ? 'คำแนะนำ: 1 ช้อนชา (tsp) = 5 mL | แนะนำใช้กระบอกฉีดยา (oral syringe) เพื่อความแม่นยำ'
                       : 'Guideline: 1 tsp = 5 mL | Recommend oral syringe or calibrated measuring spoon for accuracy',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
-                    color: Colors.deepPurple.shade700,
+                    color: AppTheme.inkMuted,
                   ),
                 ),
               ],
@@ -643,28 +705,21 @@ class DosageResultCard extends StatelessWidget {
           Container(
             key: const Key('dosage_result_vial_draw_badge'),
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.indigo.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.indigo.shade300, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.indigo.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppTheme.surfaceSubtle,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.borderStrong),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.vaccines,
-                      color: Colors.indigo.shade800,
-                      size: 20,
+                    const Icon(
+                      Icons.vaccines_outlined,
+                      color: AppTheme.inkPrimary,
+                      size: 19,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -672,10 +727,10 @@ class DosageResultCard extends StatelessWidget {
                         t
                             ? 'การเตรียมยาฉีด & ปริมาตรดูดยา (Vial Reconstitution & Draw)'
                             : 'IV Reconstitution & Draw',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo.shade900,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.inkPrimary,
                         ),
                       ),
                     ),
@@ -686,10 +741,10 @@ class DosageResultCard extends StatelessWidget {
                   t
                       ? 'ปริมาตรดูดยาจากขวด: ${res.vialDrawVolumeMl! < 1.0 ? res.vialDrawVolumeMl!.toStringAsFixed(2) : res.vialDrawVolumeMl!.toStringAsFixed(1)} mL'
                       : 'Vial Draw Volume: ${res.vialDrawVolumeMl! < 1.0 ? res.vialDrawVolumeMl!.toStringAsFixed(2) : res.vialDrawVolumeMl!.toStringAsFixed(1)} mL',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo.shade900,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.inkPrimary,
                   ),
                 ),
                 if (res.reconstitutionConcentrationMgPerMl != null ||
@@ -706,9 +761,9 @@ class DosageResultCard extends StatelessWidget {
                             ? 'จำนวนขวดที่ใช้: ${res.vialsNeeded} ขวด'
                             : 'Vials Needed: ${res.vialsNeeded}',
                     ].join(' | '),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.indigo.shade800,
+                      color: AppTheme.inkSecondary,
                     ),
                   ),
                 ],
@@ -723,28 +778,21 @@ class DosageResultCard extends StatelessWidget {
           Container(
             key: const Key('dosage_result_pump_rate_badge'),
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.teal.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.teal.shade400, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.teal.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: AppTheme.primaryTealSoft,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppTheme.primaryTealBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.speed,
-                      color: Colors.teal.shade800,
-                      size: 20,
+                    const Icon(
+                      Icons.speed_outlined,
+                      color: AppTheme.primaryTealDark,
+                      size: 19,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -752,10 +800,10 @@ class DosageResultCard extends StatelessWidget {
                         t
                             ? 'อัตราเครื่องหยดยา & สารน้ำ (Infusion Rate & Dilution)'
                             : 'Infusion Pump Rate & Bag',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.teal.shade900,
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryTealDark,
                         ),
                       ),
                     ),
@@ -766,10 +814,10 @@ class DosageResultCard extends StatelessWidget {
                   t
                       ? 'อัตราเครื่องหยดยา: ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr'
                       : 'Infusion Pump Rate: ${res.infusionRateMlPerHr!.toStringAsFixed(1)} mL/hr',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.teal.shade900,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.inkPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -788,9 +836,9 @@ class DosageResultCard extends StatelessWidget {
                           ? 'หยดน้ำเกลือ: ${res.dripRateDropsPerMin!.toStringAsFixed(0)} drops/min'
                           : 'Gravity Drip: ${res.dripRateDropsPerMin!.toStringAsFixed(0)} gtt/min',
                   ].join(' | '),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
-                    color: Colors.teal.shade800,
+                    color: AppTheme.inkSecondary,
                   ),
                 ),
               ],
@@ -824,20 +872,19 @@ class DosageResultCard extends StatelessWidget {
                 Container(
                   key: const Key('calculator_crrt_badge'),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.teal.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: Colors.teal.shade400, width: 1.5),
+                    color: AppTheme.primaryTealSoft,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.primaryTealBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.sync_rounded,
-                        color: Colors.teal.shade800,
-                        size: 18,
+                        color: AppTheme.primaryTealDark,
+                        size: 16,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -845,10 +892,10 @@ class DosageResultCard extends StatelessWidget {
                           t
                               ? 'CRRT: เฝ้าระวังระดับยาต่อเนื่อง'
                               : 'CRRT: Continuous Dialysis Mode',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 12,
-                            color: Colors.teal.shade900,
+                            color: AppTheme.primaryTealDark,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -861,22 +908,19 @@ class DosageResultCard extends StatelessWidget {
                 Container(
                   key: const Key('calculator_post_hd_badge'),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.deepPurple.shade400,
-                      width: 1.5,
-                    ),
+                    color: AppTheme.statusWarningBg,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.statusWarningBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.access_time_filled,
-                        color: Colors.deepPurple.shade800,
-                        size: 18,
+                        color: AppTheme.statusWarning,
+                        size: 16,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -884,10 +928,10 @@ class DosageResultCard extends StatelessWidget {
                           t
                               ? 'Post-HD: ให้ยาหลังการฟอกเลือด'
                               : 'Post-HD: Administer after dialysis',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 12,
-                            color: Colors.deepPurple.shade900,
+                            color: Color(0xFF92400E),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -900,20 +944,19 @@ class DosageResultCard extends StatelessWidget {
                 Container(
                   key: const Key('calculator_ihd_badge'),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: Colors.indigo.shade300, width: 1.2),
+                    color: AppTheme.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.borderStrong),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.bloodtype,
-                        color: Colors.indigo.shade800,
-                        size: 18,
+                      const Icon(
+                        Icons.bloodtype_outlined,
+                        color: AppTheme.inkPrimary,
+                        size: 16,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -921,10 +964,10 @@ class DosageResultCard extends StatelessWidget {
                           t
                               ? 'IHD: ฟอกเลือดด้วยไตเทียม'
                               : 'IHD: Hemodialysis Mode',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 12,
-                            color: Colors.indigo.shade900,
+                            color: AppTheme.inkPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -937,20 +980,19 @@ class DosageResultCard extends StatelessWidget {
                 Container(
                   key: const Key('calculator_capd_badge'),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: Colors.blue.shade300, width: 1.2),
+                    color: AppTheme.statusInfoBg,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppTheme.statusInfoBorder),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.swap_horiz_rounded,
-                        color: Colors.blue.shade800,
-                        size: 18,
+                        color: AppTheme.statusInfo,
+                        size: 16,
                       ),
                       const SizedBox(width: 6),
                       Flexible(
@@ -958,10 +1000,10 @@ class DosageResultCard extends StatelessWidget {
                           t
                               ? 'CAPD: ล้างไตทางช่องท้อง'
                               : 'CAPD: Peritoneal Dialysis',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
                             fontSize: 12,
-                            color: Colors.blue.shade900,
+                            color: Color(0xFF075985),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -979,17 +1021,17 @@ class DosageResultCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppTheme.surfaceSubtle,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: AppTheme.borderDefault),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline,
                     size: 16,
-                    color: Colors.grey.shade700,
+                    color: AppTheme.inkSecondary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -999,10 +1041,10 @@ class DosageResultCard extends StatelessWidget {
                               : (res.rrtInstructionEn ??
                                   res.rrtInstructionTh)) ??
                           '',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade800,
-                        height: 1.3,
+                        color: AppTheme.inkPrimary,
+                        height: 1.35,
                       ),
                     ),
                   ),
@@ -1103,29 +1145,25 @@ class DosageResultCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isOverdose ? const Color(0xFFEF4444) : Colors.teal.shade300,
-          width: 1.5,
+          color: isOverdose ? AppTheme.statusCritical : AppTheme.primaryTealBorder,
+          width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: (isOverdose ? Colors.red : Colors.teal).withValues(alpha: 0.06),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         children: [
-          // Clinical Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isOverdose ? const Color(0xFFFEE2E2) : Colors.teal.shade50,
+              color: isOverdose
+                  ? AppTheme.statusCriticalBg
+                  : AppTheme.primaryTealSoft,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: isOverdose ? const Color(0xFFF87171) : Colors.teal.shade200,
+                color: isOverdose
+                    ? AppTheme.statusCriticalBorder
+                    : AppTheme.primaryTealBorder,
               ),
             ),
             child: Row(
@@ -1134,7 +1172,9 @@ class DosageResultCard extends StatelessWidget {
                 Icon(
                   Icons.medical_services_outlined,
                   size: 14,
-                  color: isOverdose ? const Color(0xFF7F1D1D) : Colors.teal.shade800,
+                  color: isOverdose
+                      ? AppTheme.statusCritical
+                      : AppTheme.primaryTealDark,
                 ),
                 const SizedBox(width: 4),
                 Flexible(
@@ -1144,8 +1184,10 @@ class DosageResultCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: isOverdose ? const Color(0xFF7F1D1D) : Colors.teal.shade900,
+                      fontWeight: FontWeight.w700,
+                      color: isOverdose
+                          ? AppTheme.statusCritical
+                          : AppTheme.primaryTealDark,
                     ),
                   ),
                 ),
@@ -1153,30 +1195,28 @@ class DosageResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-
-          // Numeric Rate Display
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.center,
             child: Text(
               doseRateStr,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: isOverdose ? const Color(0xFF7F1D1D) : Colors.teal.shade900,
-                letterSpacing: -0.3,
+              style: AppTheme.monoStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: isOverdose
+                    ? AppTheme.statusCritical
+                    : AppTheme.primaryTealDark,
+                height: 1.2,
               ),
             ),
           ),
           const SizedBox(height: 4),
-
-          // Descriptor
           Text(
             t ? 'ขนาดยาตามน้ำหนักตัว' : 'Patient-normalized rate',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
-              color: Colors.grey.shade600,
+              color: AppTheme.inkMuted,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -1192,33 +1232,25 @@ class DosageResultCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.indigo.shade300, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.indigo.withValues(alpha: 0.06),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTheme.borderStrong, width: 1.2),
       ),
       child: Column(
         children: [
-          // Clinical Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.indigo.shade50,
+              color: AppTheme.surfaceSubtle,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.indigo.shade200),
+              border: Border.all(color: AppTheme.borderDefault),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.speed_rounded,
                   size: 14,
-                  color: Colors.indigo.shade800,
+                  color: AppTheme.clinicalNavy,
                 ),
                 const SizedBox(width: 4),
                 Flexible(
@@ -1226,10 +1258,10 @@ class DosageResultCard extends StatelessWidget {
                     t ? 'อัตราหยดเครื่อง (Pump Rate)' : 'Bedside Pump Rate',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade900,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.clinicalNavy,
                     ),
                   ),
                 ),
@@ -1237,8 +1269,6 @@ class DosageResultCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-
-          // Numeric Pump Rate Display (Maintains exact 'Pump Rate: X mL/hr' for test compatibility)
           if (inf.rateMlPerHr != null) ...[
             FittedBox(
               fit: BoxFit.scaleDown,
@@ -1248,11 +1278,11 @@ class DosageResultCard extends StatelessWidget {
                         inf.rateMlPerHrMax! > inf.rateMlPerHr!
                     ? 'Pump Rate: ${inf.rateMlPerHr!.toStringAsFixed(1)}–${inf.rateMlPerHrMax!.toStringAsFixed(1)} mL/hr'
                     : 'Pump Rate: ${inf.rateMlPerHr!.toStringAsFixed(1)} mL/hr',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo.shade900,
-                  letterSpacing: -0.3,
+                style: AppTheme.monoStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.clinicalNavy,
+                  height: 1.2,
                 ),
               ),
             ),
@@ -1260,9 +1290,9 @@ class DosageResultCard extends StatelessWidget {
             Text(
               t ? 'ตั้งค่าเครื่อง Infusion Pump' : 'Volumetric pump setting',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
-                color: Colors.grey.shade600,
+                color: AppTheme.inkMuted,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1272,10 +1302,10 @@ class DosageResultCard extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 t ? 'ไม่ระบุความเข้มข้น' : 'No Std Dilution',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber.shade900,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.statusWarning,
                 ),
               ),
             ),
@@ -1283,9 +1313,9 @@ class DosageResultCard extends StatelessWidget {
             Text(
               t ? 'โปรดตรวจสอบคู่มือผสมยา' : 'Consult monograph',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
-                color: Colors.amber.shade800,
+                color: Color(0xFF92400E),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1545,18 +1575,11 @@ class DosageResultCard extends StatelessWidget {
     return Container(
       key: const Key('dosage_result_multiphase_card'),
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.indigo.shade300, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.indigo.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppTheme.borderStrong),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1566,13 +1589,13 @@ class DosageResultCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppTheme.primaryTealSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.medication_liquid_rounded,
-                  color: Colors.indigo.shade800,
-                  size: 20,
+                child: const Icon(
+                  Icons.medication_liquid_outlined,
+                  color: AppTheme.primaryTealDark,
+                  size: 18,
                 ),
               ),
               const SizedBox(width: 8),
@@ -1581,10 +1604,10 @@ class DosageResultCard extends StatelessWidget {
                   t
                       ? 'โปรโตคอลการบริหารยาแบบหลายขั้นตอน (Sequential Protocol)'
                       : 'Multi-Phase Sequential Protocol',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo.shade900,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.inkPrimary,
                   ),
                 ),
               ),

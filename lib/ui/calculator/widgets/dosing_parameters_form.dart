@@ -222,7 +222,6 @@ class DosingParametersForm extends StatelessWidget {
             const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
-              height: 48,
               child: SegmentedButton<RenalReplacementMode>(
                 key: const Key('calculator_rrt_selector'),
                 showSelectedIcon: false,
@@ -285,9 +284,10 @@ class DosingParametersForm extends StatelessWidget {
                   onRrtChanged(newSelection.first);
                 },
                 style: ButtonStyle(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  minimumSize: WidgetStateProperty.all(const Size(0, 48)),
+                  tapTargetSize: MaterialTapTargetSize.padded,
                   padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 2),
+                    const EdgeInsets.symmetric(horizontal: 4),
                   ),
                   backgroundColor: WidgetStateProperty.resolveWith<Color>((
                     Set<WidgetState> states,
@@ -384,7 +384,6 @@ class DosingParametersForm extends StatelessWidget {
                 const SizedBox(height: 6),
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
                   child: SegmentedButton<ChildPughClass>(
                     key: const Key('calculator_child_pugh_selector'),
                     showSelectedIcon: false,
@@ -447,9 +446,10 @@ class DosingParametersForm extends StatelessWidget {
                       onHepaticChanged(newSelection.first, null);
                     },
                     style: ButtonStyle(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      minimumSize: WidgetStateProperty.all(const Size(0, 48)),
+                      tapTargetSize: MaterialTapTargetSize.padded,
                       padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(horizontal: 2),
+                        const EdgeInsets.symmetric(horizontal: 4),
                       ),
                       backgroundColor: WidgetStateProperty.resolveWith<Color>((
                         Set<WidgetState> states,

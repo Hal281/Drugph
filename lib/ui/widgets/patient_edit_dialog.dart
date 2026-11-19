@@ -76,15 +76,25 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       return;
     }
 
-    // Precise CrCl calculation using Cockcroft-Gault
+    // Precise renal clearance calculation: Cockcroft-Gault (Winter 2012 Auto-Weight) for >= 18y,
+    // Bedside Schwartz eGFR for pediatric (< 18y)
     double? crcl;
-    if (scr != null && scr > 0 && age >= 18) {
-      crcl = RenalCalculator.cockcroftGault(
-        ageYears: age,
-        weightKg: wt,
-        sex: _sex,
-        serumCreatinineMgDl: scr,
-      );
+    double? egfr;
+    if (scr != null && scr > 0) {
+      if (age >= 18) {
+        crcl = RenalCalculator.cockcroftGaultAutoWeight(
+          ageYears: age,
+          weightKg: wt,
+          heightCm: ht,
+          sex: _sex,
+          serumCreatinineMgDl: scr,
+        );
+      } else if (age >= 1 && ht > 0) {
+        egfr = RenalCalculator.bedsideSchwartz(
+          heightCm: ht,
+          serumCreatinineMgDl: scr,
+        );
+      }
     }
 
     final allergies = _allergiesCtrl.text
@@ -105,7 +115,7 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
       sex: _sex,
       serumCreatinineMgDl: scr,
       creatinineClearanceMlMin: crcl,
-      eGfrMlMinPer173m2: widget.initialPatient?.eGfrMlMinPer173m2,
+      eGfrMlMinPer173m2: egfr ?? (age < 18 ? widget.initialPatient?.eGfrMlMinPer173m2 : null),
       isScrStable: _isScrStable,
       isPregnant: widget.initialPatient?.isPregnant ?? false,
       hepaticImpairment: widget.initialPatient?.hepaticImpairment,
@@ -123,121 +133,131 @@ class _PatientEditDialogState extends State<PatientEditDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.isThai ? 'ข้อมูลผู้ป่วย' : 'Patient Data'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameCtrl,
-              decoration: InputDecoration(
-                labelText:
-                    widget.isThai ? 'ชื่อผู้ป่วย (ถ้ามี)' : 'Name (Optional)',
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 4),
+              TextField(
+                controller: _nameCtrl,
+                decoration: InputDecoration(
+                  labelText:
+                      widget.isThai ? 'ชื่อผู้ป่วย (ถ้ามี)' : 'Name (Optional)',
+                ),
               ),
-            ),
-            TextField(
-              controller: _hnCtrl,
-              decoration: InputDecoration(
-                labelText: widget.isThai ? 'HN (ถ้ามี)' : 'HN (Optional)',
+              const SizedBox(height: 12),
+              TextField(
+                controller: _hnCtrl,
+                decoration: InputDecoration(
+                  labelText: widget.isThai ? 'HN (ถ้ามี)' : 'HN (Optional)',
+                ),
               ),
-            ),
-            DropdownButtonFormField<Sex>(
-              initialValue: _sex,
-              decoration: InputDecoration(
-                labelText: widget.isThai ? 'เพศกำเนิด *' : 'Biological Sex *',
+              const SizedBox(height: 12),
+              DropdownButtonFormField<Sex>(
+                initialValue: _sex,
+                decoration: InputDecoration(
+                  labelText: widget.isThai ? 'เพศกำเนิด *' : 'Biological Sex *',
+                ),
+                items: Sex.values
+                    .map((s) => DropdownMenuItem(
+                          value: s,
+                          child: Text(widget.isThai ? s.nameTh : s.nameEn),
+                        ))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => _sex = val);
+                },
               ),
-              items: Sex.values
-                  .map((s) => DropdownMenuItem(
-                        value: s,
-                        child: Text(widget.isThai ? s.nameTh : s.nameEn),
-                      ))
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) setState(() => _sex = val);
-              },
-            ),
-            TextField(
-              controller: _weightCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: widget.isThai ? 'น้ำหนัก (kg) *' : 'Weight (kg) *',
+              const SizedBox(height: 12),
+              TextField(
+                controller: _weightCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: widget.isThai ? 'น้ำหนัก (kg) *' : 'Weight (kg) *',
+                ),
               ),
-            ),
-            TextField(
-              controller: _heightCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: widget.isThai ? 'ส่วนสูง (cm) *' : 'Height (cm) *',
+              const SizedBox(height: 12),
+              TextField(
+                controller: _heightCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: widget.isThai ? 'ส่วนสูง (cm) *' : 'Height (cm) *',
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _ageCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText:
-                          widget.isThai ? 'อายุ (ปี) *' : 'Age (years) *',
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _ageCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText:
+                            widget.isThai ? 'อายุ (ปี) *' : 'Age (years) *',
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _ageMonthsCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: widget.isThai
-                          ? 'เดือน (เด็กเล็ก)'
-                          : 'Months (pediatric)',
-                      hintText: '0-11',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _ageMonthsCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: widget.isThai
+                            ? 'อายุ (เดือน 0–11)'
+                            : 'Months (0–11)',
+                        hintText: '0-11',
+                      ),
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _scrCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: widget.isThai
+                      ? 'ค่าการทำงานของไต SCr (mg/dL)'
+                      : 'Serum Creatinine (mg/dL)',
                 ),
-              ],
-            ),
-            TextField(
-              controller: _scrCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: widget.isThai
-                    ? 'ค่าการทำงานของไต SCr (mg/dL)'
-                    : 'Serum Creatinine (mg/dL)',
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _allergiesCtrl,
-              decoration: InputDecoration(
-                labelText: widget.isThai
-                    ? 'ประวัติแพ้ยา (คั่นด้วยลูกน้ำ ,)'
-                    : 'Allergies (comma separated)',
-                hintText:
-                    widget.isThai ? 'เช่น Penicillin, Sulfa' : 'e.g. Penicillin, Sulfa',
-                prefixIcon: const Icon(Icons.warning_amber, color: Colors.red),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _allergiesCtrl,
+                decoration: InputDecoration(
+                  labelText: widget.isThai
+                      ? 'ประวัติแพ้ยา (คั่นด้วย ,)'
+                      : 'Allergies (comma separated)',
+                  hintText:
+                      widget.isThai ? 'เช่น Penicillin, Sulfa' : 'e.g. Penicillin, Sulfa',
+                  prefixIcon: const Icon(Icons.warning_amber, color: Colors.red),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              title: Text(
-                widget.isThai ? 'ค่า SCr คงที่ (Stable)' : 'SCr is stable',
+              const SizedBox(height: 8),
+              CheckboxListTile(
+                title: Text(
+                  widget.isThai ? 'ค่า SCr คงที่ (Stable)' : 'SCr is stable',
+                ),
+                subtitle: Text(
+                  widget.isThai
+                      ? 'จำเป็นสำหรับสูตร Cockcroft-Gault / Schwartz'
+                      : 'Required for Cockcroft-Gault / Schwartz validity',
+                  style: const TextStyle(fontSize: 12),
+                ),
+                value: _isScrStable,
+                onChanged: (val) {
+                  setState(() {
+                    _isScrStable = val ?? true;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
-              subtitle: Text(
-                widget.isThai
-                    ? 'จำเป็นสำหรับสูตร Cockcroft-Gault'
-                    : 'Required for Cockcroft-Gault validity',
-                style: const TextStyle(fontSize: 12),
-              ),
-              value: _isScrStable,
-              onChanged: (val) {
-                setState(() {
-                  _isScrStable = val ?? true;
-                });
-              },
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [

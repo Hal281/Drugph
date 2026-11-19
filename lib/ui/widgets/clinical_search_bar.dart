@@ -14,6 +14,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 /// Clinical search bar with debouncing, recent history, and clear button.
 class ClinicalSearchBar extends StatefulWidget {
@@ -123,14 +124,13 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
             constraints: const BoxConstraints(minHeight: 48),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: _focusNode.hasFocus
+                    ? AppTheme.primaryTeal
+                    : AppTheme.borderStrong,
+                width: _focusNode.hasFocus ? 1.5 : 1,
+              ),
             ),
             child: TextField(
               key: const Key('clinical_search_bar_input'),
@@ -138,29 +138,30 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
               focusNode: _focusNode,
               textInputAction: TextInputAction.search,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF1E293B),
+                color: AppTheme.inkPrimary,
               ),
               decoration: InputDecoration(
+                filled: false,
                 hintText: widget.hintText ??
                     (widget.isThai
                         ? 'ค้นหาชื่อยา, อาการ, กลุ่มยา, หรือชื่อการค้า...'
                         : 'Search drug name, indication, class, or brand...'),
-                hintStyle: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 14,
+                hintStyle: const TextStyle(
+                  color: AppTheme.inkMuted,
+                  fontSize: 13.5,
                 ),
                 prefixIcon: const Icon(
                   Icons.search,
-                  color: Color(0xFF0F766E), // Medical Teal
-                  size: 24,
+                  color: AppTheme.primaryTeal,
+                  size: 20,
                 ),
                 suffixIcon: hasText
                     ? IconButton(
                         key: const Key('clinical_search_bar_clear_button'),
-                        icon: const Icon(Icons.close, size: 20),
-                        color: Colors.grey.shade600,
+                        icon: const Icon(Icons.close, size: 18),
+                        color: AppTheme.inkSecondary,
                         tooltip: widget.isThai ? 'ล้างคำค้น' : 'Clear search',
                         constraints: const BoxConstraints(
                           minWidth: 48,
@@ -170,10 +171,12 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
                       )
                     : null,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                  horizontal: 14,
+                  vertical: 12,
                 ),
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
               onChanged: _onTextChanged,
               onSubmitted: (val) {
@@ -188,21 +191,21 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
         if (showRecent) ...[
           const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.history,
-                  size: 16,
-                  color: Colors.teal.shade200,
+                  size: 15,
+                  color: AppTheme.inkSecondary,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   widget.isThai ? 'ประวัติการค้นหาล่าสุด:' : 'Recent searches:',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Colors.teal.shade100,
+                    color: AppTheme.inkSecondary,
                   ),
                 ),
                 const Spacer(),
@@ -215,10 +218,10 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
                           horizontal: 6, vertical: 2),
                       child: Text(
                         widget.isThai ? 'ล้างประวัติ' : 'Clear',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.teal.shade200,
-                          decoration: TextDecoration.underline,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppTheme.primaryTeal,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -239,22 +242,22 @@ class _ClinicalSearchBarState extends State<ClinicalSearchBar> {
                   avatar: const Icon(
                     Icons.history,
                     size: 14,
-                    color: Color(0xFF0F766E),
+                    color: AppTheme.primaryTeal,
                   ),
                   label: Text(
                     item,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF0F766E),
+                      color: AppTheme.primaryTeal,
                     ),
                   ),
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Colors.teal.shade200),
+                  backgroundColor: AppTheme.primaryTealSoft,
+                  side: const BorderSide(color: AppTheme.primaryTealBorder),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
                   onPressed: () {
                     _controller.text = item;
                     widget.onQueryChanged(item);

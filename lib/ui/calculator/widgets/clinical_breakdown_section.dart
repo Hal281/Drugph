@@ -38,6 +38,14 @@ class _ClinicalBreakdownSectionState extends State<ClinicalBreakdownSection> {
   }
 
   @override
+  void didUpdateWidget(covariant ClinicalBreakdownSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initiallyExpanded != oldWidget.initiallyExpanded) {
+      _isExpanded = widget.initiallyExpanded;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final t = widget.isThai;
     final res = widget.state.result;

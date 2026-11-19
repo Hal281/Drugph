@@ -147,7 +147,7 @@ void main() {
         expect(find.text('Immunosuppressants'), findsNothing);
 
         final categoryScrollable = find.descendant(
-          of: find.byWidgetPredicate((w) => w is SizedBox && w.height == 95),
+          of: find.byWidgetPredicate((w) => w is SizedBox && w.height == 48),
           matching: find.byType(Scrollable),
         );
 

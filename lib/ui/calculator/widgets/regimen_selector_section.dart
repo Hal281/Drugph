@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/core.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/clinical_evidence_sheet.dart';
 
 /// Indication-driven dosing regimen dropdown selector (Lexicomp / Sanford Guide style)
-/// with route abbreviations and renal/hepatic adjustment badges.
+/// with route abbreviations and interactive renal/hepatic adjustment chips.
 class RegimenSelectorSection extends StatelessWidget {
   final Drug drug;
   final DosingRegimen? selectedRegimen;
   final ValueChanged<DosingRegimen?> onRegimenChanged;
   final OralLiquidConcentration? selectedLiquidConcentration;
   final ValueChanged<OralLiquidConcentration?>? onLiquidConcentrationChanged;
+  final int? patientAgeYears;
+  final double? patientWeightKg;
   final bool isThai;
   final Color categoryColor;
 
@@ -20,8 +24,10 @@ class RegimenSelectorSection extends StatelessWidget {
     required this.onRegimenChanged,
     this.selectedLiquidConcentration,
     this.onLiquidConcentrationChanged,
+    this.patientAgeYears,
+    this.patientWeightKg,
     required this.isThai,
-    this.categoryColor = Colors.teal,
+    this.categoryColor = AppTheme.primaryTeal,
   });
 
   @override
@@ -32,7 +38,7 @@ class RegimenSelectorSection extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: const BorderSide(color: AppTheme.borderDefault),
       ),
       color: Colors.white,
       child: Padding(
@@ -42,51 +48,68 @@ class RegimenSelectorSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.vaccines, color: categoryColor),
+                const Icon(
+                  Icons.medication_outlined,
+                  color: AppTheme.primaryTeal,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     t ? 'ข้อบ่งใช้ / วิธีบริหารยา' : 'Indication / Route',
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.inkPrimary,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 _buildRegimenPill(
                   '${drug.regimens.length} ${t ? 'สูตร' : (drug.regimens.length == 1 ? 'Regimen' : 'Regimens')}',
-                  Color.lerp(categoryColor, Colors.black, 0.3) ?? categoryColor,
-                  categoryColor.withValues(alpha: 0.12),
+                  AppTheme.primaryTealDark,
+                  AppTheme.primaryTealSoft,
+                  borderColor: AppTheme.primaryTealBorder,
                   key: const Key('regimen_count_badge'),
                 ),
               ],
             ),
             if (drug.availableIndications.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Container(
                 key: const Key('calculator_available_indications'),
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
-                  color: categoryColor.withValues(alpha: 0.06),
+                  color: AppTheme.surfaceSubtle,
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.borderDefault),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       t ? 'ข้อบ่งใช้หลัก' : 'Indications',
-                      style: TextStyle(
-                        color: categoryColor,
-                        fontWeight: FontWeight.bold,
+                      style: const TextStyle(
+                        color: AppTheme.primaryTealDark,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     ...drug.availableIndications.map(
                       (indication) => Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text('• $indication'),
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: Text(
+                          '• $indication',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: AppTheme.inkPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -97,15 +120,18 @@ class RegimenSelectorSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade200),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.borderStrong),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<DosingRegimen>(
                   isExpanded: true,
                   value: selectedRegimen,
-                  icon: const Icon(Icons.arrow_drop_down),
+                  icon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: AppTheme.inkSecondary,
+                  ),
                   items: drug.regimens
                       .map(
                         (r) => DropdownMenuItem(
@@ -114,7 +140,8 @@ class RegimenSelectorSection extends StatelessWidget {
                             '${r.indication ?? "Standard"} (${r.route.abbreviation})',
                             style: const TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.inkPrimary,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -126,7 +153,7 @@ class RegimenSelectorSection extends StatelessWidget {
               ),
             ),
             if (selectedRegimen != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Builder(
                 builder: (context) {
                   final reg = selectedRegimen!;
@@ -135,66 +162,173 @@ class RegimenSelectorSection extends StatelessWidget {
                   final doseSummary = formatRegimenDoseSummary(reg, t);
                   final clinicalNote = _resolveClinicalNote(reg, t);
 
+                  final isPediatricPatient =
+                      (patientAgeYears != null && patientAgeYears! < 18) ||
+                          (patientAgeYears == null &&
+                              patientWeightKg != null &&
+                              patientWeightKg! > 0 &&
+                              patientWeightKg! < 25.0);
+                  final isAdultPatient =
+                      patientAgeYears != null && patientAgeYears! >= 18;
+
+                  final DosingRegimen? matchingPedRegimen = drug.regimens
+                      .cast<DosingRegimen?>()
+                      .firstWhere(
+                        (r) => r?.effectiveAudience == RegimenAudience.pediatric,
+                        orElse: () => null,
+                      );
+                  final DosingRegimen? matchingAdultRegimen = drug.regimens
+                      .cast<DosingRegimen?>()
+                      .firstWhere(
+                        (r) => r?.effectiveAudience == RegimenAudience.adult,
+                        orElse: () => null,
+                      );
+
+                  final DosingRegimen? recommendedSwitch;
+                  final String? mismatchMessage;
+                  if (isPediatricPatient &&
+                      !isPediatric &&
+                      matchingPedRegimen != null) {
+                    recommendedSwitch = matchingPedRegimen;
+                    mismatchMessage = t
+                        ? 'คำเตือน: ผู้ป่วยเป็นเด็ก แต่สูตรที่เลือกเป็นสูตรสำหรับผู้ใหญ่ — แนะนำให้สลับไปใช้สูตรยาเด็ก'
+                        : 'Warning: Pediatric patient is currently assigned an adult regimen. Switch to pediatric regimen?';
+                  } else if (isAdultPatient &&
+                      isPediatric &&
+                      matchingAdultRegimen != null) {
+                    recommendedSwitch = matchingAdultRegimen;
+                    mismatchMessage = t
+                        ? 'คำเตือน: ผู้ป่วยเป็นผู้ใหญ่ แต่สูตรที่เลือกเป็นสูตรสำหรับเด็ก — แนะนำให้สลับไปใช้สูตรยาผู้ใหญ่'
+                        : 'Warning: Adult patient is currently assigned a pediatric regimen. Switch to adult regimen?';
+                  } else {
+                    recommendedSwitch = null;
+                    mismatchMessage = null;
+                  }
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (recommendedSwitch != null && mismatchMessage != null)
+                        Container(
+                          key: const Key('regimen_audience_mismatch_banner'),
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.statusWarningBg,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppTheme.statusWarning,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.warning_amber_rounded,
+                                size: 18,
+                                color: AppTheme.statusWarning,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  mismatchMessage,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF92400E),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              TextButton(
+                                key: const Key('regimen_audience_switch_button'),
+                                style: TextButton.styleFrom(
+                                  minimumSize: const Size(0, 40),
+                                  foregroundColor: const Color(0xFF78350F),
+                                  backgroundColor: const Color(0xFFFEF3C7),
+                                ),
+                                onPressed: () =>
+                                    onRegimenChanged(recommendedSwitch),
+                                child: Text(
+                                  t ? 'สลับสูตรทันที' : 'Switch',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       Wrap(
                         spacing: 6,
-                        runSpacing: 4,
+                        runSpacing: 6,
                         children: [
                           _buildRegimenPill(
                             isPediatric
                                 ? (t ? 'เด็ก (Pediatric)' : 'Pediatric')
                                 : (t ? 'ผู้ใหญ่ (Adult)' : 'Adult'),
-                            isPediatric
-                                ? Colors.deepPurple.shade800
-                                : Colors.blue.shade900,
-                            isPediatric
-                                ? Colors.deepPurple.shade50
-                                : Colors.blue.shade50,
+                            AppTheme.inkPrimary,
+                            AppTheme.surfaceSubtle,
                             key: const Key('regimen_audience_pill'),
                           ),
                           if (doseSummary != null && doseSummary.isNotEmpty)
                             _buildRegimenPill(
                               doseSummary,
-                              Colors.cyan.shade900,
-                              Colors.cyan.shade50,
+                              AppTheme.primaryTealDark,
+                              AppTheme.primaryTealSoft,
+                              borderColor: AppTheme.primaryTealBorder,
                               key: const Key('regimen_dose_rate_pill'),
                             ),
                           _buildRegimenPill(
                             t ? reg.route.nameTh : reg.route.nameEn,
-                            Colors.blueGrey.shade700,
-                            Colors.blueGrey.shade50,
+                            AppTheme.inkSecondary,
+                            AppTheme.surfaceSubtle,
                           ),
                           _buildRegimenPill(
                             t ? reg.dosingType.nameTh : reg.dosingType.nameEn,
-                            Colors.teal.shade800,
-                            Colors.teal.shade50,
+                            AppTheme.inkSecondary,
+                            AppTheme.surfaceSubtle,
                           ),
                           _buildRegimenPill(
                             t
                                 ? reg.frequency.displayTh
                                 : reg.frequency.displayEn,
-                            Colors.indigo.shade800,
-                            Colors.indigo.shade50,
+                            AppTheme.inkSecondary,
+                            AppTheme.surfaceSubtle,
                           ),
                           if (reg.renalAdjustments != null &&
                               reg.renalAdjustments!.isNotEmpty)
-                            _buildRegimenPill(
-                              t ? 'มีเกณฑ์ปรับตามไต' : 'Renal Adjusted',
-                              Colors.amber.shade900,
-                              Colors.amber.shade50,
+                            _buildInteractiveAdjustmentChip(
+                              key: const Key('regimen_renal_adjusted_chip'),
+                              label: t ? 'มีเกณฑ์ปรับตามไต' : 'Renal Adjusted',
+                              onTap: () => ClinicalEvidenceSheet.show(
+                                context,
+                                drug: drug,
+                                regimen: reg,
+                                isThai: t,
+                                initialSection: 'renal',
+                              ),
                             ),
                           if (reg.population?.maxHepaticImpairment != null)
-                            _buildRegimenPill(
-                              t ? 'มีเกณฑ์ปรับตามตับ' : 'Hepatic Adjusted',
-                              Colors.orange.shade900,
-                              Colors.orange.shade50,
+                            _buildInteractiveAdjustmentChip(
+                              key: const Key('regimen_hepatic_adjusted_chip'),
+                              label:
+                                  t ? 'มีเกณฑ์ปรับตามตับ' : 'Hepatic Adjusted',
+                              onTap: () => ClinicalEvidenceSheet.show(
+                                context,
+                                drug: drug,
+                                regimen: reg,
+                                isThai: t,
+                                initialSection: 'hepatic',
+                              ),
                             ),
                         ],
                       ),
                       if (clinicalNote != null) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Container(
                           key: const Key('regimen_clinical_note_box'),
                           width: double.infinity,
@@ -203,26 +337,26 @@ class RegimenSelectorSection extends StatelessWidget {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: AppTheme.surfaceSubtle,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(color: AppTheme.borderDefault),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.info_outline,
                                 size: 16,
-                                color: Colors.blueGrey.shade700,
+                                color: AppTheme.inkSecondary,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   clinicalNote,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
-                                    height: 1.35,
-                                    color: Colors.blueGrey.shade900,
+                                    height: 1.4,
+                                    color: AppTheme.inkPrimary,
                                   ),
                                 ),
                               ),
@@ -236,19 +370,21 @@ class RegimenSelectorSection extends StatelessWidget {
                           key: const Key('regimen_liquid_concentration_box'),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.deepPurple.shade50.withValues(alpha: 0.6),
+                            color: AppTheme.primaryTealSoft,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.deepPurple.shade200),
+                            border: Border.all(
+                              color: AppTheme.primaryTealBorder,
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  Icon(
-                                    Icons.medication_liquid_rounded,
+                                  const Icon(
+                                    Icons.medication_liquid_outlined,
                                     size: 18,
-                                    color: Colors.deepPurple.shade700,
+                                    color: AppTheme.primaryTeal,
                                   ),
                                   const SizedBox(width: 6),
                                   Expanded(
@@ -256,10 +392,10 @@ class RegimenSelectorSection extends StatelessWidget {
                                       t
                                           ? 'ความเข้มข้นยาน้ำในคลัง / ท้องตลาด (Commercial Formulation)'
                                           : 'Commercial Liquid Concentration',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.deepPurple.shade900,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.primaryTealDark,
                                       ),
                                     ),
                                   ),
@@ -267,11 +403,14 @@ class RegimenSelectorSection extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.deepPurple.shade200),
+                                  border: Border.all(
+                                    color: AppTheme.borderStrong,
+                                  ),
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<OralLiquidConcentration>(
@@ -288,6 +427,7 @@ class RegimenSelectorSection extends StatelessWidget {
                                               style: const TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w600,
+                                                color: AppTheme.inkPrimary,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -307,10 +447,10 @@ class RegimenSelectorSection extends StatelessWidget {
                                   t
                                       ? 'อ้างอิง: ${(selectedLiquidConcentration ?? reg.defaultLiquidConcentration)!.citation!}'
                                       : 'Ref: ${(selectedLiquidConcentration ?? reg.defaultLiquidConcentration)!.citation!}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 11,
                                     fontStyle: FontStyle.italic,
-                                    color: Colors.deepPurple.shade700,
+                                    color: AppTheme.inkSecondary,
                                   ),
                                 ),
                               ],
@@ -395,6 +535,7 @@ class RegimenSelectorSection extends StatelessWidget {
     String text,
     Color textColor,
     Color bgColor, {
+    Color? borderColor,
     Key? key,
   }) {
     return Container(
@@ -403,15 +544,57 @@ class RegimenSelectorSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: textColor.withValues(alpha: 0.3)),
+        border: Border.all(color: borderColor ?? AppTheme.borderDefault),
       ),
       child: Text(
         text,
         softWrap: true,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 11.5,
           fontWeight: FontWeight.w600,
           color: textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInteractiveAdjustmentChip({
+    required Key key,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      key: key,
+      borderRadius: BorderRadius.circular(6),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppTheme.statusWarningBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: AppTheme.statusWarningBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                softWrap: true,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF92400E),
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(
+              Icons.open_in_new,
+              size: 12,
+              color: Color(0xFF92400E),
+            ),
+          ],
         ),
       ),
     );

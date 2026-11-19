@@ -5,6 +5,7 @@ class DosingWeightLogicCard extends StatelessWidget {
   final String? label;
   final double? value;
   final String? reason;
+  final Map<String, dynamic>? calculationInputs;
   final bool isThai;
 
   const DosingWeightLogicCard({
@@ -12,8 +13,37 @@ class DosingWeightLogicCard extends StatelessWidget {
     required this.label,
     required this.value,
     this.reason,
+    this.calculationInputs,
     required this.isThai,
   });
+
+  String _resolveReason(bool t) {
+    final localizedInputReason = t
+        ? (calculationInputs?['crclWeightReasonTh'] as String?)
+        : (calculationInputs?['crclWeightReasonEn'] as String?);
+    final currentReason = reason ?? '';
+    final expectedTh = 'ใช้ $label ในการคำนวณขนาดยาตามเกณฑ์คลินิก';
+    final expectedEn =
+        'Using $label for clinical regimen dosing calculation';
+
+    if (t &&
+        currentReason.startsWith('Using ') &&
+        currentReason.endsWith('for clinical regimen dosing calculation')) {
+      return expectedTh;
+    }
+    if (!t &&
+        currentReason.startsWith('ใช้ ') &&
+        currentReason.endsWith('ในการคำนวณขนาดยาตามเกณฑ์คลินิก')) {
+      return expectedEn;
+    }
+    if (localizedInputReason != null &&
+        localizedInputReason.isNotEmpty &&
+        (currentReason == calculationInputs?['crclWeightReasonTh'] ||
+            currentReason == calculationInputs?['crclWeightReasonEn'])) {
+      return localizedInputReason;
+    }
+    return currentReason;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +52,7 @@ class DosingWeightLogicCard extends StatelessWidget {
     }
 
     final t = isThai;
+    final resolvedReason = _resolveReason(t);
 
     return Card(
       color: Colors.blue.shade50,
@@ -56,7 +87,7 @@ class DosingWeightLogicCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${value!.toStringAsFixed(1)} kg - ${reason ?? ""}',
+                    '${value!.toStringAsFixed(1)} kg - $resolvedReason',
                     style: TextStyle(
                       color: Colors.blue.shade800,
                       fontSize: 13,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/core.dart';
 import '../../iv_titration_screen.dart';
+import '../../theme/app_theme.dart';
 
 /// Sticky bottom calculate action bar with primary "Calculate Dose" button
 /// and optional "IV Titration Table" launcher.
@@ -18,7 +19,7 @@ class StickyCalculateBar extends StatelessWidget {
     required this.selectedRegimen,
     required this.onCalculate,
     required this.isThai,
-    this.categoryColor = Colors.teal,
+    this.categoryColor = AppTheme.primaryTeal,
   });
 
   @override
@@ -28,16 +29,12 @@ class StickyCalculateBar extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: const BoxDecoration(
           color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
+          border: Border(
+            top: BorderSide(color: AppTheme.borderDefault),
+          ),
         ),
         child: SafeArea(
           child: Row(
@@ -46,16 +43,16 @@ class StickyCalculateBar extends StatelessWidget {
                   selectedRegimen?.effectiveStandardDilutionMgPerMl != null) ...[
                 Expanded(
                   child: SizedBox(
-                    height: 54,
+                    height: 48,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red.shade700,
-                        side: BorderSide(
-                          color: Colors.red.shade700,
-                          width: 2,
+                        foregroundColor: AppTheme.statusCritical,
+                        side: const BorderSide(
+                          color: AppTheme.statusCritical,
+                          width: 1.5,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       onPressed: () {
@@ -75,8 +72,8 @@ class StickyCalculateBar extends StatelessWidget {
                         child: Text(
                           t ? 'ตารางดริปยา' : 'Titration Table',
                           style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
@@ -88,14 +85,14 @@ class StickyCalculateBar extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: SizedBox(
-                  height: 54,
+                  height: 48,
                   child: ElevatedButton(
                     key: const Key('calculator_calculate_button'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: categoryColor,
+                      backgroundColor: AppTheme.primaryTeal,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       elevation: 0,
                     ),
@@ -103,8 +100,8 @@ class StickyCalculateBar extends StatelessWidget {
                     child: Text(
                       t ? 'คำนวณโดสยา' : 'Calculate Dose',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

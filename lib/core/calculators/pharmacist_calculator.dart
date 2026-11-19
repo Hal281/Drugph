@@ -151,7 +151,18 @@ class PharmacistCalculator {
 
       // --- 3. Contraindications & Drug-Drug Interactions (D9, A8, F8) ---
       // Free-text contraindications become an info checklist, never soft warnings (F8)
+      final skipPregnancyChecklist =
+          (patient.sex == Sex.male || patient.ageYears < 10) &&
+              !patient.isPregnant &&
+              drug.contraindications.length > 1;
       for (final c in drug.contraindications) {
+        final lowerC = c.toLowerCase();
+        final isPregnancyChecklist = lowerC.contains('pregnan') ||
+            c.contains('ตั้งครรภ์') ||
+            c.contains('มีครรภ์');
+        if (skipPregnancyChecklist && isPregnancyChecklist) {
+          continue;
+        }
         warnings.add(DoseWarning(
           severity: LimitSeverity.info,
           code: DoseWarningCode.contraindicationAlert,
@@ -309,18 +320,6 @@ class PharmacistCalculator {
           }
         }
 
-      // Informational notes for general severe interactions when no active drugs are specified
-      if (patient.activeDrugIds.isEmpty) {
-        for (final inter in drug.severeInteractions) {
-          warnings.add(DoseWarning(
-            severity: LimitSeverity.info,
-            code: DoseWarningCode.severeInteractionAlert,
-            messageEn: 'Severe drug interaction potential: $inter',
-            messageTh: 'ปฏิกิริยาระหว่างยาที่สำคัญ: $inter',
-          ));
-        }
-      }
-
       // --- 4. Determine Body Weight Metrics (4.5, A6) ---
       // Devine IBW is adult-only (≥18 years). For pediatric patients, TBW is used.
       final double ibw;
@@ -446,7 +445,7 @@ class PharmacistCalculator {
               'Kinetic / AKI Protocol: Re-evaluate SCr trajectory and urine output before subsequent maintenance doses.',
             ],
             clinicalAlternativesTh: [
-              'ขอยกเว้นเฉพาะราย: หากรักษาการติดเชื้อรุนแรง สามารถให้ยาเข็มแรกได้พร้อมบันทึกเหตุผลทางคลินิก',
+              'ขอยกเว้นเฉพาะราย: หากรักษาการติดเชื้อรุนแรง สามารถให้ยาโดสแรก (First dose) ได้พร้อมบันทึกเหตุผลทางคลินิก',
               'ติดตามแนวโน้มไต: ติดตามค่า SCr ซ้ำและปริมาณปัสสาวะเพื่อปรับขนาดยาต่อเนื่องตามแนวทาง AKI',
             ],
           ),
@@ -521,7 +520,7 @@ class PharmacistCalculator {
               ? ' First/loading dose unadjusted is acceptable (${drug.firstDoseCitation ?? "Clinical reference"}). Subsequent maintenance dosing requires serum creatinine.'
               : '';
           final firstDoseTextTh = drug.firstDoseUnadjustedOk
-              ? ' ขนาดยาเริ่มต้น/เข็มแรกสามารถบริหารได้โดยไม่ต้องปรับ (${drug.firstDoseCitation ?? "เอกสารอ้างอิง"}) แต่มื้อต่อไปต้องระบุค่าไต'
+              ? ' ขนาดยาเริ่มต้น/โดสแรก (First/Loading dose) สามารถบริหารได้โดยไม่ต้องปรับ (${drug.firstDoseCitation ?? "เอกสารอ้างอิง"}) แต่มื้อต่อไปต้องระบุค่าไต'
               : '';
 
           warnings.add(
@@ -537,7 +536,7 @@ class PharmacistCalculator {
                 'Awaiting Laboratory Confirmation: Obtain STAT serum creatinine before maintenance doses.',
               ],
               clinicalAlternativesTh: [
-                'ให้ยาเข็มแรกแบบฉุกเฉิน (STAT): สามารถบริหารยาเข็มแรกได้ทันทีในภาวะฉุกเฉินระหว่างรอผลตรวจ SCr ทางห้องปฏิบัติการ',
+                'ให้ยาโดสแรกแบบฉุกเฉิน (STAT First dose): สามารถบริหารยาโดสแรกได้ทันทีในภาวะฉุกเฉินระหว่างรอผลตรวจ SCr ทางห้องปฏิบัติการ',
                 'รอผลตรวจยืนยัน: ส่งตรวจค่า SCr เร่งด่วนก่อนบริหารยามื้อถัดไป',
               ],
             ),

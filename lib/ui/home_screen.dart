@@ -4,6 +4,7 @@ import '../data/drug_search_engine.dart';
 import '../core/models/models.dart';
 import 'calculator_screen.dart';
 import 'history_screen.dart';
+import 'theme/app_theme.dart';
 import 'widgets/patient_banner.dart';
 import 'widgets/clinical_search_bar.dart';
 import '../data/prescription_cart.dart';
@@ -53,84 +54,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool get isThai => widget.currentLocale.languageCode == 'th';
 
-  Color _getCategoryColor(DrugCategory category) {
-    switch (category) {
-      case DrugCategory.antibiotic:
-        return Colors.teal;
-      case DrugCategory.cardiovascular:
-      case DrugCategory.vasopressor:
-        return Colors.red.shade400;
-      case DrugCategory.analgesic:
-      case DrugCategory.nsaid:
-      case DrugCategory.opioid:
-        return Colors.orange;
-      case DrugCategory.neurological:
-      case DrugCategory.sedative:
-        return Colors.deepPurple;
-      case DrugCategory.gastrointestinal:
-      case DrugCategory.antiemetic:
-        return Colors.lightGreen.shade600;
-      case DrugCategory.respiratory:
-        return Colors.lightBlue;
-      case DrugCategory.endocrine:
-        return Colors.pink.shade300;
-      case DrugCategory.chemotherapy:
-        return Colors.brown;
-      case DrugCategory.antifungal:
-        return Colors.indigo.shade600;
-      case DrugCategory.antiviral:
-        return Colors.deepOrange;
-      case DrugCategory.antiInflammatory:
-        return Colors.amber.shade700;
-      case DrugCategory.antihistamine:
-        return Colors.cyan;
-      case DrugCategory.supplement:
-        return Colors.green.shade600;
-      case DrugCategory.antidote:
-        return Colors.purple.shade600;
-      default:
-        return Colors.grey;
-    }
-  }
-
   IconData _getCategoryIcon(DrugCategory category) {
     switch (category) {
       case DrugCategory.antibiotic:
-        return Icons.medication;
+        return Icons.medication_outlined;
       case DrugCategory.antifungal:
-        return Icons.biotech;
+        return Icons.biotech_outlined;
       case DrugCategory.antiviral:
         return Icons.coronavirus_outlined;
       case DrugCategory.cardiovascular:
       case DrugCategory.vasopressor:
-        return Icons.favorite;
+        return Icons.monitor_heart_outlined;
       case DrugCategory.analgesic:
       case DrugCategory.nsaid:
       case DrugCategory.opioid:
-        return Icons.personal_injury;
+        return Icons.healing_outlined;
       case DrugCategory.neurological:
       case DrugCategory.sedative:
-        return Icons.psychology;
+        return Icons.psychology_outlined;
       case DrugCategory.gastrointestinal:
       case DrugCategory.antiemetic:
-        return Icons.spa;
+        return Icons.medical_services_outlined;
       case DrugCategory.respiratory:
-        return Icons.air;
+        return Icons.air_outlined;
       case DrugCategory.endocrine:
-        return Icons.bloodtype;
+        return Icons.bloodtype_outlined;
       case DrugCategory.chemotherapy:
-        return Icons.coronavirus;
+        return Icons.science_outlined;
       case DrugCategory.antiInflammatory:
-        return Icons.local_fire_department;
+        return Icons.local_pharmacy_outlined;
       case DrugCategory.antihistamine:
-        return Icons.eco;
+        return Icons.eco_outlined;
       case DrugCategory.supplement:
-        return Icons.science;
+        return Icons.science_outlined;
       case DrugCategory.antidote:
         return Icons.shield_outlined;
       default:
-        return Icons.healing;
+        return Icons.medication_outlined;
     }
+  }
+
+  String _getDrugClassLabel(Drug drug) {
+    final drugClass = drug.effectiveDrugClass;
+    return isThai
+        ? drugClass?.nameTh ?? drug.category.nameTh
+        : drugClass?.nameEn ?? drug.category.nameEn;
   }
 
   void _onDrugTapped(BuildContext context, Drug drug, bool isDesktop) {
@@ -139,14 +107,13 @@ class _HomeScreenState extends State<HomeScreen> {
         _selectedDrugForDesktop = drug;
       });
     } else {
-      final catColor = _getCategoryColor(drug.category);
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => CalculatorScreen(
             drug: drug,
             isThai: isThai,
-            categoryColor: catColor,
+            categoryColor: AppTheme.primaryTeal,
           ),
         ),
       );
@@ -160,29 +127,25 @@ class _HomeScreenState extends State<HomeScreen> {
         final isDesktop =
             constraints.maxWidth > 800; // Breakpoint for PC/Tablet
 
-        Widget drugListWidget = _buildDrugList(isDesktop);
+        final Widget drugListWidget = _buildDrugList(isDesktop);
 
         if (isDesktop) {
-          // SPLIT VIEW FOR DESKTOP
+          // 2-PANE CLINICAL WORKSPACE FOR DESKTOP / TABLET
           return Scaffold(
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: AppTheme.surfaceBackground,
             body: Column(
               children: [
                 PatientBanner(isThai: isThai),
                 Expanded(
                   child: Row(
                     children: [
-                      // Left Panel: Drug List (Fixed width)
+                      // Left Panel: Drug List (Fixed width, clean hairline divider)
                       Container(
                         width: 380,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(2, 0),
-                            )
-                          ],
+                        decoration: const BoxDecoration(
+                          border: Border(
+                            right: BorderSide(color: AppTheme.borderDefault),
+                          ),
                         ),
                         child: drugListWidget,
                       ),
@@ -191,46 +154,77 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: _selectedDrugForDesktop == null
                             ? Container(
-                                color: Colors.grey.shade100,
+                                color: AppTheme.surfaceBackground,
                                 child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.touch_app,
-                                          size: 80,
-                                          color: Colors.grey.shade300),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        isThai
-                                            ? 'เลือกยาจากเมนูด้านซ้ายเพื่อเริ่มคำนวณ'
-                                            : 'Select a drug from the left to calculate',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.grey.shade500),
-                                      ),
-                                    ],
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 64,
+                                          height: 64,
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.primaryTealSoft,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                            border: Border.all(
+                                              color: AppTheme.primaryTealBorder,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.calculate_outlined,
+                                            size: 32,
+                                            color: AppTheme.primaryTeal,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          isThai
+                                              ? 'เลือกยาจากรายการด้านซ้ายเพื่อคำนวณขนาดยา'
+                                              : 'Select a medication from the left to calculate dose',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.inkPrimary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          isThai
+                                              ? 'รองรับการปรับขนาดยาตามการทำงานของไต ตับ และ RRT'
+                                              : 'Supports real-time renal, hepatic, and RRT dose adjustment',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 13.5,
+                                            color: AppTheme.inkSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
                             : CalculatorScreen(
-                                // using UniqueKey to force rebuilding state when drug changes on desktop
                                 key: ValueKey(_selectedDrugForDesktop!.id),
                                 drug: _selectedDrugForDesktop!,
                                 isThai: isThai,
-                                categoryColor: _getCategoryColor(
-                                    _selectedDrugForDesktop!.category),
-                              ), // End CalculatorScreen
-                      ), // End right panel Expanded
+                                categoryColor: AppTheme.primaryTeal,
+                              ),
+                      ),
                     ],
-                  ), // End Row
-                ), // End Row wrapper Expanded
+                  ),
+                ),
               ],
-            ), // End Column
-          ); // End Scaffold
-        } // End if (isDesktop)
+            ),
+          );
+        }
 
         // MOBILE VIEW (Full Screen List)
         return Scaffold(
+          backgroundColor: AppTheme.surfaceBackground,
           body: Column(
             children: [
               PatientBanner(isThai: isThai),
@@ -267,62 +261,85 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: AppTheme.surfaceBackground,
       appBar: AppBar(
         title: Text(
           isThai ? 'รายชื่อยา' : 'Medications',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: AppTheme.primaryTeal,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           ValueListenableBuilder<List<Drug>>(
             valueListenable: PrescriptionCart.instance.items,
             builder: (context, drugs, child) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.shopping_cart),
-                    tooltip: isThai
-                        ? 'ตะกร้ายา (เช็กยาตีกัน)'
-                        : 'Prescription Cart (DDI)',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              PrescriptionCartScreen(isThai: isThai),
-                        ),
-                      );
-                    },
-                  ),
-                  if (drugs.isNotEmpty)
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '${drugs.length}',
-                          style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PrescriptionCartScreen(isThai: isThai),
+                      ),
+                    );
+                  },
+                  child: Tooltip(
+                    message: isThai
+                        ? 'ใบสั่งยา / ตรวจยาตีกัน (DDI)'
+                        : 'Prescription Cart & DDI Check',
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 40),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: drugs.isNotEmpty
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.25),
                         ),
                       ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.medication_liquid_outlined,
+                            size: 17,
+                            color: drugs.isNotEmpty
+                                ? AppTheme.primaryTeal
+                                : Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            drugs.isNotEmpty
+                                ? 'DDI (${drugs.length})'
+                                : 'DDI',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: drugs.isNotEmpty
+                                  ? AppTheme.primaryTeal
+                                  : Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                ],
+                  ),
+                ),
               );
             },
           ),
           IconButton(
-            icon: const Icon(Icons.smart_toy),
+            icon: const Icon(Icons.smart_toy_outlined, size: 21),
             tooltip: isThai ? 'AI ผู้ช่วย' : 'AI Assistant',
             onPressed: () {
               Navigator.push(
@@ -334,8 +351,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: isThai ? 'ประวัติ' : 'History',
+            icon: const Icon(Icons.history, size: 21),
+            tooltip: isThai ? 'ประวัติการคำนวณ' : 'History',
             onPressed: () {
               Navigator.push(
                 context,
@@ -346,49 +363,32 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              minimumSize: const Size(44, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
             onPressed: () {
               widget.onLocaleChange(
-                  isThai ? const Locale('en', 'US') : const Locale('th', 'TH'));
+                isThai ? const Locale('en', 'US') : const Locale('th', 'TH'),
+              );
             },
-            child: Text(isThai ? 'EN' : 'TH',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 16)),
+            child: Text(
+              isThai ? 'EN' : 'TH',
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Warning Banner
+          // Clean Clinical Search Header
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            color: Colors.amber.shade200,
-            child: Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded,
-                    color: Colors.deepOrange, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    isThai
-                        ? '⚠️ ซอฟต์แวร์ต้นแบบเพื่อการศึกษา (Educational Prototype) — ไม่ใช่เครื่องมือแพทย์ ห้ามใช้กับผู้ป่วยจริง'
-                        : '⚠️ Educational SaMD Prototype — Not a certified medical device. Never for real patient use.',
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.deepOrange),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Search Bar
-          Container(
-            color: Colors.teal,
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: ClinicalSearchBar(
               query: _searchQuery,
               isThai: isThai,
@@ -410,249 +410,365 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Category Filter Cards
-          SizedBox(
-            height: 95,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.chevron_left, color: Colors.teal.shade700, size: 32),
-                  onPressed: () {
-                    _categoryScrollController.animateTo(
-                      _categoryScrollController.offset - 250,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: _categoryScrollController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                    itemCount: categories.length + 1,
-                    itemBuilder: (context, index) {
-                      final isAll = index == 0;
-                      final cat = isAll ? null : categories[index - 1];
-                      final isSelected = _selectedCategory == cat;
-                      
-                      // Need to cast to MaterialColor to use .shade400, if not possible we use withOpacity
-                      final baseColor = isAll ? Colors.teal : _getCategoryColor(cat!);
-                      final Color startColor = baseColor is MaterialColor ? baseColor.shade400 : baseColor;
-                      final Color endColor = baseColor is MaterialColor ? baseColor.shade600 : baseColor;
-                      
-                      final icon = isAll ? Icons.apps : _getCategoryIcon(cat!);
-                      final label = isAll ? (isThai ? 'ทั้งหมด' : 'All') : (isThai ? cat!.nameTh : cat!.nameEn);
-
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedCategory = cat),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.only(right: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: isSelected
-                          ? LinearGradient(
-                              colors: [startColor, endColor],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            )
-                          : const LinearGradient(
-                              colors: [Colors.white, Colors.white],
-                            ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected ? Colors.transparent : Colors.grey.shade300,
-                        width: 1.5,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: baseColor.withValues(alpha: 0.4),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              )
-                            ]
-                          : [],
+          // Slim 48px Clinical Category Filter Chip Bar
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: AppTheme.borderDefault),
+              ),
+            ),
+            child: SizedBox(
+              height: 48,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: AppTheme.inkSecondary,
+                      size: 20,
                     ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 36,
+                      minHeight: 48,
+                    ),
+                    onPressed: () {
+                      _categoryScrollController.animateTo(
+                        _categoryScrollController.offset - 220,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                      );
+                    },
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      controller: _categoryScrollController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 6,
+                      ),
+                      itemCount: categories.length + 1,
+                      itemBuilder: (context, index) {
+                        final isAll = index == 0;
+                        final cat = isAll ? null : categories[index - 1];
+                        final isSelected = _selectedCategory == cat;
+
+                        final icon =
+                            isAll ? Icons.apps_outlined : _getCategoryIcon(cat!);
+                        final label = isAll
+                            ? (isThai ? 'ทั้งหมด' : 'All')
+                            : (isThai ? cat!.nameTh : cat!.nameEn);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () => setState(() => _selectedCategory = cat),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppTheme.primaryTeal
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppTheme.primaryTeal
+                                      : AppTheme.borderStrong,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    icon,
+                                    size: 16,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppTheme.inkSecondary,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    label,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : AppTheme.inkPrimary,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: AppTheme.inkSecondary,
+                      size: 20,
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 36,
+                      minHeight: 48,
+                    ),
+                    onPressed: () {
+                      _categoryScrollController.animateTo(
+                        _categoryScrollController.offset + 220,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Drug List
+          Expanded(
+            child: filteredResults.isEmpty
+                ? Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(icon, color: isSelected ? Colors.white : baseColor, size: 28),
-                        const SizedBox(height: 6),
+                        const Icon(
+                          Icons.search_off_outlined,
+                          size: 40,
+                          color: AppTheme.inkMuted,
+                        ),
+                        const SizedBox(height: 8),
                         Text(
-                          label,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            fontSize: 12,
+                          isThai ? 'ไม่พบข้อมูลยาที่ค้นหา' : 'No medications found',
+                          style: const TextStyle(
+                            color: AppTheme.inkSecondary,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.chevron_right, color: Colors.teal.shade700, size: 32),
-            onPressed: () {
-              _categoryScrollController.animateTo(
-                _categoryScrollController.offset + 250,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-          ),
-        ],
-      ),
-    ),
-
-    // Drug List
-          Expanded(
-            child: filteredResults.isEmpty
-                ? Center(
-                    child: Text(
-                      isThai ? 'ไม่พบยาข้อมูล' : 'No drugs found',
-                      style:
-                          TextStyle(color: Colors.grey.shade500, fontSize: 16),
-                    ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 8.0),
+                      horizontal: 12.0,
+                      vertical: 10.0,
+                    ),
                     itemCount: filteredResults.length,
                     itemBuilder: (context, index) {
                       final result = filteredResults[index];
                       final drug = result.drug;
-                      final catColor = _getCategoryColor(drug.category);
                       final isSelected =
                           isDesktop && _selectedDrugForDesktop?.id == drug.id;
+                      final drugClassLabel = _getDrugClassLabel(drug);
 
                       return Semantics(
-                        label: '${drug.genericName}, ${isThai ? drug.category.nameTh : drug.category.nameEn}${drug.isHighAlert ? (isThai ? ", ยาความเสี่ยงสูง" : ", High Alert") : ""}',
+                        label:
+                            '${drug.genericName}, ${isThai ? drug.category.nameTh : drug.category.nameEn}${drug.isHighAlert ? (isThai ? ", ยาความเสี่ยงสูง" : ", High Alert") : ""}',
                         button: true,
-                        child: Card(
-                          elevation: isSelected ? 4 : 1,
+                        child: Container(
                           margin: const EdgeInsets.only(bottom: 8.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppTheme.primaryTealSoft
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
                               color: isSelected
-                                  ? catColor
+                                  ? AppTheme.primaryTeal
                                   : (drug.isHighAlert
-                                      ? Colors.red.withValues(alpha: 0.5)
-                                      : Colors.transparent),
-                              width: isSelected ? 2 : 1,
+                                      ? AppTheme.statusCriticalBorder
+                                      : AppTheme.borderDefault),
+                              width: isSelected ? 1.5 : 1,
                             ),
                           ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () => _onDrugTapped(context, drug, isDesktop),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                children: [
-                                  // Icon
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: catColor.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(10),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () =>
+                                  _onDrugTapped(context, drug, isDesktop),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0,
+                                  vertical: 10.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? AppTheme.primaryTeal
+                                            : AppTheme.surfaceSubtle,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Icon(
+                                        _getCategoryIcon(drug.category),
+                                        color: isSelected
+                                            ? Colors.white
+                                            : AppTheme.primaryTeal,
+                                        size: 20,
+                                      ),
                                     ),
-                                    child: Icon(_getCategoryIcon(drug.category),
-                                        color: catColor, size: 24),
-                                  ),
-                                  const SizedBox(width: 12),
-
-                                  // Details
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: ClinicalHighlightText(
-                                                text: drug.genericName,
-                                                query: _searchQuery,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: isSelected
-                                                      ? FontWeight.w900
-                                                      : FontWeight.bold,
-                                                  color: isSelected
-                                                      ? catColor
-                                                      : Colors.black87,
-                                                ),
-                                              ),
-                                            ),
-                                            if (drug.isHighAlert)
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red.shade700,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                child: Text(
-                                                    isThai ? 'ยาความเสี่ยงสูง' : 'High Alert',
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 9,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Wrap(
+                                                  crossAxisAlignment:
+                                                      WrapCrossAlignment.center,
+                                                  spacing: 4,
+                                                  children: [
+                                                    ClinicalHighlightText(
+                                                      text: drug.genericName,
+                                                      query: _searchQuery,
+                                                      style: TextStyle(
+                                                        fontSize: 14.5,
+                                                        fontWeight: isSelected
+                                                            ? FontWeight.w700
+                                                            : FontWeight.w600,
+                                                        color: isSelected
+                                                            ? AppTheme
+                                                                .primaryTealDark
+                                                            : AppTheme
+                                                                .inkPrimary,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '($drugClassLabel)',
+                                                      style: const TextStyle(
+                                                        fontSize: 12.5,
                                                         fontWeight:
-                                                            FontWeight.bold)),
+                                                            FontWeight.w500,
+                                                        color: AppTheme
+                                                            .inkSecondary,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          [
-                                            if (drug.nameTh != null && drug.nameTh!.isNotEmpty) drug.nameTh!,
-                                            if (drug.brandNames.isNotEmpty) drug.brandNames.take(2).join(', '),
-                                          ].join(' • '),
-                                          style: TextStyle(
-                                              color: Colors.grey.shade700,
-                                              fontSize: 12),
-                                        ),
-                                        if (_searchQuery.trim().isNotEmpty &&
-                                            result.matchedReasons.isNotEmpty) ...[
-                                          const SizedBox(height: 4),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: Colors.teal.shade50,
-                                              borderRadius: BorderRadius.circular(4),
-                                              border: Border.all(color: Colors.teal.shade200),
-                                            ),
-                                            child: Text(
-                                              isThai
-                                                  ? result.primaryReasonTh
-                                                  : result.primaryReason,
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.teal.shade800,
-                                              ),
-                                            ),
+                                              if (drug.isHighAlert) ...[
+                                                const SizedBox(width: 6),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppTheme
+                                                        .statusCriticalBg,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    border: Border.all(
+                                                      color: AppTheme
+                                                          .statusCriticalBorder,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    isThai
+                                                        ? 'ยาความเสี่ยงสูง'
+                                                        : 'High Alert',
+                                                    style: const TextStyle(
+                                                      color: AppTheme
+                                                          .statusCritical,
+                                                      fontSize: 10.5,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
                                           ),
+                                          if ((drug.nameTh != null &&
+                                                  drug.nameTh!.isNotEmpty) ||
+                                              drug.brandNames.isNotEmpty) ...[
+                                            const SizedBox(height: 3),
+                                            Text(
+                                              [
+                                                if (drug.nameTh != null &&
+                                                    drug.nameTh!.isNotEmpty)
+                                                  drug.nameTh!,
+                                                if (drug.brandNames.isNotEmpty)
+                                                  drug.brandNames
+                                                      .take(2)
+                                                      .join(', '),
+                                              ].join(' • '),
+                                              style: const TextStyle(
+                                                color: AppTheme.inkSecondary,
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                          if (_searchQuery.trim().isNotEmpty &&
+                                              result.matchedReasons.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.primaryTealSoft,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                border: Border.all(
+                                                  color: AppTheme
+                                                      .primaryTealBorder,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                isThai
+                                                    ? result.primaryReasonTh
+                                                    : result.primaryReason,
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      AppTheme.primaryTealDark,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ],
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                  if (!isDesktop) ...[
-                                    const SizedBox(width: 4),
-                                    Icon(Icons.chevron_right,
-                                        color: Colors.grey.shade400, size: 20),
-                                  ]
-                                ],
+                                    if (!isDesktop) ...[
+                                      const SizedBox(width: 4),
+                                      const Icon(
+                                        Icons.chevron_right,
+                                        color: AppTheme.inkMuted,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -660,6 +776,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+          ),
+
+          // Compact 1-line clinical disclaimer footer
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: const BoxDecoration(
+              color: AppTheme.surfaceSubtle,
+              border: Border(
+                top: BorderSide(color: AppTheme.borderDefault),
+              ),
+            ),
+            child: Text(
+              isThai
+                  ? 'ซอฟต์แวร์ต้นแบบเพื่อการศึกษา (Educational Prototype) — ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น'
+                  : 'Educational SaMD Prototype — Clinical decision support reference only.',
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppTheme.inkMuted,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),

@@ -272,16 +272,19 @@ class CalculatorController extends ChangeNotifier {
     if (_state.selectedRegimen?.effectiveAudience != RegimenAudience.pediatric ||
         weight == null ||
         weight <= 0 ||
-        weight >= 25.0 ||
-        age == null ||
-        age < 18 ||
-        age > 150) {
+        weight >= 25.0) {
       return null;
     }
-    final inferredAge = weight <= 15.0 ? 2 : 6;
-    final inferredHeight = (height != null && (height - 170.0).abs() < 0.01)
-        ? (weight <= 15.0 ? 85.0 : 115.0)
-        : height;
+    final needsAgeInference = age == null || (age >= 18 && age <= 150);
+    final needsHeightInference =
+        height == null || (height - 170.0).abs() < 0.01;
+    if (!needsAgeInference && !needsHeightInference) {
+      return null;
+    }
+    final inferredAge =
+        needsAgeInference ? (weight <= 15.0 ? 2 : 6) : age;
+    final inferredHeight =
+        needsHeightInference ? (weight <= 15.0 ? 85.0 : 115.0) : height;
     return (age: inferredAge, height: inferredHeight);
   }
 
@@ -422,6 +425,41 @@ class CalculatorController extends ChangeNotifier {
   /// Executes pure deterministic dosage calculation via [PharmacistCalculator],
   /// records audit trail log, and transitions UI state.
   ValidationResult calculate({required bool isThai}) {
+    return _executeCalculation(isThai: isThai, isPreview: false);
+  }
+
+  /// Recomputes the dosage preview reactively without recording an audit log,
+  /// showing validation error dialogs, or mutating partial text input.
+  void recalculatePreview({required bool isThai}) {
+    if (_isDisposed || _state.selectedRegimen == null || _state.drug.regimens.isEmpty) {
+      return;
+    }
+
+    final hasPatientSession = PatientSession.instance.currentPatient.value != null;
+    final hasAnyInput = weightCtrl.text.trim().isNotEmpty ||
+        heightCtrl.text.trim().isNotEmpty ||
+        ageCtrl.text.trim().isNotEmpty ||
+        scrCtrl.text.trim().isNotEmpty;
+    final reqs = _state.inputRequirements;
+    final canAutoCalcFixed = !reqs.isWeightRequired &&
+        !reqs.isHeightRequired &&
+        !reqs.isAgeRequired &&
+        !reqs.isScrRequired;
+
+    if (!hasPatientSession &&
+        !hasAnyInput &&
+        !canAutoCalcFixed &&
+        !_state.hasCalculatedResult) {
+      return;
+    }
+
+    _executeCalculation(isThai: isThai, isPreview: true);
+  }
+
+  ValidationResult _executeCalculation({
+    required bool isThai,
+    required bool isPreview,
+  }) {
     if (!_hasManuallySelectedRegimen) {
       final best = CalculatorUiState.selectBestRegimenForPatient(
         _state.drug,
@@ -436,34 +474,38 @@ class CalculatorController extends ChangeNotifier {
 
     // Prevent the Default Adult Age Trap: if pediatric regimen + child weight
     // (< 25 kg) with untouched adult age (18–150), align age & default height.
-    final inferred = _inferredPediatricDemographics(
-      weight: double.tryParse(weightCtrl.text.trim()),
-      height: double.tryParse(heightCtrl.text.trim()),
-      age: int.tryParse(ageCtrl.text.trim()),
-    );
-    if (inferred != null) {
-      _isSyncingFromSession = true;
-      try {
-        ageCtrl.text = inferred.age.toString();
-        if (inferred.height != null) {
-          heightCtrl.text = inferred.height!.toStringAsFixed(0);
+    if (!isPreview) {
+      final inferred = _inferredPediatricDemographics(
+        weight: double.tryParse(weightCtrl.text.trim()),
+        height: double.tryParse(heightCtrl.text.trim()),
+        age: int.tryParse(ageCtrl.text.trim()),
+      );
+      if (inferred != null) {
+        _isSyncingFromSession = true;
+        try {
+          ageCtrl.text = inferred.age.toString();
+          if (inferred.height != null) {
+            heightCtrl.text = inferred.height!.toStringAsFixed(0);
+          }
+        } finally {
+          _isSyncingFromSession = false;
         }
-      } finally {
-        _isSyncingFromSession = false;
       }
     }
 
     final valResult = validateInputs();
 
     if (!valResult.isValid) {
-      final errEn = valResult.errorsEn.values.join('\n');
-      final errTh = valResult.errorsTh.values.join('\n');
-      _state = _state.copyWith(
-        status: CalculatorUiStatus.error,
-        errorMessage: errEn,
-        errorMessageTh: errTh,
-      );
-      notifyListeners();
+      if (!isPreview) {
+        final errEn = valResult.errorsEn.values.join('\n');
+        final errTh = valResult.errorsTh.values.join('\n');
+        _state = _state.copyWith(
+          status: CalculatorUiStatus.error,
+          errorMessage: errEn,
+          errorMessageTh: errTh,
+        );
+        notifyListeners();
+      }
       return valResult;
     }
 
@@ -479,12 +521,31 @@ class CalculatorController extends ChangeNotifier {
       enteredHeight: enteredHeight,
       enteredAge: enteredAge,
     );
+    var effectiveWeight = resolved.weight;
+    var effectiveHeight = resolved.height;
+    var effectiveAge = resolved.age;
+
+    if (isPreview) {
+      final previewInferred = _inferredPediatricDemographics(
+        weight: enteredWeight,
+        height: enteredHeight,
+        age: enteredAge,
+      );
+      if (previewInferred != null) {
+        effectiveAge = previewInferred.age;
+        effectiveHeight = previewInferred.height ?? effectiveHeight;
+      }
+    }
+
     final usedDefaultDemographics =
         enteredWeight == null && enteredHeight == null && enteredAge == null;
 
     final hasExistingSession = PatientSession.instance.currentPatient.value != null;
-    final shouldSyncSession = hasExistingSession ||
-        (enteredWeight != null && enteredHeight != null && enteredAge != null);
+    final shouldSyncSession = !isPreview &&
+        (hasExistingSession ||
+            (enteredWeight != null &&
+                enteredHeight != null &&
+                enteredAge != null));
 
     // Sync validated parameters back to PatientSession when active or complete
     final Patient patient;
@@ -492,9 +553,9 @@ class CalculatorController extends ChangeNotifier {
       _isSyncingToSession = true;
       try {
         patient = PatientSession.instance.updateCurrentPatient(
-          weightKg: resolved.weight,
-          heightCm: resolved.height,
-          ageYears: resolved.age,
+          weightKg: effectiveWeight,
+          heightCm: effectiveHeight,
+          ageYears: effectiveAge,
           serumCreatinineMgDl: enteredScr,
           sex: _state.sex,
           isScrStable: _state.isScrStable,
@@ -507,15 +568,21 @@ class CalculatorController extends ChangeNotifier {
         _isSyncingToSession = false;
       }
     } else {
+      final sessionPt = PatientSession.instance.currentPatient.value;
       patient = Patient(
-        id: 'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
-        weightKg: resolved.weight,
-        heightCm: resolved.height,
-        ageYears: resolved.age,
+        id: sessionPt?.id ?? 'PATIENT-${DateTime.now().millisecondsSinceEpoch}',
+        patientName: sessionPt?.patientName,
+        hospitalNumber: sessionPt?.hospitalNumber,
+        weightKg: effectiveWeight,
+        heightCm: effectiveHeight,
+        ageYears: effectiveAge,
         sex: _state.sex,
         serumCreatinineMgDl: enteredScr,
         isScrStable: _state.isScrStable,
         renalReplacementMode: _state.renalReplacementMode,
+        allergies: sessionPt?.allergies ?? const [],
+        activeDrugIds: sessionPt?.activeDrugIds ?? const [],
+        isPregnant: sessionPt?.isPregnant ?? false,
         hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
             ? null
             : _state.hepaticImpairment,
@@ -563,7 +630,7 @@ class CalculatorController extends ChangeNotifier {
           useRenalWeightForDisplay ? crclWeightStrategy : weightStrategy;
       displayWeightValue = useRenalWeightForDisplay
           ? crclWeightUsed
-          : (dosingWeightUsed ?? resolved.weight);
+          : (dosingWeightUsed ?? effectiveWeight);
       displayWeightReason = useRenalWeightForDisplay && crclReason != null
           ? crclReason
           : (isThai
@@ -593,9 +660,9 @@ class CalculatorController extends ChangeNotifier {
 
     _state = _state.copyWith(
       clearDemographics: true,
-      weightKg: showDosingWeight ? (enteredWeight ?? resolved.weight) : enteredWeight,
-      heightCm: showDosingWeight ? (enteredHeight ?? resolved.height) : enteredHeight,
-      ageYears: showDosingWeight ? (enteredAge ?? resolved.age) : enteredAge,
+      weightKg: showDosingWeight ? (enteredWeight ?? effectiveWeight) : enteredWeight,
+      heightCm: showDosingWeight ? (enteredHeight ?? effectiveHeight) : enteredHeight,
+      ageYears: showDosingWeight ? (enteredAge ?? effectiveAge) : enteredAge,
       scrMgDl: enteredScr,
       lastEvaluatedPatient: patient,
       usedDefaultDemographics: usedDefaultDemographics,
@@ -609,22 +676,24 @@ class CalculatorController extends ChangeNotifier {
     );
     notifyListeners();
 
-    // Persist to CalculationLog History (safer with real UUID)
-    final log = CalculationLog(
-      logId: const Uuid().v4(),
-      timestamp: DateTime.now(),
-      userId: PatientSession.instance.currentUserId,
-      patientId: patient.id,
-      drugName: _state.drug.genericName,
-      drugId: _state.drug.id,
-      route: _state.selectedRegimen!.route.abbreviation,
-      indication: _state.selectedRegimen!.indication,
-      inputs: dosageResult.calculationInputs,
-      result: dosageResult,
-      formulaUsed: dosageResult.formulaUsed,
-      softwareVersion: '0.1.0-prototype',
-    );
-    HistoryService().addLog(log);
+    if (!isPreview) {
+      // Persist to CalculationLog History (safer with real UUID)
+      final log = CalculationLog(
+        logId: const Uuid().v4(),
+        timestamp: DateTime.now(),
+        userId: PatientSession.instance.currentUserId,
+        patientId: patient.id,
+        drugName: _state.drug.genericName,
+        drugId: _state.drug.id,
+        route: _state.selectedRegimen!.route.abbreviation,
+        indication: _state.selectedRegimen!.indication,
+        inputs: dosageResult.calculationInputs,
+        result: dosageResult,
+        formulaUsed: dosageResult.formulaUsed,
+        softwareVersion: '0.1.0-prototype',
+      );
+      HistoryService().addLog(log);
+    }
 
     return valResult;
   }

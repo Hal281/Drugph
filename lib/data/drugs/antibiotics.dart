@@ -1072,6 +1072,18 @@ final List<Drug> antibiotics = [
         'Pediatric dosing is specified as total mg/kg/day divided q8h (45 mg/kg/day standard) or q12h (80-90 mg/kg/day high-dose AOM).',
     specialNotesTh:
         'ขนาดยาเด็กคำนวณจาก mg/kg/วัน แล้วหารแบ่งมื้อ: ติดเชื้อทั่วไป 45 mg/kg/วัน แบ่ง q8h; หูชั้นกลางอักเสบ (AOM) 80–90 mg/kg/วัน แบ่ง q12h',
+    sideEffects: [
+      'Diarrhea, nausea, vomiting',
+      'Maculopapular rash (especially in infectious mononucleosis) or urticaria',
+      'Hypersensitivity / anaphylaxis (beta-lactam allergy)',
+      'Clostridioides difficile-associated diarrhea (rare)',
+    ],
+    sideEffectsTh: [
+      'ท้องเสีย ถ่ายเหลว คลื่นไส้ อาเจียน',
+      'ผื่นแดงตามผิวหนัง (พบบ่อยหากเป็นโรค Infectious mononucleosis) หรือผื่นลมพิษ',
+      'ปฏิกิริยาภูมิแพ้เฉียบพลัน (Anaphylaxis ในผู้ที่แพ้ยากลุ่มเพนิซิลลิน)',
+      'ลำไส้อักเสบจากเชื้อ C. difficile (พบน้อย)',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -2046,6 +2058,18 @@ final List<Drug> antibiotics = [
         'First-generation oral cephalosporin for skin/soft tissue, streptococcal pharyngitis, uncomplicated cystitis, and pediatric otitis media (75-100 mg/kg/day). Adjust dose if CrCl < 30 mL/min.',
     specialNotesTh:
         'ยาปฏิชีวนะกลุ่ม Cephalosporin รุ่นที่ 1 แบบรับประทาน สำหรับติดเชื้อผิวหนัง คออักเสบ ทางเดินปัสสาวะ และหูชั้นกลางอักเสบในเด็ก (75–100 mg/kg/วัน) ต้องปรับขนาดยาเมื่อ CrCl < 30 mL/min',
+    sideEffects: [
+      'Diarrhea, nausea, dyspepsia, abdominal pain',
+      'Rash, urticaria, pruritus (hypersensitivity)',
+      'Transient elevation of hepatic transaminases',
+      'Eosinophilia or C. difficile colitis (rare)',
+    ],
+    sideEffectsTh: [
+      'ท้องเสีย คลื่นไส้ ปวดมวนท้อง อาหารไม่ย่อย',
+      'ผื่นแพ้ยา ลมพิษ คันตามผิวหนัง',
+      'ค่าเอนไซม์ตับเพิ่มขึ้นชั่วคราว',
+      'ลำไส้อักเสบจากเชื้อ C. difficile (พบน้อย)',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
