@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/formatters/clinical_citation_formatter.dart';
 import '../../core/models/models.dart';
 import '../theme/app_theme.dart';
 
@@ -111,10 +112,11 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
   @override
   Widget build(BuildContext context) {
     final mono = regimen?.monograph ?? drug.monograph;
-    final textbookName = mono?.textbookName ??
-        (drug.sourceCitation.isNotEmpty
-            ? drug.sourceCitation
-            : (isThai ? 'รอยืนยันแหล่งอ้างอิง (UNVERIFIED)' : 'Unverified Citation'));
+    final textbookName = ClinicalCitationFormatter.formatPrimaryCitation(
+      drug,
+      regimen: regimen,
+      isThai: isThai,
+    );
     final edition = mono?.editionYear ??
         (drug.lastReviewedDate.isNotEmpty ? drug.lastReviewedDate : 'Current Version');
     final section = mono?.sectionOrTable;
@@ -568,8 +570,8 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: RichText(
-                  text: TextSpan(
+                child: Text.rich(
+                  TextSpan(
                     style: const TextStyle(
                       fontSize: 13,
                       color: AppTheme.inkPrimary,
@@ -590,6 +592,7 @@ class _ClinicalEvidenceSheetState extends State<ClinicalEvidenceSheet> {
                       if (section != null) TextSpan(text: '\n• $section'),
                     ],
                   ),
+                  key: const Key('clinical_evidence_citation_text'),
                 ),
               ),
             ],

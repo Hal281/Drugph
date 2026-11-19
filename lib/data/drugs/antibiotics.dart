@@ -1214,6 +1214,36 @@ final List<Drug> antibiotics = [
       'Probenecid (increases amoxicillin serum levels)',
       'Allopurinol (increases risk of maculopapular rash)',
     ],
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'warfarin',
+        severity: InteractionSeverity.moderate,
+        frequency: InteractionFrequency.common,
+        mechanismEn:
+            'Disrupts vitamin K-synthesizing gut flora, potentiating Warfarin anticoagulation and elevating INR.',
+        mechanismTh:
+            'ลดแบคทีเรียในลำไส้ที่สังเคราะห์วิตามินเค ส่งเสริมฤทธิ์ต้านการแข็งตัวของเลือดจาก Warfarin และอาจทำให้ค่า INR สูงขึ้น',
+        managementEn:
+            'Lexicomp Risk Rating C (Monitor Therapy): Check INR within 3–5 days of starting/stopping Amoxicillin and monitor for signs of bleeding.',
+        managementTh:
+            'Lexicomp ระดับ C (Monitor Therapy): ติดตามค่า INR ภายใน 3–5 วันหลังเริ่มหรือหยุดยา Amoxicillin และเฝ้าระวังภาวะเลือดออกผิดปกติ',
+        source: 'Lexicomp Drug Information Handbook (APhA) — Risk Rating C (Monitor Therapy)',
+      ),
+      DrugInteraction(
+        targetDrugId: 'methotrexate',
+        severity: InteractionSeverity.major,
+        frequency: InteractionFrequency.lessCommon,
+        mechanismEn:
+            'Competes for renal tubular OAT3 secretion, reducing Methotrexate clearance and risking myelosuppression or mucositis (especially with moderate/high-dose MTX).',
+        mechanismTh:
+            'แย่งจับการขับออกทางท่อไต (OAT3 secretion) ลดการขจัด Methotrexate เพิ่มความเสี่ยงกดไขกระดูกและเยื่อบุอักเสบ',
+        managementEn:
+            'Lexicomp Risk Rating D (Consider Therapy Modification): Monitor CBC, renal, and hepatic function closely or choose a non-interacting antibiotic.',
+        managementTh:
+            'Lexicomp ระดับ D (Consider Therapy Modification): พิจารณาเปลี่ยนชนิดยาปฏิชีวนะ หรือติดตาม CBC, ค่าไต และตับอย่างใกล้ชิด',
+        source: 'Lexicomp Drug Information Handbook (APhA) — Risk Rating D (Consider Therapy Modification)',
+      ),
+    ],
     contraindications: [
       'Hypersensitivity to penicillins or beta-lactam antibiotics',
       'Infectious mononucleosis (high incidence of erythematous rash)',
@@ -1440,6 +1470,36 @@ final List<Drug> antibiotics = [
       'Methotrexate (increases toxicity)',
       'Probenecid',
       'Allopurinol (rash)',
+    ],
+    interactions: [
+      DrugInteraction(
+        targetDrugId: 'warfarin',
+        severity: InteractionSeverity.moderate,
+        frequency: InteractionFrequency.common,
+        mechanismEn:
+            'Broad-spectrum alteration of gut flora reduces vitamin K production, enhancing Warfarin anticoagulant effect and INR.',
+        mechanismTh:
+            'รบกวนเชื้อประจำถิ่นในลำไส้ที่สร้างวิตามินเค ทำให้ฤทธิ์ของ Warfarin เพิ่มขึ้นและค่า INR สูงขึ้น',
+        managementEn:
+            'Lexicomp Risk Rating C (Monitor Therapy): Monitor INR within 3–5 days and watch for bruising or bleeding.',
+        managementTh:
+            'Lexicomp ระดับ C (Monitor Therapy): ติดตามค่า INR ภายใน 3–5 วัน และสังเกตอาการจ้ำเลือดหรือเลือดออกผิดปกติ',
+        source: 'Lexicomp Drug Information Handbook (APhA) — Risk Rating C (Monitor Therapy)',
+      ),
+      DrugInteraction(
+        targetDrugId: 'methotrexate',
+        severity: InteractionSeverity.major,
+        frequency: InteractionFrequency.lessCommon,
+        mechanismEn:
+            'Amoxicillin competes for renal tubular OAT3 secretion, decreasing Methotrexate clearance and increasing systemic toxicity.',
+        mechanismTh:
+            'ส่วนประกอบ Amoxicillin ลดการขับออกของ Methotrexate ทางท่อไต เพิ่มความเสี่ยงพิษต่อไขกระดูกและตับไต',
+        managementEn:
+            'Lexicomp Risk Rating D (Consider Therapy Modification): Monitor MTX levels/CBC closely or select an alternative agent.',
+        managementTh:
+            'Lexicomp ระดับ D (Consider Therapy Modification): พิจารณาหลีกเลี่ยงการใช้ร่วมกันหรือติดตาม CBC และระดับยา Methotrexate อย่างใกล้ชิด',
+        source: 'Lexicomp Drug Information Handbook (APhA) — Risk Rating D (Consider Therapy Modification)',
+      ),
     ],
     contraindications: [
       'History of penicillin-associated jaundice/hepatic dysfunction',

@@ -7,6 +7,7 @@
 // Zero Flutter UI dependency, zero AI/LLM, zero external SDKs.
 // ============================================================
 
+export 'formatters/clinical_citation_formatter.dart';
 export 'formatters/clinical_order_formatter.dart';
 export 'formatters/clinical_terms.dart';
 export 'models/models.dart';

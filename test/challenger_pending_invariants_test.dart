@@ -166,8 +166,8 @@ void main() {
       }
       expect(acyclovirStart, isNotNull);
       expect(acyclovirEnd, isNotNull);
-      // id: 'acyclovir' line shifted after adding Amoxicillin & Cephalexin sideEffects.
-      expect(acyclovirStart, equals(2642));
+      // id: 'acyclovir' line shifted after WP-09 / WP-10 expansions in antibiotics.dart.
+      expect(acyclovirStart, equals(2969));
 
       // Check Emergency file
       final emLines = File('lib/data/drugs/emergency.dart').readAsLinesSync();
@@ -187,15 +187,16 @@ void main() {
         }
       }
 
-      expect(epiPedStart, equals(77));
-      expect(atropinePedStart, equals(160));
-      expect(dexaCroupStart, equals(334));
+      expect(epiPedStart, equals(103));
+      expect(atropinePedStart, equals(214));
+      expect(dexaCroupStart, equals(440));
 
       // Verify that the checklist mentions the target files and synchronized line ranges
-      expect(checklist.contains('lib/data/drugs/antibiotics.dart'), isTrue);
-      expect(checklist.contains('lib/data/drugs/emergency.dart` (lines 158–166)'), isTrue);
-      expect(checklist.contains('lib/data/drugs/emergency.dart` (lines 332–340)'), isTrue);
-      expect(checklist.contains('lib/data/drugs/respiratory.dart'), isTrue);
+      expect(checklist.contains('lib/data/drugs/antibiotics.dart` (lines 3001–3014)'), isTrue);
+      expect(checklist.contains('lib/data/drugs/emergency.dart` (lines 212–220)'), isTrue);
+      expect(checklist.contains('lib/data/drugs/emergency.dart` (lines 438–446)'), isTrue);
+      expect(checklist.contains('lib/data/drugs/emergency.dart` (lines 101–111)'), isTrue);
+      expect(checklist.contains('lib/data/drugs/respiratory.dart` (lines 53–64)'), isTrue);
     });
   });
 

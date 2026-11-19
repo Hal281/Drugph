@@ -13,6 +13,26 @@ enum InteractionSeverity {
   const InteractionSeverity({required this.labelEn, required this.labelTh});
 }
 
+/// Real-world clinical prevalence tier for ranking DDI alerts (WP-10 / FB-18).
+enum InteractionFrequency {
+  common(
+    labelEn: 'Common in Practice',
+    labelTh: 'พบบ่อยในเวชปฏิบัติ',
+  ),
+  lessCommon(
+    labelEn: 'Less Common / Special Population',
+    labelTh: 'พบได้น้อย / กลุ่มผู้ป่วยเฉพาะ',
+  );
+
+  final String labelEn;
+  final String labelTh;
+
+  const InteractionFrequency({
+    required this.labelEn,
+    required this.labelTh,
+  });
+}
+
 /// Structured drug-drug interaction definition (D9).
 class DrugInteraction {
   /// Target drug ID if interaction is drug-specific.
@@ -23,6 +43,9 @@ class DrugInteraction {
 
   /// Interaction severity level.
   final InteractionSeverity severity;
+
+  /// Real-world clinical frequency tier used to prioritize alerts in UI.
+  final InteractionFrequency frequency;
 
   /// Mechanism of interaction in English.
   final String mechanismEn;
@@ -43,6 +66,7 @@ class DrugInteraction {
     this.targetDrugId,
     this.targetClass,
     required this.severity,
+    this.frequency = InteractionFrequency.common,
     required this.mechanismEn,
     required this.mechanismTh,
     required this.managementEn,

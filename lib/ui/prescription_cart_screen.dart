@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/models/models.dart';
 import '../data/prescription_cart.dart';
-import '../core/models/drug.dart';
 import 'theme/app_theme.dart';
 
 class PrescriptionCartScreen extends StatelessWidget {
@@ -73,13 +73,25 @@ class PrescriptionCartScreen extends StatelessWidget {
             );
           }
 
-          final warnings = PrescriptionCart.instance.checkInteractions(isThai);
+          final alerts = PrescriptionCart.instance.evaluateAlerts();
+          final primaryAlerts = alerts
+              .where((a) =>
+                  a.category != CartAlertCategory.ddi ||
+                  a.frequency == InteractionFrequency.common)
+              .toList();
+          final lessCommonAlerts = alerts
+              .where((a) =>
+                  a.category == CartAlertCategory.ddi &&
+                  a.frequency == InteractionFrequency.lessCommon)
+              .toList();
 
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.only(bottom: 16),
             children: [
-              // Interactions & Duplication Section
-              if (warnings.isNotEmpty)
+              // Primary Alerts (Allergies, Therapeutic Duplication, & Common in Practice DDIs)
+              if (primaryAlerts.isNotEmpty)
                 Container(
+                  key: const Key('cart_common_alerts_section'),
                   margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -101,8 +113,8 @@ class PrescriptionCartScreen extends StatelessWidget {
                           Expanded(
                             child: Text(
                               isThai
-                                  ? 'พบปฏิกิริยาระหว่างยาหรือข้อห้ามใช้'
-                                  : 'Drug interactions or contraindications found',
+                                  ? 'พบปฏิกิริยาระหว่างยาหรือข้อห้ามใช้ (พบบ่อย / สำคัญ)'
+                                  : 'Clinically Significant Interactions & Contraindications',
                               style: const TextStyle(
                                 color: AppTheme.statusCritical,
                                 fontWeight: FontWeight.w700,
@@ -113,24 +125,53 @@ class PrescriptionCartScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ...warnings.map(
-                        (w) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Text(
-                            '• $w',
-                            style: const TextStyle(
-                              color: Color(0xFF991B1B),
-                              fontSize: 13,
-                              height: 1.4,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                      ...primaryAlerts.map(
+                        (a) => _buildAlertEntry(a, isThai, textColor: const Color(0xFF991B1B)),
                       ),
                     ],
                   ),
                 ),
-              if (warnings.isEmpty)
+              // Less-Common / Special Population DDIs (Collapsible)
+              if (lessCommonAlerts.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                  child: Material(
+                    color: AppTheme.statusWarningBg,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: AppTheme.statusWarningBorder),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        key: const Key('cart_less_common_ddi_tile'),
+                        initiallyExpanded: false,
+                        tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                        childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+                        leading: const Icon(
+                          Icons.info_outline_rounded,
+                          color: AppTheme.statusWarning,
+                          size: 20,
+                        ),
+                        title: Text(
+                          isThai
+                              ? 'คู่ยาที่พบน้อย / กลุ่มผู้ป่วยเฉพาะ (${lessCommonAlerts.length})'
+                              : 'Less Common / Special Population DDIs (${lessCommonAlerts.length})',
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF92400E),
+                          ),
+                        ),
+                        children: lessCommonAlerts
+                            .map((a) => _buildAlertEntry(a, isThai, textColor: const Color(0xFF92400E)))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              if (alerts.isEmpty)
                 Container(
                   margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   padding: const EdgeInsets.all(14),
@@ -164,23 +205,23 @@ class PrescriptionCartScreen extends StatelessWidget {
                 ),
 
               // Drug List
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  itemCount: drugs.length,
-                  itemBuilder: (context, index) {
-                    final d = drugs[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Column(
+                  children: drugs.map((d) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Material(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.borderDefault),
-                      ),
-                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: AppTheme.borderDefault),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: ListTile(
                         leading: Container(
                           width: 40,
                           height: 40,
@@ -220,9 +261,10 @@ class PrescriptionCartScreen extends StatelessWidget {
                             PrescriptionCart.instance.removeDrug(d.id);
                           },
                         ),
+                        ),
                       ),
                     );
-                  },
+                  }).toList(),
                 ),
               ),
             ],
@@ -270,6 +312,67 @@ class PrescriptionCartScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAlertEntry(
+    CartAlertItem alert,
+    bool isThai, {
+    required Color textColor,
+  }) {
+    final severityLabel =
+        isThai ? alert.severity.labelTh : alert.severity.labelEn;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: textColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  severityLabel,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            '• ${alert.localizedMessage(isThai)}',
+            style: TextStyle(
+              color: textColor,
+              fontSize: 13,
+              height: 1.4,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (alert.source != null && alert.source!.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 10, top: 2),
+              child: Text(
+                '${isThai ? "อ้างอิง" : "Source"}: ${alert.source}',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                  color: textColor.withValues(alpha: 0.8),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
