@@ -33,7 +33,7 @@ final List<Drug> nephrology = [
     nameTh: 'อีโปอีติน อัลฟ่า',
     category: DrugCategory.nephrology,
     pregnancyCategory: 'C',
-    isHighAlert: true,
+    isHighAlert: false,
     contraindications: [
       'Uncontrolled hypertension',
       'Pure Red Cell Aplasia (PRCA)'
@@ -174,7 +174,7 @@ final List<Drug> immunosuppressants = [
     category: DrugCategory.immunosuppressant,
     drugClass: DrugClass.immunosuppressant,
     pregnancyCategory: 'C',
-    isHighAlert: true,
+    isHighAlert: false,
     requiresRenalAdjustment: true,
     requiresTDM: true,
     severeInteractions: [
@@ -215,7 +215,7 @@ final List<Drug> immunosuppressants = [
     category: DrugCategory.immunosuppressant,
     drugClass: DrugClass.immunosuppressant,
     pregnancyCategory: 'D', // Risk of fetal harm
-    isHighAlert: true,
+    isHighAlert: false,
     contraindications: ['Pregnancy (must use effective contraception)'],
     severeInteractions: ['Antacids (decrease absorption)', 'Cholestyramine'],
     regimens: [

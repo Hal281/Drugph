@@ -9,7 +9,7 @@ final List<Drug> psychiatry = [
     category: DrugCategory.psychiatric,
     pregnancyCategory: 'C',
     requiresHepaticCaution: true,
-    isHighAlert: true,
+    isHighAlert: false,
     severeInteractions: ['Amiodarone', 'Ondansetron', 'Metoclopramide'],
     specialNotes:
         'Monitor for QT prolongation and extrapyramidal symptoms (EPS).',
@@ -282,7 +282,7 @@ final List<Drug> psychiatry = [
     nameTh: 'ลิเทียม',
     category: DrugCategory.psychiatric,
     pregnancyCategory: 'D',
-    isHighAlert: true,
+    isHighAlert: false,
     requiresTDM: true,
     severeInteractions: ['NSAIDs', 'ACE inhibitors', 'Diuretics (thiazides)'],
     specialNotes:

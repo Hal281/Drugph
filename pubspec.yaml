@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/fonts/
     - assets/data/
+    - assets/data/high_alert_lists/
     - assets/evidence/
 
   fonts:

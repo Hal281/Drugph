@@ -20,6 +20,9 @@ import 'package:drug_dosage_calculator/data/knowledge_base_loader.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Reclassified per ISMP 2024 Acute Care List (FB-11 / WP-03):
+  // Nicardipine is not on the US ISMP 2024 Acute Care High-Alert list,
+  // though its ClinicalMonograph & Provenance remain audited in monographAuditedIds.
   const highAlertIds = [
     'warfarin',
     'heparin',
@@ -30,25 +33,30 @@ void main() {
     'epinephrine',
     'dopamine',
     'dobutamine',
-    'nicardipine',
     'amiodarone',
     'insulin_regular',
     'magnesium_sulfate',
     'oxytocin',
   ];
 
+  const monographAuditedIds = [
+    ...highAlertIds,
+    'nicardipine',
+  ];
+
   group('High-Alert Medications Monograph & Provenance Verification', () {
-    test('All 14 core hospital High-Alert drugs exist in DrugDatabase', () {
-      expect(highAlertIds.length, equals(14));
+    test('All 13 ISMP High-Alert drugs exist in DrugDatabase and keep isHighAlert == true', () {
+      expect(highAlertIds.length, equals(13));
       for (final id in highAlertIds) {
         final drug = DrugDatabase.findById(id);
         expect(drug, isNotNull, reason: 'High-Alert drug "$id" must exist in DrugDatabase');
         expect(drug!.isHighAlert, isTrue, reason: '$id must have isHighAlert == true');
       }
+      expect(DrugDatabase.findById('nicardipine')!.isHighAlert, isFalse);
     });
 
-    test('Every High-Alert drug has complete ClinicalMonograph with all required fields', () {
-      for (final id in highAlertIds) {
+    test('Every audited critical-care drug has complete ClinicalMonograph with all required fields', () {
+      for (final id in monographAuditedIds) {
         final drug = DrugDatabase.findById(id)!;
         final mono = drug.monograph;
 
@@ -70,8 +78,8 @@ void main() {
       }
     });
 
-    test('Every High-Alert drug has honest Provenance with pending reviewer sign-off', () {
-      for (final id in highAlertIds) {
+    test('Every audited critical-care drug has honest Provenance with pending reviewer sign-off', () {
+      for (final id in monographAuditedIds) {
         final drug = DrugDatabase.findById(id)!;
         final prov = drug.provenance;
 
@@ -98,7 +106,7 @@ void main() {
     });
 
     test('Regimens have VerificationStatus.pendingReview while apixaban_2_of_3_criteria remains verified', () {
-      for (final id in highAlertIds) {
+      for (final id in monographAuditedIds) {
         final drug = DrugDatabase.findById(id)!;
         expect(drug.regimens, isNotEmpty, reason: '$id must have regimens');
 
@@ -136,8 +144,8 @@ void main() {
       expect(report.isValid, isTrue);
     });
 
-    test('High-Alert drugs have valid clinical classification and safety metadata', () {
-      for (final id in highAlertIds) {
+    test('High-Alert & audited critical drugs have valid clinical classification and safety metadata', () {
+      for (final id in monographAuditedIds) {
         final drug = DrugDatabase.findById(id)!;
         expect(drug.genericName.isNotEmpty, isTrue);
         expect(drug.nameTh, isNotNull);

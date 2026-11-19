@@ -721,7 +721,7 @@ final List<Drug> supplements = [
     brandNames: ['Calcium Gluconate'],
     nameTh: 'แคลเซียม กลูโคเนต',
     category: DrugCategory.supplement,
-    isHighAlert: true,
+    isHighAlert: false,
     severeInteractions: [
       'Digoxin (Increases toxicity - give slowly with ECG)',
       'Ceftriaxone IV (Precipitation in neonates - CONTRAINDICATED in neonates)'

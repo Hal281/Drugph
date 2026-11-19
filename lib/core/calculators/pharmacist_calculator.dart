@@ -7,6 +7,7 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import '../domain/high_alert_registry.dart';
 import '../formatters/clinical_terms.dart';
 import '../models/models.dart';
 import '../validators/input_validator.dart';
@@ -1155,7 +1156,10 @@ class PharmacistCalculator {
         }
       }
 
-      if (drug.isHighAlert) {
+      final isHighAlertRegimen = HighAlertRegistry.entryFor(drug.id) != null
+          ? HighAlertRegistry.isHighAlert(drug.id, route: regimen.route)
+          : drug.isHighAlert;
+      if (isHighAlertRegimen) {
         warnings.insert(0, DoseChecker.highAlertWarning(drug.genericName));
       }
 

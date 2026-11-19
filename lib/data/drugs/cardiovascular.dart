@@ -451,7 +451,7 @@ final List<Drug> cardiovascular = [
     nameTh: 'ไดจอกซิน',
     category: DrugCategory.cardiovascular,
     requiresRenalAdjustment: true,
-    isHighAlert: true,
+    isHighAlert: false,
     requiresTDM: true,
     severeInteractions: [
       'Amiodarone (increases digoxin levels by 50% - reduce digoxin dose)',
@@ -495,7 +495,7 @@ final List<Drug> cardiovascular = [
     nameTh: 'นิคาร์ดิปีน',
     category: DrugCategory.cardiovascular,
     requiresHepaticCaution: true,
-    isHighAlert: true,
+    isHighAlert: false,
     sourceCitation: '2020 ACC/AHA Hypertensive Emergency Guidelines / คู่มือยาฉีดรามาธิบดี / US FDA Cardene IV SPL',
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(

@@ -64,7 +64,7 @@ final List<Drug> neurology = [
     nameTh: 'ฟีนิทอยน์',
     category: DrugCategory.neurological,
     requiresHepaticCaution: true,
-    isHighAlert: true,
+    isHighAlert: false,
     requiresTDM: true,
     allergyClass: 'Hydantoin',
     severeInteractions: [
@@ -228,7 +228,7 @@ final List<Drug> neurology = [
     nameTh: 'วาลโปรอิก แอซิด (เดพาคีน)',
     category: DrugCategory.neurological,
     requiresHepaticCaution: true,
-    isHighAlert: true,
+    isHighAlert: false,
     requiresTDM: true,
     pregnancyCategory: 'D/X',
     interactions: [

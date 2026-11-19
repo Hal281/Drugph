@@ -139,7 +139,7 @@ final List<Drug> emergency = [
     brandNames: ['Atropine Sulfate'],
     nameTh: 'อะโทรปีน',
     category: DrugCategory.cardiovascular,
-    isHighAlert: true,
+    isHighAlert: false,
     allergyClass: 'Anticholinergic',
     severeInteractions: ['Other Anticholinergics (Additive effects)'],
     contraindications: ['Narrow-angle glaucoma (relative)'],
@@ -389,7 +389,7 @@ final List<Drug> emergency = [
     brandNames: ['Narcan'],
     nameTh: 'นาลอกโซน',
     category: DrugCategory.antidote,
-    isHighAlert: true,
+    isHighAlert: false,
     sourceCitation: 'Lexicomp Drug Information 2024 / AHA ACLS Opioid-Associated Emergency Guidelines',
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(

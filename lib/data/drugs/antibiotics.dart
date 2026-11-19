@@ -10,7 +10,7 @@ final List<Drug> antibiotics = [
     category: DrugCategory.antibiotic,
     availableStrengths: [500.0],
     requiresRenalAdjustment: true,
-    isHighAlert: true,
+    isHighAlert: false,
     requiresTDM: true,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / สมาคมโรคไตแห่งประเทศไทย',
     lastReviewedDate: '2024-10-12',
@@ -274,7 +274,7 @@ final List<Drug> antibiotics = [
     category: DrugCategory.antibiotic,
     requiresRenalAdjustment: true,
     requiresTDM: true,
-    isHighAlert: true,
+    isHighAlert: false,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Hartford Nomogram',
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(
@@ -447,7 +447,7 @@ final List<Drug> antibiotics = [
     category: DrugCategory.antibiotic,
     requiresRenalAdjustment: true,
     requiresTDM: true,
-    isHighAlert: true,
+    isHighAlert: false,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Hartford Nomogram',
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(
@@ -2529,7 +2529,7 @@ final List<Drug> antibiotics = [
     ),
     category: DrugCategory.antibiotic,
     requiresRenalAdjustment: true,
-    isHighAlert: true,
+    isHighAlert: false,
     specialNotes: 'Dosing is based on Colistin Base Activity (CBA). 1 million IU = ~33.3 mg CBA. High risk of nephrotoxicity.',
     specialNotesTh: 'ขนาดยาคำนวณตาม CBA (1 ล้านยูนิต = ~33.3 mg CBA) ระวังพิษต่อไตอย่างรุนแรง ควรติดตามค่า SCr ทุกวัน',
     regimens: [
@@ -2724,7 +2724,7 @@ final List<Drug> antibiotics = [
     nameTh: 'ไรแฟมพิน (ยารักษาวัณโรค)',
     category: DrugCategory.antibiotic,
     requiresHepaticCaution: true,
-    isHighAlert: true,
+    isHighAlert: false,
     severeInteractions: [
       'Apixaban / Rivaroxaban (Decreases DOAC levels - Avoid)',
       'Warfarin (Decreases INR significantly)',

@@ -7,9 +7,18 @@ final List<Drug> endocrine = [
     brandNames: ['Minidiab', 'Glucotrol'],
     nameTh: 'กลิพิไซด์',
     category: DrugCategory.endocrine,
+    drugClass: DrugClass.sulfonylurea,
     pregnancyCategory: 'C',
+    isHighAlert: true,
     requiresHepaticCaution: true,
     requiresRenalAdjustment: true,
+    sourceCitation: 'ISMP List of High-Alert Medications in Acute Care Settings (2024) / Lexicomp DIH 2024',
+    lastReviewedDate: '2024-10-12',
+    provenance: Provenance(
+      source: 'ISMP Acute Care High-Alert List 2024 / Lexicomp DIH 2024',
+      reviewedBy: 'Pending Clinical Pharmacist Sign-off',
+      reviewedAt: '2024-10-12',
+    ),
     severeInteractions: ['Fluconazole (increases glipizide levels)'],
     regimens: [
       DosingRegimen(

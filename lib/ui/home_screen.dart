@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/drug_database.dart';
 import '../data/drug_search_engine.dart';
+import '../core/domain/high_alert_registry.dart';
 import '../core/models/models.dart';
 import 'calculator_screen.dart';
 import 'history_screen.dart';
@@ -573,10 +574,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       final isSelected =
                           isDesktop && _selectedDrugForDesktop?.id == drug.id;
                       final drugClassLabel = _getDrugClassLabel(drug);
+                      final isHighAlert =
+                          HighAlertRegistry.isDrugHighAlertInCatalog(drug);
+                      final isNtiTdm = !isHighAlert &&
+                          HighAlertRegistry.isNarrowTherapeuticIndex(drug);
 
                       return Semantics(
                         label:
-                            '${drug.genericName}, ${isThai ? drug.category.nameTh : drug.category.nameEn}${drug.isHighAlert ? (isThai ? ", ยาความเสี่ยงสูง" : ", High Alert") : ""}',
+                            '${drug.genericName}, ${isThai ? drug.category.nameTh : drug.category.nameEn}${isHighAlert ? (isThai ? ", ยาความเสี่ยงสูง" : ", High Alert") : (isNtiTdm ? ", NTI/TDM" : "")}',
                         button: true,
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 8.0),
@@ -588,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             border: Border.all(
                               color: isSelected
                                   ? AppTheme.primaryTeal
-                                  : (drug.isHighAlert
+                                  : (isHighAlert
                                       ? AppTheme.statusCriticalBorder
                                       : AppTheme.borderDefault),
                               width: isSelected ? 1.5 : 1,
@@ -668,9 +673,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              if (drug.isHighAlert) ...[
+                                              if (isHighAlert) ...[
                                                 const SizedBox(width: 6),
                                                 Container(
+                                                  key: Key(
+                                                    'drug_high_alert_badge_${drug.id}',
+                                                  ),
                                                   padding: const EdgeInsets
                                                       .symmetric(
                                                     horizontal: 6,
@@ -694,6 +702,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     style: const TextStyle(
                                                       color: AppTheme
                                                           .statusCritical,
+                                                      fontSize: 10.5,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ] else if (isNtiTdm) ...[
+                                                const SizedBox(width: 6),
+                                                Container(
+                                                  key: Key(
+                                                    'drug_nti_tdm_badge_${drug.id}',
+                                                  ),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppTheme
+                                                        .statusWarningBg,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
+                                                    border: Border.all(
+                                                      color: AppTheme
+                                                          .statusWarningBorder,
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'NTI / TDM',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF92400E),
                                                       fontSize: 10.5,
                                                       fontWeight:
                                                           FontWeight.w700,
