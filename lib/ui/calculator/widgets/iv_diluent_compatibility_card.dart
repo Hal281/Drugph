@@ -110,6 +110,7 @@ class _IvDiluentCompatibilityCardState
               ),
               const SizedBox(height: 10),
               Wrap(
+                key: const Key('iv_diluent_compact_chips'),
                 spacing: 6,
                 runSpacing: 6,
                 children: [

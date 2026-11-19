@@ -16,7 +16,7 @@
 | **ขนาดยาเด็ก (`mg/kg/day`)** | แสดงข้อความสูตร เช่น `45–90 mg/kg/day divided q8–12h` ต้องกดเครื่องคิดเลขเอง | รับน้ำหนัก → หารจำนวนมื้อ + ปัดเศษ + แปลงเป็น **`mL` / ช้อนยา** ตามความเข้มข้นขวดยาจริง (`0.01 mL` สำหรับไซริงค์ `1 mL`) |
 | **ความเสี่ยงคำนวณพลาดใต้ความเร่งด่วน** | ผู้ใช้มีโอกาสสลับ `mg/kg/dose` กับ `/day` หรือลืมหารมื้อ | บังคับแยก `DoseBasis.perDose` vs `DoseBasis.perDay` ในระดับ Type System พร้อม Automated Regression Sweep (`test/pediatric_dosing_bug_test.dart`) |
 | **ค่าไต & น้ำหนักคนอ้วน** | ต้องเปิดอีกหน้าเพื่อคำนวณ `Cockcroft-Gault` และ `IBW/AdjBW` แยกกัน | เลือก `TBW / IBW / AdjBW` อัตโนมัติ (Winter 2012) สำหรับผู้ใหญ่ หรือ `Bedside Schwartz` สำหรับเด็ก `1–17 ปี` และเตือนจุดตัดค่าไตแบบไร้รอยต่อ |
-| **ความพร้อมใช้งานหน้างาน รพ.** | ภาษาอังกฤษล้วน, ต้องต่อเน็ตบางฟีเจอร์, ไม่เชื่อมกับ Dosing Cart ของคนไข้ | **Offline-first**, ภาษาไทย–อังกฤษ, มี Step-by-Step Breakdown ตรวจสอบย้อนกลับได้ทุกบรรทัด และมี Multi-Drug Cart ตรวจ Therapeutic Duplication & DDI |
+| **ความพร้อมใช้งานหน้างาน รพ.** | ภาษาอังกฤษล้วน, ต้องต่อเน็ตบางฟีเจอร์, ไม่เชื่อมกับ Dosing Cart ของคนไข้ | **Offline-first**, ภาษาไทย–อังกฤษ, จัด Tier ยา 3 ระดับ (**34 Core / 85 Extended / 4 ReferenceOnly = 123 ตัว**), คัดกรอง High-Alert ตาม **ISMP 2024 (Route-aware) + แยกป้าย `NTI / TDM` 11 ตัว**, จัดลำดับ DDI ตามความถี่ในเวชปฏิบัติ, และแสดง Breakdown ทุกบรรทัด |
 | **นโยบาย Overdose ฉุกเฉิน** | ไม่คำนวณให้ จึงไม่เตือนแบบ Real-time ตามน้ำหนักผู้ป่วย | **Non-Blocking Overdose Policy** (กฎข้อ 5): แสดงตัวเลขที่คำนวณได้เสมอเพื่อช่วยชีวิตฉุกเฉิน แต่ขึ้นแถบเตือนวิกฤตสีแดงเด่นชัด |
 
 ---
@@ -33,7 +33,7 @@
 
 ### Q3: "สูตรคำนวณใช้อะไรเป็น Reference และน่าเชื่อถือแค่ไหน?"
 
-ทุกสูตรในระบบเป็น **Pure Deterministic Functions** (`lib/core/calculators/`) ที่อ้างอิงจากสมการมาตรฐานทางการแพทย์ระดับสากลและมี Unit Tests ตรวจสอบกว่า 1,179+ เคส:
+ทุกสูตรในระบบเป็น **Pure Deterministic Functions** (`lib/core/calculators/`) ที่อ้างอิงจากสมการมาตรฐานทางการแพทย์ระดับสากลและมี Automated Unit/Widget Tests กว่า 1,220+ เคส (ผ่าน Sweep Test ยาเด็ก 39 สูตร = 263 การคำนวณ):
 
 | สูตร / เกณฑ์การคำนวณ | แหล่งอ้างอิงมาตรฐาน (Primary Citation) | ตำแหน่งในโค้ด |
 | :--- | :--- | :--- |
@@ -42,7 +42,7 @@
 | **Ideal Body Weight (IBW)** | Devine BJ. *Drug Intell Clin Pharm*. 1974;8:650–655 | `WeightBasedCalculator` (`lib/core/calculators/weight_based_calculator.dart`) |
 | **Pediatric eGFR (เด็ก $1–17$ ปี)** | Schwartz GJ et al. *J Am Soc Nephrol*. 2009;20(3):629–637 (`0.413 × Height_cm / SCr`) | `RenalCalculator.bedsideSchwartz` (`renal_calculator.dart:195`) |
 | **Body Surface Area (BSA)** | Mosteller RD. *N Engl J Med*. 1987;317(17):1098 | `BsaCalculator` (`lib/core/calculators/bsa_calculator.dart`) |
-| **ข้อมูลยา, ขนาดยา, DDI, IV Compatibility** | Lexicomp / *Drug Information Handbook* (APhA), The Sanford Guide, คู่มือปรับยาโรคไตสมาคมโรคไตไทย, แนวทาง IDAT, บัญชียาหลักแห่งชาติ (RDU), คู่มือยาฉีดรามาธิบดี/ศิริราช, DiPiro | `ClinicalEvidenceSheet`, [`REFERENCES.md`](file:///c:/Users/turbo/drugforPh/REFERENCES.md) |
+| **ข้อมูลยา, ขนาดยา, DDI, IV Compatibility** | *Drug Information Handbook* (Lexicomp / APhA), The Sanford Guide 2024, ISMP Acute Care 2024, คู่มือปรับยาโรคไตสมาคมโรคไตไทย, แนวทาง IDAT, บัญชียาหลักแห่งชาติ (RDU), คู่มือยาฉีดรามาธิบดี/ศิริราช, DiPiro | `ClinicalCitationFormatter`, `ClinicalEvidenceSheet`, [`REFERENCES.md`](file:///c:/Users/turbo/drugforPh/REFERENCES.md) |
 
 *(หมายเหตุความโปร่งใสทางคลินิก: ในส่วนข้อมูลยาและ Golden Test Cases ระบบมีการแยกระดับ [`VerificationMetadata.isFullyVerified`](file:///c:/Users/turbo/drugforPh/lib/core/models/verified_drug_schema.dart) ชัดเจน หากยังไม่มีเภสัชกรลงนามรับรองจะแสดงสถานะ `PENDING_HUMAN_VERIFICATION` ไม่แอบอ้างว่าผ่านการรับรองแล้ว)*
 
@@ -72,9 +72,9 @@
 
 | Phase | เป้าหมายหลัก | งานสำคัญ | เกณฑ์ผ่านก่อนขยับเฟสถัดไป (Gate) |
 | :---: | :--- | :--- | :--- |
-| **Phase 1** | **Clinical Correctness** | ปิด Bug เปิดค้าง: CG Auto-Weight ใน `PatientEditDialog`, แยก Child-Pugh `notAssessed`, คัดกรอง High-Alert ตาม ISMP, แก้ศัพท์ `"เข็มแรก"`, ลบ Dengue ซ้ำซ้อน, แสดงชื่อสมการ+เกณฑ์น้ำหนัก, และ Sweep Test ยาเด็กทุกตัว | `flutter analyze` = 0 errors, `flutter test` $\ge$ 1,179 passing, Pediatric Sweep Test ผ่าน 100% |
-| **Phase 2** | **Scope Tiering & Core Data** | แบ่ง `DrugTier` (`core` / `extended` / `referenceOnly`) โดยเน้น Core (ยาเด็ก + ยาฉีด รพ.), เติม $\ge 2–3$ ข้อบ่งใช้ + Side Effects + Common DDI พร้อมอ้างอิง *Drug Information Handbook* / *Lexicomp* | Core Formulary V1 ครบทุกตัว พร้อม Citation และติดสถานะรอเภสัชกรตรวจ |
-| **Phase 3** | **Minimalist UX & Defense Prep** | จัดลำดับหน้าคำนวณให้เห็น **ข้อบ่งใช้ $\rightarrow$ Therapeutic Dose (`mg/mL`) $\rightarrow$ Route/Admin $\rightarrow$ Side Effects** ทันที; ปรับ IV Compatibility เป็นชิปสั้น; แถบปรับไต/ตับกดเปิดดูได้ | ผ่านการทดสอบ Usability กับเภสัชกรรอบ 2 โดยไม่ต้องอธิบายวิธีใช้ |
+| **Phase 1** *(✅ Done)* | **Clinical Correctness** | ปิด Bug เปิดค้าง: CG Auto-Weight (`PatientEditDialog`/`PkSimulationController`), แยก Child-Pugh `notAssessed` (`WP-02`), คัดกรอง High-Alert ตาม **ISMP 2024 Route-aware + `NTI / TDM` badge** (`WP-03`), แก้ศัพท์ `ClinicalTerms` `"โดสแรก"` (`WP-04`), ป้ายกลุ่มยา (`WP-05`), แสดงชื่อสมการ+เกณฑ์น้ำหนัก+เตือน `< 1 yr` (`WP-06`), และ Sweep Test ยาเด็ก (`DEC-PED-AUDIENCE-001`, `WP-07`) | `flutter analyze` = 0 issues, Full Suite ผ่าน 100% (`1,208+` tests), Pediatric Sweep (39 regimens / 263 cases) ผ่าน |
+| **Phase 2** *(✅ Done)* | **Scope Tiering, Core Data & DDI/Citation** | แบ่ง `DrugTier` (`34 Core / 85 Extended / 4 ReferenceOnly` รวม 123 ตัว, `WP-08`), เติม $\ge 2$ ข้อบ่งใช้ + Common/Serious Side Effects ครบ 34 Core drugs (`WP-09`), จัดอันดับ DDI ตามความถี่ (`Amoxicillin + Warfarin` ก่อน `Methotrexate`) + อ้างอิง **Drug Information Handbook (Lexicomp / APhA)** (`WP-10`) | Core Formulary V1 ครบทั้ง 34 ตัว, `flutter test` (`1,220` tests ณ Commit `520073a`) ผ่าน 100%, ติดสถานะรอเภสัชกรตรวจ |
+| **Phase 3** *(✅ Done)* | **Minimalist UX & Defense Prep** | จัดลำดับหน้าคำนวณให้เห็น **ข้อบ่งใช้ $\rightarrow$ Therapeutic Dose (`mg/mL`) $\rightarrow$ Side Effects (Common/Serious) $\rightarrow$ Compact IV Chips $\rightarrow$ Alerts**; แถบปรับไต/ตับกดเปิด `ClinicalEvidenceSheet` ได้ทันที (`WP-11`); ซิงค์ `QA_PREP.md` และ `FEEDBACK_TRACEABILITY.md` (`WP-12`) | `calculator_hierarchy_ux_test.dart` ผ่านทั้ง Mobile (`390x844`, `320x480`) & Desktop (`1280x900`), Full Gate ผ่าน 100% |
 | **Phase 4** | **Clinical Advisor & Sign-off Pipeline** | สรรหาเภสัชกรคลินิก + กุมารแพทย์อย่างน้อยอย่างละ 1 ท่าน, ปรับ `generate_pharmacist_dossier_pdf.dart` ให้ออกเป็นชุดละ 5 ตัว, สร้าง `verification_ledger.json` เชื่อมกับ Badge สีเขียว | **$\ge 80\%$ ของ Core Drugs มีผู้ลงนามรับรอง (`verified_by` + เลขใบประกอบฯ)** ก่อนเข้า Pilot |
 | **Phase 5** | **Neonatal Module (NICU Wedge)** | พัฒนาระบบตารางโดสทารกแรกเกิด (`< 28 วัน`: PNA + GA/PMA + Birth Weight) ซึ่งเป็น Pain Point ใหญ่ที่สุดของ Medscape และเป็นจุดขายสำคัญให้ห้องเด็ก/NICU | เภสัชกร/กุมารแพทย์ทารกแรกเกิดลงนามรับรองครบทุก Band |
 | **Phase 6** | **Startup & Hospital Sales Readiness** | รองรับ Config เฉพาะโรงพยาบาล (Formulary ความเข้มข้นที่มีจริงใน รพ. + บัญชี High-Alert ประจำ รพ.), PDPA Zero-PII-by-default, ตรวจสอบสถานะ **SaMD (อย. เครื่องมือแพทย์)**, และชุด Pilot Kit + KPI (ลดเวลาคำนวณ / ดักจับ Error) | ผ่านเกณฑ์กฎหมาย อย./PDPA และสรุปผล Field Trial จากโรงพยาบาลนำร่อง |

@@ -184,9 +184,10 @@ void main() {
         final rrtSize = tester.getSize(rrtSelector);
         expect(rrtSize.height, greaterThanOrEqualTo(48.0));
 
-        await tester.tap(
-          find.byKey(const Key('calculator_hepatic_options')),
-        );
+        final hepaticTile = find.byKey(const Key('calculator_hepatic_options'));
+        await tester.ensureVisible(hepaticTile);
+        await tester.pumpAndSettle();
+        await tester.tap(hepaticTile);
         await tester.pumpAndSettle();
 
         // Child-Pugh selector

@@ -15,6 +15,7 @@ import 'widgets/dosing_weight_logic_card.dart';
 import 'widgets/iv_diluent_compatibility_card.dart';
 import 'widgets/patient_clinical_header.dart';
 import 'widgets/regimen_selector_section.dart';
+import 'widgets/side_effects_summary_card.dart';
 import 'widgets/sticky_calculate_bar.dart';
 
 /// Clinical Calculator Dashboard Screen (Clean Architecture Orchestrator).
@@ -290,6 +291,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         )
       else
         _buildEmptyGuidanceCard(t),
+      if (widget.drug.hasSideEffectData) ...[
+        const SizedBox(height: 16),
+        SideEffectsSummaryCard(
+          drug: widget.drug,
+          isThai: t,
+        ),
+      ],
       if (state.shouldShowIvDiluentCard) ...[
         const SizedBox(height: 16),
         IvDiluentCompatibilityCard(
@@ -301,7 +309,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       const SizedBox(height: 16),
       ClinicalHeaderAlerts(
         drug: widget.drug,
+        selectedRegimen: state.selectedRegimen,
         isThai: t,
+        showSideEffects: false,
         categoryColor: AppTheme.primaryTeal,
       ),
       const SizedBox(height: 8),
@@ -345,45 +355,46 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildTierBanner(t),
                     PatientClinicalHeader(
                       state: state,
                       isThai: t,
                       categoryColor: AppTheme.primaryTeal,
                     ),
-                    if (!isReferenceOnly)
+                    if (!isReferenceOnly) ...[
+                      _buildRegimenSelector(state, t),
+                      const SizedBox(height: 16),
                       _buildParametersForm(state, t, showDemographicInputs),
+                    ],
                   ],
                 ),
               ),
             ),
             const VerticalDivider(width: 1, color: AppTheme.borderDefault),
-            // Right Pane: Indication/Regimen, Dose Output, Diluent, Safety Alerts, & Math Breakdown
+            // Right Pane: Tier Notice, Dose Output, Side Effects, Diluent, Safety Alerts, & Math Breakdown
             Expanded(
               flex: 6,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: isReferenceOnly
-                      ? [
-                          _buildReferenceOnlyCard(state, t),
-                          const SizedBox(height: 16),
-                          ClinicalHeaderAlerts(
-                            drug: widget.drug,
-                            isThai: t,
-                            categoryColor: AppTheme.primaryTeal,
-                          ),
-                        ]
-                      : [
-                          _buildRegimenSelector(state, t),
-                          const SizedBox(height: 16),
-                          ..._buildOutcomeAndGuidanceSection(
-                            state,
-                            t,
-                            isWide: true,
-                          ),
-                        ],
+                  children: [
+                    _buildTierBanner(t),
+                    if (isReferenceOnly) ...[
+                      _buildReferenceOnlyCard(state, t),
+                      const SizedBox(height: 16),
+                      ClinicalHeaderAlerts(
+                        drug: widget.drug,
+                        selectedRegimen: state.selectedRegimen,
+                        isThai: t,
+                        categoryColor: AppTheme.primaryTeal,
+                      ),
+                    ] else
+                      ..._buildOutcomeAndGuidanceSection(
+                        state,
+                        t,
+                        isWide: true,
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -421,6 +432,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     const SizedBox(height: 16),
                     ClinicalHeaderAlerts(
                       drug: widget.drug,
+                      selectedRegimen: state.selectedRegimen,
                       isThai: t,
                       categoryColor: AppTheme.primaryTeal,
                     ),

@@ -8,14 +8,18 @@ import '../../widgets/clinical_evidence_sheet.dart';
 /// hepatic adjustment guidance card.
 class ClinicalHeaderAlerts extends StatelessWidget {
   final Drug drug;
+  final DosingRegimen? selectedRegimen;
   final bool isThai;
   final Color categoryColor;
+  final bool showSideEffects;
 
   const ClinicalHeaderAlerts({
     super.key,
     required this.drug,
+    this.selectedRegimen,
     required this.isThai,
     this.categoryColor = AppTheme.primaryTeal,
+    this.showSideEffects = true,
   });
 
   @override
@@ -57,21 +61,22 @@ class ClinicalHeaderAlerts extends StatelessWidget {
             items: drug.contraindications,
           ),
 
-        _buildListAlertCard(
-          icon: Icons.health_and_safety_outlined,
-          accentColor: AppTheme.statusWarning,
-          bgColor: AppTheme.statusWarningBg,
-          borderColor: AppTheme.statusWarningBorder,
-          textColor: const Color(0xFF92400E),
-          title: t ? 'ผลข้างเคียงสำคัญ (Side Effects)' : 'Important Side Effects',
-          items: sideEffects.isNotEmpty
-              ? sideEffects
-              : [
-                  t
-                      ? 'ยังไม่มีข้อมูลที่ยืนยันในฐานข้อมูล'
-                      : 'No verified side-effect data in the database.',
-                ],
-        ),
+        if (showSideEffects)
+          _buildListAlertCard(
+            icon: Icons.health_and_safety_outlined,
+            accentColor: AppTheme.statusWarning,
+            bgColor: AppTheme.statusWarningBg,
+            borderColor: AppTheme.statusWarningBorder,
+            textColor: const Color(0xFF92400E),
+            title: t ? 'ผลข้างเคียงสำคัญ (Side Effects)' : 'Important Side Effects',
+            items: sideEffects.isNotEmpty
+                ? sideEffects
+                : [
+                    t
+                        ? 'ยังไม่มีข้อมูลที่ยืนยันในฐานข้อมูล'
+                        : 'No verified side-effect data in the database.',
+                  ],
+          ),
 
         if (drug.pregnancyCategory != null)
           _buildAlertCard(
@@ -97,6 +102,27 @@ class ClinicalHeaderAlerts extends StatelessWidget {
                 : 'Pregnancy Category: ${drug.pregnancyCategory}',
           ),
 
+        if (drug.requiresRenalAdjustment)
+          _buildAlertCard(
+            key: const Key('clinical_alert_renal_adjustment_card'),
+            icon: Icons.water_drop_outlined,
+            accentColor: AppTheme.statusInfo,
+            bgColor: AppTheme.statusInfoBg,
+            borderColor: AppTheme.statusInfoBorder,
+            textColor: const Color(0xFF075985),
+            text: t
+                ? 'ต้องปรับขนาดยาตามการทำงานของไต (Renal adjustment)'
+                : 'Renal dose adjustment required — review CrCl tiers',
+            actionLabel: t ? 'ดูเกณฑ์ปรับไต ↗' : 'Renal Tiers ↗',
+            onTap: () => ClinicalEvidenceSheet.show(
+              context,
+              drug: drug,
+              regimen: selectedRegimen,
+              isThai: t,
+              initialSection: 'renal',
+            ),
+          ),
+
         if (drug.requiresHepaticCaution)
           _buildAlertCard(
             key: const Key('clinical_alert_hepatic_caution_card'),
@@ -112,6 +138,7 @@ class ClinicalHeaderAlerts extends StatelessWidget {
             onTap: () => ClinicalEvidenceSheet.show(
               context,
               drug: drug,
+              regimen: selectedRegimen,
               isThai: t,
               initialSection: 'hepatic',
             ),

@@ -26,12 +26,12 @@ void main() {
     expect(find.text('Indications'), findsOneWidget);
     final indicationFinder = find.text('• ${drug.availableIndications.first}');
     expect(indicationFinder, findsOneWidget);
-    expect(find.text('Important Side Effects'), findsOneWidget);
+    expect(find.text('Side Effects & Safety Monitoring'), findsOneWidget);
     expect(find.textContaining('Peripheral edema'), findsOneWidget);
     expect(find.textContaining('แพ้ยา'), findsNothing);
     expect(
       tester.getTopLeft(indicationFinder).dy,
-      lessThan(tester.getTopLeft(find.text('Important Side Effects')).dy),
+      lessThan(tester.getTopLeft(find.text('Side Effects & Safety Monitoring')).dy),
     );
   });
 
