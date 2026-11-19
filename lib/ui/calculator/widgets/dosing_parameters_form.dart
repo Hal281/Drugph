@@ -303,7 +303,8 @@ class DosingParametersForm extends StatelessWidget {
             const SizedBox(height: 12),
             ExpansionTile(
               key: const Key('calculator_hepatic_options'),
-              initiallyExpanded: hepaticImpairment != ChildPughClass.none ||
+              initiallyExpanded: (hepaticImpairment != ChildPughClass.none &&
+                      hepaticImpairment != ChildPughClass.notAssessed) ||
                   lastChildPughScore != null,
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.zero,
@@ -384,82 +385,41 @@ class DosingParametersForm extends StatelessWidget {
                 const SizedBox(height: 6),
                 SizedBox(
                   width: double.infinity,
-                  child: SegmentedButton<ChildPughClass>(
-                    key: const Key('calculator_child_pugh_selector'),
-                    showSelectedIcon: false,
-                    segments: [
-                      ButtonSegment<ChildPughClass>(
-                        value: ChildPughClass.none,
-                        label: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            t ? 'ปกติ' : 'Normal',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const ButtonSegment<ChildPughClass>(
-                        value: ChildPughClass.classA,
-                        label: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            'Class A',
+                  key: const Key('calculator_child_pugh_selector'),
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final option in ChildPughClass.selectorValues)
+                        ChoiceChip(
+                          label: Text(
+                            _childPughOptionLabel(option, t),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
+                              color: hepaticImpairment == option
+                                  ? categoryColor
+                                  : Colors.grey.shade800,
                             ),
                           ),
-                        ),
-                      ),
-                      const ButtonSegment<ChildPughClass>(
-                        value: ChildPughClass.classB,
-                        label: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            'Class B',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          selected: hepaticImpairment == option,
+                          showCheckmark: false,
+                          selectedColor: categoryColor.withValues(alpha: 0.18),
+                          backgroundColor: Colors.white,
+                          side: BorderSide(
+                            color: hepaticImpairment == option
+                                ? categoryColor
+                                : Colors.grey.shade300,
                           ),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.padded,
+                          onSelected: (selected) {
+                            if (selected) {
+                              onHepaticChanged(option, null);
+                            }
+                          },
                         ),
-                      ),
-                      const ButtonSegment<ChildPughClass>(
-                        value: ChildPughClass.classC,
-                        label: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            'Class C',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
-                    selected: {hepaticImpairment},
-                    onSelectionChanged: (Set<ChildPughClass> newSelection) {
-                      onHepaticChanged(newSelection.first, null);
-                    },
-                    style: ButtonStyle(
-                      minimumSize: WidgetStateProperty.all(const Size(0, 48)),
-                      tapTargetSize: MaterialTapTargetSize.padded,
-                      padding: WidgetStateProperty.all(
-                        const EdgeInsets.symmetric(horizontal: 4),
-                      ),
-                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                        Set<WidgetState> states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return categoryColor.withValues(alpha: 0.2);
-                        }
-                        return Colors.white;
-                      }),
-                    ),
                   ),
                 ),
               ],
@@ -564,6 +524,21 @@ class DosingParametersForm extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static String _childPughOptionLabel(ChildPughClass cls, bool isThai) {
+    switch (cls) {
+      case ChildPughClass.notAssessed:
+        return isThai ? 'ยังไม่ได้ประเมิน' : 'Not assessed';
+      case ChildPughClass.none:
+        return isThai ? 'ปกติ' : 'Normal';
+      case ChildPughClass.classA:
+        return 'Class A';
+      case ChildPughClass.classB:
+        return 'Class B';
+      case ChildPughClass.classC:
+        return 'Class C';
+    }
   }
 
   Widget _buildTextField(

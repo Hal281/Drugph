@@ -118,7 +118,7 @@ class CalculatorController extends ChangeNotifier {
         _state.isScrStable != p.isScrStable ||
         _state.renalReplacementMode != p.renalReplacementMode ||
         _state.hepaticImpairment !=
-            (p.hepaticImpairment ?? ChildPughClass.none);
+            (p.hepaticImpairment ?? ChildPughClass.notAssessed);
 
     _isSyncingFromSession = true;
     try {
@@ -159,7 +159,7 @@ class CalculatorController extends ChangeNotifier {
       sex: p.sex,
       isScrStable: p.isScrStable,
       renalReplacementMode: p.renalReplacementMode,
-      hepaticImpairment: p.hepaticImpairment ?? ChildPughClass.none,
+      hepaticImpairment: p.hepaticImpairment ?? ChildPughClass.notAssessed,
       usedDefaultDemographics: false,
       clearResult: profileChanged || regimenChanged,
       clearDosingWeight: profileChanged || regimenChanged,
@@ -196,9 +196,7 @@ class CalculatorController extends ChangeNotifier {
         sex: _state.sex,
         isScrStable: _state.isScrStable,
         renalReplacementMode: _state.renalReplacementMode,
-        hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
-            ? null
-            : _state.hepaticImpairment,
+        hepaticImpairment: _state.hepaticImpairment,
       );
     } finally {
       _isSyncingToSession = false;
@@ -363,9 +361,7 @@ class CalculatorController extends ChangeNotifier {
       allergies: sessionPatient?.allergies ?? const [],
       activeDrugIds: sessionPatient?.activeDrugIds ?? const [],
       isPregnant: sessionPatient?.isPregnant ?? false,
-      hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
-          ? null
-          : _state.hepaticImpairment,
+      hepaticImpairment: _state.hepaticImpairment,
     );
   }
 
@@ -560,9 +556,7 @@ class CalculatorController extends ChangeNotifier {
           sex: _state.sex,
           isScrStable: _state.isScrStable,
           renalReplacementMode: _state.renalReplacementMode,
-          hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
-              ? null
-              : _state.hepaticImpairment,
+          hepaticImpairment: _state.hepaticImpairment,
         );
       } finally {
         _isSyncingToSession = false;
@@ -583,9 +577,7 @@ class CalculatorController extends ChangeNotifier {
         allergies: sessionPt?.allergies ?? const [],
         activeDrugIds: sessionPt?.activeDrugIds ?? const [],
         isPregnant: sessionPt?.isPregnant ?? false,
-        hepaticImpairment: _state.hepaticImpairment == ChildPughClass.none
-            ? null
-            : _state.hepaticImpairment,
+        hepaticImpairment: _state.hepaticImpairment,
       );
     }
 

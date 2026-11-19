@@ -113,6 +113,9 @@ enum DoseWarningCode {
   /// Fallback renal tier used for RRT patient because drug lacks explicit RRT protocol (M1).
   rrtFallbackAdvisory,
 
+  /// Hepatic function has not yet been assessed (Child-Pugh notAssessed) on a hepatic-caution drug (WP-02 / FB-12).
+  hepaticNotAssessed,
+
   calculationError,
   generalAlert,
 }

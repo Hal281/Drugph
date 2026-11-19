@@ -2,8 +2,9 @@ import 'patient.dart';
 import 'unit.dart';
 import 'dose_limit.dart';
 
-/// Child-Pugh classification for hepatic impairment (D4).
+/// Child-Pugh classification for hepatic impairment (D4, WP-02).
 enum ChildPughClass {
+  notAssessed(labelEn: 'Not assessed', labelTh: 'ยังไม่ได้ประเมิน'),
   none(labelEn: 'None (Normal)', labelTh: 'ปกติ'),
   classA(labelEn: 'Child-Pugh A (Mild)', labelTh: 'Child-Pugh A (ตับทำงานบกพร่องเล็กน้อย)'),
   classB(labelEn: 'Child-Pugh B (Moderate)', labelTh: 'Child-Pugh B (ตับทำงานบกพร่องปานกลาง)'),
@@ -15,6 +16,25 @@ enum ChildPughClass {
   const ChildPughClass({required this.labelEn, required this.labelTh});
 
   static List<ChildPughClass> get clinicalValues => [none, classA, classB, classC];
+
+  static List<ChildPughClass> get selectorValues =>
+      [notAssessed, none, classA, classB, classC];
+
+  /// Ordinal severity rank for clinical threshold comparison, or `null` when unassessed.
+  int? get severityRank {
+    switch (this) {
+      case ChildPughClass.notAssessed:
+        return null;
+      case ChildPughClass.none:
+        return 0;
+      case ChildPughClass.classA:
+        return 1;
+      case ChildPughClass.classB:
+        return 2;
+      case ChildPughClass.classC:
+        return 3;
+    }
+  }
 }
 
 /// Structured population applicability criteria for a dosing regimen (D4).
@@ -129,18 +149,18 @@ class PopulationCriteria {
       ));
     }
 
-    // Hepatic check
-    if (maxHepaticImpairment != null && patient.hepaticImpairment != null) {
-      if (patient.hepaticImpairment!.index > maxHepaticImpairment!.index) {
-        warnings.add(DoseWarning(
-          severity: LimitSeverity.hard,
-          code: DoseWarningCode.contraindicationAlert,
-          messageEn:
-              'Patient hepatic impairment (${patient.hepaticImpairment!.labelEn}) exceeds maximum allowable level (${maxHepaticImpairment!.labelEn}).',
-          messageTh:
-              'ระดับการทำงานของตับ (${patient.hepaticImpairment!.labelTh}) รุนแรงกว่าเกณฑ์ที่อนุญาตให้ใช้สูตรนี้ (${maxHepaticImpairment!.labelTh})',
-        ));
-      }
+    // Hepatic check (skip auto-blocking when hepatic status is unassessed)
+    final patientRank = patient.hepaticClass.severityRank;
+    final maxRank = maxHepaticImpairment?.severityRank;
+    if (maxRank != null && patientRank != null && patientRank > maxRank) {
+      warnings.add(DoseWarning(
+        severity: LimitSeverity.hard,
+        code: DoseWarningCode.contraindicationAlert,
+        messageEn:
+            'Patient hepatic impairment (${patient.hepaticClass.labelEn}) exceeds maximum allowable level (${maxHepaticImpairment!.labelEn}).',
+        messageTh:
+            'ระดับการทำงานของตับ (${patient.hepaticClass.labelTh}) รุนแรงกว่าเกณฑ์ที่อนุญาตให้ใช้สูตรนี้ (${maxHepaticImpairment!.labelTh})',
+      ));
     }
 
     return warnings;

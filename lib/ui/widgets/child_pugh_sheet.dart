@@ -72,6 +72,8 @@ class _ChildPughCalculatorSheetState extends State<ChildPughCalculatorSheet> {
 
   Color _classColor(ChildPughClass cls) {
     switch (cls) {
+      case ChildPughClass.notAssessed:
+        return Colors.blueGrey.shade700;
       case ChildPughClass.none:
       case ChildPughClass.classA:
         return Colors.teal.shade800;
@@ -84,6 +86,8 @@ class _ChildPughCalculatorSheetState extends State<ChildPughCalculatorSheet> {
 
   Color _classBgColor(ChildPughClass cls) {
     switch (cls) {
+      case ChildPughClass.notAssessed:
+        return Colors.blueGrey.shade50;
       case ChildPughClass.none:
       case ChildPughClass.classA:
         return Colors.teal.shade50;

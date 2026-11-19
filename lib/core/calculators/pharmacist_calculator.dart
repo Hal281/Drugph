@@ -191,16 +191,42 @@ class PharmacistCalculator {
         }
       }
 
-      if (patient.hepaticClass != null && patient.hepaticClass != ChildPughClass.none) {
+      if (patient.hepaticClass == ChildPughClass.notAssessed) {
+        if (drug.requiresHepaticCaution) {
+          final monoNotes = drug.monograph?.clinicalNotes?.trim();
+          final hepaticHintEn =
+              (monoNotes != null && monoNotes.isNotEmpty)
+                  ? monoNotes
+                  : drug.specialNotes?.trim();
+          final hepaticHintTh =
+              (monoNotes != null && monoNotes.isNotEmpty)
+                  ? monoNotes
+                  : drug.specialNotesTh?.trim();
+          final hintEn = hepaticHintEn != null && hepaticHintEn.isNotEmpty
+              ? ' Reference guidance: $hepaticHintEn'
+              : '';
+          final hintTh = hepaticHintTh != null && hepaticHintTh.isNotEmpty
+              ? '\nคำแนะนำจากตำรา: $hepaticHintTh'
+              : '';
+          warnings.add(DoseWarning(
+            severity: LimitSeverity.soft,
+            code: DoseWarningCode.hepaticNotAssessed,
+            messageEn:
+                'Hepatic Function Not Assessed (Child-Pugh): ${drug.genericName} requires hepatic caution. Standard unreduced dose calculated — verify LFTs / Child-Pugh score if liver disease is suspected.$hintEn',
+            messageTh:
+                'ยังไม่ได้ประเมินการทำงานของตับ (Child-Pugh): ยา ${drug.genericName} ต้องระมัดระวังในผู้ป่วยโรคตับ — ระบบคำนวณขนาดยามาตรฐานโดยยังไม่ปรับลดอัตโนมัติ โปรดประเมิน LFTs / Child-Pugh หากสงสัยภาวะตับบกพร่อง$hintTh',
+          ));
+        }
+      } else if (patient.hepaticClass != ChildPughClass.none) {
         if (drug.requiresHepaticCaution) {
           final isSevere = patient.hepaticClass == ChildPughClass.classC;
           warnings.add(DoseWarning(
             severity: isSevere ? LimitSeverity.hard : LimitSeverity.soft,
             code: DoseWarningCode.contraindicationAlert,
             messageEn:
-                'HEPATIC IMPAIRMENT: Patient has ${patient.hepaticClass!.labelEn}. ${drug.genericName} requires hepatic dosage caution or surveillance.',
+                'HEPATIC IMPAIRMENT: Patient has ${patient.hepaticClass.labelEn}. ${drug.genericName} requires hepatic dosage caution or surveillance.',
             messageTh:
-                'การทำงานของตับบกพร่อง: ผู้ป่วยมีภาวะ ${patient.hepaticClass!.labelTh} ยา ${drug.genericName} ต้องปรับขนาดยาหรือเฝ้าระวังอย่างใกล้ชิด',
+                'การทำงานของตับบกพร่อง: ผู้ป่วยมีภาวะ ${patient.hepaticClass.labelTh} ยา ${drug.genericName} ต้องปรับขนาดยาหรือเฝ้าระวังอย่างใกล้ชิด',
           ));
         }
       }

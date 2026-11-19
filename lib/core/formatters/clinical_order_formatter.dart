@@ -242,9 +242,13 @@ class ClinicalOrderFormatter {
     buf.writeln('  • Allergies: $allergyStr');
 
     // Pregnancy / Hepatic status
-    final hepStr = patient.hepaticImpairment != null
-        ? 'Child-Pugh Class ${patient.hepaticImpairment!.name.toUpperCase()}'
-        : 'Normal / Not assessed';
+    final hepStr = switch (patient.hepaticClass) {
+      ChildPughClass.notAssessed => isThai ? 'ยังไม่ได้ประเมิน (Not assessed)' : 'Not assessed',
+      ChildPughClass.none => isThai ? 'ปกติ (Assessed Normal)' : 'Normal (Assessed)',
+      ChildPughClass.classA => 'Child-Pugh Class A',
+      ChildPughClass.classB => 'Child-Pugh Class B',
+      ChildPughClass.classC => 'Child-Pugh Class C',
+    };
     if (patient.isPregnant) {
       buf.writeln('  • Clinical Status: Pregnant | Hepatic: $hepStr');
     } else if (patient.sex == Sex.female && patient.ageYears >= 10) {

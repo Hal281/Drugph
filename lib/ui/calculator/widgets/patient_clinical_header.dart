@@ -286,14 +286,32 @@ class PatientClinicalHeader extends StatelessWidget {
                       AppTheme.statusWarningBorder,
                       maxBadgeWidth,
                     ),
-                  if (state.hepaticImpairment != ChildPughClass.none)
+                  if (state.hepaticImpairment != ChildPughClass.notAssessed)
                     _buildBadge(
                       Icons.local_hospital_outlined,
                       'Child-Pugh: ${t ? state.hepaticImpairment.labelTh : state.hepaticImpairment.labelEn}${state.lastChildPughScore != null ? " (${state.lastChildPughScore}/15)" : ""}',
-                      const Color(0xFF92400E),
-                      AppTheme.statusWarningBg,
-                      AppTheme.statusWarningBorder,
+                      state.hepaticImpairment == ChildPughClass.none
+                          ? AppTheme.primaryTealDark
+                          : const Color(0xFF92400E),
+                      state.hepaticImpairment == ChildPughClass.none
+                          ? AppTheme.primaryTealSoft
+                          : AppTheme.statusWarningBg,
+                      state.hepaticImpairment == ChildPughClass.none
+                          ? AppTheme.primaryTealBorder
+                          : AppTheme.statusWarningBorder,
                       maxBadgeWidth,
+                    )
+                  else if (state.drug.requiresHepaticCaution)
+                    _buildBadge(
+                      Icons.local_hospital_outlined,
+                      t
+                          ? 'ตับ (Child-Pugh): ยังไม่ได้ประเมิน'
+                          : 'Hepatic (Child-Pugh): Not assessed',
+                      AppTheme.inkSecondary,
+                      AppTheme.surfaceSubtle,
+                      AppTheme.borderDefault,
+                      maxBadgeWidth,
+                      key: const Key('patient_header_hepatic_not_assessed'),
                     ),
                   if (state.dosingWeightLabel != null &&
                       state.dosingWeightValue != null)

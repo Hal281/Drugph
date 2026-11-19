@@ -54,7 +54,7 @@ class CalculatorUiState {
     this.sex = Sex.male,
     this.isScrStable = true,
     this.renalReplacementMode = RenalReplacementMode.none,
-    this.hepaticImpairment = ChildPughClass.none,
+    this.hepaticImpairment = ChildPughClass.notAssessed,
     this.lastChildPughScore,
     this.result,
     this.warnings = const [],
@@ -124,7 +124,7 @@ class CalculatorUiState {
       sex: Sex.male,
       isScrStable: true,
       renalReplacementMode: RenalReplacementMode.none,
-      hepaticImpairment: ChildPughClass.none,
+      hepaticImpairment: ChildPughClass.notAssessed,
       status: CalculatorUiStatus.empty,
     );
   }

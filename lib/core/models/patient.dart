@@ -79,8 +79,12 @@ class Patient {
   /// Convenience alias for [hospitalNumber].
   String? get hn => hospitalNumber;
 
-  /// Convenience alias for [hepaticImpairment] (F8).
-  ChildPughClass? get hepaticClass => hepaticImpairment;
+  /// Effective hepatic classification, defaulting to [ChildPughClass.notAssessed] when omitted (F8, WP-02).
+  ChildPughClass get hepaticClass =>
+      hepaticImpairment ?? ChildPughClass.notAssessed;
+
+  /// Whether hepatic status has been explicitly assessed (Normal or Child-Pugh A/B/C).
+  bool get isHepaticAssessed => hepaticClass != ChildPughClass.notAssessed;
 
   const Patient({
     required this.id,
