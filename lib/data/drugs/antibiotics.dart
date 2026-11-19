@@ -13,6 +13,26 @@ final List<Drug> antibiotics = [
     isHighAlert: false,
     requiresTDM: true,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / สมาคมโรคไตแห่งประเทศไทย',
+    sideEffects: const [
+      'Phlebitis / infusion-site irritation',
+      'Nausea, mild fever, chills',
+      'Transient elevation of serum creatinine',
+    ],
+    sideEffectsTh: const [
+      'หลอดเลือดดำอักเสบ / ระคายเคืองตำแหน่งให้ยา',
+      'คลื่นไส้ ไข้ต่ำๆ หนาวสั่น',
+      'ค่าไต SCr สูงขึ้นชั่วคราว',
+    ],
+    seriousSideEffects: const [
+      'Vancomycin Infusion Reaction (Red Man Syndrome) from rapid infusion',
+      'Nephrotoxicity (especially with Piperacillin/Tazobactam or aminoglycosides)',
+      'Ototoxicity (high-frequency hearing loss) & neutropenia',
+    ],
+    seriousSideEffectsTh: const [
+      'Red Man Syndrome (หน้าแดง คัน ความดันตกจากการดริปยาเร็วเกินไป)',
+      'พิษต่อไต (โดยเฉพาะเมื่อใช้ร่วมกับ Piperacillin/Tazobactam หรือ Aminoglycosides)',
+      'พิษต่อหู และเม็ดเลือดขาวต่ำเมื่อใช้นาน',
+    ],
     lastReviewedDate: '2024-10-12',
     provenance: const Provenance(
       source: 'The Sanford Guide to Antimicrobial Therapy 2024 (54th Ed.)',
@@ -264,6 +284,42 @@ final List<Drug> antibiotics = [
           ),
         ],
       ),
+      const DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Systemic Infection / Bacteremia (Pediatric > 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 60.0,
+        minDosePerKg: 40.0,
+        maxDosePerKg: 60.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q6h,
+        infusionTimeMinutes: 60.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes: 'Lexicomp Pediatric 2024 / AAP Red Book: 40–60 mg/kg/day IV divided q6h (15 mg/kg/dose q6h); infuse over >= 60 min; adjust via AUC/TDM.',
+        notesTh: 'เด็ก (> 1 เดือน) ติดเชื้อในกระแสเลือด/ระบบ: 60 mg/kg/วัน IV แบ่งทุก 6 ชม. (15 mg/kg/ครั้ง ดริปนาน >= 60 นาที); ติดตาม TDM',
+        limits: DoseLimit(maxSingleDose: 1000.0, maxDailyDose: 3600.0),
+      ),
+      const DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'CNS Infection / Meningitis (Pediatric > 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 60.0,
+        minDosePerKg: 60.0,
+        maxDosePerKg: 70.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q6h,
+        infusionTimeMinutes: 60.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes: 'AAP / IDSA Bacterial Meningitis: 60 mg/kg/day IV divided q6h (up to 60–75 mg/kg/day for MRSA CNS); infuse over >= 60 min.',
+        notesTh: 'เด็ก (> 1 เดือน) เยื่อหุ้มสมองอักเสบ: 60 mg/kg/วัน IV แบ่งทุก 6 ชม. (ดริป >= 60 นาที) และติดตาม TDM อย่างใกล้ชิด',
+        limits: DoseLimit(maxSingleDose: 1500.0, maxDailyDose: 4000.0),
+      ),
     ],
   ),
   const Drug(
@@ -276,6 +332,26 @@ final List<Drug> antibiotics = [
     requiresTDM: true,
     isHighAlert: false,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Hartford Nomogram',
+    sideEffects: [
+      'Elevated serum creatinine (reversible early tubular dysfunction)',
+      'Injection-site pain or mild irritation',
+      'Nausea or transient rash',
+    ],
+    sideEffectsTh: [
+      'ค่าไต Cr สูงขึ้น (มักฟื้นตัวได้หากหยุดยาหรือปรับโดสทัน)',
+      'ปวดหรือระคายเคืองบริเวณที่ให้ยา',
+      'คลื่นไส้ หรือผื่นเล็กน้อย',
+    ],
+    seriousSideEffects: [
+      'Nephrotoxicity / acute tubular necrosis (ATN)',
+      'Irreversible ototoxicity (vestibular toxicity / hearing loss)',
+      'Neuromuscular blockade (especially in myasthenia gravis)',
+    ],
+    seriousSideEffectsTh: [
+      'พิษต่อไตอย่างรุนแรง / ไตวายเฉียบพลัน',
+      'พิษต่อหูและระบบทรงตัว (หูตึง/เวียนศีรษะถาวร)',
+      'กล้ามเนื้ออ่อนแรงจาก Neuromuscular blockade',
+    ],
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(
       source: 'The Sanford Guide to Antimicrobial Therapy 2024 (Table 10D: Aminoglycoside Dosing)',
@@ -437,6 +513,40 @@ final List<Drug> antibiotics = [
           ),
         ],
       ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Extended-Interval Dosing (Pediatric > 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 5.0,
+        minDosePerKg: 5.0,
+        maxDosePerKg: 7.5,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q24h,
+        infusionTimeMinutes: 30.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes: 'Lexicomp Pediatric 2024 / AAP Red Book: 5–7.5 mg/kg/dose IV q24h (avoid EID in meningitis, endocarditis, cystic fibrosis, or AKI).',
+        notesTh: 'เด็ก (> 1 เดือน) วันละครั้ง (EID): 5–7.5 mg/kg/ครั้ง IV ทุก 24 ชม. (หลีกเลี่ยงในเยื่อหุ้มสมองอักเสบ/ไตวาย)',
+        limits: DoseLimit(maxSingleDose: 500.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Traditional Dosing (Pediatric > 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 2.5,
+        minDosePerKg: 2.0,
+        maxDosePerKg: 2.5,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        infusionTimeMinutes: 30.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes: 'Lexicomp Pediatric 2024 / AAP Red Book: 6–7.5 mg/kg/day divided q8h (2–2.5 mg/kg/dose IV q8h); monitor peak/trough TDM.',
+        notesTh: 'เด็ก (> 1 เดือน) แบบแบ่งมื้อ: 2–2.5 mg/kg/ครั้ง IV ทุก 8 ชม. (6–7.5 mg/kg/วัน); ติดตาม Peak/Trough TDM',
+        limits: DoseLimit(maxSingleDose: 120.0, maxDailyDose: 360.0),
+      ),
     ],
   ),
   const Drug(
@@ -449,6 +559,26 @@ final List<Drug> antibiotics = [
     requiresTDM: true,
     isHighAlert: false,
     sourceCitation: 'The Sanford Guide to Antimicrobial Therapy 2024 / Hartford Nomogram',
+    sideEffects: [
+      'Elevated serum creatinine (reversible early tubular dysfunction)',
+      'Injection-site pain or mild irritation',
+      'Nausea or transient rash',
+    ],
+    sideEffectsTh: [
+      'ค่าไต Cr สูงขึ้น (มักฟื้นตัวได้หากหยุดยาหรือปรับโดสทัน)',
+      'ปวดหรือระคายเคืองบริเวณที่ให้ยา',
+      'คลื่นไส้ หรือผื่นเล็กน้อย',
+    ],
+    seriousSideEffects: [
+      'Nephrotoxicity / acute tubular necrosis (ATN)',
+      'Irreversible ototoxicity (vestibular toxicity / hearing loss)',
+      'Neuromuscular blockade (especially in myasthenia gravis)',
+    ],
+    seriousSideEffectsTh: [
+      'พิษต่อไตอย่างรุนแรง / ไตวายเฉียบพลัน',
+      'พิษต่อหูและระบบทรงตัว (หูตึง/เวียนศีรษะถาวร)',
+      'กล้ามเนื้ออ่อนแรงจาก Neuromuscular blockade',
+    ],
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(
       source: 'The Sanford Guide to Antimicrobial Therapy 2024 (Table 10D: Aminoglycoside Dosing)',
@@ -875,6 +1005,26 @@ final List<Drug> antibiotics = [
         'No renal adjustment needed for usual doses. Monitor for biliary sludging with prolonged high-dose therapy.',
     specialNotesTh:
         'ไม่ต้องปรับโดสในผู้ป่วยโรคไต ระวังตะกอนในถุงน้ำดีหากใช้ยาต่อเนื่องนาน',
+    sideEffects: const [
+      'Injection-site pain / warmth, phlebitis',
+      'Diarrhea, loose stools, elevated liver transaminases',
+      'Rash, eosinophilia',
+    ],
+    sideEffectsTh: const [
+      'ปวดหรืออุ่นบริเวณที่ฉีด หลอดเลือดดำอักเสบ',
+      'ถ่ายเหลว ท้องเสีย เอนไซม์ตับสูงขึ้น',
+      'ผื่นผิวหนัง เม็ดเลือดขาวอีโอซิโนฟิลสูง',
+    ],
+    seriousSideEffects: const [
+      'Fatal ceftriaxone-calcium precipitation in lungs/kidneys in neonates',
+      'Biliary sludging / pseudolithiasis (especially in pediatrics)',
+      'Anaphylaxis, severe hemolytic anemia, or C. difficile colitis',
+    ],
+    seriousSideEffectsTh: const [
+      'ตกตะกอนกับแคลเซียมในปอด/ไตในทารกแรกเกิด (ถึงแก่ชีวิต)',
+      'ตะกอนในถุงน้ำดี / นิ่วเทียม (พบบ่อยในเด็ก)',
+      'แพ้ยารุนแรง Anaphylaxis, เม็ดเลือดแดงแตก, ลำไส้อักเสบ C. difficile',
+    ],
     ivDiluentCompatibility: const IvDiluentCompatibility(
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,
@@ -1075,14 +1225,22 @@ final List<Drug> antibiotics = [
     sideEffects: [
       'Diarrhea, nausea, vomiting',
       'Maculopapular rash (especially in infectious mononucleosis) or urticaria',
-      'Hypersensitivity / anaphylaxis (beta-lactam allergy)',
-      'Clostridioides difficile-associated diarrhea (rare)',
+      'Candidiasis (oral/vaginal)',
     ],
     sideEffectsTh: [
       'ท้องเสีย ถ่ายเหลว คลื่นไส้ อาเจียน',
       'ผื่นแดงตามผิวหนัง (พบบ่อยหากเป็นโรค Infectious mononucleosis) หรือผื่นลมพิษ',
-      'ปฏิกิริยาภูมิแพ้เฉียบพลัน (Anaphylaxis ในผู้ที่แพ้ยากลุ่มเพนิซิลลิน)',
-      'ลำไส้อักเสบจากเชื้อ C. difficile (พบน้อย)',
+      'ติดเชื้อราในช่องปากหรือช่องคลอด',
+    ],
+    seriousSideEffects: [
+      'Anaphylaxis / severe IgE-mediated hypersensitivity',
+      'Clostridioides difficile-associated diarrhea (CDAD)',
+      'Severe cutaneous adverse reactions (SJS / DRESS, rare)',
+    ],
+    seriousSideEffectsTh: [
+      'ปฏิกิริยาภูมิแพ้เฉียบพลันรุนแรง (Anaphylaxis)',
+      'ลำไส้อักเสบติดเชื้อ C. difficile',
+      'ผื่นแพ้ยาขั้นรุนแรง SJS / DRESS (พบน้อย)',
     ],
     regimens: [
       DosingRegimen(
@@ -1290,6 +1448,26 @@ final List<Drug> antibiotics = [
         'Dosing is based on the Amoxicillin component. High doses of clavulanate can cause diarrhea.',
     specialNotesTh:
         'คำนวณโดสจาก Amoxicillin เป็นหลัก ระวังท้องเสียจาก Clavulanate ที่สูงเกินไป',
+    sideEffects: [
+      'Diarrhea / loose stools (dose-dependent clavulanate effect)',
+      'Nausea, vomiting, abdominal discomfort',
+      'Skin rash, mucocutaneous candidiasis',
+    ],
+    sideEffectsTh: [
+      'ท้องเสีย ถ่ายเหลว (พบบ่อยตามขนาด Clavulanate)',
+      'คลื่นไส้ อาเจียน ปวดมวนท้อง',
+      'ผื่นผิวหนัง เชื้อราในช่องปากหรือช่องคลอด',
+    ],
+    seriousSideEffects: [
+      'Cholestatic hepatitis / drug-induced liver injury (reversible or severe)',
+      'Anaphylaxis / severe beta-lactam hypersensitivity',
+      'Clostridioides difficile-associated diarrhea (CDAD)',
+    ],
+    seriousSideEffectsTh: [
+      'ตับอักเสบจากท่อน้ำดีอุดตัน (Cholestatic jaundice)',
+      'ปฏิกิริยาแพ้ยาเฉียบพลัน (Anaphylaxis)',
+      'ลำไส้อักเสบติดเชื้อ C. difficile',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -1483,6 +1661,26 @@ final List<Drug> antibiotics = [
     specialNotes:
         'Risk of QT prolongation. Take on an empty stomach for some formulations.',
     specialNotesTh: 'ระวังคลื่นไฟฟ้าหัวใจผิดปกติ (QT prolongation)',
+    sideEffects: [
+      'Nausea, vomiting, diarrhea, abdominal cramping',
+      'Headache, dizziness',
+      'Mild transient elevation of transaminases',
+    ],
+    sideEffectsTh: [
+      'คลื่นไส้ อาเจียน ท้องเสีย ปวดบิดท้อง',
+      'ปวดศีรษะ เวียนศีรษะ',
+      'เอนไซม์ตับสูงขึ้นชั่วคราว',
+    ],
+    seriousSideEffects: [
+      'QT interval prolongation / Torsades de Pointes arrhythmia',
+      'Hepatotoxicity / cholestatic jaundice',
+      'Infantile hypertrophic pyloric stenosis (IHPS in neonates < 6 weeks)',
+    ],
+    seriousSideEffectsTh: [
+      'คลื่นไฟฟ้าหัวใจ QT ยาว / หัวใจเต้นผิดจังหวะ Torsades de Pointes',
+      'พิษต่อตับ / ดีซ่าน',
+      'กระเพาะอาหารส่วนปลายตีบในทารกแรกเกิด (< 6 สัปดาห์)',
+    ],
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -1860,6 +2058,29 @@ final List<Drug> antibiotics = [
     category: DrugCategory.antibiotic,
     requiresRenalAdjustment: true,
     allergyClass: 'Cephalosporin (1st Gen)',
+    sourceCitation:
+        'Drug Information Handbook (Lexicomp/APhA) 2024 / ASHP Surgical Prophylaxis / The Sanford Guide 2024',
+    lastReviewedDate: '2024-10-12',
+    sideEffects: [
+      'Injection-site pain, phlebitis',
+      'Diarrhea, nausea, mild abdominal cramps',
+      'Maculopapular rash, pruritus, transient eosinophilia',
+    ],
+    sideEffectsTh: [
+      'ปวดบริเวณที่ฉีด หลอดเลือดดำอักเสบ',
+      'ท้องเสีย คลื่นไส้ ปวดท้องเล็กน้อย',
+      'ผื่นแดง คัน เม็ดเลือดขาวอีโอซิโนฟิลสูงชั่วคราว',
+    ],
+    seriousSideEffects: [
+      'Anaphylaxis / severe beta-lactam hypersensitivity',
+      'Clostridioides difficile-associated diarrhea (CDAD)',
+      'Seizures with excessive unadjusted dosing in severe renal failure',
+    ],
+    seriousSideEffectsTh: [
+      'ปฏิกิริยาแพ้ยารุนแรง (Anaphylaxis)',
+      'ลำไส้อักเสบติดเชื้อ C. difficile',
+      'ชักหากได้รับยาเกินขนาดโดยไม่ปรับลดในผู้ป่วยไตวายรุนแรง',
+    ],
     severeInteractions: [], // Standard
     specialNotes: 'Drug of choice for surgical prophylaxis. Cross-reactivity with penicillin allergy is ~1-5%.',
     specialNotesTh: 'ยาหลักสำหรับป้องกันการติดเชื้อก่อนผ่าตัด ระวังในผู้ป่วยที่แพ้ Penicillin รุนแรง',
@@ -2002,6 +2223,44 @@ final List<Drug> antibiotics = [
           ),
         ],
       ),
+      DosingRegimen(
+        route: DoseRoute.ivPush,
+        indication: 'Surgical Prophylaxis (Pediatric >= 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 30.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.once,
+        doseCap: 2000.0,
+        doseCapCitation:
+            'ASHP/IDSA Surgical Prophylaxis Guidelines / Lexicomp Pediatric 2024',
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'ASHP/IDSA / Lexicomp Pediatric 2024: 30 mg/kg IV within 60 min prior to incision (max 2,000 mg).',
+        notesTh:
+            'ป้องกันติดเชื้อผ่าตัด (เด็ก >= 1 เดือน): 30 mg/kg IV ก่อนลงมีดภายใน 60 นาที (สูงสุด 2,000 mg)',
+        limits: DoseLimit(maxSingleDose: 2000.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Systemic Infection (Pediatric >= 1 month)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 1, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 50.0,
+        minDosePerKg: 25.0,
+        maxDosePerKg: 100.0,
+        doseBasis: DoseBasis.perDay,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'Lexicomp Pediatric 2024: 25–50 mg/kg/day IV divided q8h for mild-to-moderate infections (up to 100–150 mg/kg/day for severe MSSA/osteoarticular; max 6,000 mg/day).',
+        notesTh:
+            'ติดเชื้อทั่วไป (เด็ก >= 1 เดือน): 50 mg/kg/วัน IV แบ่งทุก 8 ชม. (ติดเชื้อรุนแรง 100 mg/kg/วัน; สูงสุด 6,000 mg/วัน)',
+        limits: DoseLimit(maxSingleDose: 2000.0, maxDailyDose: 6000.0),
+      ),
     ],
   ),
   const Drug(
@@ -2060,15 +2319,23 @@ final List<Drug> antibiotics = [
         'ยาปฏิชีวนะกลุ่ม Cephalosporin รุ่นที่ 1 แบบรับประทาน สำหรับติดเชื้อผิวหนัง คออักเสบ ทางเดินปัสสาวะ และหูชั้นกลางอักเสบในเด็ก (75–100 mg/kg/วัน) ต้องปรับขนาดยาเมื่อ CrCl < 30 mL/min',
     sideEffects: [
       'Diarrhea, nausea, dyspepsia, abdominal pain',
-      'Rash, urticaria, pruritus (hypersensitivity)',
+      'Rash, urticaria, pruritus',
       'Transient elevation of hepatic transaminases',
-      'Eosinophilia or C. difficile colitis (rare)',
     ],
     sideEffectsTh: [
       'ท้องเสีย คลื่นไส้ ปวดมวนท้อง อาหารไม่ย่อย',
       'ผื่นแพ้ยา ลมพิษ คันตามผิวหนัง',
       'ค่าเอนไซม์ตับเพิ่มขึ้นชั่วคราว',
-      'ลำไส้อักเสบจากเชื้อ C. difficile (พบน้อย)',
+    ],
+    seriousSideEffects: [
+      'Anaphylaxis / severe IgE-mediated beta-lactam hypersensitivity',
+      'Clostridioides difficile-associated diarrhea (CDAD)',
+      'Hemolytic anemia or acute interstitial nephritis (rare)',
+    ],
+    seriousSideEffectsTh: [
+      'ปฏิกิริยาแพ้ยาเฉียบพลันรุนแรง (Anaphylaxis)',
+      'ลำไส้อักเสบติดเชื้อ C. difficile',
+      'ภาวะเม็ดเลือดแดงแตกหรือไตอักเสบเฉียบพลัน (พบน้อย)',
     ],
     regimens: [
       DosingRegimen(
@@ -2645,6 +2912,29 @@ final List<Drug> antibiotics = [
     nameTh: 'อะไซโคลเวียร์ (แบบฉีด)',
     category: DrugCategory.antibiotic,
     requiresRenalAdjustment: true,
+    sourceCitation:
+        'Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Zovirax IV SPL',
+    lastReviewedDate: '2024-10-12',
+    sideEffects: [
+      'Phlebitis / inflammation at IV injection site',
+      'Nausea, vomiting, diarrhea',
+      'Headache, malaise',
+    ],
+    sideEffectsTh: [
+      'หลอดเลือดดำอักเสบ / ปวดบริเวณที่ให้ยา IV',
+      'คลื่นไส้ อาเจียน ท้องเสีย',
+      'ปวดศีรษะ อ่อนเพลีย',
+    ],
+    seriousSideEffects: [
+      'Crystal nephropathy / acute kidney injury (requires slow >= 1h infusion & hydration)',
+      'Neurotoxicity / encephalopathy (agitation, tremors, hallucinations in renal failure)',
+      'Thrombocytopenia / thrombotic microangiopathy (rare)',
+    ],
+    seriousSideEffectsTh: [
+      'ยาตกผลึกในท่อไต / ไตวายเฉียบพลัน (ต้องดริปนาน >= 1 ชม. และให้น้ำเพียงพอ)',
+      'พิษต่อระบบประสาท / สับสน ชัก (พบบ่อยขึ้นในผู้ป่วยไตเสื่อม)',
+      'เกล็ดเลือดต่ำ (พบน้อย)',
+    ],
     specialNotes: 'Must infuse over at least 1 hour to prevent renal crystal nephropathy. Ensure adequate hydration. Use IBW for obese patients.',
     specialNotesTh: 'ต้องดริปยานานกว่า 1 ชม. และให้สารน้ำให้เพียงพอ เพื่อป้องกันยาตกผลึกอุดตันในไต (ใช้ IBW คำนวณในคนอ้วน)',
     regimens: [
@@ -2661,6 +2951,47 @@ final List<Drug> antibiotics = [
           RenalAdjustment(crclMin: 10, crclMax: 25, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h),
           RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, absoluteDose: 500.0, adjustedFrequency: Frequency.q24h, notes: '500 mg q24h'),
         ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Severe Mucocutaneous HSV (Adult)',
+        audience: RegimenAudience.adult,
+        population: PopulationCriteria(minAgeMonths: 216),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        infusionTimeMinutes: 60.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'Lexicomp DIH 2024 / US FDA Zovirax SPL: 5 mg/kg IV q8h over 1 hour (use IBW if obese).',
+        notesTh:
+            'เริมเยื่อบุ/ผิวหนังรุนแรง (ผู้ใหญ่): 5 mg/kg IV ทุก 8 ชม. ดริปนาน 1 ชม. (คนอ้วนใช้ IBW)',
+        limits: DoseLimit(maxSingleDose: 800.0),
+        renalAdjustments: [
+          RenalAdjustment(crclMin: 25, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q12h),
+          RenalAdjustment(crclMin: 10, crclMax: 25, action: RenalAction.adjust, adjustmentFactor: 1.0, adjustedFrequency: Frequency.q24h),
+          RenalAdjustment(crclMin: 0, crclMax: 10, action: RenalAction.adjust, adjustmentFactor: 0.5, adjustedFrequency: Frequency.q24h),
+        ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'HSV Encephalitis / Severe VZV (Pediatric > 3 months)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(minAgeMonths: 3, maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 10.0,
+        minDosePerKg: 10.0,
+        maxDosePerKg: 20.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.q8h,
+        infusionTimeMinutes: 60.0,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'Lexicomp Pediatric 2024 / AAP Red Book: 10 mg/kg IV q8h (> 3 months–12 yrs HSV encephalitis/VZV; up to 20 mg/kg q8h for infant HSV encephalitis). Infuse over >= 1 hour.',
+        notesTh:
+            'เด็ก (> 3 เดือน) สมองอักเสบจาก HSV / งูสวัดรุนแรง: 10 mg/kg IV ทุก 8 ชม. ดริปนาน >= 1 ชม.',
+        limits: DoseLimit(maxSingleDose: 800.0),
       ),
     ],
   ),

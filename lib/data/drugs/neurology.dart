@@ -18,6 +18,32 @@ final List<Drug> neurology = [
       'Sleep apnea syndrome',
       'Severe hepatic impairment'
     ],
+    sourceCitation:
+        'Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide',
+    sideEffects: [
+      'Drowsiness, sedation, lethargy',
+      'Ataxia, muscle weakness, dizziness',
+      'Pain or phlebitis at IV injection site',
+      'Paradoxical agitation (especially in children/elderly)',
+    ],
+    sideEffectsTh: [
+      'ง่วงซึม อ่อนเพลีย',
+      'เดินเซ กล้ามเนื้ออ่อนแรง เวียนศีรษะ',
+      'ปวดหรือหลอดเลือดดำอักเสบตำแหน่งที่ฉีด IV',
+      'กระสับกระส่ายหรือตื่นตัวผิดปกติ (พบได้ในเด็กและผู้สูงอายุ)',
+    ],
+    seriousSideEffects: [
+      'Respiratory depression / apnea (especially rapid IV push or with opioids)',
+      'Hypotension & cardiovascular collapse',
+      'Propylene glycol toxicity / metabolic acidosis (prolonged high-dose IV)',
+      'Physical dependence & acute withdrawal seizures on abrupt stop',
+    ],
+    seriousSideEffectsTh: [
+      'กดการหายใจหรือหยุดหายใจ (โดยเฉพาะเมื่อฉีด IV เร็ว หรือใช้ร่วมกับ Opioid)',
+      'ความดันโลหิตตกและระบบไหลเวียนล้มเหลว',
+      'ภาวะเลือดเป็นกรดจากตัวทำละลาย Propylene glycol (เมื่อใช้ IV ขนาดสูงต่อเนื่อง)',
+      'การติดยาและอาการชักซ้ำเมื่อหยุดยากะทันหัน',
+    ],
     specialNotes: 'High risk of dependence. Rapid IV push can cause respiratory arrest (push max 5mg/min).',
     specialNotesTh: 'เสี่ยงติดยา การฉีด IV เร็วเกินไปอาจทำให้หยุดหายใจได้ (ดันยาไม่เกิน 5mg/นาที)',
     regimens: [
@@ -72,6 +98,32 @@ final List<Drug> neurology = [
       'Amiodarone / Fluconazole (Increases phenytoin levels)'
     ],
     contraindications: ['Sinus bradycardia', 'Sinoatrial block'],
+    sourceCitation:
+        'Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide',
+    sideEffects: [
+      'Nystagmus, ataxia, slurred speech (dose-dependent)',
+      'Dizziness, drowsiness, mild confusion',
+      'Gingival hyperplasia & hirsutism (chronic therapy)',
+      'Nausea, vomiting, venous irritation at IV site',
+    ],
+    sideEffectsTh: [
+      'ตากระตุก เดินเซ พูดไม่ชัด (สัมพันธ์กับระดับยาในเลือด)',
+      'เวียนศีรษะ ง่วงซึม มึนงง',
+      'เหงือกบวมหนาและขนดก (เมื่อใช้ระยะยาว)',
+      'คลื่นไส้ อาเจียน ระคายเคืองหลอดเลือดดำตำแหน่งให้ยา',
+    ],
+    seriousSideEffects: [
+      'Severe hypotension, bradycardia, or cardiac arrest (rapid IV infusion >50 mg/min)',
+      'Purple Glove Syndrome & tissue necrosis from IV extravasation',
+      'Stevens-Johnson Syndrome (SJS) / TEN (screen HLA-B*1502)',
+      'DRESS syndrome & acute hepatotoxicity',
+    ],
+    seriousSideEffectsTh: [
+      'ความดันตก หัวใจเต้นช้า หรือหัวใจหยุดเต้นหากหยด IV เร็วเกิน 50 mg/นาที',
+      'ภาวะมือม่วง/เนื้อเยื่อตาย (Purple Glove Syndrome) หากยารั่วซึมหรือให้ทาง IV ส่วนปลาย',
+      'ผื่นแพ้ยารุนแรง SJS / TEN (สัมพันธ์กับยีน HLA-B*1502)',
+      'กลุ่มอาการ DRESS และตับอักเสบเฉียบพลัน',
+    ],
     specialNotes: 'Non-linear pharmacokinetics. Target TDM: 10-20 mcg/mL. Max IV rate 50mg/min to prevent arrhythmias.',
     specialNotesTh: 'ต้องเจาะเลือดดูระดับยา (Target 10-20) การให้ IV ห้ามเกิน 50mg/min ป้องกันหัวใจหยุดเต้น',
     ivDiluentCompatibility: IvDiluentCompatibility(
@@ -123,7 +175,31 @@ final List<Drug> neurology = [
     category: DrugCategory.neurological,
     requiresRenalAdjustment: true,
     allergyClass: 'Pyrrolidine derivative',
+    sourceCitation:
+        'AES Status Epilepticus Guideline 2016 / Lexicomp Drug Information Handbook 2024',
     severeInteractions: [],
+    sideEffects: [
+      'Somnolence, fatigue, dizziness',
+      'Headache & mild nasopharyngitis',
+      'Irritability, mood swings, agitation',
+      'Mild GI upset or anorexia',
+    ],
+    sideEffectsTh: [
+      'ง่วงซึม อ่อนเพลีย เวียนศีรษะ',
+      'ปวดศีรษะ คัดจมูกเล็กน้อย',
+      'หงุดหงิด อารมณ์แปรปรวน กระสับกระส่าย',
+      'ระคายเคืองกระเพาะอาหารหรือเบื่ออาหารเล็กน้อย',
+    ],
+    seriousSideEffects: [
+      'Severe behavioral psychosis, aggression, or suicidal ideation',
+      'Stevens-Johnson Syndrome (SJS) / TEN / DRESS (rare)',
+      'Pancytopenia / neutropenia / thrombocytopenia (rare)',
+    ],
+    seriousSideEffectsTh: [
+      'พฤติกรรมก้าวร้าวรุนแรง อาการทางจิต หรือความคิดทำร้ายตนเอง',
+      'ผื่นแพ้ยารุนแรง SJS / TEN / DRESS (พบได้น้อย)',
+      'กดไขกระดูก เม็ดเลือดขาวหรือเกล็ดเลือดต่ำ (พบได้น้อย)',
+    ],
     specialNotes: 'Can cause behavioral abnormalities (aggression, agitation). Very safe for liver.',
     specialNotesTh: 'อาจทำให้มีอาการก้าวร้าวหรืออารมณ์แปรปรวนได้ ปลอดภัยต่อตับแต่ต้องปรับโดสตามไต',
     regimens: [
@@ -140,6 +216,37 @@ final List<Drug> neurology = [
           RenalAdjustment(crclMin: 30, crclMax: 50, action: RenalAction.adjust, adjustmentFactor: 0.5, adjustedFrequency: Frequency.q12h),
           RenalAdjustment(crclMin: 0, crclMax: 30, action: RenalAction.adjust, adjustmentFactor: 0.5, adjustedFrequency: Frequency.q12h, notes: '250-500 mg q12h'),
         ],
+      ),
+      DosingRegimen(
+        route: DoseRoute.iv,
+        indication: 'Status Epilepticus (Adult IV Loading)',
+        audience: RegimenAudience.adult,
+        dosingType: DosingType.weightBased,
+        dosePerKg: 60.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.once,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'AES Guideline 2016 / ESETT Trial: 60 mg/kg IV once over 10–15 minutes (max 4,500 mg/dose).',
+        notesTh:
+            'Status Epilepticus (ผู้ใหญ่): 60 mg/kg หยด IV นาน 10–15 นาที ครั้งเดียว (สูงสุดไม่เกิน 4,500 mg)',
+        limits: DoseLimit(maxSingleDose: 4500.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.iv,
+        indication: 'Status Epilepticus (Pediatric IV Loading)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 60.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.once,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'AES Guideline 2016 / ESETT Trial (Pediatric): 60 mg/kg IV once over 10–15 minutes (max 4,500 mg/dose).',
+        notesTh:
+            'Status Epilepticus (เด็ก): 60 mg/kg หยด IV นาน 10–15 นาที ครั้งเดียว (สูงสุดไม่เกิน 4,500 mg)',
+        limits: DoseLimit(maxSingleDose: 4500.0),
       ),
     ],
   ),
@@ -308,6 +415,30 @@ final List<Drug> neurology = [
     isHighAlert: true,
     sourceCitation:
         'Ramathibodi High-Alert IV Infusion Guide 2024 / PADIS Guidelines 2018 / Neurocritical Care Society 2016',
+    sideEffects: [
+      'Sedation, drowsiness, amnesia',
+      'Mild hypotension & dizziness',
+      'Nausea, vomiting, hiccups',
+      'Paradoxical agitation / disinhibition (pediatrics/elderly)',
+    ],
+    sideEffectsTh: [
+      'ง่วงซึม สับสนชั่วคราว สูญเสียความจำระยะสั้น',
+      'ความดันโลหิตต่ำเล็กน้อย เวียนศีรษะ',
+      'คลื่นไส้ อาเจียน สะอึก',
+      'กระสับกระส่ายหรือตื่นตัวผิดปกติ (ในเด็ก/ผู้สูงอายุ)',
+    ],
+    seriousSideEffects: [
+      'Severe respiratory depression, hypoventilation, or apnea',
+      'Hypotension & cardiac arrest (with rapid IV bolus or concurrent opioids)',
+      'ICU delirium & prolonged weaning with continuous infusion',
+      'Physical dependence & withdrawal syndrome after prolonged infusion',
+    ],
+    seriousSideEffectsTh: [
+      'กดการหายใจรุนแรง หรือหยุดหายใจ (โดยเฉพาะเมื่อฉีดร่วมกับ Opioid)',
+      'ความดันโลหิตตกวิกฤตหรือหัวใจหยุดเต้นเมื่อฉีด IV เร็วเกินไป',
+      'ภาวะสับสนเฉียบพลันในไอซียู (ICU Delirium) และหย่าเครื่องช่วยหายใจยากขึ้น',
+      'อาการถอนยาเมื่อหยุดให้ยาหยดต่อเนื่องเป็นเวลานาน',
+    ],
     lastReviewedDate: '2024-10-12',
     provenance: Provenance(
       source:

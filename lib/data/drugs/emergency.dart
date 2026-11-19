@@ -48,6 +48,32 @@ final List<Drug> emergency = [
       'MAOIs (Severe hypertensive crisis)',
       'Halothane (Cardiac arrhythmias)'
     ],
+    sideEffects: [
+      'Palpitations, sinus tachycardia',
+      'Tremor, anxiety, restlessness',
+      'Headache, pallor, diaphoresis',
+      'Transient nausea or dizziness',
+    ],
+    sideEffectsTh: [
+      'ใจสั่น หัวใจเต้นเร็ว',
+      'มือสั่น กระสับกระส่าย วิตกกังวล',
+      'ปวดศีรษะ ตัวซีด เหงื่อออกมาก',
+      'คลื่นไส้ หรือเวียนศีรษะชั่วคราว',
+    ],
+    seriousSideEffects: [
+      'Ventricular arrhythmias (VT/VF) & sudden cardiac arrest',
+      'Hypertensive crisis & intracranial hemorrhage',
+      'Myocardial ischemia / acute coronary syndrome',
+      'Acute pulmonary edema',
+      'Extravasation tissue necrosis (use phentolamine rescue)',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจห้องล่างเต้นผิดจังหวะรุนแรง (VT/VF) และหัวใจหยุดเต้น',
+      'ความดันโลหิตสูงวิกฤตและเลือดออกในสมอง',
+      'กล้ามเนื้อหัวใจขาดเลือดเฉียบพลัน',
+      'ภาวะน้ำท่วมปอดเฉียบพลัน',
+      'เนื้อเยื่อตายเฉพาะที่หากยารั่วซึมนอกหลอดเลือด',
+    ],
     specialNotes: 'Anaphylaxis: IM into anterolateral thigh. Cardiac arrest: IV/IO. Dilute 1:10,000 for IV push.',
     specialNotesTh: 'แพ้ยารุนแรง: ฉีด IM ที่ต้นขาด้านนอก, หัวใจหยุดเต้น: IV/IO ใช้ความเข้มข้น 1:10,000 ฉีด IV Push',
     ivDiluentCompatibility: IvDiluentCompatibility(
@@ -140,9 +166,37 @@ final List<Drug> emergency = [
     nameTh: 'อะโทรปีน',
     category: DrugCategory.cardiovascular,
     isHighAlert: false,
+    sourceCitation:
+        'AHA ACLS Guidelines 2020 / AHA PALS Guidelines 2020 / Lexicomp Drug Information Handbook 2024',
     allergyClass: 'Anticholinergic',
     severeInteractions: ['Other Anticholinergics (Additive effects)'],
     contraindications: ['Narrow-angle glaucoma (relative)'],
+    sideEffects: [
+      'Xerostomia (dry mouth) & thirst',
+      'Blurred vision & mydriasis (pupil dilation)',
+      'Sinus tachycardia & palpitations',
+      'Flushed dry skin & mild urinary hesitancy',
+      'Constipation',
+    ],
+    sideEffectsTh: [
+      'ปากแห้ง คอแห้ง กระหายน้ำ',
+      'ตาพร่ามัว ม่านตาขยาย',
+      'หัวใจเต้นเร็ว ใจสั่น',
+      'ผิวหนังแดงแห้ง ปัสสาวะขัดชั่วคราว',
+      'ท้องผูก',
+    ],
+    seriousSideEffects: [
+      'Supraventricular or ventricular tachyarrhythmias',
+      'Central anticholinergic syndrome (delirium, hallucinations)',
+      'Acute angle-closure glaucoma crisis',
+      'Acute urinary retention or paralytic ileus',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจเต้นเร็วผิดจังหวะรุนแรง (SVT / Ventricular arrhythmia)',
+      'พิษต่อระบบประสาทส่วนกลาง (สับสน เพ้อ ประสาทหลอน)',
+      'ต้อหินมุมปิดเฉียบพลัน',
+      'ปัสสาวะคั่งเฉียบพลัน หรือลำไส้อืดไม่ทำงาน',
+    ],
     specialNotes: 'For symptomatic bradycardia. May be ineffective in transplanted hearts (denervated).',
     specialNotesTh: 'ใช้รักษาหัวใจเต้นช้าที่มีอาการ ไม่ค่อยได้ผลในคนไข้ที่เปลี่ยนหัวใจ',
     regimens: [
@@ -216,6 +270,30 @@ final List<Drug> emergency = [
       'Neuromuscular blockers (Prolongs paralysis)'
     ],
     contraindications: ['Heart block', 'Myocardial damage'],
+    sideEffects: [
+      'Facial flushing & sensation of warmth',
+      'Sweating, nausea, or mild vomiting',
+      'Pain/burning at IM or IV infusion site',
+      'Mild transient hypotension or drowsiness',
+    ],
+    sideEffectsTh: [
+      'หน้าแดง รู้สึกร้อนวูบวาบตามร่างกาย',
+      'เหงื่อออก คลื่นไส้ หรืออาเจียนเล็กน้อย',
+      'ปวดหรือแสบตำแหน่งที่ฉีด IM หรือให้ยา IV',
+      'ความดันโลหิตต่ำเล็กน้อย หรือซึมง่วง',
+    ],
+    seriousSideEffects: [
+      'Hypermagnesemia toxicity (loss of deep tendon reflexes)',
+      'Respiratory depression or respiratory paralysis',
+      'Severe hypotension & circulatory collapse',
+      'Complete AV heart block / asystole',
+    ],
+    seriousSideEffectsTh: [
+      'ภาวะแมกนีเซียมในเลือดสูงเป็นพิษ (รีเฟล็กซ์เข่าหายไป)',
+      'กดการหายใจรุนแรง หรือหยุดหายใจจากกล้ามเนื้ออ่อนแรง',
+      'ความดันโลหิตตกมากและระบบไหลเวียนล้มเหลว',
+      'การนำไฟฟ้าหัวใจถูกปิดกั้นสมบูรณ์ (Complete heart block)',
+    ],
     specialNotes: 'Monitor deep tendon reflexes, respiratory rate, and urine output. Calcium gluconate is the antidote.',
     specialNotesTh: 'ต้องวัดรีเฟล็กซ์เข่า อัตราการหายใจ และปัสสาวะอย่างต่อเนื่อง ถ้าเกิดพิษ ให้ Calcium gluconate เป็นยาแก้พิษ',
     ivDiluentCompatibility: IvDiluentCompatibility(
@@ -300,10 +378,38 @@ final List<Drug> emergency = [
     category: DrugCategory.antiInflammatory,
     tags: ['obstetric'],
     allergyClass: 'Corticosteroid',
+    sourceCitation:
+        'Lexicomp Drug Information Handbook 2024 / RECOVERY Trial (NEJM 2021) / Thai NLEM',
     severeInteractions: [
       'Warfarin (Increases bleeding risk)',
       'NSAIDs (Increased GI bleeding risk)',
       'Live Vaccines (Avoid)'
+    ],
+    sideEffects: [
+      'Hyperglycemia (elevated blood glucose)',
+      'Insomnia, restlessness, or mood changes',
+      'Increased appetite & mild fluid retention',
+      'Dyspepsia / epigastric discomfort',
+      'Perineal burning if rapid IV bolus',
+    ],
+    sideEffectsTh: [
+      'ระดับน้ำตาลในเลือดสูง',
+      'นอนไม่หลับ กระสับกระส่าย หรืออารมณ์แปรปรวน',
+      'อยากอาหารมากขึ้น บวมน้ำเล็กน้อย',
+      'ระคายเคืองกระเพาะอาหาร แสบร้อนลิ้นปี่',
+      'แสบคันบริเวณฝีเย็บชั่วคราวหากฉีด IV เร็วเกินไป',
+    ],
+    seriousSideEffects: [
+      'Gastrointestinal hemorrhage or peptic perforation',
+      'HPA-axis suppression & acute adrenal crisis on abrupt stop',
+      'Severe immunosuppression & opportunistic infections',
+      'Severe hyperglycemia / diabetic ketoacidosis (DKA)',
+    ],
+    seriousSideEffectsTh: [
+      'เลือดออกในทางเดินอาหารหรือกระเพาะทะลุ',
+      'กดการทำงานของต่อมหมวกไต (เสี่ยงวิกฤตเมื่อหยุดยาเฉียบพลัน)',
+      'ภูมิคุ้มกันถูกกดและติดเชื้อฉวยโอกาสรุนแรง',
+      'น้ำตาลในเลือดสูงวิกฤต (DKA / HHS)',
     ],
     specialNotes: 'Monitor blood glucose (hyperglycemia). Taper slowly if used >7 days to avoid adrenal crisis.',
     specialNotesTh: 'ระวังน้ำตาลในเลือดสูง หากใช้ยานานเกิน 7 วัน ต้องค่อยๆ ลดโดสยา (Taper) ป้องกันภาวะต่อมหมวกไตบกพร่องเฉียบพลัน',
@@ -414,6 +520,30 @@ final List<Drug> emergency = [
           '• ค่าครึ่งชีวิตสั้น (30–90 นาที) สั้นกว่า Opioid หลายชนิด (เช่น Morphine, Methadone, Fentanyl) จึงต้องเฝ้าระวังภาวะ Re-sedation หรือกดการหายใจซ้ำหลังหมดฤทธิ์ยาอย่างน้อย 2–4 ชม.',
       externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=naloxone',
     ),
+    sideEffects: [
+      'Nausea, vomiting, diaphoresis',
+      'Restlessness, agitation, or anxiety',
+      'Tachycardia & transient flushing',
+      'Headache or pain at injection site',
+    ],
+    sideEffectsTh: [
+      'คลื่นไส้ อาเจียน เหงื่อออกมาก',
+      'กระสับกระส่าย หงุดหงิด วิตกกังวล',
+      'หัวใจเต้นเร็ว หน้าแดงชั่วคราว',
+      'ปวดศีรษะ หรือปวดตำแหน่งที่ฉีดยา',
+    ],
+    seriousSideEffects: [
+      'Acute precipitated opioid withdrawal (severe hypertension/agitation)',
+      'Non-cardiogenic pulmonary edema (flash pulmonary edema)',
+      'Ventricular arrhythmias / cardiac arrest (post-reversal catecholamine surge)',
+      'Recurrent CNS/respiratory depression (re-sedation as naloxone wears off)',
+    ],
+    seriousSideEffectsTh: [
+      'กลุ่มอาการถอนยาเสพติดเฉียบพลัน (ความดันพุ่งสูงรุนแรง)',
+      'ภาวะน้ำท่วมปอดเฉียบพลัน (Flash pulmonary edema)',
+      'หัวใจเต้นผิดจังหวะรุนแรงหลังฤทธิ์ต้านโอปิออยด์',
+      'กลับมากดการหายใจซ้ำเมื่อยาหมดฤทธิ์ (ต้องเฝ้าระวังต่อเนื่อง)',
+    ],
     specialNotes: 'Opioid reversal agent (Antidote). Short duration (30-90 min); re-sedation may occur. Titrate to respiratory effort.',
     specialNotesTh: 'ยาต้านพิษกลุ่ม Opioid (Antidote) ออกฤทธิ์สั้น (30-90 นาที) ผู้ป่วยอาจกลับมากดการหายใจซ้ำ ต้อง Titrate ตามอัตราการหายใจ',
     regimens: [
@@ -476,6 +606,34 @@ final List<Drug> emergency = [
       externalUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=dobutamine',
     ),
     severeInteractions: ['Beta-blockers (Antagonistic effect)'],
+    sideEffects: [
+      'Sinus tachycardia & palpitations',
+      'Premature ventricular contractions (PVCs)',
+      'Mild hypertension or transient hypotension',
+      'Headache, nausea, angina / chest discomfort',
+      'Phlebitis or pain at IV infusion site',
+    ],
+    sideEffectsTh: [
+      'หัวใจเต้นเร็ว ใจสั่น',
+      'หัวใจเต้นผิดจังหวะชนิด PVC',
+      'ความดันโลหิตสูงขึ้นเล็กน้อย หรือความดันตกชั่วคราว',
+      'ปวดศีรษะ คลื่นไส้ เจ็บแน่นหน้าอก',
+      'หลอดเลือดดำอักเสบหรือปวดบริเวณที่ให้ยา',
+    ],
+    seriousSideEffects: [
+      'Ventricular tachycardia / ventricular fibrillation (VT/VF)',
+      'Myocardial ischemia or acute infarction (increased MVO2)',
+      'Severe hypotension (excessive beta-2 vasodilation in hypovolemia)',
+      'Hypokalemia',
+      'Hypersensitivity / bronchospasm (sulfite sensitivity)',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจห้องล่างเต้นผิดจังหวะรุนแรง (VT/VF)',
+      'กล้ามเนื้อหัวใจขาดเลือด (เพิ่มการใช้ออกซิเจนของหัวใจ)',
+      'ความดันโลหิตตกมากในผู้ป่วยขาดน้ำ (จากฤทธิ์ขยายหลอดเลือด Beta-2)',
+      'โพแทสเซียมในเลือดต่ำ',
+      'แพ้ยาหรือหลอดลมหดเกร็ง (ในผู้แพ้ Sulfite)',
+    ],
     specialNotes: 'Inotrope for acute decompensated heart failure. Increases cardiac output. May cause tachycardia.',
     specialNotesTh: 'ยาเพิ่มแรงบีบตัวของหัวใจ สำหรับหัวใจล้มเหลวเฉียบพลัน อาจทำให้หัวใจเต้นเร็ว',
     ivDiluentCompatibility: IvDiluentCompatibility(
@@ -506,6 +664,26 @@ final List<Drug> emergency = [
         doseUnit: DoseUnit.mcg,
         frequency: Frequency.continuous,
         standardDilutionMgPerMl: 1.0, // 250mg in 250mL
+        limits: DoseLimit(maxInfusionRate: 20.0, infusionRateUnit: 'mcg/kg/min'),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Pediatric Shock / Low Cardiac Output Syndrome',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.titrated,
+        continuousRateMin: 2.0,
+        continuousRateMax: 20.0,
+        continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
+        doseUnit: DoseUnit.mcg,
+        frequency: Frequency.continuous,
+        standardDilutionMgPerMl: 1.0,
+        notes:
+            'Surviving Sepsis Campaign Pediatric 2020 / Lexicomp Pediatric 2024: Start 2–5 mcg/kg/min IV, titrate to cardiac output / perfusion (max 20 mcg/kg/min).',
+        notesTh:
+            'ภาวะช็อก/แรงบีบหัวใจต่ำในเด็ก: เริ่ม 2–5 mcg/kg/min IV หยดต่อเนื่อง ปรับตามการไหลเวียนโลหิต (สูงสุด 20 mcg/kg/min)',
         limits: DoseLimit(maxInfusionRate: 20.0, infusionRateUnit: 'mcg/kg/min'),
       ),
     ],

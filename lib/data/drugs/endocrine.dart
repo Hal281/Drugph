@@ -280,6 +280,26 @@ final List<Drug> endocrine = [
       'Beta-blockers - May mask symptoms of hypoglycemia',
     ],
     contraindications: ['Episodes of hypoglycemia'],
+    sideEffects: [
+      'Mild-to-moderate hypoglycemia (sweating, tremor, palpitations, hunger)',
+      'Injection site lipodystrophy / redness (SC)',
+      'Mild weight gain or peripheral edema',
+    ],
+    sideEffectsTh: [
+      'ภาวะน้ำตาลในเลือดต่ำเล็กน้อยถึงปานกลาง (เหงื่อออก ใจสั่น มือสั่น หิว)',
+      'รอยแดงหรือก้อนไขมันใต้ผิวหนังตำแหน่งที่ฉีด (SC)',
+      'น้ำหนักเพิ่มขึ้นหรือบวมเล็กน้อย',
+    ],
+    seriousSideEffects: [
+      'Severe prolonged hypoglycemia (seizures, coma, brain injury — increased risk in AKI/CKD)',
+      'Severe life-threatening hypokalemia (cardiac arrhythmias, respiratory weakness)',
+      'Anaphylaxis (rare)',
+    ],
+    seriousSideEffectsTh: [
+      'ภาวะน้ำตาลในเลือดต่ำรุนแรงและยาวนาน (ชัก หมดสติ เสี่ยงเพิ่มขึ้นในผู้ป่วยไตวาย)',
+      'โพแทสเซียมในเลือดต่ำวิกฤต (เสี่ยงหัวใจเต้นผิดจังหวะรุนแรง)',
+      'แพ้ยารุนแรง Anaphylaxis (พบได้น้อย)',
+    ],
     specialNotes:
         'HIGH ALERT MEDICATION. Dosed in UNITS. Risk of severe hypoglycemia and hypokalemia.',
     specialNotesTh:

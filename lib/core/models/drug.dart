@@ -476,11 +476,24 @@ class Drug {
   /// Known contraindications (English).
   final List<String> contraindications;
 
-  /// Important adverse effects documented for this drug.
+  /// Important adverse effects documented for this drug (Common).
   final List<String> sideEffects;
 
-  /// Important adverse effects documented for this drug (Thai).
+  /// Important adverse effects documented for this drug (Thai, Common).
   final List<String> sideEffectsTh;
+
+  /// Serious / red-flag adverse effects requiring urgent clinical attention (WP-09).
+  final List<String> seriousSideEffects;
+
+  /// Serious / red-flag adverse effects (Thai) (WP-09).
+  final List<String> seriousSideEffectsTh;
+
+  /// Whether common or serious side-effect data is available for display.
+  bool get hasSideEffectData =>
+      sideEffects.isNotEmpty ||
+      sideEffectsTh.isNotEmpty ||
+      seriousSideEffects.isNotEmpty ||
+      seriousSideEffectsTh.isNotEmpty;
 
   /// Available vial sizes or tablet strengths (e.g., [250, 500, 1000]).
   final List<double>? availableStrengths;
@@ -568,6 +581,8 @@ class Drug {
     this.contraindications = const [],
     this.sideEffects = const [],
     this.sideEffectsTh = const [],
+    this.seriousSideEffects = const [],
+    this.seriousSideEffectsTh = const [],
     this.availableStrengths,
     this.requiresRenalAdjustment = false,
     this.renalDataPolicy = RenalDataPolicy.warn,

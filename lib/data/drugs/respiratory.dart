@@ -12,6 +12,32 @@ final List<Drug> respiratory = [
       'Non-selective Beta-blockers (e.g. Propranolol) - Antagonizes effect, may trigger bronchospasm',
       'MAOIs / TCAs - Potentiates cardiovascular effects'
     ],
+    sourceCitation:
+        'GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024',
+    sideEffects: [
+      'Fine skeletal muscle tremor',
+      'Sinus tachycardia & palpitations',
+      'Nervousness, restlessness, headache',
+      'Throat irritation or coughing (inhalation)',
+    ],
+    sideEffectsTh: [
+      'มือสั่น กล้ามเนื้อสั่น',
+      'หัวใจเต้นเร็ว ใจสั่น',
+      'กระสับกระส่าย วิตกกังวล ปวดศีรษะ',
+      'ระคายเคืองคอหรือไอหลังพ่นยา',
+    ],
+    seriousSideEffects: [
+      'Supraventricular or ventricular arrhythmias (especially high-dose nebulization)',
+      'Significant hypokalemia (intracellular potassium shift)',
+      'Paradoxical bronchospasm (rare, stop immediately)',
+      'Myocardial ischemia in patients with coronary artery disease',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจเต้นผิดจังหวะรุนแรง (เมื่อพ่นยาขนาดสูงต่อเนื่อง)',
+      'โพแทสเซียมในเลือดต่ำรุนแรง (Hypokalemia)',
+      'หลอดลมหดเกร็งเฉียบพลันหลังพ่นยา (Paradoxical bronchospasm)',
+      'กล้ามเนื้อหัวใจขาดเลือดในผู้ป่วยโรคหลอดเลือดหัวใจ',
+    ],
     specialNotes: 'Can cause tachycardia, tremor, and hypokalemia (at high doses).',
     specialNotesTh: 'อาจทำให้ใจสั่น มือสั่น และโพแทสเซียมต่ำ (หากใช้โดสสูง)',
     regimens: [
@@ -186,6 +212,32 @@ final List<Drug> respiratory = [
       'NSAIDs (Increased GI bleeding)',
       'Live Vaccines (Avoid)',
       'Warfarin (Increases bleeding risk)'
+    ],
+    sourceCitation:
+        'GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024',
+    sideEffects: [
+      'Dyspepsia, epigastric discomfort, increased appetite',
+      'Insomnia, mood lability, irritability',
+      'Mild fluid retention & weight gain',
+      'Hyperglycemia',
+    ],
+    sideEffectsTh: [
+      'ระคายเคืองกระเพาะอาหาร แสบร้อนลิ้นปี่ อยากอาหารมากขึ้น',
+      'นอนไม่หลับ อารมณ์แปรปรวน หงุดหงิด',
+      'บวมน้ำเล็กน้อย น้ำหนักเพิ่ม',
+      'ระดับน้ำตาลในเลือดสูงขึ้น',
+    ],
+    seriousSideEffects: [
+      'GI ulceration, bleeding, or perforation (especially with NSAIDs)',
+      'HPA-axis suppression / acute adrenal insufficiency on abrupt withdrawal (>7-14 days)',
+      'Severe immunosuppression & opportunistic infections',
+      'Osteoporosis, avascular necrosis, Cushing syndrome (long-term)',
+    ],
+    seriousSideEffectsTh: [
+      'แผลในกระเพาะอาหาร เลือดออก หรือกระเพาะทะลุ (โดยเฉพาะเมื่อใช้ร่วมกับ NSAIDs)',
+      'กดต่อมหมวกไต หากหยุดยากะทันหันหลังใช้ต่อเนื่อง >7-14 วัน',
+      'ติดเชื้อรุนแรงจากภูมิคุ้มกันถูกกด',
+      'กระดูกพรุน ข้อสะโพกขาดเลือด กลุ่มอาการคุชชิง (เมื่อใช้ระยะยาว)',
     ],
     specialNotes: 'Short course (3-5 days) for asthma exacerbation. Monitor blood glucose. Taper if >7 days use.',
     specialNotesTh: 'ใช้ระยะสั้น 3-5 วันสำหรับหอบหืดกำเริบ ระวังน้ำตาลสูง ถ้าใช้เกิน 7 วันต้องค่อยๆ ลดโดส',

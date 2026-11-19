@@ -258,16 +258,28 @@ void main() {
       for (final drug in allDrugs) {
         for (final reg in drug.regimens) {
           if (reg.dosingType == DosingType.titrated) {
-            final testPatient = (reg.population?.sex != null && reg.population!.sex != patient.sex)
+            final isPedRegimen = reg.audience == RegimenAudience.pediatric ||
+                (reg.population?.maxAgeMonths != null &&
+                    reg.population!.maxAgeMonths! < 216);
+            final testPatient = isPedRegimen
                 ? Patient(
-                    id: 'patient-test-titrated-sex-match',
-                    ageYears: 45,
-                    weightKg: 70.0,
-                    heightCm: 175.0,
-                    sex: reg.population!.sex!,
+                    id: 'patient-test-titrated-pediatric',
+                    ageYears: 6,
+                    weightKg: 20.0,
+                    heightCm: 115.0,
+                    sex: reg.population?.sex ?? Sex.male,
                     isScrStable: true,
                   )
-                : patient;
+                : ((reg.population?.sex != null && reg.population!.sex != patient.sex)
+                    ? Patient(
+                        id: 'patient-test-titrated-sex-match',
+                        ageYears: 45,
+                        weightKg: 70.0,
+                        heightCm: 175.0,
+                        sex: reg.population!.sex!,
+                        isScrStable: true,
+                      )
+                    : patient);
             final result = PharmacistCalculator.calculateDose(
               drug: drug,
               patient: testPatient,

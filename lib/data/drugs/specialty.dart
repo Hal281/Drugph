@@ -673,11 +673,35 @@ final List<Drug> supplements = [
     nameTh: 'โพแทสเซียม คลอไรด์',
     category: DrugCategory.supplement,
     isHighAlert: true, // Concentrated KCl is high alert
+    sourceCitation:
+        'ISMP High-Alert Medications 2024 / Ramathibodi High-Alert IV Infusion Guide / Lexicomp DIH 2024',
     severeInteractions: [
       'ACE Inhibitors / ARBs (Hyperkalemia)',
       'Potassium-sparing Diuretics (Hyperkalemia)'
     ],
     contraindications: ['Hyperkalemia', 'Severe renal impairment with oliguria'],
+    sideEffects: [
+      'Pain, burning, or phlebitis at peripheral IV infusion site',
+      'Nausea, abdominal discomfort, diarrhea (oral)',
+      'Local venous spasm',
+    ],
+    sideEffectsTh: [
+      'ปวด แสบ หรือหลอดเลือดดำอักเสบตามแนวเส้นเลือด (เมื่อให้ทาง peripheral IV)',
+      'คลื่นไส้ ปวดท้อง ท้องเสีย (รูปแบบรับประทาน)',
+      'หลอดเลือดดำหดเกร็งเฉพาะที่',
+    ],
+    seriousSideEffects: [
+      'Fatal hyperkalemia & cardiac arrest / ventricular fibrillation (undiluted IV push or rapid infusion)',
+      'ECG changes (peaked T waves, widened QRS, sine wave, asystole)',
+      'Tissue necrosis from extravasation',
+      'GI ulceration / bleeding / perforation (oral wax-matrix tablets)',
+    ],
+    seriousSideEffectsTh: [
+      'โพแทสเซียมในเลือดสูงวิกฤตและหัวใจหยุดเต้น (หากฉีด IV Push หรือหยดเร็วเกินไป)',
+      'คลื่นไฟฟ้าหัวใจผิดปกติรุนแรง (Peaked T wave, Wide QRS, Asystole)',
+      'เนื้อเยื่อตายเฉพาะที่หากยารั่วซึม',
+      'แผลหรือเลือดออกในทางเดินอาหาร (ชนิดเม็ดเคลือบออกฤทธิ์เนิ่น)',
+    ],
     specialNotes: 'NEVER give undiluted IV push (cardiac arrest risk). Max IV rate: 10 mEq/hr via peripheral, 20 mEq/hr via central.',
     specialNotesTh: 'ห้ามฉีด IV Push เด็ดขาด (หัวใจหยุดเต้น) อัตราหยดสูงสุด: 10 mEq/hr ทาง peripheral, 20 mEq/hr ทาง central line',
     ivDiluentCompatibility: IvDiluentCompatibility(
@@ -722,9 +746,33 @@ final List<Drug> supplements = [
     nameTh: 'แคลเซียม กลูโคเนต',
     category: DrugCategory.supplement,
     isHighAlert: false,
+    sourceCitation:
+        'AHA ACLS Guidelines 2020 / Lexicomp Drug Information Handbook 2024',
     severeInteractions: [
       'Digoxin (Increases toxicity - give slowly with ECG)',
       'Ceftriaxone IV (Precipitation in neonates - CONTRAINDICATED in neonates)'
+    ],
+    sideEffects: [
+      'Metallic/chalky taste & sensation of warmth/flushing during IV push',
+      'Mild transient hypotension or bradycardia',
+      'Local venous irritation or stinging at IV site',
+    ],
+    sideEffectsTh: [
+      'รับรู้รสเฝื่อนในปาก ร้อนวูบวาบ หน้าแดงระหว่างฉีดยา',
+      'ความดันโลหิตต่ำหรือหัวใจเต้นช้าชั่วคราว',
+      'ระคายเคืองหลอดเลือดดำตำแหน่งที่ฉีดยา',
+    ],
+    seriousSideEffects: [
+      'Severe bradycardia, AV block, syncope, or cardiac arrest (rapid IV push)',
+      'Severe tissue necrosis / calcinosis cutis from extravasation',
+      'Fatal ceftriaxone-calcium lung/kidney precipitates in neonates',
+      'Digoxin-induced fatal arrhythmias if infused too rapidly',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจเต้นช้าวิกฤต AV block หรือหัวใจหยุดเต้นหากฉีด IV เร็วเกินไป',
+      'เนื้อเยื่อตายและแคลเซียมเกาะใต้ผิวหนังหากยารั่วซึมนอกหลอดเลือด',
+      'เกิดตะกอนอุดตันปอด/ไตถึงแก่ชีวิตในทารกแรกเกิดหากให้ร่วมกับ Ceftriaxone IV',
+      'กระตุ้นหัวใจเต้นผิดจังหวะรุนแรงในผู้ป่วยที่ได้ยา Digoxin',
     ],
     specialNotes: 'Give slowly IV over 5-10 min. Monitor heart rate. Extravasation causes tissue necrosis.',
     specialNotesTh: 'ฉีด IV ช้าๆ ใน 5-10 นาที ดูจอมอนิเตอร์หัวใจ ถ้ายารั่วซึมนอกหลอดเลือดจะทำให้เนื้อเยื่อตาย',

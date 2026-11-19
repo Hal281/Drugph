@@ -41,14 +41,22 @@ final List<Drug> analgesics = [
     specialNotes: 'Max daily dose 4g in adults to prevent hepatotoxicity. Reduce to 2g/day in severe hepatic impairment or chronic alcoholism.',
     specialNotesTh: 'ขนาดยาสูงสุด 4 กรัม/วัน ในผู้ใหญ่เพื่อป้องกันตับอักเสบ ลดเหลือ 2 กรัม/วัน ในผู้ป่วยโรคตับรุนแรงหรือติดสุราเรื้อรัง',
     sideEffects: const [
-      'Hepatotoxicity / elevated serum transaminases (overdose or >4 g/day)',
       'Nausea and vomiting',
-      'Rash or hypersensitivity (rare; Stevens-Johnson syndrome / TEN very rare)',
+      'Mild transient elevation of liver enzymes',
+      'Headache',
     ],
     sideEffectsTh: const [
-      'พิษต่อตับ / เอนไซม์ตับ AST, ALT สูงขึ้น (เมื่อได้รับยาเกินขนาดหรือ > 4 กรัม/วัน)',
       'คลื่นไส้ อาเจียน',
-      'ผื่นแพ้ยา (พบน้อย; กลุ่มอาการรุนแรง SJS/TEN พบได้น้อยมาก)',
+      'เอนไซม์ตับ AST, ALT สูงขึ้นชั่วคราว',
+      'ปวดศีรษะ',
+    ],
+    seriousSideEffects: const [
+      'Acute hepatotoxicity / hepatic necrosis (> 4 g/day or overdose)',
+      'Severe hypersensitivity / Stevens-Johnson syndrome (SJS/TEN, rare)',
+    ],
+    seriousSideEffectsTh: const [
+      'พิษต่อตับเฉียบพลัน / ตับวาย (เมื่อเกิน 4 กรัม/วัน หรือได้รับยาเกินขนาด)',
+      'ผื่นแพ้ยาขั้นรุนแรง SJS / TEN (พบน้อยมาก)',
     ],
     regimens: [
       DosingRegimen(
@@ -171,16 +179,24 @@ final List<Drug> analgesics = [
     specialNotes: 'Take with food or milk immediately after meals to reduce GI irritation. Do not combine with other NSAIDs.',
     specialNotesTh: 'รับประทานพร้อมอาหารหรือหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะอาหาร ห้ามใช้ซ้ำซ้อนกับยากลุ่ม NSAIDs ตัวอื่น',
     sideEffects: const [
-      'Dyspepsia, heartburn, nausea, abdominal pain, GI ulceration/bleeding',
-      'Acute kidney injury (AKI), fluid retention, edema, hypertension',
+      'Dyspepsia, heartburn, nausea, abdominal pain',
+      'Fluid retention, peripheral edema',
       'Dizziness, headache, tinnitus',
-      'Increased risk of cardiovascular thrombotic events',
     ],
     sideEffectsTh: const [
-      'ระคายเคืองกระเพาะอาหาร แสบท้อง คลื่นไส้ แผลหรือเลือดออกในทางเดินอาหาร',
-      'ไตวายเฉียบพลัน (AKI) บวมน้ำ ความดันโลหิตสูง',
+      'ระคายเคืองกระเพาะอาหาร แสบท้อง คลื่นไส้ ปวดท้อง',
+      'บวมน้ำ คั่งน้ำ',
       'เวียนศีรษะ ปวดศีรษะ หูอื้อ',
-      'เพิ่มความเสี่ยงภาวะหลอดเลือดหัวใจและสมองอุดตันเมื่อใช้ต่อเนื่อง',
+    ],
+    seriousSideEffects: const [
+      'GI ulceration, bleeding, or perforation',
+      'Acute kidney injury (AKI) / renal papillary necrosis',
+      'Cardiovascular thrombotic events (MI / stroke with prolonged use)',
+    ],
+    seriousSideEffectsTh: const [
+      'แผล เลือดออก หรือกระเพาะอาหารทะลุ',
+      'ไตวายเฉียบพลัน (AKI)',
+      'เพิ่มความเสี่ยงหลอดเลือดหัวใจและสมองอุดตันเมื่อใช้ต่อเนื่อง',
     ],
     regimens: [
       DosingRegimen(
@@ -346,14 +362,24 @@ final List<Drug> analgesics = [
     specialNotes: 'Take with food or milk immediately after meals to reduce GI irritation. Do not combine with other NSAIDs.',
     specialNotesTh: 'รับประทานพร้อมอาหารหรือหลังอาหารทันทีเพื่อลดการระคายเคืองกระเพาะอาหาร ห้ามใช้ซ้ำซ้อนกับยากลุ่ม NSAIDs ตัวอื่น',
     sideEffects: [
-      'Dyspepsia, epigastric pain, nausea, peptic ulcer/GI bleeding',
-      'Renal impairment (AKI), peripheral edema, hypertension',
+      'Dyspepsia, epigastric pain, nausea',
+      'Peripheral edema, mild hypertension',
       'Dizziness, drowsiness, headache',
     ],
     sideEffectsTh: [
-      'ระคายเคืองกระเพาะอาหาร ปวดจุกแน่นท้อง แผลหรือเลือดออกในทางเดินอาหาร',
-      'การทำงานของไตลดลง (AKI) บวมน้ำ ความดันโลหิตสูง',
+      'ระคายเคืองกระเพาะอาหาร ปวดจุกแน่นท้อง คลื่นไส้',
+      'บวมน้ำ ความดันโลหิตสูง',
       'เวียนศีรษะ ง่วงซึม ปวดศีรษะ',
+    ],
+    seriousSideEffects: [
+      'Peptic ulceration, GI bleeding, or perforation',
+      'Acute kidney injury (AKI) / hyperkalemia',
+      'Cardiovascular thrombotic events (MI / stroke)',
+    ],
+    seriousSideEffectsTh: [
+      'แผลหรือเลือดออกในทางเดินอาหาร / กระเพาะทะลุ',
+      'ไตวายเฉียบพลัน (AKI) / โพแทสเซียมสูง',
+      'ภาวะหลอดเลือดหัวใจและสมองอุดตัน',
     ],
     regimens: [
       DosingRegimen(
@@ -488,6 +514,26 @@ final List<Drug> analgesics = [
       externalUrl: 'https://online.lexi.com',
     ),
     contraindications: ['Respiratory depression', 'Paralytic ileus'],
+    sideEffects: const [
+      'Constipation, nausea, vomiting',
+      'Sedation, drowsiness, dizziness',
+      'Pruritus, dry mouth, urinary retention',
+    ],
+    sideEffectsTh: const [
+      'ท้องผูก คลื่นไส้ อาเจียน',
+      'ง่วงซึม มึนงง เวียนศีรษะ',
+      'คันตามผิวหนัง ปากแห้ง ปัสสาวะคั่ง',
+    ],
+    seriousSideEffects: const [
+      'Severe respiratory depression / apnea',
+      'Hypotension and bradycardia',
+      'M6G metabolite accumulation causing prolonged neurotoxicity in CKD',
+    ],
+    seriousSideEffectsTh: const [
+      'กดการหายใจรุนแรง / หยุดหายใจ',
+      'ความดันโลหิตต่ำ หัวใจเต้นช้า',
+      'สารเมแทบอไลต์ M6G คั่งในผู้ป่วยไตเสื่อมทำให้ซึมลึกนาน',
+    ],
     specialNotes: 'Active metabolites accumulate in renal impairment. Monitor for respiratory depression.',
     specialNotesTh: 'สารเมแทบอไลต์สะสมในผู้ป่วยไตวาย ต้องระวังการกดการหายใจอย่างใกล้ชิด',
     regimens: [
@@ -531,6 +577,27 @@ final List<Drug> analgesics = [
     category: DrugCategory.opioid,
     requiresHepaticCaution: true,
     isHighAlert: true,
+    sourceCitation: 'Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Sublimaze SPL',
+    sideEffects: [
+      'Sedation, dizziness, nausea, vomiting',
+      'Constipation, pruritus, diaphoresis',
+      'Mild bradycardia or hypotension',
+    ],
+    sideEffectsTh: [
+      'ง่วงซึม เวียนศีรษะ คลื่นไส้ อาเจียน',
+      'ท้องผูก คันตามผิวหนัง เหงื่อออก',
+      'หัวใจเต้นช้าหรือความดันโลหิตต่ำเล็กน้อย',
+    ],
+    seriousSideEffects: [
+      'Severe respiratory depression / apnea (mcg vs mg 1000x dosing error risk)',
+      'Chest wall rigidity (wooden chest syndrome) with rapid IV bolus',
+      'Serotonin syndrome when combined with SSRIs/MAOIs',
+    ],
+    seriousSideEffectsTh: [
+      'กดการหายใจรุนแรง / หยุดหายใจ (ระวังผิดพลาดหน่วย mcg กับ mg)',
+      'กล้ามเนื้อหน้าอกแข็งเกร็ง (Chest wall rigidity) เมื่อฉีด IV เร็วเกินไป',
+      'Serotonin syndrome เมื่อใช้ร่วมกับ SSRIs/MAOIs',
+    ],
     specialNotes: 'Dosed in MICROGRAMS (mcg). 100 times more potent than morphine. Preferred in renal failure.',
     specialNotesTh: 'ขนาดยาหน่วยเป็น ไมโครกรัม (mcg) แรงกว่ามอร์ฟีน 100 เท่า ปลอดภัยกว่าในผู้ป่วยโรคไต',
     regimens: [

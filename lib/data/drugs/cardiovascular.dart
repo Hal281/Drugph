@@ -42,6 +42,26 @@ final List<Drug> cardiovascular = [
         'Administer via central line to prevent extravasation necrosis.',
     specialNotesTh:
         'ควรให้ทางหลอดเลือดดำใหญ่เพื่อป้องกันเนื้อเยื่อตายจากการรั่วซึม',
+    sideEffects: const [
+      'Sinus bradycardia (reflex baroreceptor response), palpitations',
+      'Transient hypertension, headache',
+      'Peripheral vasoconstriction / cold extremities',
+    ],
+    sideEffectsTh: const [
+      'หัวใจเต้นช้าจากปฏิกิริยาสะท้อน (Reflex bradycardia) หรือใจสั่น',
+      'ความดันโลหิตสูง ปวดศีรษะ',
+      'หลอดเลือดส่วนปลายหดตัว ปลายมือปลายเท้าเย็น',
+    ],
+    seriousSideEffects: const [
+      'Extravasation tissue ischemia / necrosis (antidote: Phentolamine SC)',
+      'Digital / mesenteric ischemia with prolonged high-dose infusion',
+      'Ventricular arrhythmias / myocardial ischemia',
+    ],
+    seriousSideEffectsTh: const [
+      'เนื้อเยื่อขาดเลือด/ตายหากยารั่วซึมนอกหลอดเลือด (ใช้ Phentolamine แก้พิษ)',
+      'ปลายนิ้วหรือลำไส้ขาดเลือดเมื่อใช้ขนาดสูงต่อเนื่อง',
+      'หัวใจเต้นผิดจังหวะชนิดรุนแรง / กล้ามเนื้อหัวใจขาดเลือด',
+    ],
     ivDiluentCompatibility: const IvDiluentCompatibility(
       compatibleDiluents: [IvDiluent.d5w, IvDiluent.d5nss],
       preferredDiluent: IvDiluent.d5w,
@@ -76,6 +96,29 @@ final List<Drug> cardiovascular = [
           infusionRateUnit: 'mcg/kg/min',
         ),
       ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Septic Shock / Hypotension (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.titrated,
+        continuousRateMin: 0.05,
+        continuousRateMax: 2.0,
+        continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
+        doseUnit: DoseUnit.mcg,
+        frequency: Frequency.continuous,
+        standardDilutionMgPerMl: 0.016,
+        notes:
+            'Surviving Sepsis Campaign Pediatric / Lexicomp Pediatric 2024: Start 0.05–0.1 mcg/kg/min IV, titrate to target MAP (usual max 2 mcg/kg/min).',
+        notesTh:
+            'ภาวะช็อคจากติดเชื้อ (เด็ก): เริ่ม 0.05–0.1 mcg/kg/min IV หยดต่อเนื่อง ปรับตามความดันโลหิต (ทั่วไปสูงสุด 2 mcg/kg/min)',
+        limits: DoseLimit(
+          maxInfusionRate: 2.0,
+          infusionRateUnit: 'mcg/kg/min',
+        ),
+      ),
     ],
   ),
   const Drug(
@@ -85,14 +128,24 @@ final List<Drug> cardiovascular = [
     nameTh: 'โดปามีน',
     category: DrugCategory.vasopressor,
     sideEffects: [
-      'Tachycardia',
-      'Ventricular arrhythmias',
-      'Myocardial ischemia',
+      'Tachycardia, palpitations, ectopic beats',
+      'Nausea, vomiting, headache',
+      'Hypertension at pressor doses',
     ],
     sideEffectsTh: [
-      'หัวใจเต้นเร็ว',
-      'หัวใจเต้นผิดจังหวะ',
-      'กล้ามเนื้อหัวใจขาดเลือด',
+      'หัวใจเต้นเร็ว ใจสั่น หัวใจเต้นสะดุด',
+      'คลื่นไส้ อาเจียน ปวดศีรษะ',
+      'ความดันโลหิตสูงเกินเป้าหมาย',
+    ],
+    seriousSideEffects: [
+      'Ventricular arrhythmias / myocardial ischemia',
+      'Extravasation tissue necrosis (antidote: Phentolamine SC)',
+      'Peripheral digital gangrene with prolonged high-dose infusion',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจเต้นผิดจังหวะชนิดรุนแรง / กล้ามเนื้อหัวใจขาดเลือด',
+      'เนื้อเยื่อขาดเลือดตายหากยารั่วซึมนอกหลอดเลือด',
+      'ปลายนิ้วมือนิ้วเท้าขาดเลือด/เนื้อตาย',
     ],
     isHighAlert: true,
     sourceCitation: 'Ramathibodi High-Alert IV Infusion Guide 2024 / AHA Shock Guidelines / US FDA Intropin SPL',
@@ -161,6 +214,29 @@ final List<Drug> cardiovascular = [
           infusionRateUnit: 'mcg/kg/min',
         ),
       ),
+      DosingRegimen(
+        route: DoseRoute.ivInfusion,
+        indication: 'Hemodynamic Support (Pediatric)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.titrated,
+        continuousRateMin: 2.0,
+        continuousRateMax: 20.0,
+        continuousRateUnit: 'mcg/kg/min',
+        rateUnit: RateUnit.mcgKgMin,
+        verificationStatus: VerificationStatus.pendingReview,
+        doseUnit: DoseUnit.mcg,
+        frequency: Frequency.continuous,
+        standardDilutionMgPerMl: 1.6,
+        notes:
+            'Lexicomp Pediatric 2024 / AHA PALS: 2–20 mcg/kg/min IV continuous infusion (epinephrine/norepinephrine preferred first-line in pediatric septic shock).',
+        notesTh:
+            'ประคับประคองการไหลเวียนเลือด (เด็ก): 2–20 mcg/kg/min IV หยดต่อเนื่อง (SSC แนะนำ Epinephrine/Norepinephrine เป็นทางเลือกแรก)',
+        limits: DoseLimit(
+          maxInfusionRate: 20.0,
+          infusionRateUnit: 'mcg/kg/min',
+        ),
+      ),
     ],
   ),
   const Drug(
@@ -170,16 +246,24 @@ final List<Drug> cardiovascular = [
     nameTh: 'อะมิโอดาโรน',
     category: DrugCategory.cardiovascular,
     sideEffects: [
-      'Pulmonary toxicity/fibrosis',
-      'Hepatotoxicity',
-      'Proarrhythmic effects',
       'Acute hypotension and bradycardia with rapid infusion',
+      'Phlebitis / venous irritation via peripheral IV (> 2 mg/mL)',
+      'Nausea, corneal microdeposits, photosensitivity (chronic)',
     ],
     sideEffectsTh: [
-      'พิษต่อปอด/พังผืดในปอด',
-      'พิษต่อตับ',
-      'กระตุ้นหัวใจเต้นผิดจังหวะ',
       'ความดันโลหิตต่ำและหัวใจเต้นช้าเมื่อหยดยาเร็ว',
+      'หลอดเลือดดำอักเสบเมื่อให้ทางหลอดเลือดดำส่วนปลาย (> 2 mg/mL)',
+      'คลื่นไส้ ตะกอนที่กระจกตา ผิวไวต่อแสง (เมื่อใช้ต่อเนื่อง)',
+    ],
+    seriousSideEffects: [
+      'Pulmonary toxicity / interstitial pneumonitis / fibrosis',
+      'Hepatotoxicity / elevated transaminases',
+      'Proarrhythmic effects (QT prolongation, Torsades de Pointes, AV block)',
+    ],
+    seriousSideEffectsTh: [
+      'พิษต่อปอด / พังผืดในปอด',
+      'พิษต่อตับ / เอนไซม์ตับสูง',
+      'กระตุ้นหัวใจเต้นผิดจังหวะ QT ยาว / Torsades de Pointes / AV block',
     ],
     isHighAlert: true,
     sourceCitation: 'AHA ACLS Guidelines 2020 / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี / US FDA Cordarone SPL',
@@ -241,6 +325,40 @@ final List<Drug> cardiovascular = [
         frequency: Frequency.once,
         infusionTimeMinutes: 10.0,
         verificationStatus: VerificationStatus.pendingReview,
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivPush,
+        indication: 'Cardiac Arrest — Pulseless VT/VF (Adult ACLS)',
+        audience: RegimenAudience.adult,
+        population: PopulationCriteria(minAgeMonths: 216),
+        dosingType: DosingType.fixed,
+        fixedDose: 300.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.stat,
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'AHA ACLS 2020 / Lexicomp DIH 2024: First dose 300 mg IV/IO bolus for shock-refractory VF/pVT; may repeat 150 mg once.',
+        notesTh:
+            'หัวใจหยุดเต้น VF/pVT (ผู้ใหญ่ ACLS): โดสแรก 300 mg IV/IO push (ให้ซ้ำ 150 mg ได้ 1 ครั้ง)',
+        limits: DoseLimit(maxSingleDose: 300.0, maxDailyDose: 2200.0),
+      ),
+      DosingRegimen(
+        route: DoseRoute.ivPush,
+        indication: 'Cardiac Arrest — Pulseless VT/VF (Pediatric PALS)',
+        audience: RegimenAudience.pediatric,
+        population: PopulationCriteria(maxAgeMonths: 215),
+        dosingType: DosingType.weightBased,
+        dosePerKg: 5.0,
+        doseUnit: DoseUnit.mg,
+        frequency: Frequency.stat,
+        doseCap: 300.0,
+        doseCapCitation: 'AHA PALS Guidelines 2020 / Lexicomp Pediatric 2024',
+        verificationStatus: VerificationStatus.pendingReview,
+        notes:
+            'AHA PALS 2020 / Lexicomp Pediatric 2024: 5 mg/kg IV/IO rapid bolus for refractory VF/pVT (max 300 mg/dose; may repeat up to 3 total doses).',
+        notesTh:
+            'หัวใจหยุดเต้น VF/pVT (เด็ก PALS): 5 mg/kg IV/IO push (สูงสุดไม่เกิน 300 mg/ครั้ง)',
+        limits: DoseLimit(maxSingleDose: 300.0),
       ),
     ],
   ),
@@ -327,6 +445,28 @@ final List<Drug> cardiovascular = [
     category: DrugCategory.cardiovascular, // or diuretic
     drugClass: DrugClass.loopDiuretic,
     allergyClass: 'Sulfonamide (Sulfa)',
+    sourceCitation: 'Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Lasix SPL',
+    lastReviewedDate: '2024-10-12',
+    sideEffects: [
+      'Polyuria, mild dehydration, thirst',
+      'Hypokalemia, hyponatremia, hypomagnesemia',
+      'Hyperuricemia, dizziness, orthostatic hypotension',
+    ],
+    sideEffectsTh: [
+      'ปัสสาวะบ่อย ขาดน้ำ คอแห้ง',
+      'โพแทสเซียมต่ำ โซเดียมต่ำ แมกนีเซียมต่ำ',
+      'กรดยูริกในเลือดสูง เวียนศีรษะ ความดันตกเมื่อเปลี่ยนท่า',
+    ],
+    seriousSideEffects: [
+      'Ototoxicity / hearing loss (with rapid IV push > 20 mg/min or aminoglycosides)',
+      'Severe hypokalemia triggering ventricular arrhythmias / digoxin toxicity',
+      'Prerenal acute kidney injury from aggressive volume depletion',
+    ],
+    seriousSideEffectsTh: [
+      'พิษต่อหู / หูตึง (หากฉีด IV เร็วเกิน 20 mg/min หรือใช้ร่วมกับ Aminoglycosides)',
+      'โพแทสเซียมต่ำรุนแรงกระตุ้นหัวใจเต้นผิดจังหวะ',
+      'ไตวายเฉียบพลันจากการขาดสารน้ำรุนแรง',
+    ],
     severeInteractions: [
       'Aminoglycosides (Increased risk of ototoxicity)',
       'Digoxin (Toxicity if hypokalemic)'
@@ -406,6 +546,28 @@ final List<Drug> cardiovascular = [
     nameTh: 'อะดีโนซีน',
     category: DrugCategory.cardiovascular, // Antiarrhythmic
     isHighAlert: true,
+    sourceCitation: 'Drug Information Handbook (Lexicomp/APhA) 2024 / AHA ACLS & PALS SVT Guidelines',
+    lastReviewedDate: '2024-10-12',
+    sideEffects: [
+      'Transient facial flushing, warmth',
+      'Chest discomfort / pressure, dyspnea',
+      'Lightheadedness, nausea, metallic taste',
+    ],
+    sideEffectsTh: [
+      'หน้าแดง ร้อนวูบวาบชั่วคราว',
+      'แน่นหน้าอก หายใจลำบากชั่วขณะ',
+      'มึนงง คลื่นไส้',
+    ],
+    seriousSideEffects: [
+      'Transient asystole / high-degree AV block (expected brief pause)',
+      'Severe bronchospasm in asthma / COPD patients',
+      'Prolonged bradycardia or atrial fibrillation conversion',
+    ],
+    seriousSideEffectsTh: [
+      'หัวใจหยุดเต้นชั่วคราว / AV block (เกิดขึ้นชั่วครู่หลังฉีด)',
+      'หลอดลมหดเกร็งรุนแรงในผู้ป่วยหอบหืด/ถุงลมโป่งพอง',
+      'หัวใจเต้นช้าหรือสั่นพลิ้วต่อเนื่อง',
+    ],
     severeInteractions: [
       'Dipyridamole (potentiates effect - reduce adenosine dose)',
       'Theophylline / Caffeine (antagonizes effect - may need larger dose)'
