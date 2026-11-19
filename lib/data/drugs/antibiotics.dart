@@ -872,9 +872,9 @@ final List<Drug> antibiotics = [
       'Concurrent use with IV calcium in neonates',
     ],
     specialNotes:
-        'No renal adjustment needed for usual doses. Avoid in neonates.',
+        'No renal adjustment needed for usual doses. Monitor for biliary sludging with prolonged high-dose therapy.',
     specialNotesTh:
-        'ไม่ต้องปรับโดสในผู้ป่วยโรคไต ห้ามใช้ในทารกแรกเกิดที่ตัวเหลือง',
+        'ไม่ต้องปรับโดสในผู้ป่วยโรคไต ระวังตะกอนในถุงน้ำดีหากใช้ยาต่อเนื่องนาน',
     ivDiluentCompatibility: const IvDiluentCompatibility(
       compatibleDiluents: [IvDiluent.nss, IvDiluent.d5w],
       preferredDiluent: IvDiluent.nss,

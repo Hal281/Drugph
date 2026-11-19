@@ -97,8 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getDrugClassLabel(Drug drug) {
     final drugClass = drug.effectiveDrugClass;
     return isThai
-        ? drugClass?.nameTh ?? drug.category.nameTh
-        : drugClass?.nameEn ?? drug.category.nameEn;
+        ? drugClass?.shortBadgeTh ?? drug.category.nameTh
+        : drugClass?.shortBadgeEn ?? drug.category.nameEn;
   }
 
   void _onDrugTapped(BuildContext context, Drug drug, bool isDesktop) {

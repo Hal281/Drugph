@@ -17,7 +17,7 @@ final List<Drug> metabolic = [
       'Acute or chronic metabolic acidosis (e.g. DKA)'
     ],
     specialNotes: 'Risk of lactic acidosis. Monitor eGFR closely.',
-    specialNotesTh: 'เสี่ยงต่อภาวะเลือดเป็นกรด (Lactic acidosis) ห้ามใช้ในผู้ป่วยที่ไตวาย (eGFR < 30) และต้องงดยาก่อนฉีดสี 48 ชั่วโมง',
+    specialNotesTh: 'เสี่ยงต่อภาวะเลือดเป็นกรด (Lactic acidosis) และต้องงดยาก่อนฉีดสารทึบรังสี 48 ชั่วโมง',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,
@@ -56,7 +56,7 @@ final List<Drug> metabolic = [
       'Pregnancy and lactation'
     ],
     specialNotes: 'Risk of myopathy and rhabdomyolysis. Monitor liver enzymes.',
-    specialNotesTh: 'ระวังกล้ามเนื้อสลายตัว (Rhabdomyolysis) ห้ามใช้ในคนท้องและผู้ป่วยตับอักเสบ ห้ามกินร่วมกับยาฆ่าเชื้อบางชนิด',
+    specialNotesTh: 'ระวังกล้ามเนื้อสลายตัว (Rhabdomyolysis) และตรวจสอบปฏิกิริยาระหว่างยาก่อนใช้ร่วมกับยาฆ่าเชื้อบางชนิด',
     regimens: [
       DosingRegimen(
         route: DoseRoute.po,

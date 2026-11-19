@@ -170,7 +170,7 @@ final List<Drug> anticoagulants = [
           '• ผู้ป่วย CrCl < 30 mL/min (Severe Renal Impairment):\n'
           '  - ข้อบ่งชี้ Treatment: ปรับลดขนาดยาเป็น 1 mg/kg SC ทุก 24 ชม. (q24h)\n'
           '  - ข้อบ่งชี้ Prophylaxis: ปรับลดขนาดยาเป็น 30 mg SC ทุก 24 ชม. (q24h)\n'
-          '• แนะนำเจาะตรวจระดับ Anti-Xa Peak (4 ชม. หลังฉีดยาเข็มที่ 3 หรือ 4; เป้าหมาย Treatment q12h คือ 0.6–1.0 IU/mL; Treatment q24h คือ 1.0–2.0 IU/mL)',
+          '• แนะนำเจาะตรวจระดับ Anti-Xa Peak (4 ชม. หลังให้ยาโดสที่ 3 หรือ 4; เป้าหมาย Treatment q12h คือ 0.6–1.0 IU/mL; Treatment q24h คือ 1.0–2.0 IU/mL)',
       administrationGuideline:
           '• การบริหารยา: ฉีดเข้าใต้ผิวหนัง (Deep Subcutaneous Injection) บริเวณหน้าท้องด้านซ้ายหรือขวา ห่างจากสะดืออย่างน้อย 2 นิ้ว (Anterolateral / Posterolateral abdominal wall)\n'
           '• เทคนิคการฉีด: สลับข้างซ้าย-ขวาทุกครั้ง, จัดท่านอนหงาย, บีบผิวหนังเป็นรอยพับและแทงเข็มทำมุม 90 องศาจนสุดความยาวเข็ม\n'

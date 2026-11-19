@@ -418,7 +418,7 @@ final List<Drug> cardiovascular = [
     specialNotes:
         'Must be given as a RAPID IV push (1-2 seconds) followed immediately by a rapid normal saline flush.',
     specialNotesTh:
-        'ต้องฉีด IV Push เร็วมากๆ (1-2 วินาที) แล้วตามด้วย Normal Saline ทันที ห้ามใช้ในคนไข้หอบหืด',
+        'ต้องฉีด IV Push เร็วมากๆ (1-2 วินาที) แล้วตามด้วย Normal Saline ทันที',
     regimens: [
       DosingRegimen(
         route: DoseRoute.ivPush,

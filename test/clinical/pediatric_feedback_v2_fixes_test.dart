@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:drug_dosage_calculator/core/core.dart';
 import 'package:drug_dosage_calculator/data/drug_database.dart';
 import 'package:drug_dosage_calculator/data/patient_session.dart';
 import 'package:drug_dosage_calculator/ui/calculator/calculator_screen.dart';
 import 'package:drug_dosage_calculator/ui/calculator/controllers/calculator_controller.dart';
+import 'package:drug_dosage_calculator/ui/pkpd/controllers/pk_simulation_controller.dart';
 import 'package:drug_dosage_calculator/ui/widgets/patient_banner.dart';
 import 'package:drug_dosage_calculator/ui/widgets/patient_edit_dialog.dart';
 import 'package:flutter/material.dart';
@@ -534,6 +537,102 @@ void main() {
         await tester.tap(find.byKey(const Key('regimen_audience_switch_button')));
         await tester.pumpAndSettle();
         expect(find.byKey(const Key('regimen_audience_mismatch_banner')), findsNothing);
+      },
+    );
+
+    test(
+      'FB-09 (WP-01): PkSimulationController uses Winter 2012 AdjBW for obese adult and Bedside Schwartz for pediatric patient',
+      () {
+        const obeseAdult = Patient(
+          id: 'pk-obese-fb09',
+          weightKg: 120.0,
+          heightCm: 170.0,
+          ageYears: 50,
+          sex: Sex.male,
+          serumCreatinineMgDl: 1.0,
+          isScrStable: true,
+        );
+        final expectedAdjCrcl = RenalCalculator.cockcroftGaultAutoWeight(
+          ageYears: 50,
+          weightKg: 120.0,
+          heightCm: 170.0,
+          sex: Sex.male,
+          serumCreatinineMgDl: 1.0,
+        );
+        expect(
+          PkSimulationController.resolveCrclForPatient(obeseAdult),
+          closeTo(expectedAdjCrcl, 0.01),
+        );
+
+        const childPatient = Patient(
+          id: 'pk-child-fb09',
+          weightKg: 18.0,
+          heightCm: 110.0,
+          ageYears: 5,
+          sex: Sex.male,
+          serumCreatinineMgDl: 0.5,
+          isScrStable: true,
+        );
+        final expectedSchwartz = RenalCalculator.bedsideSchwartz(
+          heightCm: 110.0,
+          serumCreatinineMgDl: 0.5,
+        );
+        expect(
+          PkSimulationController.resolveCrclForPatient(childPatient),
+          closeTo(expectedSchwartz, 0.01),
+        );
+      },
+    );
+
+    test(
+      'FB-13 (WP-04): ClinicalTerms standardizes first-dose labels and lib/ contains zero colloquial "เข็มแรก"/"เข็มที่"',
+      () {
+        expect(ClinicalTerms.firstDoseTh, equals('โดสแรก'));
+        expect(ClinicalTerms.loadingDoseEn, equals('Loading dose'));
+
+        final libDir = Directory('lib');
+        final offenders = <String>[];
+        for (final entity in libDir.listSync(recursive: true)) {
+          if (entity is File && entity.path.endsWith('.dart')) {
+            final content = entity.readAsStringSync();
+            if (content.contains('เข็มแรก') || content.contains('เข็มที่')) {
+              offenders.add(entity.path);
+            }
+          }
+        }
+        expect(offenders, isEmpty, reason: 'Colloquial needle wording found in: $offenders');
+      },
+    );
+
+    testWidgets(
+      'FB-10 (WP-06): PatientClinicalHeader shows explicit < 1 year infant eGFR disclaimer when SCr is entered',
+      (tester) async {
+        final amox = DrugDatabase.findById('amoxicillin')!;
+        PatientSession.instance.setPatient(
+          const Patient(
+            id: 'infant-header-fb10',
+            weightKg: 6.0,
+            heightCm: 62.0,
+            ageYears: 0,
+            ageMonths: 4,
+            sex: Sex.female,
+            serumCreatinineMgDl: 0.4,
+            isScrStable: true,
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: CalculatorScreen(drug: amox, isThai: false),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byKey(const Key('patient_header_infant_egfr_disclaimer')),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Infant < 1 yr'), findsOneWidget);
       },
     );
   });

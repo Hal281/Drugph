@@ -261,6 +261,21 @@ class PatientClinicalHeader extends StatelessWidget {
                           ],
                         );
                       },
+                    )
+                  else if (isPediatricPatient &&
+                      age < 1 &&
+                      patient?.serumCreatinineMgDl != null &&
+                      patient!.serumCreatinineMgDl! > 0)
+                    _buildBadge(
+                      Icons.info_outline,
+                      t
+                          ? 'ทารก < 1 ปี: สูตร Bedside Schwartz ยังไม่รองรับ — โปรดประเมินไตโดยเฉพาะทาง'
+                          : 'Infant < 1 yr: Bedside Schwartz eGFR not validated — specialist renal review required',
+                      const Color(0xFF92400E),
+                      AppTheme.statusWarningBg,
+                      AppTheme.statusWarningBorder,
+                      maxBadgeWidth,
+                      key: const Key('patient_header_infant_egfr_disclaimer'),
                     ),
                   if (state.renalReplacementMode != RenalReplacementMode.none)
                     _buildBadge(

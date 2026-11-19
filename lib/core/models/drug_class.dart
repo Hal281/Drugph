@@ -58,4 +58,96 @@ enum DrugClass {
   final String nameTh;
 
   const DrugClass({required this.nameEn, required this.nameTh});
+
+  /// Concise class badge for AppBar and catalog rows (FB-15).
+  String get shortBadgeEn {
+    switch (this) {
+      case DrugClass.nsaid:
+        return 'NSAID';
+      case DrugClass.aceInhibitor:
+        return 'ACEI';
+      case DrugClass.arb:
+        return 'ARB';
+      case DrugClass.anticoagulantVka:
+        return 'VKA Anticoagulant';
+      case DrugClass.anticoagulantDoac:
+        return 'DOAC';
+      case DrugClass.statin:
+        return 'Statin';
+      case DrugClass.biguanide:
+        return 'Biguanide';
+      case DrugClass.protonPumpInhibitor:
+        return 'PPI';
+      case DrugClass.antiemetic5Ht3:
+        return '5-HT3 Antagonist';
+      case DrugClass.beta2Agonist:
+        return 'Beta-2 Agonist';
+      default:
+        return nameEn;
+    }
+  }
+
+  /// Concise Thai-friendly class badge without verbose parenthetical sentences (FB-15).
+  String get shortBadgeTh {
+    switch (this) {
+      case DrugClass.nsaid:
+        return 'NSAIDs';
+      case DrugClass.aceInhibitor:
+        return 'ACEI';
+      case DrugClass.arb:
+        return 'ARB';
+      case DrugClass.betaLactamPenicillin:
+        return 'Penicillin';
+      case DrugClass.betaLactamCephalosporin:
+        return 'Cephalosporin';
+      case DrugClass.betaLactamCarbapenem:
+        return 'Carbapenem';
+      case DrugClass.aminoglycoside:
+        return 'Aminoglycoside';
+      case DrugClass.fluoroquinolone:
+        return 'Fluoroquinolone';
+      case DrugClass.glycopeptide:
+        return 'Glycopeptide';
+      case DrugClass.macrolide:
+        return 'Macrolide';
+      case DrugClass.sulfonamide:
+        return 'Sulfonamide';
+      case DrugClass.anticoagulantVka:
+        return 'VKA';
+      case DrugClass.anticoagulantDoac:
+        return 'DOAC';
+      case DrugClass.anticoagulantHeparin:
+        return 'Heparin / LMWH';
+      case DrugClass.opioid:
+        return 'Opioid';
+      case DrugClass.statin:
+        return 'Statin';
+      case DrugClass.loopDiuretic:
+        return 'Loop Diuretic';
+      case DrugClass.potassiumSparingDiuretic:
+        return 'K-Sparing Diuretic';
+      case DrugClass.thiazideDiuretic:
+        return 'Thiazide';
+      case DrugClass.biguanide:
+        return 'Biguanide';
+      case DrugClass.protonPumpInhibitor:
+        return 'PPI';
+      case DrugClass.calciumChannelBlocker:
+        return 'CCB';
+      case DrugClass.betaBlocker:
+        return 'Beta-Blocker';
+      case DrugClass.vasopressorInotrope:
+        return 'Vasopressor / Inotrope';
+      case DrugClass.nonOpioidAnalgesic:
+        return 'ยาแก้ปวดลดไข้';
+      case DrugClass.antiemetic5Ht3:
+        return '5-HT3 Antagonist';
+      case DrugClass.dopamineAntagonist:
+        return 'Dopamine Antagonist';
+      case DrugClass.beta2Agonist:
+        return 'Beta-2 Agonist';
+      default:
+        return nameTh;
+    }
+  }
 }

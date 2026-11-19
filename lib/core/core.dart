@@ -8,6 +8,7 @@
 // ============================================================
 
 export 'formatters/clinical_order_formatter.dart';
+export 'formatters/clinical_terms.dart';
 export 'models/models.dart';
 export 'calculators/calculators.dart';
 export 'validators/input_validator.dart';

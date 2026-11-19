@@ -7,6 +7,7 @@
 // DISCLAIMER: SaMD prototype — not for clinical use.
 // ============================================================
 
+import '../formatters/clinical_terms.dart';
 import '../models/models.dart';
 import '../validators/input_validator.dart';
 import 'calculators.dart';
@@ -445,7 +446,7 @@ class PharmacistCalculator {
               'Kinetic / AKI Protocol: Re-evaluate SCr trajectory and urine output before subsequent maintenance doses.',
             ],
             clinicalAlternativesTh: [
-              'ขอยกเว้นเฉพาะราย: หากรักษาการติดเชื้อรุนแรง สามารถให้ยาโดสแรก (First dose) ได้พร้อมบันทึกเหตุผลทางคลินิก',
+              ClinicalTerms.akiFirstDoseAlternativeTh,
               'ติดตามแนวโน้มไต: ติดตามค่า SCr ซ้ำและปริมาณปัสสาวะเพื่อปรับขนาดยาต่อเนื่องตามแนวทาง AKI',
             ],
           ),
@@ -517,10 +518,10 @@ class PharmacistCalculator {
         if (drug.renalDataPolicy != RenalDataPolicy.notNeeded) {
           final isHardBlock = drug.renalDataPolicy == RenalDataPolicy.block;
           final firstDoseTextEn = drug.firstDoseUnadjustedOk
-              ? ' First/loading dose unadjusted is acceptable (${drug.firstDoseCitation ?? "Clinical reference"}). Subsequent maintenance dosing requires serum creatinine.'
+              ? ' ${ClinicalTerms.firstDoseUnadjustedPrefixEn} (${drug.firstDoseCitation ?? "Clinical reference"}). Subsequent maintenance dosing requires serum creatinine.'
               : '';
           final firstDoseTextTh = drug.firstDoseUnadjustedOk
-              ? ' ขนาดยาเริ่มต้น/โดสแรก (First/Loading dose) สามารถบริหารได้โดยไม่ต้องปรับ (${drug.firstDoseCitation ?? "เอกสารอ้างอิง"}) แต่มื้อต่อไปต้องระบุค่าไต'
+              ? ' ${ClinicalTerms.firstDoseUnadjustedPrefixTh} (${drug.firstDoseCitation ?? "เอกสารอ้างอิง"}) แต่มื้อต่อไปต้องระบุค่าไต'
               : '';
 
           warnings.add(
@@ -536,7 +537,7 @@ class PharmacistCalculator {
                 'Awaiting Laboratory Confirmation: Obtain STAT serum creatinine before maintenance doses.',
               ],
               clinicalAlternativesTh: [
-                'ให้ยาโดสแรกแบบฉุกเฉิน (STAT First dose): สามารถบริหารยาโดสแรกได้ทันทีในภาวะฉุกเฉินระหว่างรอผลตรวจ SCr ทางห้องปฏิบัติการ',
+                ClinicalTerms.statFirstDoseAlternativeTh,
                 'รอผลตรวจยืนยัน: ส่งตรวจค่า SCr เร่งด่วนก่อนบริหารยามื้อถัดไป',
               ],
             ),

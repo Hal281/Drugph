@@ -102,3 +102,17 @@ This document records all clinical decisions, human-in-the-loop policies, and op
 - **Responsible Pharmacist:** Infectious Disease & Allergy Stewardship Pharmacist
 - **Date:** 2026-10-07
 - **Source Reference:** Macy E, et al. *JAMA Netw Open*. 2021; Shenoy ES, et al. Evaluation and Management of Penicillin Allergy: A Review. *JAMA*. 2019.
+
+---
+
+## 8. Pediatric vs. Adult Regimen Audience Mismatch Safety Policy
+- **ID:** `DEC-PED-AUDIENCE-001`
+- **Topic:** Calculation engine behavior when an adult-only regimen is selected for a pediatric patient (`< 18` years) or a pediatric-only regimen is selected for an adult (`>= 18` years).
+- **Status:** `[RATIFIED CLINICAL POLICY]`
+- **Policy Determination:**
+  - Adult-to-Pediatric and Pediatric-to-Adult regimen mismatches remain **safety-blocked** (`LimitSeverity.hard`, `DoseWarningCode.pediatricBlocked` / `DoseWarningCode.populationMismatch`) in `PharmacistCalculator.calculateDose` to prevent fatal cross-population dosing errors (e.g., adult fixed continuous infusions in infants/children).
+  - The UI surfaces a prominent `regimen_audience_mismatch_banner` with a 1-tap `regimen_audience_switch_button` so clinicians can immediately switch to the age-appropriate regimen.
+  - Rule 5 Non-Blocking Overdose Policy applies to supra-threshold doses calculated **within** an age-appropriate regimen.
+- **Responsible Clinician:** Lead Developer & Clinical Review Alignment (WP-07)
+- **Date:** 2026-11-19
+- **Source Reference:** IEC 62366-1 Usability Safety Architecture; Drugph Ironclad Rule 5 & `adversarial_infusion_invertibility_test.dart`.

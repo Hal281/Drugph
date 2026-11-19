@@ -171,8 +171,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final state = _controller.state;
     final drugClass = widget.drug.effectiveDrugClass;
     final drugClassName = t
-        ? drugClass?.nameTh ?? widget.drug.category.nameTh
-        : drugClass?.nameEn ?? widget.drug.category.nameEn;
+        ? drugClass?.shortBadgeTh ?? widget.drug.category.nameTh
+        : drugClass?.shortBadgeEn ?? widget.drug.category.nameEn;
 
     return Scaffold(
       backgroundColor: AppTheme.surfaceBackground,

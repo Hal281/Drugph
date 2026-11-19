@@ -100,18 +100,43 @@ class PkSimulationController extends ChangeNotifier {
     return Isolate.run(() => PkSimulationEngine.simulate(params));
   }
 
+  /// Exposes renal clearance resolution for unit tests and PK diagnostics.
+  static double resolveCrclForPatient(Patient patient) => _resolveCrcl(patient);
+
   static double _resolveCrcl(Patient patient) {
     if (patient.creatinineClearanceMlMin != null &&
         patient.creatinineClearanceMlMin! > 0) {
       return patient.creatinineClearanceMlMin!;
     }
-    if (patient.serumCreatinineMgDl != null &&
-        patient.serumCreatinineMgDl! > 0) {
+    final scr = patient.serumCreatinineMgDl;
+    if (scr != null && scr > 0) {
+      if (patient.ageYears < 18) {
+        if (patient.eGfrMlMinPer173m2 != null &&
+            patient.eGfrMlMinPer173m2! > 0) {
+          return patient.eGfrMlMinPer173m2!;
+        }
+        if (patient.ageYears >= 1 && patient.heightCm > 0) {
+          return RenalCalculator.bedsideSchwartz(
+            heightCm: patient.heightCm,
+            serumCreatinineMgDl: scr,
+          );
+        }
+        return 65.0;
+      }
+      if (patient.heightCm > 0 && patient.weightKg > 0) {
+        return RenalCalculator.cockcroftGaultAutoWeight(
+          ageYears: patient.ageYears,
+          weightKg: patient.weightKg,
+          heightCm: patient.heightCm,
+          sex: patient.sex,
+          serumCreatinineMgDl: scr,
+        );
+      }
       return RenalCalculator.cockcroftGault(
         ageYears: patient.ageYears,
         weightKg: patient.weightKg,
         sex: patient.sex,
-        serumCreatinineMgDl: patient.serumCreatinineMgDl!,
+        serumCreatinineMgDl: scr,
       );
     }
     return 65.0;
