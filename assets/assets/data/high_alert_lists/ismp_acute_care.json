@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0.0",
+  "source_name": "ISMP List of High-Alert Medications in Acute Care Settings",
+  "source_edition": "2024",
+  "source_url": "https://www.ismp.org/recommendations/high-alert-medications-acute-list",
+  "entries": [
+    {
+      "drugId": "norepinephrine",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv", "io"],
+      "ismpCategory": "Adrenergic agonists, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV vasoactive catecholamine; dosing/infusion-rate errors rapidly cause severe hypertension, arrhythmias, or tissue ischemia."
+    },
+    {
+      "drugId": "epinephrine",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv", "io"],
+      "ismpCategory": "Adrenergic agonists, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV/IO adrenergic agonist requires double-check for concentration (1:10,000 vs 1:1,000) and pump rate; IM anaphylaxis auto-injector/IM is excluded from IV class."
+    },
+    {
+      "drugId": "dopamine",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv", "io"],
+      "ismpCategory": "Adrenergic agonists, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV adrenergic agonist (look-alike Tall Man pair DOPamine/DOBUTamine); infusion errors cause tachyarrhythmias or hemodynamic collapse."
+    },
+    {
+      "drugId": "dobutamine",
+      "applicableRoutes": ["ivInfusion", "iv"],
+      "ismpCategory": "Inotropic medications, IV / Adrenergic agonists, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV inotropic catecholamine (look-alike Tall Man pair DOBUTamine/DOPamine)."
+    },
+    {
+      "drugId": "vasopressin",
+      "applicableRoutes": ["ivInfusion", "iv", "io"],
+      "ismpCategory": "Vasopressin, IV and intraosseous",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Explicitly listed on ISMP 2024 Specific Medications (IV and IO) due to severe vasoconstriction and dose-unit confusion (units/min vs units/hr)."
+    },
+    {
+      "drugId": "metoprolol",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv"],
+      "ismpCategory": "Adrenergic antagonists, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV beta-blocker listed under Adrenergic antagonists, IV; oral metoprolol is not high-alert."
+    },
+    {
+      "drugId": "amiodarone",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv"],
+      "ismpCategory": "Antiarrhythmics, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV antiarrhythmic; rapid non-arrest bolus or miscalculation risks severe hypotension, bradycardia, and arrhythmias."
+    },
+    {
+      "drugId": "adenosine",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv"],
+      "ismpCategory": "Antiarrhythmics, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV antiarrhythmic producing transient asystole; requires rapid push protocol and cardiac monitoring."
+    },
+    {
+      "drugId": "digoxin",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv"],
+      "ismpCategory": "Inotropic medications, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV digoxin is listed under Inotropic medications, IV; oral digoxin is tracked separately as an NTI/TDM drug."
+    },
+    {
+      "drugId": "warfarin",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Antithrombotic agents — Anticoagulants",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Oral vitamin K antagonist with narrow therapeutic index and fatal hemorrhage risk."
+    },
+    {
+      "drugId": "enoxaparin",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Antithrombotic agents — Low molecular weight heparins",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "LMWH anticoagulant with bleeding and spinal/epidural hematoma risk."
+    },
+    {
+      "drugId": "heparin",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Antithrombotic agents — Unfractionated heparin",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "High-risk anticoagulant prone to weight-based/vial-strength dosing errors and hemorrhage."
+    },
+    {
+      "drugId": "apixaban",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Antithrombotic agents — DOACs and factor Xa inhibitors",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Direct factor Xa inhibitor carrying major/fatal bleeding risk if unadjusted for renal/age/weight criteria."
+    },
+    {
+      "drugId": "rivaroxaban",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Antithrombotic agents — DOACs and factor Xa inhibitors",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Direct factor Xa inhibitor with strict renal/hepatic contraindications and hemorrhage risk."
+    },
+    {
+      "drugId": "insulin_regular",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Insulin, subcutaneous and IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Severe hypoglycemia and hypokalemia risk across SC and IV routes."
+    },
+    {
+      "drugId": "insulin_glargine",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Insulin, subcutaneous and IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Long-acting insulin with fatal hypoglycemia risk on wrong-dose or look-alike insulin mix-ups."
+    },
+    {
+      "drugId": "glipizide",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Hypoglycemics, oral",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Oral sulfonylurea included under ISMP 2024 Hypoglycemics, oral due to prolonged severe hypoglycemia risk, especially in renal impairment."
+    },
+    {
+      "drugId": "morphine",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Opioids (all routes)",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Opioid analgesic across IV/SC/PO routes; respiratory depression and 10x concentration errors."
+    },
+    {
+      "drugId": "fentanyl",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Opioids (all routes)",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Potent opioid dosed in mcg; respiratory depression and fatal mg-vs-mcg error risk."
+    },
+    {
+      "drugId": "tramadol",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Opioids (all routes)",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Opioid agonist carrying respiratory depression, seizure, and serotonin toxicity risks across routes."
+    },
+    {
+      "drugId": "midazolam",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv", "po"],
+      "ismpCategory": "Moderate sedation agents, IV / Pediatric oral sedation",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV moderate sedation agent (and oral moderate/minimal sedation for children) carrying apnea/respiratory arrest risk."
+    },
+    {
+      "drugId": "dexmedetomidine",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv"],
+      "ismpCategory": "Moderate sedation agents, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Explicitly cited in ISMP 2024 moderate sedation agents, IV; risk of profound bradycardia and hypotension."
+    },
+    {
+      "drugId": "propofol",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Anesthetic agents, general, inhaled and IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "IV general anesthetic carrying rapid apnea, hypotension, and PRIS toxicity."
+    },
+    {
+      "drugId": "magnesium_sulfate",
+      "applicableRoutes": ["ivInfusion", "ivPush", "iv", "im"],
+      "ismpCategory": "Magnesium sulfate injection",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Explicitly listed on ISMP 2024 Specific Medications (injection); overdose causes respiratory paralysis and cardiac arrest."
+    },
+    {
+      "drugId": "oxytocin",
+      "applicableRoutes": ["ivInfusion", "iv"],
+      "ismpCategory": "Oxytocin, IV",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Explicitly listed on ISMP 2024 Specific Medications (IV only); uterine tachysystole and fetal distress risk."
+    },
+    {
+      "drugId": "potassium_chloride",
+      "applicableRoutes": ["ivInfusion", "iv"],
+      "ismpCategory": "Potassium chloride for injection concentrate",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Explicitly listed on ISMP 2024 Specific Medications (injection concentrate); undiluted push or excessive rate causes fatal cardiac arrest. Oral KCl is excluded."
+    },
+    {
+      "drugId": "carboplatin",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Chemotherapeutic agents, parenteral and oral",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Parenteral cytotoxic antineoplastic agent."
+    },
+    {
+      "drugId": "methotrexate",
+      "applicableRoutes": ["all"],
+      "ismpCategory": "Chemotherapeutic agents / Methotrexate, oral, non-oncologic use",
+      "sourceEdition": "ISMP Acute Care 2024",
+      "rationale": "Listed under both Chemotherapy and Specific Medications (oral non-oncologic weekly regimen mix-up risk)."
+    }
+  ]
+}

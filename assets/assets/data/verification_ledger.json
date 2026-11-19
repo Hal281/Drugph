@@ -1,0 +1,869 @@
+{
+  "schema_version": "1.0.0",
+  "entries": [
+    {
+      "drug_id": "vancomycin",
+      "regimen_id": "ivinfusion__systemic_infection_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "vancomycin",
+      "regimen_id": "ivinfusion__systemic_infection_bacteremia_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "vancomycin",
+      "regimen_id": "ivinfusion__cns_infection_meningitis_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "gentamicin",
+      "regimen_id": "ivinfusion__extended_interval_dosing",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "gentamicin",
+      "regimen_id": "ivinfusion__traditional_dosing",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "gentamicin",
+      "regimen_id": "ivinfusion__extended_interval_dosing_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "gentamicin",
+      "regimen_id": "ivinfusion__traditional_dosing_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "ceftriaxone",
+      "regimen_id": "ivinfusion__severe_infection_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "ceftriaxone",
+      "regimen_id": "ivinfusion__standard_infection_cap_uti_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "ceftriaxone",
+      "regimen_id": "ivinfusion__bacterial_meningitis_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "ceftriaxone",
+      "regimen_id": "ivinfusion__standard_infection_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "ceftriaxone",
+      "regimen_id": "ivinfusion__meningitis_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin",
+      "regimen_id": "po__standard_infection_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin",
+      "regimen_id": "po__standard_infection_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin",
+      "regimen_id": "po__acute_otitis_media_high_dose_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin_clavulanate",
+      "regimen_id": "po__standard_infection_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin_clavulanate",
+      "regimen_id": "po__standard_infection_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "amoxicillin_clavulanate",
+      "regimen_id": "po__acute_otitis_media_high_dose_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "azithromycin",
+      "regimen_id": "po__atypical_pneumonia_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "azithromycin",
+      "regimen_id": "po__otitis_media_pneumonia_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "cefazolin",
+      "regimen_id": "ivpush__surgical_prophylaxis_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / ASHP Surgical Prophylaxis / The Sanford Guide 2024 (Pending)"
+    },
+    {
+      "drug_id": "cefazolin",
+      "regimen_id": "ivpush__systemic_infection_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / ASHP Surgical Prophylaxis / The Sanford Guide 2024 (Pending)"
+    },
+    {
+      "drug_id": "cefazolin",
+      "regimen_id": "ivpush__surgical_prophylaxis_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / ASHP Surgical Prophylaxis / The Sanford Guide 2024 (Pending)"
+    },
+    {
+      "drug_id": "cefazolin",
+      "regimen_id": "ivinfusion__systemic_infection_pediatric_1_month",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / ASHP Surgical Prophylaxis / The Sanford Guide 2024 (Pending)"
+    },
+    {
+      "drug_id": "cephalexin",
+      "regimen_id": "po__standard_infection_skin_cystitis_adult_po",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "cephalexin",
+      "regimen_id": "po__severe_deep_infection_cellulitis_adult_po",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "cephalexin",
+      "regimen_id": "po__mild_to_moderate_infection_pediatric_po",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "cephalexin",
+      "regimen_id": "po__otitis_media_severe_infection_pediatric_po",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "The Sanford Guide to Antimicrobial Therapy & Drug Information Handbook (Lexicomp / APhA) (Pending)"
+    },
+    {
+      "drug_id": "acyclovir",
+      "regimen_id": "ivinfusion__herpes_simplex_encephalitis",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Zovirax IV SPL (Pending)"
+    },
+    {
+      "drug_id": "acyclovir",
+      "regimen_id": "ivinfusion__severe_mucocutaneous_hsv_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Zovirax IV SPL (Pending)"
+    },
+    {
+      "drug_id": "acyclovir",
+      "regimen_id": "ivinfusion__hsv_encephalitis_severe_vzv_pediatric_3_months",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Zovirax IV SPL (Pending)"
+    },
+    {
+      "drug_id": "norepinephrine",
+      "regimen_id": "ivinfusion__septic_shock_hypotension",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Surviving Sepsis Campaign / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "norepinephrine",
+      "regimen_id": "ivinfusion__septic_shock_hypotension_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Surviving Sepsis Campaign / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "dopamine",
+      "regimen_id": "ivinfusion__hemodynamic_support",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Ramathibodi High-Alert IV Infusion Guide / AHA Shock Guidelines (Pending)"
+    },
+    {
+      "drug_id": "dopamine",
+      "regimen_id": "ivinfusion__hemodynamic_support_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Ramathibodi High-Alert IV Infusion Guide / AHA Shock Guidelines (Pending)"
+    },
+    {
+      "drug_id": "amiodarone",
+      "regimen_id": "ivinfusion__ventricular_arrhythmias_stable",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "amiodarone",
+      "regimen_id": "ivpush__cardiac_arrest_pulseless_vt_vf_adult_acls",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "amiodarone",
+      "regimen_id": "ivpush__cardiac_arrest_pulseless_vt_vf_pediatric_pals",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines / คู่มือยาฉีดความเสี่ยงสูง รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "furosemide",
+      "regimen_id": "po__edema_heart_failure_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Lasix SPL (Pending)"
+    },
+    {
+      "drug_id": "furosemide",
+      "regimen_id": "ivpush__acute_pulmonary_edema_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Lasix SPL (Pending)"
+    },
+    {
+      "drug_id": "furosemide",
+      "regimen_id": "po__edema_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Lasix SPL (Pending)"
+    },
+    {
+      "drug_id": "furosemide",
+      "regimen_id": "ivpush__edema_pediatric_iv",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Lasix SPL (Pending)"
+    },
+    {
+      "drug_id": "adenosine",
+      "regimen_id": "ivpush__svt_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / AHA ACLS & PALS SVT Guidelines (Pending)"
+    },
+    {
+      "drug_id": "adenosine",
+      "regimen_id": "ivpush__svt_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / AHA ACLS & PALS SVT Guidelines (Pending)"
+    },
+    {
+      "drug_id": "paracetamol",
+      "regimen_id": "po__fever_pain_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "paracetamol",
+      "regimen_id": "po__fever_pain_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "paracetamol",
+      "regimen_id": "ivinfusion__fever_pain_adult_iv",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "ibuprofen",
+      "regimen_id": "po__mild_to_moderate_pain_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "ibuprofen",
+      "regimen_id": "po__osteoarthritis_rheumatoid_arthritis_inflammatory_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "ibuprofen",
+      "regimen_id": "po__fever_pain_pediatric_6_months",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "ibuprofen",
+      "regimen_id": "po__juvenile_idiopathic_arthritis_inflammatory_pediatric_6_months",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "naproxen",
+      "regimen_id": "po__pain_inflammation_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "naproxen",
+      "regimen_id": "po__pain_juvenile_idiopathic_arthritis_pediatric_2_yrs",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / RDU Thailand (Pending)"
+    },
+    {
+      "drug_id": "morphine",
+      "regimen_id": "ivpush__severe_pain_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "morphine",
+      "regimen_id": "ivpush__severe_pain_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "fentanyl",
+      "regimen_id": "ivpush__analgesia_procedural_sedation_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Sublimaze SPL (Pending)"
+    },
+    {
+      "drug_id": "fentanyl",
+      "regimen_id": "ivinfusion__continuous_sedation_analgesia_icu",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp/APhA) 2024 / US FDA Sublimaze SPL (Pending)"
+    },
+    {
+      "drug_id": "salbutamol",
+      "regimen_id": "inhalation__asthma_copd_exacerbation_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "salbutamol",
+      "regimen_id": "inhalation__asthma_wheezing_pediatric_20kg",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "prednisolone",
+      "regimen_id": "po__asthma_exacerbation_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "prednisolone",
+      "regimen_id": "po__asthma_exacerbation_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "GINA Global Strategy 2024 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "diazepam",
+      "regimen_id": "po__anxiety_muscle_spasm_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide (Pending)"
+    },
+    {
+      "drug_id": "diazepam",
+      "regimen_id": "ivpush__status_epilepticus_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide (Pending)"
+    },
+    {
+      "drug_id": "diazepam",
+      "regimen_id": "ivpush__status_epilepticus_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide (Pending)"
+    },
+    {
+      "drug_id": "phenytoin",
+      "regimen_id": "ivinfusion__status_epilepticus_loading_dose_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide (Pending)"
+    },
+    {
+      "drug_id": "phenytoin",
+      "regimen_id": "po__maintenance_dosing_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / AES Status Epilepticus Guideline 2016 / Ramathibodi IV Guide (Pending)"
+    },
+    {
+      "drug_id": "levetiracetam",
+      "regimen_id": "po__seizure_prophylaxis_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AES Status Epilepticus Guideline 2016 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "levetiracetam",
+      "regimen_id": "iv__status_epilepticus_adult_iv_loading",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AES Status Epilepticus Guideline 2016 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "levetiracetam",
+      "regimen_id": "iv__status_epilepticus_pediatric_iv_loading",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AES Status Epilepticus Guideline 2016 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "midazolam",
+      "regimen_id": "ivinfusion__icu_sedation_continuous_infusion",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Ramathibodi High-Alert IV Infusion Guide / PADIS Guidelines 2018 (Pending)"
+    },
+    {
+      "drug_id": "midazolam",
+      "regimen_id": "ivinfusion__refractory_status_epilepticus_infusion",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Ramathibodi High-Alert IV Infusion Guide / PADIS Guidelines 2018 (Pending)"
+    },
+    {
+      "drug_id": "midazolam",
+      "regimen_id": "ivpush__procedural_sedation_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Ramathibodi High-Alert IV Infusion Guide / PADIS Guidelines 2018 (Pending)"
+    },
+    {
+      "drug_id": "epinephrine",
+      "regimen_id": "im__anaphylaxis_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO) (Pending)"
+    },
+    {
+      "drug_id": "epinephrine",
+      "regimen_id": "im__anaphylaxis_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO) (Pending)"
+    },
+    {
+      "drug_id": "epinephrine",
+      "regimen_id": "ivpush__cardiac_arrest_acls_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO) (Pending)"
+    },
+    {
+      "drug_id": "epinephrine",
+      "regimen_id": "ivpush__cardiac_arrest_pals_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO) (Pending)"
+    },
+    {
+      "drug_id": "epinephrine",
+      "regimen_id": "ivinfusion__septic_cardiogenic_shock_inotropic_support",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA Guidelines (ACLS/PALS) / World Allergy Organization (WAO) (Pending)"
+    },
+    {
+      "drug_id": "atropine",
+      "regimen_id": "ivpush__symptomatic_bradycardia_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines 2020 / AHA PALS Guidelines 2020 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "atropine",
+      "regimen_id": "ivpush__bradycardia_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines 2020 / AHA PALS Guidelines 2020 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "magnesium_sulfate",
+      "regimen_id": "ivinfusion__eclampsia_pre_eclampsia_loading",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ACOG Guidelines (Bulletin 222) / AHA ACLS Guidelines (Pending)"
+    },
+    {
+      "drug_id": "magnesium_sulfate",
+      "regimen_id": "ivinfusion__eclampsia_pre_eclampsia_maintenance",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ACOG Guidelines (Bulletin 222) / AHA ACLS Guidelines (Pending)"
+    },
+    {
+      "drug_id": "magnesium_sulfate",
+      "regimen_id": "ivpush__torsades_de_pointes_hypomagnesemia_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ACOG Guidelines (Bulletin 222) / AHA ACLS Guidelines (Pending)"
+    },
+    {
+      "drug_id": "dexamethasone",
+      "regimen_id": "ivpush__cerebral_edema_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / RECOVERY Trial (NEJM 2021) / Thai NLEM (Pending)"
+    },
+    {
+      "drug_id": "dexamethasone",
+      "regimen_id": "im__fetal_lung_maturity",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / RECOVERY Trial (NEJM 2021) / Thai NLEM (Pending)"
+    },
+    {
+      "drug_id": "dexamethasone",
+      "regimen_id": "po__croup_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / RECOVERY Trial (NEJM 2021) / Thai NLEM (Pending)"
+    },
+    {
+      "drug_id": "dexamethasone",
+      "regimen_id": "po__anti_inflammatory_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Lexicomp Drug Information Handbook 2024 / RECOVERY Trial (NEJM 2021) / Thai NLEM (Pending)"
+    },
+    {
+      "drug_id": "naloxone",
+      "regimen_id": "ivpush__opioid_overdose_reversal_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / AHA ACLS Guidelines (Pending)"
+    },
+    {
+      "drug_id": "naloxone",
+      "regimen_id": "ivpush__opioid_reversal_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "Drug Information Handbook (Lexicomp / APhA) / AHA ACLS Guidelines (Pending)"
+    },
+    {
+      "drug_id": "dobutamine",
+      "regimen_id": "ivinfusion__cardiogenic_shock_acute_hf",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA/ACC Heart Failure Guidelines / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "dobutamine",
+      "regimen_id": "ivinfusion__pediatric_shock_low_cardiac_output_syndrome",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA/ACC Heart Failure Guidelines / รามาธิบดี (Pending)"
+    },
+    {
+      "drug_id": "potassium_chloride",
+      "regimen_id": "po__hypokalemia_replacement_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ISMP High-Alert Medications 2024 / Ramathibodi High-Alert IV Infusion Guide / Drug Information Handbook (Lexicomp / APhA) DIH 2024 (Pending)"
+    },
+    {
+      "drug_id": "potassium_chloride",
+      "regimen_id": "ivinfusion__severe_hypokalemia_adult_iv",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ISMP High-Alert Medications 2024 / Ramathibodi High-Alert IV Infusion Guide / Drug Information Handbook (Lexicomp / APhA) DIH 2024 (Pending)"
+    },
+    {
+      "drug_id": "calcium_gluconate",
+      "regimen_id": "ivpush__hyperkalemia_hypocalcemia_adult",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines 2020 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "calcium_gluconate",
+      "regimen_id": "ivpush__hyperkalemia_hypocalcemia_pediatric",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "AHA ACLS Guidelines 2020 / Lexicomp Drug Information Handbook 2024 (Pending)"
+    },
+    {
+      "drug_id": "insulin_regular",
+      "regimen_id": "sc__diabetes_prandial_sliding_scale",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ADA Standards of Care in Diabetes / Endocrine Society Guidelines (Pending)"
+    },
+    {
+      "drug_id": "insulin_regular",
+      "regimen_id": "iv__diabetic_ketoacidosis_dka",
+      "verified": false,
+      "verified_by": null,
+      "license_no": null,
+      "verified_date": null,
+      "source_checked": "ADA Standards of Care in Diabetes / Endocrine Society Guidelines (Pending)"
+    }
+  ]
+}
